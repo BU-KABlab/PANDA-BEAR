@@ -142,7 +142,7 @@ def connect_to_instruments(
         logger.debug("Connecting to mill")
         instruments.mill = Mill()
         instruments.mill.connect_to_mill()
-        # instruments.mill.homing_sequence()
+        instruments.mill.homing_sequence()
     except Exception as error:
         logger.error("No mill connected, %s", error)
         instruments.mill = None
@@ -178,53 +178,58 @@ def connect_to_instruments(
         incomplete = True
 
     # Check for camera based on the configuration
-    if camera_type.lower() == "webcam":
-        try:
-            logger.debug("Connecting to Webcam")
-            webcam_id, resolution = read_webcam_settings()
-            instruments.opencv_camera = OpenCVCamera(
-                camera_id=webcam_id, resolution=resolution
-            )
+    if camera_type:
+        if camera_type.lower() == "webcam":
+            try:
+                logger.debug("Connecting to Webcam")
+                webcam_id, resolution = read_webcam_settings()
+                instruments.opencv_camera = OpenCVCamera(
+                    camera_id=webcam_id, resolution=resolution
+                )
 
-            if not instruments.opencv_camera.connect():
-                logger.error(f"Failed to connect to webcam with ID {webcam_id}")
+                if not instruments.opencv_camera.connect():
+                    logger.error(f"Failed to connect to webcam with ID {webcam_id}")
+                    instruments.opencv_camera = None
+                    incomplete = True
+                else:
+                    logger.debug(
+                        f"Connected to webcam ID {webcam_id} at resolution {resolution}"
+                    )
+            except Exception as error:
+                logger.error(f"No webcam connected, {error}")
                 instruments.opencv_camera = None
                 incomplete = True
-            else:
-                logger.debug(
-                    f"Connected to webcam ID {webcam_id} at resolution {resolution}"
-                )
-        except Exception as error:
-            logger.error(f"No webcam connected, {error}")
-            instruments.opencv_camera = None
-            incomplete = True
-    else:
-        # Default to FLIR camera
-        try:
-            logger.debug("Connecting to FLIR Camera")
-            system = PySpin.System.GetInstance()
-            cam_list = system.GetCameras()
-            if cam_list.GetSize() == 0:
-                logger.error("No FLIR Camera connected")
-                instruments.flir_camera = None
-            else:
-                instruments.flir_camera = cam_list.GetByIndex(0)
-                # instruments.flir_camera.Init()
-                cam_list.Clear()
-                system.ReleaseInstance()
+        else:
+            # Default to FLIR camera
+            try:
+                logger.debug("Connecting to FLIR Camera")
+                system = PySpin.System.GetInstance()
+                cam_list = system.GetCameras()
+                if cam_list.GetSize() == 0:
+                    logger.error("No FLIR Camera connected")
+                    instruments.flir_camera = None
+                else:
+                    instruments.flir_camera = cam_list.GetByIndex(0)
+                    # instruments.flir_camera.Init()
+                    cam_list.Clear()
+                    system.ReleaseInstance()
 
-                logger.debug("Connected to FLIR Camera")
-        except Exception as error:
-            logger.error("No FLIR Camera connected, %s", error)
-            instruments.flir_camera = None
-            incomplete = True
+                    logger.debug("Connected to FLIR Camera")
+            except Exception as error:
+                logger.error("No FLIR Camera connected, %s", error)
+                instruments.flir_camera = None
+                incomplete = True
+    else:
+        logger.error("No camera type specified in the configuration file")
+        instruments.flir_camera = None
+        incomplete = False
 
     # Connect to PSTAT
 
     # Connect to Arduino
     try:
         logger.debug("Connecting to Arduino")
-        arduino = ArduinoLink()
+        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
         if not arduino.configured:
             logger.error("No Arduino connected")
             incomplete = True
