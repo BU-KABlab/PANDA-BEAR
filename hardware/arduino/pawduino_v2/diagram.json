@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "author": "Gregory Robben",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-breadboard-half", "id": "bb1", "top": 256.2, "left": 89.2, "attrs": {} },
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0.6, "left": -10.2, "attrs": {} },
+    {
+      "type": "wokwi-led-ring",
+      "id": "ring1",
+      "top": 0.51,
+      "left": -502.87,
+      "attrs": { "pixels": "24" }
+    },
+    { "type": "wokwi-neopixel", "id": "rgb1", "top": -70.7, "left": -125.8, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "rgb2", "top": -41.9, "left": -193, "attrs": {} },
+    { "type": "wokwi-ir-receiver", "id": "ir1", "top": 56.25, "left": 459.02, "attrs": {} },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "stepper1",
+      "top": -341.09,
+      "left": 528.88,
+      "attrs": { "name": "Pipette Motor" }
+    },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "limit1",
+      "top": -264.4,
+      "left": 147.1,
+      "attrs": { "value": "1" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "emag1",
+      "top": -256.8,
+      "left": -94.2,
+      "attrs": { "name": "Electromagnet" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "lineBreakLed",
+      "top": -138,
+      "left": 301.4,
+      "attrs": { "color": "yellow", "name": "Line Break Indicator" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text1",
+      "top": -297.6,
+      "left": 105.6,
+      "attrs": { "text": "Limit Switch" }
+    }
+  ],
+  "connections": [
+    [ "rgb1:DIN", "uno:6", "blue", [ "h0" ] ],
+    [ "uno:GND.2", "bb1:tn.5", "black", [ "v0" ] ],
+    [ "uno:5V", "bb1:tp.4", "red", [ "v0" ] ],
+    [ "ring1:GND", "bb1:tn.2", "black", [ "v0" ] ],
+    [ "ring1:VCC", "bb1:tp.1", "red", [ "v0" ] ],
+    [ "ring1:DIN", "uno:3", "cyan", [ "v28.8", "h96", "v-528", "h543.7" ] ],
+    [ "ir1:GND", "bb1:tn.16", "black", [ "v38.4", "h96" ] ],
+    [ "ir1:VCC", "bb1:tp.18", "red", [ "v28.8", "h105.6", "v9.6" ] ],
+    [ "ir1:DAT", "uno:4", "gold", [ "h67.2", "v-163.2", "h-359.1" ] ],
+    [ "rgb1:VSS", "bb1:tn.3", "black", [ "h18.4", "v363.9", "h228.8" ] ],
+    [ "rgb1:VDD", "bb1:tp.2", "red", [ "h-19.2", "v297.6", "h276.8" ] ],
+    [ "bb1:tp.1", "rgb2:VDD", "red", [ "v-28.5", "h-353.6", "v-278.4" ] ],
+    [ "rgb2:VSS", "bb1:tn.4", "black", [ "h8.8", "v-0.9", "h11.2", "v355.2", "h304" ] ],
+    [ "stepper1:B-", "bb1:tp.28", "blue", [ "v0" ] ],
+    [ "stepper1:B+", "bb1:tp.29", "purple", [ "v0" ] ],
+    [ "stepper1:GND", "bb1:tn.26", "black", [ "v0" ] ],
+    [ "stepper1:VCC", "bb1:tp.27", "red", [ "v0" ] ],
+    [ "limit1:1", "uno:10", "magenta", [ "h-9.6", "v115.2", "h-0.7" ] ],
+    [ "limit1:2", "bb1:tn.30", "black", [ "v0" ] ],
+    [ "limit1:3", "bb1:tp.30", "red", [ "v0" ] ],
+    [ "emag1:1", "uno:11", "orange", [ "h201.6", "v182.4" ] ],
+    [ "emag1:2", "bb1:tn.20", "black", [ "v0" ] ],
+    [ "lineBreakLed:A", "uno:7", "violet", [ "v38.4", "h-147.6" ] ],
+    [ "lineBreakLed:C", "bb1:tn.24", "black", [ "v0" ] ],
+    [ "rgb2:DIN", "uno:5", "green", [ "h0" ] ]
+  ],
+  "dependencies": {}
+}

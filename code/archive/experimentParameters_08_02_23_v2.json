@@ -1,5 +1,0 @@
-{"Experiments":[
-{"Target_Well": "D2", "DMF": 0, "PEG": 300, "Acrylate": 0, "Ferrocene": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2, "status": "new"}, 
-{"Target_Well": "D3", "DMF": 0, "PEG": 0, "Acrylate": 300, "Ferrocene": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2, "status": "new"} 
-]
-}

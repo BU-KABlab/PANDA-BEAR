@@ -1,3 +1,0 @@
-import PrintPanda
-
-PrintPanda.printpanda

@@ -1,9 +1,0 @@
-{"Experiments":[
-{"Target_Well": "D1", "DMF": 0, "PEG": 145, "Acrylate": 145, "Ferrocene": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2, "status": "new"}, 
-{"Target_Well": "D2", "DMF": 0, "PEG": 145, "Acrylate": 145, "Ferrocene": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2, "status": "new"}, 
-{"Target_Well": "D3", "DMF": 0, "PEG": 145, "Acrylate": 145, "Ferrocene": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2, "status": "new"}, 
-{"Target_Well": "D4", "DMF": 0, "PEG": 145, "Acrylate": 145, "Ferrocene": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2, "status": "new"}, 
-{"Target_Well": "D5", "DMF": 0, "PEG": 145, "Acrylate": 145, "Ferrocene": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2, "status": "new"},
-{"Target_Well": "D6", "DMF": 0, "PEG": 145, "Acrylate": 145, "Ferrocene": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2, "status": "new"}
-]
-}
