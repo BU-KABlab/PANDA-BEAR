@@ -569,8 +569,7 @@ def flush_pipette(
 
 @timing_wrapper
 def purge_pipette(
-    mill: Union[Mill, MockMill],
-    pump: Union[SyringePump, MockPump],
+    toolkit: Union[Toolkit, Hardware],
 ):
     """
     Move the pipette over an available waste vessel and purge its contents
