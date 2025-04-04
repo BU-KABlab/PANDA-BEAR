@@ -21,6 +21,7 @@ Returns:
 
 import logging
 import math
+import os
 from logging import Logger
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
@@ -29,7 +30,6 @@ from PIL import Image
 from sqlalchemy.orm import Session
 
 from hardware.grbl_cnc_mill import Instruments
-from hardware.panda_pipette.syringepump import MockPump, SyringePump
 from shared_utilities.config.config_tools import (
     ConfigParserError,
     read_config,
@@ -52,7 +52,6 @@ from ..experiments.experiment_types import (
 )
 from ..imaging import add_data_zone, capture_new_image, image_filepath_generator
 from ..labware import StockVial, Vial, WasteVial, Well, read_vials
-from ..panda_gantry import MockPandaMill as MockMill
 from ..panda_gantry import PandaMill as Mill
 from ..toolkit import ArduinoLink, Hardware, Labware, Toolkit
 from ..tools import MockOBSController, OBSController
@@ -60,7 +59,7 @@ from ..utilities import Coordinates, correction_factor, solve_vials_ilp
 
 TESTING = read_testing_config()
 
-if TESTING:
+if TESTING or os.name != "nt":
     from hardware.gamry_potentiostat.gamry_control_mock import (
         GamryPotentiostat as echem,
     )
@@ -578,12 +577,12 @@ def purge_pipette(
         mill (Union[Mill, MockMill]): _description_
         pump (Union[Pump, MockPump]): _description_
     """
-    liquid_volume = pump.pipette.liquid_volume()
-    total_volume = pump.pipette.volume
+    liquid_volume = toolkit.pump.pipette.liquid_volume()
+    total_volume = toolkit.pump.pipette.volume
     purge_vial = waste_selector("waste", liquid_volume)
 
     # Move to the purge vial
-    mill.safe_move(
+    toolkit.mill.safe_move(
         purge_vial.x,
         purge_vial.y,
         purge_vial.top,
@@ -591,7 +590,7 @@ def purge_pipette(
     )
 
     # Purge the pipette
-    pump.infuse(
+    toolkit.pump.infuse(
         volume_to_infuse=liquid_volume,
         being_infused=None,
         infused_into=purge_vial,

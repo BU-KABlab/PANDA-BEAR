@@ -1,4 +1,5 @@
 import logging
+import os
 from logging import Logger
 from pathlib import Path
 from typing import Optional, Tuple
@@ -20,7 +21,7 @@ from ..toolkit import Toolkit
 
 TESTING = read_testing_config()
 
-if TESTING:
+if TESTING or os.name != "nt":
     from hardware.gamry_potentiostat.gamry_control_mock import (
         GamryPotentiostat as echem,
     )

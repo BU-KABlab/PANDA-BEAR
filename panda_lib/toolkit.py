@@ -4,12 +4,13 @@ import logging
 from dataclasses import dataclass
 from logging import Logger
 from typing import Union
+import os
 
 import PySpin
 from sartorius import Scale
 from sartorius.mock import Scale as MockScale
 
-from hardware.gamry_potentiostat import gamry_control
+
 from hardware.panda_pipette.syringepump import MockPump, SyringePump
 from panda_lib.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
@@ -23,6 +24,11 @@ from shared_utilities.config.config_tools import (
     read_config_value,
     read_webcam_settings,
 )
+
+if os.name == "nt":
+    from hardware.gamry_potentiostat import gamry_control
+else:
+    pass
 
 
 @dataclass
@@ -408,15 +414,21 @@ def test_instrument_connections(
     # Potentiostat connection
     print("Checking Potentiostat connection...", end="\r", flush=True)
     try:
-        logger.debug("Connecting to Potentiostat")
-        connected = gamry_control.pstatconnect()
-        if not connected:
-            raise Exception("Failed to connect to Potentiostat")
+        if os.name == "nt":
+            logger.debug("Connecting to Potentiostat")
+            connected = gamry_control.pstatconnect()
+            if not connected:
+                raise Exception("Failed to connect to Potentiostat")
 
-        logger.debug("Connected to Potentiostat")
-        print("Potentiostat connected                        ", flush=True)
-        connected_instruments.append("Potentiostat")
-        gamry_control.pstatdisconnect()
+            logger.debug("Connected to Potentiostat")
+            print("Potentiostat connected                        ", flush=True)
+            connected_instruments.append("Potentiostat")
+            gamry_control.pstatdisconnect()
+        else:
+            logger.debug("Gamry Potentiostat connection not available on non-Windows OS")
+            print("Gamry Potentiostat connection not available on non-Windows OS", flush=True)
+            connected_instruments.append("Potentiostat")
+            incomplete = True
     except Exception as error:
         logger.error("Error connecting to Potentiostat, %s", error)
         print("Potentiostat not found                        ", flush=True)
