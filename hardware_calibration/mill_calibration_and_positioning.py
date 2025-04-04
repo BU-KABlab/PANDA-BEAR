@@ -31,6 +31,7 @@ from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import setup_default_logger
 
 from .decapper_testing import main as decapper_test
+from .line_break_validation import main as line_break_test
 
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 config = read_config()["MILL"]
@@ -1015,11 +1016,64 @@ def test_decapper(mill: Mill, *args, **kwargs):
     decapper_test()
 
 
+def line_break_validation(mill: Mill, *args, **kwargs):
+    """
+    Test the decapper by moving it to a vial and then moving it up and down
+    """
+    warn = input(
+        "Warning: This test uses a hardcoded vial location and will control the mill if available to cap and decap the vial. Proceed? (y/n): "
+    ).lower()
+    if warn not in ["y", "yes"]:
+        return
+    line_break_test()
+
+
 def rinse_electrode(mill: Mill, *args, **kwargs):
     """
     Rinse the electrode in the electrode bath
     """
     mill.rinse_electrode()
+
+
+def manual_commands(mill: Mill, *args, **kwargs):
+    """
+    Enter manual commands for the mill
+    """
+    print("Enter manual commands for the mill. Type 'exit' to quit.")
+    while True:
+        command = input("Enter command (G00 X# Y# Z#): ")
+        if command.lower() == "exit":
+            break
+        try:
+            # Parse the command and extract coordinates
+            coordinates = {}
+            for part in command.split(" "):
+                if part.startswith("G"):
+                    continue
+                if part.startswith("X"):
+                    coordinates["x"] = float(part[1:])
+                elif part.startswith("Y"):
+                    coordinates["y"] = float(part[1:])
+                elif part.startswith("Z"):
+                    coordinates["z"] = float(part[1:])
+
+            # Create a Coordinates object
+            coords = Coordinates(
+                coordinates.get("x", mill.current_coordinates().x),
+                coordinates.get("y", mill.current_coordinates().y),
+                coordinates.get("z", mill.current_coordinates().z),
+            )
+
+            # Prompt for the tool
+            tool = input("Enter tool (pipette/electrode/decapper): ").strip().lower()
+            if tool not in ["pipette", "electrode", "decapper"]:
+                print("Invalid tool. Using default: pipette")
+                tool = "pipette"
+
+            new_cords = mill.safe_move(coordinates=coords, tool=tool)
+            print(f"Moved to coordinates: {new_cords}")
+        except Exception as e:
+            print(f"Error executing command: {e}")
 
 
 menu_options = {
@@ -1031,7 +1085,9 @@ menu_options = {
     "6": calibrate_vial_holders,
     "7": calibrate_image_height,
     "8": test_decapper,
-    "9": rinse_electrode,
+    "9": line_break_validation,
+    "10": rinse_electrode,
+    "11": manual_commands,
     "q": quit_calibration,
 }
 
