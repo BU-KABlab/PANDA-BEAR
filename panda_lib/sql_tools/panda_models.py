@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from datetime import timezone
 
 import sqlalchemy as sa
-from sqlalchemy import Column, Computed, ForeignKey, Table, Text, event, select, text
+from sqlalchemy import Column, Computed, ForeignKey, Table, Text, event, select
 from sqlalchemy.ext import compiler
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
@@ -46,6 +46,25 @@ class JSONEncodedDict(TypeDecorator):
 def model_to_dict(model):
     """Convert a SQLAlchemy model to a dictionary."""
     return {c.key: getattr(model, c.key) for c in inspect(model).mapper.column_attrs}
+
+
+class panda_units(Base):
+    """
+    Panda Units table model
+
+    Attributes:
+        id (int): The unit ID.
+        version (float): The version of the unit.
+        name (str): The name of the unit.
+    """
+
+    __tablename__ = "panda_units"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    version: Mapped[float] = mapped_column(Float, nullable=False)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+
+    def __repr__(self):
+        return f"<PandaUnit(id={self.id}, version={self.version}, name={self.name})>"
 
 
 class Experiments(Base):
@@ -205,6 +224,9 @@ class Pipette(Base):
     updated: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
     active: Mapped[int] = mapped_column(Integer)  # 0 = inactive, 1 = active
     uses: Mapped[int] = mapped_column(Integer, default=0)
+    panda_unit_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("panda_units.id"), nullable=False
+    )
 
     def __repr__(self):
         return f"<Pipette(id={self.id}, capacity_ul={self.capacity_ul}, capacity_ml={self.capacity_ml}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, contents={self.contents}, updated={self.updated})>"
@@ -219,6 +241,7 @@ class PipetteLog(Base):
     volume_ul = Column(Float, nullable=False)
     volume_ml = Column(Float, nullable=False)
     updated = Column(String, default=dt.now(timezone.utc))
+    panda_unit_id = Column(Integer, ForeignKey("panda_units.id"), nullable=False)
 
     def __repr__(self):
         return f"<PipetteLog(id={self.id}, pipette_id={self.pipette_id}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, updated={self.updated})>"
@@ -271,6 +294,7 @@ class SystemStatus(Base):
     comment = Column(String)
     status_time = Column(String, default=dt.now(timezone.utc))
     test_mode = Column(Boolean)
+    panda_unit_id = Column(Integer, ForeignKey("panda_units.id"), nullable=False)
 
     def __repr__(self):
         return f"<SystemStatus(id={self.id}, status={self.status}, comment={self.comment}, status_time={self.status_time}, test_mode={self.test_mode})>"
@@ -455,6 +479,11 @@ class Vials(Base):
         nullable=True,
     )
 
+    # Relationships
+    panda_unit_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("panda_units.id"), nullable=False
+    )
+
     def __repr__(self):
         return f"<Vials(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
 
@@ -555,6 +584,7 @@ _vial_status_view = view(
         _subquery.c.dead_volume.label("dead_volume"),
         _subquery.c.volume_height.label("volume_height"),
         _subquery.c.contents.label("contents"),
+        _subquery.c.panda_unit_id.label("panda_unit_id"),
     ).where(_subquery.c.rn == 1),
 )
 
@@ -578,35 +608,6 @@ class VialStatus(Base):
     @property
     def z(self):
         return self.coordinates.get("z", 0)
-
-
-# class VialStatus(VialsBase):
-#     """VialStatus view model"""
-
-#     __tablename__ = "panda_vial_status"
-#     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-#     position: Mapped[str] = mapped_column(String)
-#     category: Mapped[int] = mapped_column(Integer)
-#     viscosity_cp: Mapped[float] = mapped_column(Float)
-#     concentration: Mapped[float] = mapped_column(Float)
-#     density: Mapped[float] = mapped_column(Float)
-#     active: Mapped[bool] = mapped_column(Boolean, default=True)
-#     updated: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
-
-#     def __repr__(self):
-#         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
-
-#     @property
-#     def x(self):
-#         return self.coordinates.get("x", 0)
-
-#     @property
-#     def y(self):
-#         return self.coordinates.get("y", 0)
-
-#     @property
-#     def z(self):
-#         return self.coordinates.get("z", 0)
 
 
 class WellModel(VesselBase, Base):
@@ -693,6 +694,9 @@ class Wellplates(Base, DeckObjectBase):
     cols: Mapped[int] = mapped_column(Integer, default=12)
     echem_height: Mapped[float] = mapped_column(Float)
     image_height: Mapped[float] = mapped_column(Float)
+    panda_unit_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("panda_units.id"), nullable=False
+    )
 
     def __repr__(self):
         return f"<Wellplates(id={self.id}, type_id={self.type_id}, current={self.current})>"
@@ -714,6 +718,9 @@ class WellStatus:
     coordinates: Mapped[dict] = mapped_column(JSON)
     capacity: Mapped[float] = mapped_column(Float)
     height: Mapped[float] = mapped_column(Float)
+    panda_unit_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("panda_units.id"), nullable=False
+    )
 
     def __repr__(self):
         return f"<WellStatus(plate_id={self.plate_id}, type_number={self.type_number}, well_id={self.well_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, experiment_id={self.experiment_id}, project_id={self.project_id}, volume={self.volume}, coordinates={self.coordinates}, capacity={self.capacity}, height={self.height})>"
@@ -733,36 +740,12 @@ class Queue:
     well_id: Mapped[str] = mapped_column(String)
     status: Mapped[str] = mapped_column(String)
     status_date: Mapped[str] = mapped_column(String)
-
-    def __repr__(self):
-        return f"<Queue(experiment_id={self.experiment_id}, project_id={self.project_id}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, well_type={self.well_type}, well_id={self.well_id}, status={self.status}, status_date={self.status_date})>"
-
-
-class SystemVersions(Base):
-    """SystemVersions table model"""
-
-    __tablename__ = "panda_system_versions"
-    id = Column(Integer, primary_key=True)
-    mill = Column(Integer, nullable=False)
-    pump = Column(String, default="00")
-    potentiostat = Column(String, default="00")
-    reference_electrode = Column(String, default="00")
-    working_electrode = Column(String, default="00")
-    wells = Column(String, default="00")
-    pipette_adapter = Column(String, default="00")
-    optics = Column(String, default="00")
-    scale = Column(String, default="00")
-    camera = Column(String, default="00")
-    lens = Column(String, default="00")
-    pin = Column(
-        String,
-        default=text(
-            "(CAST (mill AS String) || ' ' || CAST (pump AS String) || ' ' || CAST (potentiostat AS String) || ' ' || CAST (reference_electrode AS String) || ' ' || CAST (working_electrode AS String) || ' ' || CAST (wells AS String) || ' ' || CAST (pipette_adapter AS String) || ' ' || CAST (optics AS String) || ' ' || CAST (scale AS String) || ' ' || CAST (camera AS String) || ' ' || CAST (lens AS String))"
-        ),
+    panda_unit_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("panda_units.id"), nullable=False
     )
 
     def __repr__(self):
-        return f"<SystemVersions(id={self.id}, mill={self.mill}, pump={self.pump}, potentiostat={self.potentiostat}, reference_electrode={self.reference_electrode}, working_electrode={self.working_electrode}, wells={self.wells}, pipette_adapter={self.pipette_adapter}, optics={self.optics}, scale={self.scale}, camera={self.camera}, lens={self.lens}, pin={self.pin})>"
+        return f"<Queue(experiment_id={self.experiment_id}, project_id={self.project_id}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, well_type={self.well_type}, well_id={self.well_id}, status={self.status}, status_date={self.status_date})>"
 
 
 class PotentiostatReadout(Base):
@@ -810,55 +793,3 @@ class PotentiostatTechniques(Base):
     gamry_1010T = Column(Boolean, nullable=False)
     gamry_1010B = Column(Boolean, nullable=False)
     gamry_1010E = Column(Boolean, nullable=False)
-
-
-class Tool(Base):
-    """Tool table model"""
-
-    __tablename__ = "panda_mill_tools"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    offset = Column(JSON, nullable=False)
-    updated = Column(String, default=dt.now(timezone.utc))
-
-    def __repr__(self):
-        return f"<Tool(id={self.id}, name={self.name}, offset={self.offset}, updated={self.updated})>"
-
-    @property
-    def x(self):
-        value: float = 0.0
-        try:
-            value = float(self.offset.get("x"))
-        except ValueError:
-            value = 0.0
-        return value
-
-    @property
-    def y(self):
-        value: float = 0.0
-        try:
-            value = float(self.offset.get("y"))
-        except ValueError:
-            value = 0.0
-        return value
-
-    @property
-    def z(self):
-        value: float = 0.0
-        try:
-            value = float(self.offset.get("z"))
-        except ValueError:
-            value = 0.0
-        return value
-
-    @x.setter
-    def x(self, value: float):
-        self.offset["x"] = value
-
-    @y.setter
-    def y(self, value: float):
-        self.offset["y"] = value
-
-    @z.setter
-    def z(self, value: float):
-        self.offset["z"] = value
