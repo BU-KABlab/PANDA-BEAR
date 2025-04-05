@@ -1,17 +1,24 @@
 """Custom functions for the PANDA_SDL library which are specific to a particular experiment type."""
 
-from panda_lib.actions.actions_default import (
+from typing import Tuple
+
+from panda_lib.actions.electrochemistry import (
+    ExperimentStatus,
+    chrono_parameters,
+    cv_parameters,
+    logger,
+)
+from panda_lib.actions.electrochemistry import (
+    perform_chronoamperometry as chrono_amp,
+)
+from panda_lib.actions.electrochemistry import (
+    perform_cyclic_voltammetry as cyclic_volt,
+)
+from panda_lib.errors import (
     CAFailure,
     CVFailure,
     DepositionFailure,
-    ExperimentStatus,
     OCPError,
-    Tuple,
-    chrono_amp,
-    chrono_parameters,
-    cv_parameters,
-    cyclic_volt,
-    logger,
 )
 from panda_lib.experiments.experiment_types import EchemExperimentBase
 
