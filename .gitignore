@@ -196,3 +196,4 @@ temp.db
 *.local
 # Ignore INI files in the root directory only
 /*.ini
+hardware/grbl_cnc_mill/tools.json
