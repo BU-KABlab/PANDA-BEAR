@@ -1,5 +1,7 @@
 """grbl_cnc_mill – GRBL CNC Mill Interfacing Library for Python 3.7+."""
 
+import os
+
 from .driver import Mill
 from .exceptions import (
     CNCMillException,
@@ -38,3 +40,18 @@ __all__ = [
     "StatusReturnError",
     "VERSION",
 ]
+
+# Set up non-tracked files
+files_to_make = ["_configuration.json", "mill_port.txt"]
+
+# Get the directory where the package is installed
+package_dir = os.path.dirname(__file__)
+
+# Create the files if they do not exist
+for file in files_to_make:
+    file_path = os.path.join(package_dir, file)
+    # Check if the file exists
+    if not os.path.exists(file_path):
+        # Create the file
+        with open(file_path, "w") as new_file:
+            new_file.write("")
