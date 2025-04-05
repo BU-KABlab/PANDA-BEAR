@@ -7,7 +7,7 @@ from logging import Logger
 from pathlib import Path
 from typing import Optional
 
-from PySpin import PySpin
+import PySpin
 
 from .flir_camera_tools import (
     file_enumeration,
