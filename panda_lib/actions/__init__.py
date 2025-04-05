@@ -13,7 +13,7 @@ from .electrochemistry import (
     perform_chronoamperometry,
     perform_cyclic_voltammetry,
 )
-from .imaging import image_well
+from .imaging import capture_new_image, image_well
 from .movement import capping_sequence, decapping_sequence, move_to_vial, move_to_well
 from .pipetting import (
     clear_well,
@@ -34,6 +34,8 @@ __all__ = [
     "chrono_amp_edot_bleaching",
     "chrono_amp_edot_coloring",
     "perform_cyclic_voltammetry",
+    "capture_new_image",
+    "capping_sequence",
     "cyclic_volt_edot_characterizing",
     "cyclic_volt_pgma_fc",
     "cyclic_volt_pgma_pama",
