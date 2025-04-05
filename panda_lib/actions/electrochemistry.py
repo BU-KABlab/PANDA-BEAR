@@ -42,8 +42,6 @@ config = read_config()
 
 # Constants
 try:
-    AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
-    DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
     if TESTING:
         PATH_TO_DATA = Path(config.get("TESTING", "data_dir"))
         PATH_TO_LOGS = Path(config.get("TESTING", "logging_dir"))
