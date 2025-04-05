@@ -188,10 +188,15 @@ class Mill:
 
         def read_past_found_on_port() -> str:
             """Read past the found on port"""
+            if not os.path.exists(Path(__file__).parent / "mill_port.txt"):
+                # Make a file if it doesn't exist
+                with open(Path(__file__).parent / "mill_port.txt", "w") as file:
+                    file.write("")
+
             with open(Path(__file__).parent / "mill_port.txt", "r") as file:
                 found_on = file.read()
 
-            if not found_on:
+            if not found_on or found_on == "":
                 return []
 
             return [found_on]

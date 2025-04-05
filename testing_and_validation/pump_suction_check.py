@@ -2,8 +2,7 @@
 
 import time
 
-from panda_lib.actions.actions_default import (
-    Instruments,
+from panda_lib.actions import (
     solution_selector,
     waste_selector,
 )
@@ -13,7 +12,7 @@ from panda_lib.experiment_loop import (
     disconnect_from_instruments,
 )
 from panda_lib.utilities import correction_factor, input_validation
-
+from panda_lib.tools import Instruments
 purge = 40
 drip_stop = 5
 

@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Optional, Union
 
 from hardware.grbl_cnc_mill import Instruments
-from hardware.panda_pipette.syringepump import MockPump, SyringePump
 from panda_lib.errors import NoAvailableSolution
 from shared_utilities.config.config_tools import (
     ConfigParserError,
@@ -19,8 +18,6 @@ from ..experiments.experiment_types import (
     ExperimentStatus,
 )
 from ..labware import StockVial, Vial, WasteVial, Well
-from ..panda_gantry import MockPandaMill as MockMill
-from ..panda_gantry import PandaMill as Mill
 from ..toolkit import Hardware, Labware, Toolkit
 from ..utilities import Coordinates, correction_factor
 from .movement import capping_sequence, decapping_sequence
@@ -199,12 +196,13 @@ def _forward_pipette_v3(
         except NoAvailableSolution as e:
             toolkit.global_logger.error("No available destination vial found: %s", e)
             raise e
-        
+
         except KeyError as e:
-            toolkit.global_logger.error("Well %s not found on wellplate: %s",dst_vessel, e)
+            toolkit.global_logger.error(
+                "Well %s not found on wellplate: %s", dst_vessel, e
+            )
             raise e
 
-            
         selected_source_vessels, source_vessel_volumes = _handle_source_vessels(
             volume=volume,
             src_vessel=src_vessel,
@@ -385,7 +383,7 @@ def flush_pipette(
 
 @timing_wrapper
 def purge_pipette(
-    toolkit:Toolkit,
+    toolkit: Toolkit,
 ):
     """
     Move the pipette over an available waste vessel and purge its contents
@@ -427,6 +425,7 @@ def purge_pipette(
         Coordinates(purge_vial.x, purge_vial.y, purge_vial.top),
         toolkit.arduino,
     )
+
 
 @timing_wrapper
 def volume_correction(

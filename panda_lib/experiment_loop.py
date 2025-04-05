@@ -23,7 +23,7 @@ from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
 
 from panda_lib import scheduler
-from panda_lib.actions import actions_default
+from panda_lib.actions import purge_pipette
 from panda_lib.errors import (
     CAFailure,
     CVFailure,
@@ -129,7 +129,7 @@ def experiment_loop_worker(
         if toolkit.pump.pipette.volume > 0:
             # obs.place_text_on_screen("Pipette is not empty, purging into waste")
             status_queue.put((process_id, "Purging pipette into waste"))
-            actions_default.purge_pipette(toolkit)
+            purge_pipette(toolkit)
 
         while True:
             ## Begin slack monitoring
@@ -508,7 +508,7 @@ def sila_experiment_loop_worker(
             if hardware.pump.pipette.volume > 0:
                 exp_logger.info("Pipette not empty, purging into waste")
                 set_worker_state(SystemState.PIPETTE_PURGE)
-                actions_default.purge_pipette(toolkit)
+                purge_pipette(toolkit)
             # This also validates the experiment parameters since its a pydantic object
             exp_obj: EchemExperimentBase = _initialize_experiment(
                 specific_experiment_id, hardware, labware, exp_logger, specific_well_id
@@ -587,7 +587,7 @@ def sila_experiment_loop_worker(
             ## Clean up the instruments
             if hardware.pump.pipette.volume > 0 and hardware.pump.pipette.volume_ml < 1:
                 # assume unreal volume, not actually solution, set to 0
-                actions_default.purge_pipette(toolkit)
+                purge_pipette(toolkit)
 
             hardware.mill.rest_electrode()
             # We are not disconnecting from instruments with this function, that will

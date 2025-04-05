@@ -1,4 +1,5 @@
 import logging
+import os
 from logging import Logger
 from pathlib import Path
 from typing import Optional, Tuple
@@ -20,7 +21,7 @@ from ..toolkit import Toolkit
 
 TESTING = read_testing_config()
 
-if TESTING:
+if TESTING or os.name != "nt":
     from hardware.gamry_potentiostat.gamry_control_mock import (
         GamryPotentiostat as echem,
     )
@@ -41,8 +42,6 @@ config = read_config()
 
 # Constants
 try:
-    AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
-    DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
     if TESTING:
         PATH_TO_DATA = Path(config.get("TESTING", "data_dir"))
         PATH_TO_LOGS = Path(config.get("TESTING", "logging_dir"))

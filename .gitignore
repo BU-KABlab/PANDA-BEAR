@@ -192,3 +192,8 @@ cython_debug/
 hardware/grbl_cnc_mill/_configuration.json
 hardware/grbl_cnc_mill/mill_port.txt
 temp.db
+# Local configuration files
+*.local
+# Ignore INI files in the root directory only
+/*.ini
+hardware/grbl_cnc_mill/tools.json

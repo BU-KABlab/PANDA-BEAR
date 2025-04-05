@@ -17,6 +17,7 @@ The module relies on other modules such as:
 import logging
 import os
 import platform
+import re
 from pathlib import Path
 from typing import Sequence
 
@@ -31,6 +32,7 @@ from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import setup_default_logger
 
 from .decapper_testing import main as decapper_test
+from .line_break_validation import main as line_break_test
 
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 config = read_config()["MILL"]
@@ -1015,11 +1017,194 @@ def test_decapper(mill: Mill, *args, **kwargs):
     decapper_test()
 
 
+def line_break_validation(mill: Mill, *args, **kwargs):
+    """
+    Test the decapper by moving it to a vial and then moving it up and down
+    """
+    warn = input(
+        "Warning: This test uses a hardcoded vial location and will control the mill if available to cap and decap the vial. Proceed? (y/n): "
+    ).lower()
+    if warn not in ["y", "yes"]:
+        return
+    line_break_test()
+
+
 def rinse_electrode(mill: Mill, *args, **kwargs):
     """
     Rinse the electrode in the electrode bath
     """
     mill.rinse_electrode()
+
+
+def manual_commands(mill: Mill, *args, **kwargs):
+    """
+    Interactive terminal interface for sending GRBL commands to the mill.
+
+    This function allows users to:
+    - Enter G-code commands directly
+    - View command descriptions
+    - Execute movement commands with tool selection
+    - See current mill status and position
+    """
+    from hardware.grbl_cnc_mill.grbl_gcode_reference import (
+        get_all_commands,
+        get_command_description,
+        validate_command_or_gcode,
+    )
+
+    print("\n=== GRBL Manual Command Interface ===")
+    print("Enter GRBL commands to send to the mill.")
+    print("Special commands:")
+    print("  help - Show available commands and descriptions")
+    print("  status - Show current mill status")
+    print("  position - Show current mill position")
+    print("  exit - Exit the command interface")
+
+    valid_tools = ["pipette", "electrode", "decapper", "lens", "center"]
+
+    while True:
+        try:
+            command = input("\nCommand: ").strip()
+
+            # Check for special interface commands
+            if command.lower() == "exit":
+                break
+
+            elif command.lower() == "help":
+                print("\nCommon GRBL Commands:")
+                commands = get_all_commands()
+                for cmd in sorted(list(commands.keys()))[:20]:  # Show first 20 commands
+                    print(f"  {cmd:8} - {commands[cmd]}")
+                print(
+                    "  ...more commands available. Type 'help <command>' for details."
+                )
+                continue
+
+            elif command.lower().startswith("help "):
+                cmd = command[5:].upper()
+                desc = get_command_description(cmd)
+                print(f"\n{cmd}: {desc}")
+                continue
+
+            elif command.lower() == "status":
+                status = mill.current_status()
+                print(f"Mill status: {status}")
+                continue
+
+            elif command.lower() == "position":
+                pos = mill.current_coordinates()
+                print(
+                    f"Mill position (center): X={pos.x:.3f}, Y={pos.y:.3f}, Z={pos.z:.3f}"
+                )
+                continue
+
+            elif command.lower() == "reset":
+                # Reset the mill
+                mill.reset()
+
+            elif command[0] == "G":
+                # Process actual GRBL commands
+                # Check if it's a movement command to handle specially
+                # Handle both "G00 X10 Y20" and "G00X10Y20" formats
+                command, coordinates = _parse_gcode(command)
+                command_upper = command.upper()
+
+                # If we have at least one coordinate, ask about tool selection
+                if coordinates:
+                    # Ask which tool to move
+                    tool = input_validation(
+                        "Which tool to move? (pipette/electrode/decapper/lens/center): ",
+                        str,
+                        menu_items=valid_tools,
+                        default="pipette",
+                    )
+
+                    # Confirm the movement
+                    print(
+                        f"Moving {tool} to: X={coordinates.x:.3f}, Y={coordinates.y:.3f}, Z={coordinates.z:.3f}"
+                    )
+                    if input("Proceed with movement? (y/n): ").lower() in [
+                        "y",
+                        "yes",
+                        "",
+                    ]:
+                        try:
+                            new_coords = mill.safe_move(
+                                coordinates=coordinates, tool=tool
+                            )
+                            print(f"Movement complete. New position: {new_coords}")
+                        except Exception as e:
+                            print(f"Error during movement: {e}")
+                    else:
+                        print("Movement cancelled")
+                else:
+                    print("No coordinates specified in movement command")
+
+            # For non-movement commands, validate and send directly
+            elif validate_command_or_gcode(command_upper):
+                print(f"Sending command: {command}")
+                try:
+                    response = mill.execute_command(command)
+                    print(f"Response: {response}")
+                except Exception as e:
+                    print(f"Error executing command: {e}")
+            else:
+                print(f"Unknown or invalid command: {command}")
+                suggestion = get_command_description(command_upper)
+                if suggestion != "Unknown command":
+                    print(f"Did you mean: {command_upper} - {suggestion}?")
+
+        except Exception as e:
+            print(f"Error processing command: {e}")
+
+
+def _parse_gcode(command: str) -> tuple[str, Coordinates | None]:
+    """
+    Parse a G-code command and extract coordinates.
+    This function uses regex to extract the G-code command and coordinates.
+    """
+    movement_commands = ["G0", "G00", "G1", "G01"]
+
+    # Define a regex pattern to extract G-code command and coordinates
+    coordinate_pattern = re.compile(r"([XYZ])(-?\d+\.?\d*)")
+    print(f"Processing command: {command}")
+    command = command.upper()
+
+    # Extract all X, Y, Z coordinates with their values
+    coords = coordinate_pattern.findall(command)
+
+    # Extract the G-code command (G00, G01, etc.)
+    if command.startswith("G") or command.startswith("M"):
+        # Use regex to extract the complete G-code command (G0, G00, G01, etc.)
+        g_command_pattern = re.compile(r"^([GM]\d+)")
+        g_match = g_command_pattern.search(command)
+        if g_match:
+            command_upper = g_match.group(1)
+        else:
+            command_upper = command[:3]  # Fallback
+    else:
+        command_upper = command[:3]
+
+    # Build a dictionary of coordinates
+    try:
+        coordinate_dict = {axis: float(value) for axis, value in coords}
+    except ValueError:
+        coordinate_dict = {}
+        print(f"Error parsing coordinates in command: {command}")
+
+    # Check if the command is a movement command
+    if command_upper in movement_commands:
+        # Extract coordinates
+        x = coordinate_dict.get("X")
+        y = coordinate_dict.get("Y")
+        z = coordinate_dict.get("Z")
+
+        coords = Coordinates(x, y, z)
+
+        return command, coords
+    else:
+        # For non-movement commands, return the command and None for coordinates
+        return command, None
 
 
 menu_options = {
@@ -1031,7 +1216,9 @@ menu_options = {
     "6": calibrate_vial_holders,
     "7": calibrate_image_height,
     "8": test_decapper,
-    "9": rinse_electrode,
+    "9": line_break_validation,
+    "10": rinse_electrode,
+    "11": manual_commands,
     "q": quit_calibration,
 }
 
