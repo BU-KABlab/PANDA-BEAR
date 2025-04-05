@@ -25,8 +25,6 @@ config = read_config()
 
 # Constants
 try:
-    AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
-    DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
     if TESTING:
         PATH_TO_DATA = Path(config.get("TESTING", "data_dir"))
         PATH_TO_LOGS = Path(config.get("TESTING", "logging_dir"))
@@ -342,6 +340,7 @@ def decapping_sequence(
         # as the line break sensor is not available
         pass
 
+
 def capping_sequence(
     mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink
 ) -> None:
@@ -385,6 +384,7 @@ def capping_sequence(
         # For unit versions <= 1.0, we assume the cap is not present
         # as the line break sensor is not available
         pass
+
 
 if __name__ == "__main__":
     pass
