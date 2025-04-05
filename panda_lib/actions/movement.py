@@ -329,7 +329,7 @@ def decapping_sequence(
         tool="decapper",
     )
 
-    unit_version = config.get("PANDA", "unit_version")
+    unit_version = config.getfloat("PANDA", "version")
     # Check that a cap is present by checking the line break sensor (should be true - broken line and cap present)
     if unit_version > 1.0:
         line_break_result = asyncio.run(ard_link.async_line_break())
@@ -374,7 +374,7 @@ def capping_sequence(
     # Move the decapper +10mm in the y direction
     mill.move_to_position(target_coords.x, target_coords.y + 15, 0, tool="decapper")
 
-    unit_version = config.get("PANDA", "unit_version")
+    unit_version = config.getfloat("PANDA", "version")
     # Check that a cap is present by checking the line break sensor (should be false - no cap present)
     if unit_version > 1.0:
         line_break_result = asyncio.run(ard_link.async_line_break())
