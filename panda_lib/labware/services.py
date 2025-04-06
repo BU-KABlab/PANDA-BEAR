@@ -59,6 +59,7 @@ class VialService:
 
             try:
                 # Convert Pydantic model to SQLAlchemy model
+                vial_data.panda_unit_id = read_config_value("PANDA", "unit_id", 99)
                 vial: Vials = Vials(**vial_data.model_dump())
                 vial.active = 1
                 db_session.add(vial)
