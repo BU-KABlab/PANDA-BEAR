@@ -1,3 +1,24 @@
+import sys
+
+
+class GamryError(Exception):
+    """Base exception for Gamry errors."""
+
+    pass
+
+
+class GamryCOMError(GamryError):
+    """Exception raised when a COM error occurs."""
+
+    pass
+
+
+class GamryPlatformError(GamryError):
+    """Exception raised when using Gamry on unsupported platforms."""
+
+    pass
+
+
 class ErrorCodeLookup:
     ERROR_CODES = {
         3758096386: "Device Load",
@@ -52,3 +73,21 @@ class ErrorCodeLookup:
     @classmethod
     def get_error_description(cls, code):
         return cls.ERROR_CODES.get(code, "Unknown Error Code")
+
+
+def check_platform_compatibility():
+    """Check if the current platform is supported for Gamry potentiostat.
+
+    Returns:
+        bool: True if platform is supported, False otherwise
+
+    Raises:
+        GamryPlatformError: If platform is not Windows
+    """
+    if sys.platform != "win32":
+        raise GamryPlatformError(
+            f"Gamry potentiostats are only supported on Windows platforms. "
+            f"Current platform: {sys.platform}. "
+            f"Use mock implementation for testing on non-Windows platforms."
+        )
+    return True
