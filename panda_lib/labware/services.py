@@ -370,6 +370,7 @@ class WellplateService:
     def create_plate(self, plate_data: WellplateWriteModel) -> WellPlateDBModel:
         with self.session_maker() as db_session:
             try:
+                plate_data.panda_unit_id = read_config_value("PANDA", "unit_id", 99)
                 plate: WellPlateDBModel = WellPlateDBModel(**plate_data.model_dump())
                 db_session.add(plate)
                 db_session.commit()
