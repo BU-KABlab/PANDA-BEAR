@@ -104,8 +104,8 @@ class SyringePump:
                 pump_control_logger.debug(f"Setting up pump on port {port}...")
                 pump_port = nesp_lib.Port(
                     name=port,
-                    baud_rate= config.getint("PUMP", "baudrate", fallback=19200),
-                    timeout = 5,
+                    baud_rate=config.getint("PUMP", "baudrate", fallback=19200),
+                    timeout=5,
                 )
 
                 syringe_pump = nesp_lib.Pump(pump_port)

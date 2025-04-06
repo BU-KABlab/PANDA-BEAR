@@ -78,7 +78,9 @@ def select_protocol(protocol_id) -> ProtocolEntry:
     with SessionLocal() as session:
         if isinstance(protocol_id, str):
             result = (
-                session.query(Protocols).filter(Protocols.name == protocol_id.split('.')[0]).first()
+                session.query(Protocols)
+                .filter(Protocols.name == protocol_id.split(".")[0])
+                .first()
             )
             if result is None:  # Check if the protocol_id is a file name
                 result = (

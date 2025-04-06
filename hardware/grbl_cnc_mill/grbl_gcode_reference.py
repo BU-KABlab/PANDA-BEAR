@@ -283,6 +283,7 @@ def validate_alarm_code(alarm_code):
     else:
         return False
 
+
 def validate_command_or_gcode(command_or_gcode):
     """
     Validate a given GRBL command or G-code.

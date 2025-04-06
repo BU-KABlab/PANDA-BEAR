@@ -7,6 +7,7 @@ def print_panda():
     """Prints the ePANDA panda."""
     return random.choice([print_normal_panda(), print_fancy_panda()])
 
+
 # _       _ _   _       _ _     _
 # (_)     (_) | (_)     | (_)   (_)
 # _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _
@@ -15,6 +16,7 @@ def print_panda():
 # |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
 #                                         __/ |
 #                                         |___/
+
 
 def print_normal_panda():
     """Prints the ePANDA panda."""
