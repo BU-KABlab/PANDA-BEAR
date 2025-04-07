@@ -37,7 +37,22 @@ def check_if_plate_type_exists(type_id: int) -> bool:
             is not None
         )
 
+def select_current_wellplate_id() -> int:
+    """Get the current wellplate ID.
 
+    Returns
+    -------
+    int
+        The current wellplate ID.
+    """
+    with SessionLocal() as session:
+        statement = select(Wellplates).filter_by(
+            current=1, panda_unit_id=read_config_value("PANDA", "unit_id", 99)
+        )
+        result: Wellplates = session.execute(statement).scalar_one_or_none()
+        if result is None:
+            return None
+        return result.id
 def check_if_current_wellplate_is_new() -> bool:
     """Check if the current wellplate is new.
 
@@ -47,7 +62,7 @@ def check_if_current_wellplate_is_new() -> bool:
         True if all wells in current wellplate have 'new' status, False otherwise.
     """
     with SessionLocal() as session:
-        current_plate_id = select_current_wellplate_info()[0]
+        current_plate_id = select_current_wellplate_id()
 
         if current_plate_id is None:
             logger.info("No current wellplate found")
@@ -81,7 +96,7 @@ def get_number_of_wells(plate_id: Union[int, None] = None) -> int:
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
         result = session.query(WellModel).filter(WellModel.plate_id == plate_id).count()
         return result
 
@@ -104,7 +119,7 @@ def get_number_of_clear_wells(plate_id: Union[int, None] = None) -> int:
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
         result = (
             session.query(WellModel)
             .filter(WellModel.plate_id == plate_id)
@@ -153,8 +168,8 @@ def select_wellplate_info(plate_id: int) -> Wellplates:
     """
     with SessionLocal() as session:
         statement = select(Wellplates).filter_by(
-            Wellplates.id == plate_id,
-            Wellplates.panda_unit_id == read_config_value("PANDA", "unit_id", 99),
+            id=plate_id,
+            panda_unit_id=read_config_value("PANDA", "unit_id", 99),
         )
         result = session.execute(statement).scalar_one_or_none()
         return result
@@ -175,7 +190,7 @@ def select_well_ids(plate_id: Union[int, None] = None) -> List[str]:
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
 
         statement = (
             select(WellModel.well_id)
@@ -203,7 +218,7 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
 
         statement = (
             select(
@@ -293,7 +308,7 @@ def select_well_status(well_id: str, plate_id: Union[int, None] = None) -> str:
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
 
         statement = (
             select(WellModel.status)
@@ -320,7 +335,7 @@ def count_wells_with_new_status(plate_id: Union[int, None] = None) -> int:
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
 
         statement = (
             select(func.count())
@@ -348,7 +363,7 @@ def select_next_available_well(plate_id: Union[int, None] = None) -> str:
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
 
         statement = (
             select(WellModel.well_id)
@@ -524,7 +539,7 @@ def get_well_by_id(
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
 
         statement = (
             select(WellModel)
@@ -600,7 +615,7 @@ def update_well_coordinates(
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
 
         update_stmt = (
             update(WellModel)
@@ -630,7 +645,7 @@ def update_well_status(
     """
     with SessionLocal() as session:
         if plate_id is None:
-            plate_id = select_current_wellplate_info()[0]
+            plate_id = select_current_wellplate_id()
 
         if status is None:
             status = select_well_status(well_id, plate_id)
