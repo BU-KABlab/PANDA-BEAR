@@ -184,6 +184,67 @@ class MockPandaMill(MockMill):
         self.load_tools()
         self.logger = mill_control_logger
 
+    def load_tools(self):
+        """Loads all of the tools from the local config file."""
+        self.tools = {}
+
+        tools = list(json.loads(read_config_value("TOOLS", "offsets")))
+        if not tools:
+            mill_control_logger.warning("No tools found in the config file.")
+            return
+
+        for tool in tools:
+            # NOTE: We use the tool_manager's add_tool method to add the tools from the db without updating the db
+            # for this one time operation. Otherwise you would use the add_tool method.
+            self.tool_manager.add_tool(tool["name"], (tool["x"], tool["y"], tool["z"]))
+
+    def add_tool(self, tool_name: str, tool_offset: tuple[float, float, float]):
+        """Adds a tool to the tool manager."""
+        self.tool_manager.add_tool(tool_name, tool_offset)
+
+    def update_tool(self, tool_name: str, tool_offset: tuple[float, float, float]):
+        """Updates a tool in the tool manager and config file."""
+        self.tool_manager.update_tool(tool_name, tool_offset)
+
+        # Update the config file's tool offsets
+        tools = list(json.loads(read_config_value("TOOLS", "offsets")))
+        for tool in tools:
+            if tool["name"] == tool_name:
+                tool["x"] = tool_offset[0]
+                tool["y"] = tool_offset[1]
+                tool["z"] = tool_offset[2]
+                break
+        else:
+            tools.append(
+                {
+                    "name": tool_name,
+                    "x": tool_offset[0],
+                    "y": tool_offset[1],
+                    "z": tool_offset[2],
+                }
+            )
+        # Write the updated tools back to the config file
+        write_config_value("TOOLS", "offsets", json.dumps(tools))
+
+    def delete_tool(self, tool_name: str):
+        """Deletes a tool from the tool manager."""
+        self.tool_manager.delete_tool(tool_name)
+
+        # Delete from the config file
+        tools = list(json.loads(read_config_value("TOOLS", "offsets")))
+        for tool in tools:
+            if tool["name"] == tool_name:
+                tools.remove(tool)
+                break
+        else:
+            mill_control_logger.warning(f"Tool {tool_name} not found in config file.")
+            return
+        # Write the updated tools back to the config file
+        write_config_value("TOOLS", "offsets", json.dumps(tools))
+        mill_control_logger.info(f"Tool {tool_name} deleted from config file.")
+        mill_control_logger.info(f"Tool {tool_name} deleted from tool manager.")
+        return
+
     def rinse_electrode(self, rinses: int = 3):
         """Rinse the electrode by moving it to the rinse position and back to the center position."""
         ebath_vial = None
