@@ -688,7 +688,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
 
         print(f"""Missing essential labware:
 {", ".join(missing_labware)}
-Experiments and generation are disabled until the labware is present.""")
+Experiments and generation are disabled until the labware is present.\n""")
 
     while True:
         menu_items = list(menu_options.items())
@@ -880,16 +880,16 @@ if __name__ == "__main__":
             banner()
             print(
                 f"""
-===================================================================
+====================================================================================================
 PANDA Unit Information
 System Version: {version}
 Unit ID: {unit_id}
 Unit Name: {unit_name}
-===================================================================
+====================================================================================================
 Testing mode is {"ENABLED" if read_testing_config() else "DISABLED"}
 DB: {get_active_db()}
 Project ID: {prj_id}
-===================================================================
+====================================================================================================
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
 The current pipette id is {current_pipette.id} and has {remaining_uses} uses left.
 The queue has {sql_queue.count_queue_length()} experiments.
@@ -897,7 +897,7 @@ Project {prj_id} has {sql_queue.count_queue_length(prj_id)} experiments.
 Process Status:
     Experiment Loop Running: {exp_loop_prcss.is_alive() if exp_loop_prcss else False} - {exp_loop_status}
     Analysis Loop Running: {analysis_prcss.is_alive() if analysis_prcss else False} - {analysis_status}
-===================================================================
+====================================================================================================
 PANDA SDL Main Menu
 """
             )
