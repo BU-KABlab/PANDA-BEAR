@@ -764,7 +764,7 @@ def _establish_system_state(
 
     # if any waste vials are full, send a slack message prompting the user to empty them and confirm if program should continue
     full_waste_vials = [vial for vial in waste_vials_only if vial.volume > 19000]
-    if len(full_waste_vials) == len(waste_vials_only):
+    if len(full_waste_vials) == len(waste_vials_only) and len(waste_vials_only)>0:
         slack.send_message(
             "alert",
             "The following waste vials are full: "
@@ -774,14 +774,16 @@ def _establish_system_state(
             "alert",
             "Please empty the waste vials and confirm in the terminal that the program should continue",
         )
-        options = input(
-            "Confirm that the program should continue by pressing enter or q to exit: "
-        )
-        if options.lower() == "q":
-            slack.send_message("alert", "PANDA_SDL is shutting down")
-            raise ShutDownCommand
+        # options = input(
+        #     "Confirm that the program should continue by pressing enter or q to exit: "
+        # )
+        # if options.lower() == "q":
+        #     slack.send_message("alert", "PANDA_SDL is shutting down")
+        #     raise ShutDownCommand
 
-        slack.send_message("alert", "The program is continuing")
+        # slack.send_message("alert", "The program is continuing")
+        raise ShutDownCommand
+
 
     # read the wellplate json and log the status of each well in a grid
     number_of_clear_wells = 0
