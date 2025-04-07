@@ -24,7 +24,7 @@ from typing import Optional
 from sqlalchemy import and_, select
 
 from shared_utilities.db_setup import SessionLocal
-
+from shared_utilities.config.config_tools import read_config_value
 
 class Queue:
     def __init__(
@@ -91,6 +91,7 @@ def select_queue(project_id: Optional[int] = None) -> list:
             .where(
                 and_(
                     Wellplates.current == 1,
+                    Wellplates.panda_unit_id == read_config_value("PANDA","unit_id",99),
                     WellModel.status.in_(["queued", "waiting"]),
                     Experiments.project_id == project_id
                     if project_id is not None
