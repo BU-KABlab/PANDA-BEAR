@@ -1,5 +1,6 @@
 import os
 import sys
+import tempfile
 from datetime import datetime
 from unittest.mock import MagicMock
 
@@ -9,6 +10,191 @@ os.environ["TEMP_DB"] = "1"
 
 # Add the root directory of your project to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+
+@pytest.fixture(scope="session", autouse=True)
+def testing_config_file():
+    """
+    Creates a temporary testing config file for tests.
+    This separates testing configuration from the local environment.
+    """
+    # Store original environment variables to restore later
+    original_env = {}
+    env_vars_to_store = [
+        "PANDA_SDL_CONFIG_PATH",
+        "TEMP_DB",
+        "PANDA_UNIT_ID",
+        "PANDA_TESTING_CONFIG_PATH",
+        "PANDA_TESTING_MODE",
+    ]
+
+    for var in env_vars_to_store:
+        if var in os.environ:
+            original_env[var] = os.environ[var]
+
+    # Create a temporary config file
+    temp_fd, temp_path = tempfile.mkstemp(suffix=".ini", prefix="panda_test_config_")
+    os.close(temp_fd)
+
+    # Write default testing configuration
+    with open(temp_path, "w") as f:
+        f.write("""
+[PANDA]
+version = 2.0
+unit_id = 99
+unit_name = "Buster"
+
+[DEFAULTS]
+air_gap = 40.0
+drip_stop_volume = 5.0
+pipette_purge_volume = 20.0
+pumping_rate = 0.3
+
+[OPTIONS]
+testing = True
+random_experiment_selection = False
+use_slack = False
+use_obs = False
+precision = 6
+
+[LOGGING]
+file_level = DEBUG
+console_level = ERROR
+
+[GENERAL]
+local_dir = panda_lib
+protocols_dir = panda_experiment_protocols
+generators_dir = panda_experiment_generators
+
+[TESTING]
+testing_dir = panda_lib
+testing_db_type = sqlite
+testing_db_address = test_db.db
+testing_db_user = None
+testing_db_password = None
+logging_dir = logs_test
+data_dir = data_test
+
+[PRODUCTION]
+production_dir = 
+production_db_type = 
+production_db_address = 
+production_db_password = 
+logging_dir =
+data_dir =
+
+[OBS]
+obs_host = localhost
+obs_password = 
+obs_port = 4455
+obs_timeout = 3
+
+[SLACK]
+slack_token = 
+slack_conversation_channel_id = 
+slack_alert_channel_id = 
+slack_data_channel_id = 
+slack_test_conversation_channel_id = 
+slack_test_alert_channel_id = 
+slack_test_data_channel_id = 
+
+[MILL]
+port = COM4
+baudrate = 115200
+timeout = 10
+config_file = mill_config.json
+
+[PUMP]
+port = 
+baudrate = 19200
+timeout = 10
+syringe_inside_diameter = 4.600
+syringe_capacity = 1
+max_pumping_rate = 0.654
+units = MM
+
+[SCALE]
+port = 
+baudrate = 9600
+timeout = 10
+
+[CAMERA]
+camera_type = 
+webcam_id = 0
+webcam_resolution_width = 1280
+webcam_resolution_height = 720
+
+[ARDUINO]
+port = COM3
+baudrate = 115200
+timeout = 10
+
+[TOOLS]
+offsets = [
+	{
+	"name": "center",
+	"x": 0.0,
+	"y": 0.0,
+	"z": 0.0
+	},
+	{
+	"name": "pipette",
+	"x": -99.0,
+	"y": 0.0,
+	"z": 130.0
+	},
+	{
+	"name": "electrode",
+	"x": 22.0,
+	"y": 51.0,
+	"z": 124.0
+	},
+	{
+	"name": "decapper",
+	"x": -73.0,
+	"y": 0.0,
+	"z": 72.0
+	},
+	{
+	"name": "lens",
+	"x": 4.0,
+	"y": -1.0,
+	"z": 0.0
+	}
+	]
+
+
+""")
+
+    # Set environment variables for testing
+    os.environ["PANDA_TESTING_CONFIG_PATH"] = temp_path
+    os.environ["PANDA_TESTING_MODE"] = "1"
+    os.environ["PANDA_UNIT_ID"] = "99"  # Set unit ID to match config file
+    os.environ["TEMP_DB"] = "1"  # Ensure we're using temp DB
+
+    # Force config_tools to use our test config
+    os.environ["PANDA_SDL_CONFIG_PATH"] = temp_path
+
+    print(f"Test config created at: {temp_path}")
+    print(f"Environment set: PANDA_UNIT_ID={os.environ.get('PANDA_UNIT_ID')}")
+
+    # Let the tests run
+    yield temp_path
+
+    # Clean up after tests
+    try:
+        os.unlink(temp_path)
+
+        # Restore original environment variables
+        for var in env_vars_to_store:
+            if var in original_env:
+                os.environ[var] = original_env[var]
+            elif var in os.environ:
+                del os.environ[var]
+
+        print("Test environment cleaned up and original environment restored")
+    except (OSError, KeyError) as e:
+        print(f"Error during cleanup: {e}")
 
 
 @pytest.fixture(scope="session")
@@ -282,8 +468,20 @@ def temp_test_db():
                 datetime(2024, 12, 27, 1, 52, 35, 723000),
                 0,
                 159,
+                99,
             ),
-            (2, 200, 0.2, 0, 0, {}, datetime(2024, 12, 27, 1, 52, 35, 724000), 1, 0),
+            (
+                2,
+                200,
+                0.2,
+                0,
+                0,
+                {},
+                datetime(2024, 12, 27, 1, 52, 35, 724000),
+                1,
+                0,
+                99,
+            ),
         ]
 
         with SessionLocal() as sesh:
@@ -299,6 +497,7 @@ def temp_test_db():
                         updated=pipette[6],
                         active=pipette[7],
                         uses=pipette[8],
+                        panda_unit_id=pipette[9],
                     )
                 )
             sesh.commit()
@@ -315,6 +514,7 @@ def temp_test_db():
             orientation=0,
             rows="ABCDEFGH",
             cols=12,
+            panda_unit_id=99,
         )
         plate.activate_plate()
 
@@ -336,6 +536,7 @@ def temp_test_db():
                     coordinates={"x": -4, "y": -106, "z": -83},
                     base_thickness=1,
                     dead_volume=1000,
+                    panda_unit_id=99,
                 ),
                 VialWriteModel(
                     position="s1",
@@ -353,6 +554,7 @@ def temp_test_db():
                     coordinates={"x": -4, "y": -136, "z": -83},
                     base_thickness=1,
                     dead_volume=1000,
+                    panda_unit_id=99,
                 ),
                 VialWriteModel(
                     position="w0",
@@ -370,6 +572,7 @@ def temp_test_db():
                     coordinates={"x": -4, "y": -106, "z": -83},
                     base_thickness=1,
                     dead_volume=1000,
+                    panda_unit_id=99,
                 ),
                 VialWriteModel(
                     position="s3",
@@ -387,6 +590,7 @@ def temp_test_db():
                     coordinates={"x": -4, "y": -166, "z": -83},
                     base_thickness=1,
                     dead_volume=1000,
+                    panda_unit_id=99,
                 ),
             ]
 

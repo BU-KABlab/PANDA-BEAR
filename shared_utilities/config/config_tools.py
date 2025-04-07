@@ -87,6 +87,29 @@ def validate_config_path(config_path: str) -> bool:
     return True
 
 
+def is_testing_mode() -> bool:
+    """Check if we're running in testing mode based on environment variables"""
+    return (
+        os.getenv("PANDA_TESTING_MODE") == "1"
+        or os.getenv("PYTEST_CURRENT_TEST") is not None
+    )
+
+
+def get_config_path() -> str:
+    """Get the appropriate config path based on environment"""
+    # First check for specific test config path
+    if is_testing_mode():
+        test_config_path = os.getenv("PANDA_TESTING_CONFIG_PATH")
+        if test_config_path and os.path.exists(test_config_path):
+            return test_config_path
+
+    # Otherwise use the standard config path
+    return get_env_var(
+        "PANDA_SDL_CONFIG_PATH",
+        default=str(get_repo_path() / "config" / "settings.ini"),
+    )
+
+
 @lru_cache(maxsize=1)
 def read_config() -> ConfigParser:
     """Reads a configuration file with caching.
@@ -100,10 +123,7 @@ def read_config() -> ConfigParser:
     """
     global _config_cache
 
-    config_path = get_env_var(
-        "PANDA_SDL_CONFIG_PATH",
-        default=str(get_repo_path() / "config" / "settings.ini"),
-    )
+    config_path = get_config_path()
 
     # Only reload if config has changed or not loaded
     if _config_cache is None or not hasattr(_config_cache, "last_modified"):
@@ -241,6 +261,10 @@ def read_testing_config() -> bool:
     Returns:
         True if testing mode is enabled, False otherwise
     """
+    # Always return True if environment indicates we're in testing mode
+    if is_testing_mode():
+        return True
+
     try:
         return get_config_boolean("OPTIONS", "testing", default=False)
     except (FileNotFoundError, PermissionError, ConfigParserError) as e:
