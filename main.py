@@ -865,7 +865,7 @@ if __name__ == "__main__":
             num, p_type, new_wells = wellplates.read_current_wellplate_info()
             try:
                 current_pipette = select_pipette_status()
-            except AttributeError:
+            except (AttributeError,ValueError):
                 insert_new_pipette()
                 current_pipette = select_pipette_status()
             remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
