@@ -8,7 +8,7 @@ from panda_lib.actions import (
     image_well,
     rinse_well,
     waste_selector,
-    transfer
+    transfer,
 )
 
 # If you are using custom actions, import them from the appropriate module.

@@ -2,7 +2,6 @@
 
 # pylint: disable=line-too-long
 
-import base64
 import configparser
 import logging
 import math
@@ -13,12 +12,10 @@ from datetime import datetime
 
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 from enum import Enum
-from io import BytesIO
 from logging import Logger
 from pathlib import Path
 from typing import List, Union
 
-from PIL import Image
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
@@ -30,7 +27,6 @@ from panda_lib.experiments.results import (
     ExperimentResultsRecord,
     select_specific_result,
 )
-from panda_lib.imaging.panda_image_tools import add_data_zone
 from panda_lib.labware import vials
 from panda_lib.labware.wellplates import Well
 from panda_lib.sql_tools import (
@@ -38,7 +34,6 @@ from panda_lib.sql_tools import (
     sql_system_state,
     sql_wellplate,
 )
-from panda_lib.tools import OBSController
 from shared_utilities.config.config_tools import read_config, read_testing_config
 from shared_utilities.log_tools import setup_default_logger
 
@@ -581,41 +576,7 @@ class SlackBot:
 
     def take_screenshot(self, channel_id, camera_name: str):
         """Take a screenshot of the camera."""
-        if not config_options.getboolean("use_obs"):
-            self.send_message(channel_id, "OBS is not enabled")
-            return 1
-        try:
-            file_name = "tmp_screenshot.png"
-            obs = OBSController()
-            # verify that the camera is an active source
-            try:
-                sources = obs.client.get_source_active(camera_name)
-            except Exception:
-                self.send_message(
-                    channel_id, f"Could not find a camera source named {camera_name}"
-                )
-                return 1
-            if not sources:
-                self.send_message(channel_id, f"Camera {camera_name} is not active")
-                return 1
-            screenshot = obs.client.get_source_screenshot(
-                camera_name, "png", 1920, 1080, -1
-            )
-            img = Image.open(
-                BytesIO(base64.b64decode(screenshot.image_data.split(",")[1]))
-            )
-            img = add_data_zone(img, context=f"{camera_name.capitalize()} Screenshot")
-            img.save(file_name, "png")
-            self.send_slack_file(
-                channel_id, file_name, f"{camera_name.capitalize()} Screenshot"
-            )
-            Path(file_name).unlink()  # delete the file
-            return 1
-
-        except Exception as e:
-            self.send_message(channel_id, "Error taking screenshot")
-            self.send_message(channel_id, str(e))
-            return 1
+        self.send_message(channel_id, "Screenshots not implemented yet")
 
     def _share_experiment_images(self, experiment_id: int):
         """Share the images for an experiment."""

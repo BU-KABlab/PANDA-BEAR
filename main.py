@@ -688,7 +688,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
 
         print(f"""Missing essential labware:
 {", ".join(missing_labware)}
-Experiments and generation are disabled until the labware is present.""")
+Experiments and generation are disabled until the labware is present.\n""")
 
     while True:
         menu_items = list(menu_options.items())
@@ -747,18 +747,12 @@ class ProcessIDs:
 
 def print_disclaimer():
     """Prints the disclaimer."""
-    print(
-        textwrap.dedent(
-            """\n
-PANDA SDL version 1.0.0, Copyright (C) 2024 Gregory Robben, Harley Quinn
-PANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warranty'
-for more details.
-
-This is free software, and you are welcome to redistribute it
-under certain conditions; choose `show_conditions' for details.
+    version = read_config()["PANDA"]["version"]
+    disclaimer = f"""\nPANDA SDL version {version}, Copyright (C) 2024 Gregory Robben, Harley Quinn\nPANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warranty'
+for more details.\n\nThis is free software, and you are welcome to redistribute it
+under certain conditions; choose `show_conditions' for details.\n\n
 """
-        ).strip()
-    )
+    print(textwrap.dedent(disclaimer))
 
 
 def banner():
@@ -816,6 +810,15 @@ def get_active_db():
         return read_config()["PRODUCTION"]["production_db_address"]
 
 
+def read_panda_unit_information():
+    """Reads the unit information from the config file."""
+    config = read_config()
+    version = config["PANDA"]["version"]
+    unit_id = config["PANDA"]["unit_id"]
+    unit_name = config["PANDA"]["unit_name"]
+    return unit_id, unit_name, version
+
+
 def check_essential_labware():
     """Check if the essential labware is present."""
     missing = []
@@ -862,7 +865,7 @@ if __name__ == "__main__":
             num, p_type, new_wells = wellplates.read_current_wellplate_info()
             try:
                 current_pipette = select_pipette_status()
-            except AttributeError:
+            except (AttributeError,ValueError):
                 insert_new_pipette()
                 current_pipette = select_pipette_status()
             remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
@@ -872,22 +875,30 @@ if __name__ == "__main__":
             analysis_status = get_process_status(
                 status_queue, ProcessIDs.ANALYSIS, analysis_status
             )
+            unit_id, unit_name, version = read_panda_unit_information()
             # slackbot_status = get_process_status(status_queue, ProcessIDs.SLACKBOT, slackbot_status)
             banner()
             print(
                 f"""
-Welcome!
+====================================================================================================
+PANDA Unit Information
+System Version: {version}
+Unit ID: {unit_id}
+Unit Name: {unit_name}
+====================================================================================================
 Testing mode is {"ENABLED" if read_testing_config() else "DISABLED"}
 DB: {get_active_db()}
 Project ID: {prj_id}
-
+====================================================================================================
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
 The current pipette id is {current_pipette.id} and has {remaining_uses} uses left.
 The queue has {sql_queue.count_queue_length()} experiments.
 Project {prj_id} has {sql_queue.count_queue_length(prj_id)} experiments.
 Process Status:
-    Experiment Loop: {exp_loop_prcss.is_alive() if exp_loop_prcss else False} - {exp_loop_status}
-    Analysis Loop: {analysis_prcss.is_alive() if analysis_prcss else False} - {analysis_status}
+    Experiment Loop Running: {exp_loop_prcss.is_alive() if exp_loop_prcss else False} - {exp_loop_status}
+    Analysis Loop Running: {analysis_prcss.is_alive() if analysis_prcss else False} - {analysis_status}
+====================================================================================================
+PANDA SDL Main Menu
 """
             )
 

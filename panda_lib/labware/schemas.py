@@ -56,20 +56,6 @@ class VesselModel(DeckObjectModel):
     contents: Dict[str, float] = Field(default_factory=dict)
     volume_height: float = 0.0
 
-    # @property
-    # def volume_height(self) -> float:
-    #     return self.volume * 1000 / (3.14159 * self.radius**2)
-
-    # @property
-    # def bottom(self) -> float:
-    #     dead_volume_height = self.dead_volume * 1000 / (3.14159 * self.radius**2)
-    #     return (
-    #         self.coordinates["z"]
-    #         + self.base_thickness
-    #         + self.volume_height
-    #         + dead_volume_height
-    #     )
-
 
 class VialWriteModel(BaseModel):
     position: str
@@ -89,7 +75,7 @@ class VialWriteModel(BaseModel):
     )
     name: str = "default"
     base_thickness: float = 1.0
-
+    panda_unit_id: int = 1
     model_config = ConfigDict(from_attributes=True)
 
     @classmethod
@@ -105,6 +91,7 @@ class VialReadModel(VesselModel):
     concentration: float = 0.0
     density: float = 1.0
     active: int = 1
+    panda_unit_id: int = 1
     updated: str
 
     model_config = ConfigDict(from_attributes=True)
@@ -176,6 +163,7 @@ class WellplateReadModel(DeckObjectModel):
     cols: int
     echem_height: float  # height of echem cell placement in mm
     image_height: float  # height of the image in mm
+    panda_unit_id: int
     # TODO Add substrate and well count...probably inherit the PlateTypeModel instead or in addition to the DeckObjectModel
     model_config = ConfigDict(from_attributes=True)
 
@@ -197,5 +185,6 @@ class WellplateWriteModel(BaseModel):
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
     base_thickness: float = 1.0
+    panda_unit_id: int = 99
 
     model_config = ConfigDict(from_attributes=True)

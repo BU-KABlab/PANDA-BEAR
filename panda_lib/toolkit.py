@@ -1,15 +1,14 @@
 """A class to hold all of the instruments"""
 
 import logging
+import os
 from dataclasses import dataclass
 from logging import Logger
 from typing import Union
-import os
 
 import PySpin
 from sartorius import Scale
 from sartorius.mock import Scale as MockScale
-
 
 from hardware.panda_pipette.syringepump import MockPump, SyringePump
 from panda_lib.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
@@ -18,7 +17,7 @@ from panda_lib.labware.wellplates import Wellplate
 from panda_lib.panda_gantry import MockPandaMill as MockMill
 from panda_lib.panda_gantry import PandaMill as Mill
 from panda_lib.slack_tools.slackbot_module import SlackBot
-from panda_lib.tools import ArduinoLink, MockArduinoLink, OBSController
+from panda_lib.tools import ArduinoLink, MockArduinoLink
 from shared_utilities.config.config_tools import (
     read_camera_type,
     read_config_value,
@@ -83,7 +82,6 @@ class Monitoring:
     """A class to hold all of the monitoring tools"""
 
     slack_monitor: SlackBot = None
-    obs: OBSController = None
 
 
 def connect_to_instruments(
@@ -425,8 +423,13 @@ def test_instrument_connections(
             connected_instruments.append("Potentiostat")
             gamry_control.pstatdisconnect()
         else:
-            logger.debug("Gamry Potentiostat connection not available on non-Windows OS")
-            print("Gamry Potentiostat connection not available on non-Windows OS", flush=True)
+            logger.debug(
+                "Gamry Potentiostat connection not available on non-Windows OS"
+            )
+            print(
+                "Gamry Potentiostat connection not available on non-Windows OS",
+                flush=True,
+            )
             connected_instruments.append("Potentiostat")
             incomplete = True
     except Exception as error:

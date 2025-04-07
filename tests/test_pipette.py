@@ -32,8 +32,9 @@ pipette_data = [
         datetime(2024, 12, 27, 1, 52, 35, 723000),
         0,
         159,
+        99,
     ),
-    (2, 200, 0.2, 0, 0, {}, datetime(2024, 12, 27, 1, 52, 35, 724000), 1, 0),
+    (2, 200, 0.2, 0, 0, {}, datetime(2024, 12, 27, 1, 52, 35, 724000), 1, 0, 99),
 ]
 
 with Session(engine) as session_maker:
@@ -49,6 +50,7 @@ with Session(engine) as session_maker:
                 updated=pipette[6],
                 active=pipette[7],
                 uses=pipette[8],
+                panda_unit_id=pipette[9],
             )
         )
     session_maker.commit()
@@ -61,7 +63,6 @@ def session_maker():
     try:
         yield db
     finally:
-        # db.close()
         pass
 
 
@@ -76,6 +77,7 @@ def test_pipette_initialization(session_maker: sessionmaker):
     assert pipette_db.contents == {}
     assert pipette_db.id == 2
     assert pipette_db.uses == 0
+    assert pipette_db.panda_unit_id == 99
 
     # and assert that the pipette and pipette_db are the same
     assert pipette.capacity_ml == pipette_db.capacity_ml
@@ -85,6 +87,7 @@ def test_pipette_initialization(session_maker: sessionmaker):
     assert pipette.contents == pipette_db.contents
     assert pipette.id == pipette_db.id
     assert pipette.uses == pipette_db.uses
+    assert pipette.panda_unit_id == pipette_db.panda_unit_id
 
 
 def test_set_capacity(session_maker: Session):

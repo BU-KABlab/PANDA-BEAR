@@ -3,21 +3,29 @@
 import gc
 import logging
 import pathlib
+import sys
 import threading
 import time
 from decimal import Decimal
 from typing import Tuple
 
-import comtypes
 import numpy as np
 import pandas as pd
-from comtypes import client
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
 from shared_utilities.config.config_tools import read_config
 
+from .errors import ErrorCodeLookup, GamryCOMError, check_platform_compatibility
 from .timer import countdown_timer
+
+# Only import comtypes on Windows
+if sys.platform == "win32":
+    import comtypes
+    from comtypes import client
+else:
+    comtypes = None
+    client = None
 
 config = read_config()
 if config.getboolean("OPTIONS", "testing"):
@@ -41,6 +49,18 @@ global CONNECTION
 global ACTIVE
 global COMPLETE_FILE_NAME
 global OPEN_CONNECTION
+
+# Initialize global variables
+PSTAT = None
+DEVICES = None
+GAMRY_COM = None
+DTAQ = None
+SIGNAL = None
+DTAQ_SINK = None
+CONNECTION = None
+ACTIVE = False
+COMPLETE_FILE_NAME = None
+OPEN_CONNECTION = False
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -91,12 +111,6 @@ class potentiostat_ocp_parameters:
     OCPrate: float = 0.5
 
 
-class GamryCOMError(Exception):
-    """Exception raised when a COM error occurs."""
-
-    pass
-
-
 class GamryDtaqEvents(object):
     """Class to handle events from the data acquisition."""
 
@@ -137,40 +151,54 @@ class GamryDtaqEvents(object):
         self.call_savedata(self.complete_file_name)
 
 
+def gamry_error_decoder(err) -> GamryCOMError:
+    """Decode a COM error from GamryCOM into a more useful exception."""
+    if comtypes and isinstance(err, comtypes.COMError):
+        hresult = 2**32 + err.args[0]
+        if hresult & 0x20000000:
+            error_description = ErrorCodeLookup.get_error_description(hresult)
+            return GamryCOMError(
+                f"0x{hresult:08x}: {err.args[1]} - {error_description}"
+            )
+    return err
+
+
 def pstatconnect() -> bool:
     """connect to the pstat
 
     Returns:
         bool: True if the connection is successful, False otherwise
 
+    Raises:
+        GamryPlatformError: If not running on Windows
     """
     global PSTAT
     global DEVICES
     global GAMRY_COM
     global OPEN_CONNECTION
 
-    GAMRY_COM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
-    PSTAT = client.CreateObject("GamryCOM.GamryPC6Pstat")
-    DEVICES = client.CreateObject("GamryCOM.GamryDeviceList")
-    PSTAT.Init(DEVICES.EnumSections()[0])  # grab first pstat
-    PSTAT.Open()  # open connection to pstat
+    # Check platform compatibility
+    check_platform_compatibility()
 
-    if DEVICES.EnumSections():
+    try:
+        GAMRY_COM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
+        PSTAT = client.CreateObject("GamryCOM.GamryPC6Pstat")
+        DEVICES = client.CreateObject("GamryCOM.GamryDeviceList")
+        if not DEVICES.EnumSections():
+            logger.error("No Gamry devices found")
+            OPEN_CONNECTION = False
+            return False
+
+        PSTAT.Init(DEVICES.EnumSections()[0])  # grab first pstat
+        PSTAT.Open()  # open connection to pstat
+
         logger.debug("\tPstat connected: %s", DEVICES.EnumSections()[0])
         OPEN_CONNECTION = True
-    else:
-        logger.debug("\tPstat not connected")
+        return True
+    except Exception as e:
+        logger.error("Failed to connect to potentiostat: %s", str(e))
         OPEN_CONNECTION = False
-    return OPEN_CONNECTION
-
-
-def gamry_error_decoder(err) -> GamryCOMError:
-    """Decode a COM error from GamryCOM into a more useful exception."""
-    if isinstance(err, comtypes.COMError):
-        hresult = 2**32 + err.args[0]
-        if hresult & 0x20000000:
-            return GamryCOMError(f"0x{hresult:08x}: {err.args[1]}")
-    return err
+        raise gamry_error_decoder(e)
 
 
 def initializepstat():

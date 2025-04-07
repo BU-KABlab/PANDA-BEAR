@@ -28,7 +28,7 @@ def get_port_names():
     return [port.name for port in ports]
 
 
-def get_port_manufacturers()->dict[str:str]:
+def get_port_manufacturers() -> dict[str:str]:
     """List all available port manufacturers"""
     import os
 
@@ -40,7 +40,7 @@ def get_port_manufacturers()->dict[str:str]:
         ports = list(serial.tools.list_ports.grep("COM"))
     else:
         raise OSError("Unsupported OS")
-    
+
     manufacturers = {}
     for port in ports:
         manufacturer = port.manufacturer if port.manufacturer else "Unknown"

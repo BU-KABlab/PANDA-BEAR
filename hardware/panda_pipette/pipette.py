@@ -32,6 +32,7 @@ class Pipette:
         self.contents = {}
         self.id = pipette_id
         self.uses = 0
+        self.panda_unit_id = 99
         self.session_maker: sessionmaker = db_session_maker
 
         if self.id is not None and (self.id <= 0 or not isinstance(self.id, int)):
