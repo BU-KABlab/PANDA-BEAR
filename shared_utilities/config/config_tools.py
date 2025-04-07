@@ -163,7 +163,7 @@ def read_config_value(
     config = read_config()
 
     try:
-        return config.get(section, key)
+        value= config.get(section, key)
     except (ConfigParserError, KeyError):
         if fallback_section:
             try:
@@ -172,6 +172,19 @@ def read_config_value(
                 pass
         return default
 
+    # Convert to appropriate type
+    if value.lower() in ("true", "1"):
+        return True
+    elif value.lower() in ("false", "0"):
+        return False
+    elif value.isdigit():
+        return int(value)
+    try:
+        return float(value)
+    except ValueError:
+        pass
+    return value
+    # If all else fails, return the string value
 
 def write_config_value(section: str, key: str, value: str) -> None:
     """Writes a value to the configuration file.
