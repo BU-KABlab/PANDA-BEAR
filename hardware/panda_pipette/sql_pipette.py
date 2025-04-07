@@ -42,7 +42,7 @@ def select_pipette_status(
                 session.query(Pipette)
                 .filter(
                     Pipette.active == 1,
-                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                    Pipette.panda_unit_id == read_config_value("PANDA", "unit_id", 99),
                 )
                 .order_by(Pipette.updated.desc())
                 .first()
@@ -52,9 +52,13 @@ def select_pipette_status(
                 session.query(Pipette)
                 .filter(
                     Pipette.id == pipette_id,
-                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                    Pipette.panda_unit_id == read_config_value("PANDA", "unit_id", 99),
                 )
                 .first()
+            )
+        if pipette_status is None:
+            raise ValueError(
+                f"Pipette with ID {pipette_id} not found with PANDA unit {read_config_value('PANDA', 'unit_id', 99)}."
             )
 
         if pipette_status.contents:
@@ -239,6 +243,8 @@ def insert_new_pipette(
                 contents={},
                 id=pipette_id,
                 active=1 if activate else 0,
+                uses=0,
+                panda_unit_id=read_config_value("PANDA", "unit_id", 99),
             )
             session.add(new_pipette)
 

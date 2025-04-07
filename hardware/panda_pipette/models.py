@@ -69,6 +69,7 @@ class Pipette(Base):
         updated (datetime): The last time the pipette was updated.
         active (int): The status of the pipette. 0 = inactive, 1 = active.
         uses (int): The number of times the pipette has been used.
+        panda_unit_id (int): The ID of the panda unit associated with the pipette.
 
 
     """

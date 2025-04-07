@@ -148,7 +148,6 @@ class PlateTypeModel(BaseModel):
     max_liquid_height_mm: float
     capacity_ul: float
     base_thickness: float
-    panda_unit_id: int
 
     model_config = ConfigDict(from_attributes=True)
 

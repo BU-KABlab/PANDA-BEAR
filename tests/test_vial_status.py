@@ -38,6 +38,7 @@ def test_vial_status_generation(db_session):
         dead_volume=1.0,
         active=1,
         updated="2023-10-01T10:00:00Z",
+        panda_unit_id=99,
     )
     vial2 = Vials(
         position="A1",
@@ -56,6 +57,7 @@ def test_vial_status_generation(db_session):
         dead_volume=1.0,
         active=1,
         updated="2023-10-02T10:00:00Z",
+        panda_unit_id=99,
     )
     db_session.add(vial1)
     db_session.add(vial2)
