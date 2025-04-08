@@ -1,6 +1,7 @@
-import time
 import csv
+import time
 from datetime import datetime
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
@@ -9,6 +10,7 @@ from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
 from panda_lib.panda_gantry import PandaMill
 from panda_lib.sql_tools.panda_models import Base
 from panda_lib.tools import pawduino
+from shared_utilities.config.config_tools import read_config_value
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
@@ -28,14 +30,14 @@ def main():
             viscosity_cp=1,
             concentration=0.01,
             density=1,
-            height=64,
+            height=66,
             radius=14,
             volume=20000,
             capacity=20000,
             contamination=0,
             coordinates={
-                "x": -4,
-                "y": -139,
+                "x": -67.5,
+                "y": -45.5,
                 "z": -197,
             },  # TODO replace with vial coordinates
             base_thickness=1,
@@ -51,7 +53,7 @@ def main():
         input("Press Enter to continue...")
         # Set up the hardware connections
         with PandaMill() as mill:
-            with pawduino.ArduinoLink() as arduino:
+            with pawduino.ArduinoLink(read_config_value("ARDUINO", "port")) as arduino:
                 # Check the tools in the tool manager
                 print("Tools in the tool manager:")
                 for tool in mill.tool_manager.tool_offsets.values():
@@ -60,7 +62,7 @@ def main():
                 if "decapper" not in mill.tool_manager.tool_offsets:
                     print("Adding the decapper tool")
                     mill.add_tool(
-                        "decapper", (-73, 0, 72)
+                        "decapper", (-64.376, -6.5, 61.5)
                     )  # TODO fix offset for PANDA V2
                 if mill.homed:
                     print("Mill has been homed")
@@ -182,8 +184,8 @@ def decapping_sequence(
         print(f"Decapping attempt {attempts} of {max_attempts}")
 
         # Activate the decapper
-        ard_link.no_cap()
-
+        rx = ard_link.no_cap()
+        print(f"Decapper activated: {rx == 105}")
         # Move the decapper up 20mm
         mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
 
@@ -233,15 +235,16 @@ def capping_sequence(
         )
 
         # Deactivate the decapper
-        ard_link.ALL_CAP()
+        rx = ard_link.ALL_CAP()
+        print(f"Decapper deactivated: {rx == 106}")
 
         # Move the decapper +5mm in the y direction
         mill.move_to_position(
-            target_coords.x, target_coords.y + 5, target_coords.z, tool="decapper"
+            target_coords.x, target_coords.y, target_coords.z, tool="decapper"
         )
 
         # Move the decapper to 0 z
-        mill.move_to_position(target_coords.x, target_coords.y + 5, 0, tool="decapper")
+        mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
 
         # Check if cap is present via linebreak sensor
         cap_still_held = ard_link.line_break()
