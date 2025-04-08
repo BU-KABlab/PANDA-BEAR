@@ -146,6 +146,15 @@ def read_config() -> ConfigParser:
     return _config_cache
 
 
+def reload_config() -> None:
+    """Reloads the configuration file and clears the cache."""
+    global _config_cache
+    _config_cache = None
+    read_config.cache_clear()
+    read_config()
+    logger.info("Configuration reloaded.")
+
+
 def read_config_value(
     section: str, key: str, default: Any = None, fallback_section: str = None
 ) -> Any:
@@ -163,7 +172,7 @@ def read_config_value(
     config = read_config()
 
     try:
-        value= config.get(section, key)
+        value = config.get(section, key)
     except (ConfigParserError, KeyError):
         if fallback_section:
             try:
@@ -185,6 +194,7 @@ def read_config_value(
         pass
     return value
     # If all else fails, return the string value
+
 
 def write_config_value(section: str, key: str, value: str) -> None:
     """Writes a value to the configuration file.

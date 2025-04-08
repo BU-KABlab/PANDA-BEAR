@@ -18,6 +18,7 @@ from shared_utilities.config.config_tools import (
     read_config_value,
     read_logging_dir,
     read_testing_config,
+    reload_config,
     write_config_value,
 )
 from shared_utilities.db_setup import SessionLocal
@@ -52,7 +53,7 @@ class PandaMill(Mill):
     def load_tools(self):
         """Loads all of the tools from the local config file."""
         self.tools = {}
-
+        reload_config()
         tools = list(json.loads(read_config_value("TOOLS", "offsets")))
         if not tools:
             mill_control_logger.warning("No tools found in the config file.")
@@ -187,7 +188,7 @@ class MockPandaMill(MockMill):
     def load_tools(self):
         """Loads all of the tools from the local config file."""
         self.tools = {}
-
+        reload_config()
         tools = list(json.loads(read_config_value("TOOLS", "offsets")))
         if not tools:
             mill_control_logger.warning("No tools found in the config file.")

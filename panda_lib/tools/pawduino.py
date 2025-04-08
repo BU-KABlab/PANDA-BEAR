@@ -149,9 +149,9 @@ class ArduinoLink:
 
             if self.ser.is_open:
                 # Look for acknowlegement
-                time.sleep(2)
+                time.sleep(20)
                 rx = self.ser.read_all().decode().strip()
-                if rx == self.ack:
+                if self.ack in rx:
                     self.configured = True
                 else:
                     self.configured = False
@@ -239,6 +239,9 @@ class ArduinoLink:
 
         if rx is None:
             raise ConnectionError
+
+        if ":" in rx:
+            rx = rx.split(":")[-1]
         try:
             return int(rx)
         except (ValueError, TypeError):
@@ -525,19 +528,19 @@ class PawduinoFunctions(enum.Enum):
 
     """
 
-    CMD_WHITE_ON = (1,)
-    CMD_WHITE_OFF = (2,)
-    CMD_CONTACT_ON = (3,)
-    CMD_CONTACT_OFF = (4,)
-    CMD_EMAG_ON = (5,)
-    CMD_EMAG_OFF = (6,)
-    CMD_LINE_BREAK = (7,)
-    CMD_LINE_TEST = (8,)
-    CMD_PIPETTE_HOME = (9,)
-    CMD_PIPETTE_MOVE = (10,)
-    CMD_PIPETTE_ASPIRATE = (11,)
-    CMD_PIPETTE_DISPENSE = (12,)
-    CMD_PIPETTE_STATUS = (13,)
+    CMD_WHITE_ON = 1
+    CMD_WHITE_OFF = 2
+    CMD_CONTACT_ON = 3
+    CMD_CONTACT_OFF = 4
+    CMD_EMAG_ON = 5
+    CMD_EMAG_OFF = 6
+    CMD_LINE_BREAK = 7
+    CMD_LINE_TEST = 8
+    CMD_PIPETTE_HOME = 9
+    CMD_PIPETTE_MOVE = 10
+    CMD_PIPETTE_ASPIRATE = 11
+    CMD_PIPETTE_DISPENSE = 12
+    CMD_PIPETTE_STATUS = 13
     CMD_HELLO = 99
 
 
@@ -555,19 +558,19 @@ class PawduinoReturnCodes(enum.Enum):
 
     """
 
-    RESP_WHITE_ON = (101,)
-    RESP_WHITE_OFF = (102,)
-    RESP_CONTACT_ON = (103,)
-    RESP_CONTACT_OFF = (104,)
-    RESP_EMAG_ON = (105,)
-    RESP_EMAG_OFF = (106,)
-    RESP_LINE_BREAK = (107,)
-    RESP_LINE_UNBROKEN = (108,)
-    RESP_PIPETTE_HOMED = (109,)
-    RESP_PIPETTE_MOVED = (110,)
-    RESP_PIPETTE_ASPIRATED = (111,)
-    RESP_PIPETTE_DISPENSED = (112,)
-    RESP_PIPETTE_STATUS = (113,)
+    RESP_WHITE_ON = 101
+    RESP_WHITE_OFF = 102
+    RESP_CONTACT_ON = 103
+    RESP_CONTACT_OFF = 104
+    RESP_EMAG_ON = 105
+    RESP_EMAG_OFF = 106
+    RESP_LINE_BREAK = 107
+    RESP_LINE_UNBROKEN = 108
+    RESP_PIPETTE_HOMED = 109
+    RESP_PIPETTE_MOVED = 110
+    RESP_PIPETTE_ASPIRATED = 111
+    RESP_PIPETTE_DISPENSED = 112
+    RESP_PIPETTE_STATUS = 113
     RESP_HELLO = 999
 
 
