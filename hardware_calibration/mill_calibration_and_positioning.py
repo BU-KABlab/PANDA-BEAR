@@ -31,8 +31,6 @@ from panda_lib.utilities import Instruments, input_validation
 from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import setup_default_logger
 
-from .decapper_testing import main as decapper_test
-from .line_break_validation import main as line_break_test
 
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 config = read_config()["MILL"]
@@ -1058,6 +1056,7 @@ def manual_commands(mill: Mill, *args, **kwargs):
     print("  help - Show available commands and descriptions")
     print("  status - Show current mill status")
     print("  position - Show current mill position")
+    print("  reload tools - Reload the Mill tools from config file")
     print("  exit - Exit the command interface")
 
     valid_tools = ["pipette", "electrode", "decapper", "lens", "center"]
@@ -1098,15 +1097,21 @@ def manual_commands(mill: Mill, *args, **kwargs):
                 )
                 continue
 
+            elif command.lower() == "reload tools":
+                # Reload the tools from the config file
+                mill.load_tools()
+                print("Tools reloaded from config file")
+                continue
+
             elif command.lower() == "reset":
                 # Reset the mill
                 mill.reset()
 
-            elif command[0] == "G":
+            elif command[0].upper() == "G":
                 # Process actual GRBL commands
                 # Check if it's a movement command to handle specially
                 # Handle both "G00 X10 Y20" and "G00X10Y20" formats
-                command, coordinates = _parse_gcode(command)
+                command, coordinates = _parse_gcode(command, mill.current_coordinates())
                 command_upper = command.upper()
 
                 # If we have at least one coordinate, ask about tool selection
@@ -1158,7 +1163,9 @@ def manual_commands(mill: Mill, *args, **kwargs):
             print(f"Error processing command: {e}")
 
 
-def _parse_gcode(command: str) -> tuple[str, Coordinates | None]:
+def _parse_gcode(
+    command: str, current_coords: Coordinates
+) -> tuple[str, Coordinates | None]:
     """
     Parse a G-code command and extract coordinates.
     This function uses regex to extract the G-code command and coordinates.
@@ -1195,9 +1202,9 @@ def _parse_gcode(command: str) -> tuple[str, Coordinates | None]:
     # Check if the command is a movement command
     if command_upper in movement_commands:
         # Extract coordinates
-        x = coordinate_dict.get("X")
-        y = coordinate_dict.get("Y")
-        z = coordinate_dict.get("Z")
+        x = coordinate_dict.get("X", current_coords.x)
+        y = coordinate_dict.get("Y", current_coords.y)
+        z = coordinate_dict.get("Z", current_coords.z)
 
         coords = Coordinates(x, y, z)
 
@@ -1215,8 +1222,6 @@ menu_options = {
     "5": calibrate_echem_height,
     "6": calibrate_vial_holders,
     "7": calibrate_image_height,
-    "8": test_decapper,
-    "9": line_break_validation,
     "10": rinse_electrode,
     "11": manual_commands,
     "q": quit_calibration,
