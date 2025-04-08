@@ -630,6 +630,13 @@ def list_analysis_script_ids():
 
     input("Press Enter to continue...")
 
+def decapper_test():
+    """Runs the decapper testing."""
+    decapper_testing.main()
+
+def linebreak_test():
+    """Runs the line break testing."""
+    line_break_validation.main()
 
 def main_menu(reduced: bool = False) -> Tuple[callable, str]:
     """Main menu for PANDA_SDL."""
@@ -658,8 +665,8 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "4.4": remove_testing_experiments,
         "5": change_pipette_tip,
         "6": mill_calibration,
-        "6.1": decapper_testing.main(),
-        "6.2": line_break_validation.main(),
+        "6.1": decapper_test,
+        "6.2": linebreak_test,
         "7": test_image,
         "8": instrument_check,
         "9": change_project_id,  # Add the change_project_id function to the menu
