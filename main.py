@@ -16,6 +16,10 @@ from hardware.panda_pipette import (
     select_pipette_status,
 )
 from hardware_calibration.mill_calibration_and_positioning import calibrate_mill
+from hardware_calibration import (
+    line_break_validation,
+    decapper_testing,
+)
 from menu.license_text import show_conditions, show_warranty
 from panda_lib import (
     SystemState,
@@ -654,6 +658,8 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "4.4": remove_testing_experiments,
         "5": change_pipette_tip,
         "6": mill_calibration,
+        "6.1": decapper_testing.main(),
+        "6.2": line_break_validation.main(),
         "7": test_image,
         "8": instrument_check,
         "9": change_project_id,  # Add the change_project_id function to the menu
