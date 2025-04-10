@@ -117,6 +117,7 @@ class Mill:
         self.config = self.read_mill_config_file("_configuration.json")
         self.ser_mill: serial.Serial = None
         self.homed = False
+        self.auto_home = True
         self.active_connection = False
         self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = self.read_working_volume()
@@ -187,10 +188,15 @@ class Mill:
 
         def read_past_found_on_port() -> str:
             """Read past the found on port"""
+            if not os.path.exists(Path(__file__).parent / "mill_port.txt"):
+                # Make a file if it doesn't exist
+                with open(Path(__file__).parent / "mill_port.txt", "w") as file:
+                    file.write("")
+
             with open(Path(__file__).parent / "mill_port.txt", "r") as file:
                 found_on = file.read()
 
-            if not found_on:
+            if not found_on or found_on == "":
                 return []
 
             return [found_on]
@@ -369,14 +375,16 @@ class Mill:
         #             self.homing_sequence()
         #         else:
         #             self.logger.warning("User chose not to home the mill")
-        self.logger.info("Mill is connected and ready for use, homing first")
-        self.homing_sequence()
+        # self.logger.info("Mill is connected and ready for use, homing first")
+        # self.homing_sequence()
 
     def __enter__(self):
         """Enter the context manager"""
+        # Connect to mill with any port specified during object creation
         self.connect_to_mill()
 
-        if not self.homed:
+        # Optional auto-homing behavior that can be controlled by a property
+        if not self.homed and getattr(self, "auto_home", True):
             self.homing_sequence()
         return self
 

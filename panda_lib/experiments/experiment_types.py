@@ -72,11 +72,7 @@ class ExperimentBase:
         title="Well ID",
         description="Identifier for the well used in the experiment",
     )
-    pin: Union[str, int] = Field(
-        default=0,
-        title="PIN",
-        description="Personal Identification Number associated with the experiment",
-    )
+
     project_id: int = Field(
         default=999,
         title="Project ID",
@@ -120,12 +116,7 @@ class ExperimentBase:
         title="Project Campaign ID",
         description="Identifier for the project campaign associated with the experiment",
     )
-    protocol_type: int = Field(
-        default=1,
-        title="Protocol Type",
-        description="Type of protocol used in the experiment",
-        deprecated=True,
-    )
+
     plate_id: Optional[int] = Field(
         default=None,
         title="Plate ID",
@@ -136,24 +127,7 @@ class ExperimentBase:
         title="Override Well Selection",
         description="Flag to override well selection (0 is normal, 1 is override)",
     )
-    process_type: Optional[int] = Field(
-        default=1,
-        title="Process Type",
-        description="Type of process used in the experiment",
-        deprecated=True,
-    )
-    jira_issue_key: Optional[str] = Field(
-        default=None,
-        title="JIRA Issue Key",
-        description="JIRA issue key associated with the experiment",
-        deprecated=True,
-    )
-    experiment_type: int = Field(
-        default=0,
-        title="Experiment Type",
-        description="Type of experiment",
-        deprecated=True,
-    )
+
     well: object = Field(
         default=None,
         title="Well",
@@ -184,6 +158,18 @@ class ExperimentBase:
         title="Steps",
         description="Number of steps completed in the experiment",
         exclude=True,
+    )
+
+    panda_version: float = Field(
+        default=config.getfloat("PANDA", "version", fallback=0.0),
+        title="Panda System Version",
+        description="Version of the PANDA system used for the experiment",
+    )
+
+    panda_unit_id: int = Field(
+        default=config.getint("PANDA", "unit_id", fallback=0),
+        title="Panda Unit ID",
+        description="Identifier for the PANDA unit used for the experiment",
     )
 
     @field_validator("experiment_name")
@@ -301,7 +287,7 @@ class ExperimentBase:
             for parameter_type, parameter_value in self.__dict__.items()
         ]
 
-        # Remove project_id, project_campaign_id, well_type,protocol_id, pin, experiment_type, jira_issue_key, priority, process_type, filename, status, status_date, results, well
+        # Remove project_id, project_campaign_id, well_type,protocol_id, priority, filename, status, status_date, results, well
         all_parameters = [
             parameter
             for parameter in all_parameters
@@ -312,11 +298,7 @@ class ExperimentBase:
                 "well_type",
                 "protocol_id",
                 "protocol_type",  # depreciated
-                "pin",
-                "experiment_type",
-                "jira_issue_key",
                 "priority",
-                "process_type",
                 "filename",
                 "status",
                 "status_date",
@@ -444,7 +426,6 @@ class EchemExperimentBase(ExperimentBase):
     This is the base class for all echem experiments.
     """
 
-    experiment_type: int = 1  # echem generic
     ocp: int = 1  # Open Circuit Potential
     ca: int = 1  # Cyclic Amperometry
     cv: int = 1  # Cyclic Voltammetry
@@ -577,7 +558,7 @@ def _select_next_experiment_id() -> int:
             .first()
         )
     if result in [None, []]:
-        return 10000000
+        return 1
     return result[0] + 1
 
 
@@ -737,11 +718,7 @@ def _insert_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.project_campaign_id,
                 experiment.plate_type_number,
                 experiment.protocol_id,
-                experiment.pin,
-                experiment.experiment_type,
-                experiment.jira_issue_key,
                 experiment.priority,
-                experiment.process_type,
                 experiment.filename,
                 datetime.now().isoformat(timespec="seconds"),
             )
@@ -756,13 +733,9 @@ def _insert_experiments(experiments: List[ExperimentBase]) -> None:
                     project_campaign_id=parameter[2],
                     well_type=parameter[3],
                     protocol_id=parameter[4],
-                    pin=parameter[5],
-                    experiment_type=parameter[6],
-                    jira_issue_key=parameter[7],
-                    priority=parameter[8],
-                    process_type=parameter[9],
-                    filename=parameter[10],
-                    created=datetime.strptime(parameter[11], "%Y-%m-%dT%H:%M:%S"),
+                    priority=parameter[5],
+                    filename=parameter[6],
+                    created=datetime.strptime(parameter[7], "%Y-%m-%dT%H:%M:%S"),
                 )
             )
         session.commit()
@@ -842,11 +815,7 @@ def _update_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.project_campaign_id,
                 experiment.plate_type_number,
                 experiment.protocol_id,
-                experiment.pin,
-                experiment.experiment_type,
-                experiment.jira_issue_key,
                 experiment.priority,
-                experiment.process_type,
                 experiment.filename,
                 experiment.experiment_id,
             )
@@ -855,19 +824,15 @@ def _update_experiments(experiments: List[ExperimentBase]) -> None:
     with SessionLocal() as session:
         for parameter in parameters:
             session.query(Experiments).filter(
-                Experiments.experiment_id == parameter[10]
+                Experiments.experiment_id == parameter[6]
             ).update(
                 {
                     Experiments.project_id: parameter[0],
                     Experiments.project_campaign_id: parameter[1],
                     Experiments.well_type: parameter[2],
                     Experiments.protocol_id: parameter[3],
-                    Experiments.pin: parameter[4],
-                    Experiments.experiment_type: parameter[5],
-                    Experiments.jira_issue_key: parameter[6],
-                    Experiments.priority: parameter[7],
-                    Experiments.process_type: parameter[8],
-                    Experiments.filename: parameter[9],
+                    Experiments.priority: parameter[4],
+                    Experiments.filename: parameter[5],
                 }
             )
         session.commit()

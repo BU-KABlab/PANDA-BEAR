@@ -34,14 +34,16 @@ def insert_slack_ticket(ticket: SlackTicket) -> None:
     """
 
     with SessionLocal() as session:
-        session.add(SlackTickets(
-            msg_id=ticket.msg_id,
-            channel_id=ticket.channel_id,
-            message=ticket.msg_text,
-            response=ticket.valid_cmd,
-            timestamp=ticket.timestamp,
-            addressed_timestamp=ticket.addressed_timestamp,
-        ))
+        session.add(
+            SlackTickets(
+                msg_id=ticket.msg_id,
+                channel_id=ticket.channel_id,
+                message=ticket.msg_text,
+                response=ticket.valid_cmd,
+                timestamp=ticket.timestamp,
+                addressed_timestamp=ticket.addressed_timestamp,
+            )
+        )
         session.commit()
 
 

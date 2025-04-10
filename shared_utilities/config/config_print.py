@@ -9,6 +9,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def load_default_config():
+    """Load the default configuration file."""
+    config = ConfigParser()
+    config.read("./panda_lib/config/default_config.ini")
+    return config
+
+
 def print_config_values():
     # Read the config file
     CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
@@ -25,6 +32,7 @@ def print_config_values():
     for section in config.sections():
         print(f"[{section}]")
         for key, value in config.items(section):
+            value = value.split(";", 1)[0].strip()
             # Handle None or blank values
             if value in [None, "", "None"]:
                 print(f"{key} = None")
@@ -73,34 +81,57 @@ def resolve_config_paths():
         # Read the config file
         config.read(CONFIG_FILE)
 
+        print(
+            "Default config file generated. Please edit the config file and run again."
+        )
+
+    # Check that the config file has all sections and keys as the default config file
+    default_config = load_default_config()
+    for section in default_config.sections():
+        if not config.has_section(section):
+            print(f"Missing section: {section} in config file, creating it...")
+            config.add_section(section)
+            for key, value in default_config.items(section):
+                config.set(section, key, value)
+            continue
+        for key, value in default_config.items(section):
+            if not config.has_option(section, key):
+                print(
+                    f"Missing key: {key} in section: {section} in config file. Creating it..."
+                )
+                config.set(section, key, value)
+                continue
+            # Not checking the value of the key, just that it exists
+
     # Print the config file values
     for section in config.sections():
         for key, value in config.items(section):
+            value = value.split(";", 1)[0].strip()
             # Check that the db_address for both testing and production are valid
             if "db_address" in key:
-                    try:
-                        if value not in [None, "", "None", '""']:
-                            # Check if the path exists
-                            assert Path(value).exists()
-                        else:
-                            raise AssertionError
-                    except AssertionError:
-                        print(f"{key} = Path does not exist: {value}")
-                        generate_blank_db = input("Use default template database? (y/n): ")
-                        if generate_blank_db.lower() == "y":
-                            from shutil import copyfile
-                            copyfile("./panda_lib/config/template.db", ".")
-                        else:
-                            raise FileNotFoundError
-            
+                try:
+                    if value not in [None, "", "None", '""']:
+                        # Check if the path exists
+                        assert Path(value).resolve().exists()
+                    else:
+                        raise AssertionError
+                except AssertionError:
+                    print(f"{key} = Path does not exist: {value}")
+                    generate_blank_db = input("Use default template database? (y/n): ")
+                    if generate_blank_db.lower() == "y":
+                        from shutil import copyfile
+
+                        copyfile("./panda_lib/config/template.db", ".")
+                    else:
+                        raise FileNotFoundError
+
             # Handle None or blank values
             if value in [None, "", "None"]:
                 continue
 
-
             if "dir" in key or "path" in key:
                 # Check if the path exists
-                if not Path(value).exists():
+                if not Path(value).resolve().exists():
                     print(f"{key} = Path does not exist: {value}")
                     create = input("Create the path? (y/n): ")
                     if create.lower() == "y":

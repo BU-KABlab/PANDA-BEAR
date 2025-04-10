@@ -158,6 +158,13 @@ class ToolManager:
                 data = json.load(file)
                 return {item["name"]: ToolOffset.from_dict(item) for item in data}
         except (FileNotFoundError, json.JSONDecodeError):
+            with open(self.json_file, "w") as file:
+                json.dump(default_tool_json, file, indent=4)
+            return {
+                item["name"]: ToolOffset.from_dict(item) for item in default_tool_json
+            }
+        except Exception as e:
+            print(f"Error loading tools: {e}")
             return {}
 
     def save_tools(self):
@@ -221,3 +228,12 @@ class ToolManager:
 
     def __default_tool(self):
         return ToolOffset(name="center", offset=Coordinates(0, 0, 0))
+
+
+default_tool_json = [
+    {"name": "center", "x": 0.0, "y": 0.0, "z": 0.0},
+    {"name": "pipette", "x": 0.0, "y": 0.0, "z": 0.0},
+    {"name": "electrode", "x": 0.0, "y": 0.0, "z": 0.0},
+    {"name": "decapper", "x": 0.0, "y": 0.0, "z": 0.0},
+    {"name": "lens", "x": 0.0, "y": 0.0, "z": 0.0},
+]

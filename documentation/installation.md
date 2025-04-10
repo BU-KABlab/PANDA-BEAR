@@ -18,6 +18,8 @@ Example:
 
 `git clone -b my-branch git@github.com:user/myproject.git`
 
+For the PANDA SDL choose the `releases` branch.
+
 # 1. Drivers and SDKs
 
 ## FLIR SDK
@@ -30,7 +32,7 @@ Spinnaker is proprietary software made by FLIR and as such cannot be included in
 
 Downloading is free but you will need to make an account: <https://www.flir.com/products/spinnaker-sdk/>.
 
-Download both the 4.0 version of the Full Spinnaker SDK as well as the Python SDK that matches your OS and architecture. For example: Windows AMD which is the same as Windows x86.
+Download both the 4.0 version of the Full Spinnaker SDK as well as the Python SDK that matches your OS and architecture. For example: Windows AMD which is the same as Windows x86. Rasperry Pis are ARM devices.
 
 Install the SDK to your system (you do not need the developer version) to allow for using the Python SDK with this project.
 
@@ -92,11 +94,11 @@ Run the following commands:
 
 `uv venv --python 3.10` -- Creates the virtual environment. You can add a name if you want with `uv venv <name> --python 3.10`
 
-`source .venv\Scripts\activate` -- Activates the environment (change .venv to your .custom_name if you used one)
+Windows: `.venv\Scripts\activate` | MacOS & Linux `source .venv\bin\activate` -- Activates the environment (change .venv to your custom name if you used one)
 
 The commandline should now begin with `(.venv)` or the custom name you used.
 
-`uv sync` -- This will read the `pyproject.toml` file and install dependencies.
+`uv sync --reinstall` -- This will read the `pyproject.toml` file and install dependencies.
 
 ### Summary using 'panda_sdl' as environment name
 
@@ -146,11 +148,22 @@ pip install -r requirements.txt
 
 ## `.env` File
 
-PANDA_SDL only uses one `.env` file variable to point to the location of your configuration file. This way the config file can live outside of the repository and safely contain keys and tokens. The `.env` is in the repository's top directory.
+PANDA SDL uses an `.env` file variable to point to the location of your configuration file. This way the config file can live outside of the repository and safely contain keys and tokens.
+
+When first installing PANDA SDL. Create a new file with the name `.env` in the repository's top directory. Paste the following into the file and then update the #TODO field.
+
+```txt
+# Paths
+PANDA_SDL_CONFIG_PATH = #TODO
+
+# Temp DB for pytest
+TEMP_DB='0'
+
+```
 
 ## `Config.ini` File
 
-There is a `default_config.ini` in `shared_utilities/config` which you should use as a template and place wherever you desire so long as you update `.env`. Not all fields are required those that are, are prefilled.
+There is a `default_config.ini` in `shared_utilities/config` which you should use as a template and place wherever you desire (make sure to update your `.env`). Not all fields are required those that are, are prefilled.
 
 ## Test Your Installation
 
@@ -158,13 +171,9 @@ From the top directory, run: `pytest tests -v`
 
 If all tests pass you are ready to use the PANDA SDL!
 
-## Test Your Installation
-
-From the top directory, run: `pytest tests -v`
-
 ## Project Data
 
-PANDA SDL uses a SQL DB to keep track of experiments, parameters, results, and deck object. The SQLalchemy library is used to interface with which ever database you prefer. By default a SQLite dialect is used, and there is a demonstration SQlite database called `test_db.db` which can be built from running `db_default_structure.sql` then `db_default_data.sql`
+PANDA SDL uses a SQL DB to keep track of experiments, parameters, results, and deck objects. The SQLalchemy library is used to interface with which ever database you prefer. By default a SQLite dialect is used, and there is a demonstration SQlite database called `test_db.db` which can be built from running `db_default_structure.sql` then `db_default_data.sql`
 
 ## Setting up Slack [Optional]
 

@@ -33,7 +33,7 @@ from .schemas import (
     WellReadModel,
     WellWriteModel,
 )
-
+from shared_utilities.config.config_tools import read_config_value
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
 
@@ -822,7 +822,7 @@ def change_wellplate_location(
 
     with db_session() as session:
         ## Get the current plate id and location
-        statement = select(Wellplates).filter_by(current=1)
+        statement = select(Wellplates).filter_by(current=1, panda_unit_id=read_config_value("PANDA","unit_id",99))
 
         result: Wellplates = session.execute(statement).scalar()
         current_plate_id = result.id
@@ -1003,7 +1003,7 @@ def read_current_wellplate_info(
 
     try:
         with db_session() as session:
-            statement = select(Wellplates).filter_by(current=1)
+            statement = select(Wellplates).filter_by(current=1, panda_unit_id=read_config_value("PANDA","unit_id",99))
 
             result: Wellplates = session.execute(statement).scalar_one_or_none()
             current_plate_id = result.id

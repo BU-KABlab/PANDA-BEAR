@@ -48,7 +48,7 @@ class OpenCVCamera:
             self.logger.error(f"Error connecting to webcam: {e}")
             return False
 
-    def disconnect(self) -> None:
+    def close(self) -> None:
         """Disconnect from the camera"""
         if self.camera is not None:
             self.camera.release()
@@ -132,7 +132,7 @@ class MockOpenCVCamera:
         self.logger.info(f"Connected to mock webcam ID {self.camera_id}")
         return True
 
-    def disconnect(self) -> None:
+    def close(self) -> None:
         """Disconnect from the mock camera"""
         self.connected = False
         self.logger.info("Disconnected from mock webcam")

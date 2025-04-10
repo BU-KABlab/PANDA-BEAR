@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 from sqlalchemy.orm import sessionmaker
 
 from panda_lib.utilities import Coordinates, directory_picker, file_picker
+from shared_utilities.config.config_tools import read_config_value
 from shared_utilities.db_setup import SessionLocal
 from shared_utilities.log_tools import setup_default_logger
 
@@ -174,6 +175,7 @@ class Vial:
             coordinates=kwargs.get("coordinates", {"x": 0.0, "y": 0.0, "z": 0.0}),
             name=kwargs.get("name", "default"),
             base_thickness=kwargs.get("base_thickness", 1.0),
+            panda_unit_id=read_config_value("PANDA", "unit_id", 1),
         )
         self.vial_data = VialWriteModel.model_validate(
             self.service.create_vial(new_vial)
@@ -358,16 +360,6 @@ def read_vials(
         return list_of_waste_solutions, None
     else:
         return list_of_stock_solutions, list_of_waste_solutions
-
-    # for items in vial_parameters:
-    #     if items["name"] is not None:
-    #         if items["category"] == 0:  # Stock vial
-    #             read_vial = StockVial(**items)
-    #             list_of_stock_solutions.append(read_vial)
-    #         elif items["category"] == 1:  # Waste vial
-    #             read_vial = WasteVial(**items)
-    #             list_of_waste_solutions.append(read_vial)
-    # return list_of_stock_solutions, list_of_waste_solutions
 
 
 def reset_vials(

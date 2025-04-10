@@ -5,9 +5,10 @@ This module contains functions to interact with the pipette_status table in the 
 import json
 from typing import Union
 
+from sqlalchemy import select
 from sqlalchemy.orm.session import Session, sessionmaker
 
-from shared_utilities.config.config_tools import read_config
+from shared_utilities.config.config_tools import read_config, read_config_value
 from shared_utilities.db_setup import SessionLocal
 
 from .models import (
@@ -39,13 +40,25 @@ def select_pipette_status(
         if pipette_id is None:
             pipette_status = (
                 session.query(Pipette)
-                .filter(Pipette.active == 1)
+                .filter(
+                    Pipette.active == 1,
+                    Pipette.panda_unit_id == read_config_value("PANDA", "unit_id", 99),
+                )
                 .order_by(Pipette.updated.desc())
                 .first()
             )
         else:
             pipette_status = (
-                session.query(Pipette).filter(Pipette.id == pipette_id).first()
+                session.query(Pipette)
+                .filter(
+                    Pipette.id == pipette_id,
+                    Pipette.panda_unit_id == read_config_value("PANDA", "unit_id", 99),
+                )
+                .first()
+            )
+        if pipette_status is None:
+            raise ValueError(
+                f"Pipette with ID {pipette_id} not found with PANDA unit {read_config_value('PANDA', 'unit_id', 99)}."
             )
 
         if pipette_status.contents:
@@ -87,9 +100,14 @@ def update_pipette_status(
     """
     with session_maker() as session:
         session: Session
-        pipette_status = session.query(Pipette).filter(Pipette.id == pipette_id).first()
+
+        stmt = select(Pipette).where(
+            Pipette.id == pipette_id,
+            Pipette.panda_unit_id == read_config_value("PANDA", "unit_id", 99),
+        )
+        pipette_status = session.execute(stmt).scalar_one_or_none()
         if pipette_status is None:
-            new_pipette_status = Pipette(
+            pipette_status = Pipette(
                 capacity_ul=round(capacity_ul, precision),
                 capacity_ml=round(capacity_ml, precision),
                 volume_ul=round(volume_ul, precision),
@@ -97,13 +115,14 @@ def update_pipette_status(
                 contents=contents,
                 id=pipette_id,
             )
-            session.add(new_pipette_status)
+            session.add(pipette_status)
         else:
             pipette_status.capacity_ul = round(capacity_ul, precision)
             pipette_status.capacity_ml = round(capacity_ml, precision)
             pipette_status.volume_ul = round(volume_ul, precision)
             pipette_status.volume_ml = round(volume_ml, precision)
             pipette_status.contents = contents
+            session.commit()
         session.commit()
 
 
@@ -224,6 +243,8 @@ def insert_new_pipette(
                 contents={},
                 id=pipette_id,
                 active=1 if activate else 0,
+                uses=0,
+                panda_unit_id=read_config_value("PANDA", "unit_id", 99),
             )
             session.add(new_pipette)
 

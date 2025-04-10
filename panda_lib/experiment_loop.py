@@ -23,7 +23,7 @@ from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
 
 from panda_lib import scheduler
-from panda_lib.actions import actions_default
+from panda_lib.actions import purge_pipette
 from panda_lib.errors import (
     CAFailure,
     CVFailure,
@@ -129,10 +129,7 @@ def experiment_loop_worker(
         if toolkit.pump.pipette.volume > 0:
             # obs.place_text_on_screen("Pipette is not empty, purging into waste")
             status_queue.put((process_id, "Purging pipette into waste"))
-            actions_default.purge_pipette(
-                mill=toolkit.mill,
-                pump=toolkit.pump,
-            )
+            purge_pipette(toolkit)
 
         while True:
             ## Begin slack monitoring
@@ -511,7 +508,7 @@ def sila_experiment_loop_worker(
             if hardware.pump.pipette.volume > 0:
                 exp_logger.info("Pipette not empty, purging into waste")
                 set_worker_state(SystemState.PIPETTE_PURGE)
-                actions_default.purge_pipette(hardware.mill, hardware.pump)
+                purge_pipette(toolkit)
             # This also validates the experiment parameters since its a pydantic object
             exp_obj: EchemExperimentBase = _initialize_experiment(
                 specific_experiment_id, hardware, labware, exp_logger, specific_well_id
@@ -590,10 +587,7 @@ def sila_experiment_loop_worker(
             ## Clean up the instruments
             if hardware.pump.pipette.volume > 0 and hardware.pump.pipette.volume_ml < 1:
                 # assume unreal volume, not actually solution, set to 0
-                actions_default.purge_pipette(
-                    mill=hardware.mill,
-                    pump=hardware.pump,
-                )
+                purge_pipette(toolkit)
 
             hardware.mill.rest_electrode()
             # We are not disconnecting from instruments with this function, that will
@@ -620,7 +614,8 @@ def _initialize_experiment(
     exp_obj = select_complete_experiment_information(exp_id)
 
     # TODO: this is silly but we need to reference the queue to get the well_id because the experiment object isn't updated with the correct target well_id
-    _, _, _, _, well_id = sql_queue.get_next_experiment_from_queue(
+    # TODO: make a function that just gets the well_id from the queue and returns it
+    _, _, _, well_id = sql_queue.get_next_experiment_from_queue(
         specific_experiment_id=exp_id
     )
     # TODO: Replace with checking for available well, unless given one.
@@ -769,7 +764,7 @@ def _establish_system_state(
 
     # if any waste vials are full, send a slack message prompting the user to empty them and confirm if program should continue
     full_waste_vials = [vial for vial in waste_vials_only if vial.volume > 19000]
-    if len(full_waste_vials) == len(waste_vials_only):
+    if len(full_waste_vials) == len(waste_vials_only) and len(waste_vials_only)>0:
         slack.send_message(
             "alert",
             "The following waste vials are full: "
@@ -779,14 +774,16 @@ def _establish_system_state(
             "alert",
             "Please empty the waste vials and confirm in the terminal that the program should continue",
         )
-        options = input(
-            "Confirm that the program should continue by pressing enter or q to exit: "
-        )
-        if options.lower() == "q":
-            slack.send_message("alert", "PANDA_SDL is shutting down")
-            raise ShutDownCommand
+        # options = input(
+        #     "Confirm that the program should continue by pressing enter or q to exit: "
+        # )
+        # if options.lower() == "q":
+        #     slack.send_message("alert", "PANDA_SDL is shutting down")
+        #     raise ShutDownCommand
 
-        slack.send_message("alert", "The program is continuing")
+        # slack.send_message("alert", "The program is continuing")
+        raise ShutDownCommand
+
 
     # read the wellplate json and log the status of each well in a grid
     number_of_clear_wells = 0
@@ -823,6 +820,7 @@ def _check_stock_vials(
     Args:
     -----
         exp_solns (dict): Dictionary of solutions required for the experiment
+            formatted as:  {solution_name: {"volume": volume, "repeated": number_of_repeats}}
         stock_vials (list[Vial]): The stock vials
 
     Returns:
@@ -857,16 +855,27 @@ def _check_stock_vials(
         for key in vial.contents.keys():
             contents_keys_list.append(key)
 
+    names_list = [vial.vial_data.name.lower() for vial in stock_vials]
+    # Check that the experiment solution names are found in the stock vials
     for solution in exp_solns:
-        logger.debug("Checking for solution %s in stock vials", solution)
-
-        if solution not in contents_keys_list:
+        if solution not in names_list:
             logger.error(
                 "The experiment requires solution %s but it is not in the stock vials",
                 solution,
             )
             passes = False
             check_table["missing"].append(solution)
+
+    # for solution in exp_solns:
+    #     logger.debug("Checking for solution %s in stock vials", solution)
+
+    # if solution not in contents_keys_list:
+    #     logger.error(
+    #         "The experiment requires solution %s but it is not in the stock vials",
+    #         solution,
+    #     )
+    #     passes = False
+    #     check_table["missing"].append(solution)
 
     ## Check that there is enough volume in the stock vials to run the experiment
     ## Note there may be multiple of the same stock vial so we need to sum the volumes

@@ -1,4 +1,6 @@
+import json
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 from sqlalchemy import select
@@ -11,14 +13,30 @@ from hardware.grbl_cnc_mill import (
     set_up_mill_logger,
 )
 from panda_lib.labware.vials import read_vial
-from panda_lib.sql_tools.panda_models import Tool, VialStatus
-from shared_utilities.config.config_tools import read_logging_dir, read_testing_config
+from panda_lib.sql_tools.panda_models import VialStatus
+from shared_utilities.config.config_tools import (
+    read_config_value,
+    read_logging_dir,
+    read_testing_config,
+    reload_config,
+    write_config_value,
+)
 from shared_utilities.db_setup import SessionLocal
 
 # Set up the mill connection
 TESTING = read_testing_config()
 BaseMill = MockMill if TESTING else Mill
 mill_control_logger = set_up_mill_logger(Path(read_logging_dir()))
+
+
+@dataclass
+class Tool:
+    """A class representing a tool."""
+
+    name: str
+    x: float
+    y: float
+    z: float
 
 
 # A wrapper for the grbl_cnc_mill library adding electrode specific functions,
@@ -33,61 +51,65 @@ class PandaMill(Mill):
         self.logger = mill_control_logger
 
     def load_tools(self):
-        """Loads all of the tools from the PANDA db."""
+        """Loads all of the tools from the local config file."""
         self.tools = {}
-        with SessionLocal() as db:
-            tools = db.scalars(select(Tool)).all()
-            for tool in tools:
-                # NOTE: We use the tool_manager's add_tool method to add the tools from the db without updating the db
-                # for this one time operation. Otherwise you would use the add_tool method.
-                self.tool_manager.add_tool(tool.name, (tool.x, tool.y, tool.z))
+        reload_config()
+        tools = list(json.loads(read_config_value("TOOLS", "offsets")))
+        if not tools:
+            mill_control_logger.warning("No tools found in the config file.")
+            return
+
+        for tool in tools:
+            # NOTE: We use the tool_manager's add_tool method to add the tools from the db without updating the db
+            # for this one time operation. Otherwise you would use the add_tool method.
+            self.tool_manager.add_tool(tool["name"], (tool["x"], tool["y"], tool["z"]))
 
     def add_tool(self, tool_name: str, tool_offset: tuple[float, float, float]):
         """Adds a tool to the tool manager."""
         self.tool_manager.add_tool(tool_name, tool_offset)
-        with SessionLocal() as db:
-            existing_tool = db.scalars(
-                select(Tool).filter(Tool.name == tool_name)
-            ).first()
-            if existing_tool:
-                existing_tool.x = tool_offset[0]
-                existing_tool.y = tool_offset[1]
-                existing_tool.z = tool_offset[2]
-            else:
-                new_tool = Tool(
-                    name=tool_name,
-                    offset={
-                        "x": tool_offset[0],
-                        "y": tool_offset[1],
-                        "z": tool_offset[2],
-                    },
-                )
-                db.add(new_tool)
-            db.commit()
 
     def update_tool(self, tool_name: str, tool_offset: tuple[float, float, float]):
-        """Updates a tool in the tool manager."""
+        """Updates a tool in the tool manager and config file."""
         self.tool_manager.update_tool(tool_name, tool_offset)
-        with SessionLocal() as db:
-            tool = db.scalars(select(Tool).filter(Tool.name == tool_name)).first()
-            if tool:
-                tool.x = tool_offset[0]
-                tool.y = tool_offset[1]
-                tool.z = tool_offset[2]
-                db.commit()
-            else:
-                raise ValueError(f"Tool {tool_name} does not exist in the PANDA db")
+
+        # Update the config file's tool offsets
+        tools = list(json.loads(read_config_value("TOOLS", "offsets")))
+        for tool in tools:
+            if tool["name"] == tool_name:
+                tool["x"] = tool_offset[0]
+                tool["y"] = tool_offset[1]
+                tool["z"] = tool_offset[2]
+                break
+        else:
+            tools.append(
+                {
+                    "name": tool_name,
+                    "x": tool_offset[0],
+                    "y": tool_offset[1],
+                    "z": tool_offset[2],
+                }
+            )
+        # Write the updated tools back to the config file
+        write_config_value("TOOLS", "offsets", json.dumps(tools))
 
     def delete_tool(self, tool_name: str):
         """Deletes a tool from the tool manager."""
         self.tool_manager.delete_tool(tool_name)
-        with SessionLocal() as db:
-            tool = db.scalars(select(Tool).filter(Tool.name == tool_name)).first()
-            if tool:
-                db.delete(tool)
-                db.commit()
-            else:
-                raise ValueError(f"Tool {tool_name} does not exist in the PANDA db")
+
+        # Delete from the config file
+        tools = list(json.loads(read_config_value("TOOLS", "offsets")))
+        for tool in tools:
+            if tool["name"] == tool_name:
+                tools.remove(tool)
+                break
+        else:
+            mill_control_logger.warning(f"Tool {tool_name} not found in config file.")
+            return
+        # Write the updated tools back to the config file
+        write_config_value("TOOLS", "offsets", json.dumps(tools))
+        mill_control_logger.info(f"Tool {tool_name} deleted from config file.")
+        mill_control_logger.info(f"Tool {tool_name} deleted from tool manager.")
+        return
 
     def rinse_electrode(self, rinses: int = 3):
         """Rinse the electrode by moving it to the rinse position and back to the center position."""
@@ -164,61 +186,65 @@ class MockPandaMill(MockMill):
         self.logger = mill_control_logger
 
     def load_tools(self):
-        """Loads all of the tools from the PANDA db."""
+        """Loads all of the tools from the local config file."""
         self.tools = {}
-        with SessionLocal() as db:
-            tools = db.scalars(select(Tool)).all()
-            for tool in tools:
-                # NOTE: We use the tool_manager's add_tool method to add the tools from the db without updating the db
-                # for this one time operation. Otherwise you would use the add_tool method.
-                self.tool_manager.add_tool(tool.name, (tool.x, tool.y, tool.z))
+        reload_config()
+        tools = list(json.loads(read_config_value("TOOLS", "offsets")))
+        if not tools:
+            mill_control_logger.warning("No tools found in the config file.")
+            return
+
+        for tool in tools:
+            # NOTE: We use the tool_manager's add_tool method to add the tools from the db without updating the db
+            # for this one time operation. Otherwise you would use the add_tool method.
+            self.tool_manager.add_tool(tool["name"], (tool["x"], tool["y"], tool["z"]))
 
     def add_tool(self, tool_name: str, tool_offset: tuple[float, float, float]):
         """Adds a tool to the tool manager."""
         self.tool_manager.add_tool(tool_name, tool_offset)
-        with SessionLocal() as db:
-            existing_tool = db.scalars(
-                select(Tool).filter(Tool.name == tool_name)
-            ).first()
-            if existing_tool:
-                existing_tool.x = tool_offset[0]
-                existing_tool.y = tool_offset[1]
-                existing_tool.z = tool_offset[2]
-            else:
-                new_tool = Tool(
-                    name=tool_name,
-                    offset={
-                        "x": tool_offset[0],
-                        "y": tool_offset[1],
-                        "z": tool_offset[2],
-                    },
-                )
-                db.add(new_tool)
-            db.commit()
 
     def update_tool(self, tool_name: str, tool_offset: tuple[float, float, float]):
-        """Updates a tool in the tool manager."""
+        """Updates a tool in the tool manager and config file."""
         self.tool_manager.update_tool(tool_name, tool_offset)
-        with SessionLocal() as db:
-            tool = db.scalars(select(Tool).filter(Tool.name == tool_name)).first()
-            if tool:
-                tool.x = tool_offset[0]
-                tool.y = tool_offset[1]
-                tool.z = tool_offset[2]
-                db.commit()
-            else:
-                raise ValueError(f"Tool {tool_name} does not exist in the PANDA db")
+
+        # Update the config file's tool offsets
+        tools = list(json.loads(read_config_value("TOOLS", "offsets")))
+        for tool in tools:
+            if tool["name"] == tool_name:
+                tool["x"] = tool_offset[0]
+                tool["y"] = tool_offset[1]
+                tool["z"] = tool_offset[2]
+                break
+        else:
+            tools.append(
+                {
+                    "name": tool_name,
+                    "x": tool_offset[0],
+                    "y": tool_offset[1],
+                    "z": tool_offset[2],
+                }
+            )
+        # Write the updated tools back to the config file
+        write_config_value("TOOLS", "offsets", json.dumps(tools))
 
     def delete_tool(self, tool_name: str):
         """Deletes a tool from the tool manager."""
         self.tool_manager.delete_tool(tool_name)
-        with SessionLocal() as db:
-            tool = db.scalars(select(Tool).filter(Tool.name == tool_name)).first()
-            if tool:
-                db.delete(tool)
-                db.commit()
-            else:
-                raise ValueError(f"Tool {tool_name} does not exist in the PANDA db")
+
+        # Delete from the config file
+        tools = list(json.loads(read_config_value("TOOLS", "offsets")))
+        for tool in tools:
+            if tool["name"] == tool_name:
+                tools.remove(tool)
+                break
+        else:
+            mill_control_logger.warning(f"Tool {tool_name} not found in config file.")
+            return
+        # Write the updated tools back to the config file
+        write_config_value("TOOLS", "offsets", json.dumps(tools))
+        mill_control_logger.info(f"Tool {tool_name} deleted from config file.")
+        mill_control_logger.info(f"Tool {tool_name} deleted from tool manager.")
+        return
 
     def rinse_electrode(self, rinses: int = 3):
         """Rinse the electrode by moving it to the rinse position and back to the center position."""

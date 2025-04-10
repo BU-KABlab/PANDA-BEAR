@@ -12,7 +12,7 @@ def countdown_timer(samplerate, cycle):
             minutes, seconds = divmod(estimated_time, 60)
             sys.stdout.write("\r")
             sys.stdout.write(
-                f"Time remaining: {int(minutes)} minutes {round(seconds,2)} seconds"
+                f"Time remaining: {int(minutes)} minutes {round(seconds, 2)} seconds"
             )
             sys.stdout.flush()
         sys.stdout.write("\n")

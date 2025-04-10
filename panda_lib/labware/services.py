@@ -5,6 +5,7 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
+from shared_utilities.config.config_tools import read_config_value
 from shared_utilities.db_setup import SessionLocal
 
 from ..sql_tools.panda_models import PlateTypes as PlateTypeDBModel
@@ -44,7 +45,10 @@ class VialService:
         with self.db_session_maker() as db_session:
             # Check if the vial position is currently active, and deactivate it if so
             try:
-                stmt = select(Vials).filter_by(position=vial_data.position)
+                stmt = select(Vials).filter_by(
+                    position=vial_data.position,
+                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                )
                 vials = db_session.execute(stmt).scalars().all()
                 for vial in vials:
                     vial.active = 0
@@ -55,6 +59,7 @@ class VialService:
 
             try:
                 # Convert Pydantic model to SQLAlchemy model
+                vial_data.panda_unit_id = read_config_value("PANDA", "unit_id", 99)
                 vial: Vials = Vials(**vial_data.model_dump())
                 vial.active = 1
                 db_session.add(vial)
@@ -80,9 +85,17 @@ class VialService:
         with self.db_session_maker() as db_session:
             active_only = 1 if active_only else 0
             if name:
-                stmt = select(Vials).filter_by(name=name, active=active_only)
+                stmt = select(Vials).filter_by(
+                    name=name,
+                    active=active_only,
+                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                )
             elif position:
-                stmt = select(Vials).filter_by(position=position, active=active_only)
+                stmt = select(Vials).filter_by(
+                    position=position,
+                    active=active_only,
+                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                )
             else:
                 raise ValueError("Either position or name must be provided.")
             vial = db_session.execute(stmt).scalar()
@@ -109,10 +122,17 @@ class VialService:
             try:
                 if vial_id:
                     stmt = select(Vials).filter_by(
-                        id=vial_id, position=position, active=1
+                        id=vial_id,
+                        position=position,
+                        active=1,
+                        panda_unit_id=read_config_value("PANDA", "unit_id", 99),
                     )
                 else:
-                    stmt = select(Vials).filter_by(position=position, active=1)
+                    stmt = select(Vials).filter_by(
+                        position=position,
+                        active=1,
+                        panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                    )
                 vial = db_session.execute(stmt).scalar()
                 if not vial:
                     raise ValueError(f"Vial at position {position} not found.")
@@ -141,7 +161,10 @@ class VialService:
         """
         with self.db_session_maker() as db_session:
             try:
-                stmt = select(Vials).filter_by(position=position)
+                stmt = select(Vials).filter_by(
+                    position=position,
+                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                )
                 vial = db_session.execute(stmt).scalar()
                 if not vial:
                     raise ValueError(f"Vial at position {position} not found.")
@@ -161,7 +184,9 @@ class VialService:
             List[VialModel]: List of Pydantic models representing active vials.
         """
         with self.db_session_maker() as db_session:
-            stmt = select(Vials).filter_by(active=1)
+            stmt = select(Vials).filter_by(
+                active=1, panda_unit_id=read_config_value("PANDA", "unit_id", 99)
+            )
             result = db_session.execute(stmt)
             vials = result.scalars().all() if result else []
             vials = [vial for vial in vials if vial.category == cat] if cat else vials
@@ -182,7 +207,9 @@ class VialService:
             List[VialModel]: List of Pydantic models representing all vials.
         """
         with self.db_session_maker() as db_session:
-            stmt = select(Vials)
+            stmt = select(Vials).filter_by(
+                panda_unit_id=read_config_value("PANDA", "unit_id", 99)
+            )
             result = db_session.execute(stmt)
             vials = result.scalars().all() if result else []
 
@@ -203,7 +230,9 @@ class VialService:
             List[VialModel]: List of Pydantic models representing inactive vials.
         """
         with self.db_session_maker() as db_session:
-            stmt = select(Vials).filter_by(active=0)
+            stmt = select(Vials).filter_by(
+                active=0, panda_unit_id=read_config_value("PANDA", "unit_id", 99)
+            )
             result = db_session.execute(stmt)
             vials = result.scalars().all() if result else []
 
@@ -341,6 +370,7 @@ class WellplateService:
     def create_plate(self, plate_data: WellplateWriteModel) -> WellPlateDBModel:
         with self.session_maker() as db_session:
             try:
+                plate_data.panda_unit_id = read_config_value("PANDA", "unit_id", 99)
                 plate: WellPlateDBModel = WellPlateDBModel(**plate_data.model_dump())
                 db_session.add(plate)
                 db_session.commit()
@@ -446,6 +476,44 @@ class WellplateService:
             stmt = select(WellPlateDBModel).filter_by(id=plate_id)
             plate = db_session.execute(stmt).scalar()
             return plate is not None
+
+    def get_plate_types(self) -> List[PlateTypeModel]:
+        """
+        Fetches all plate types from the database.
+
+        Returns:
+            List[PlateTypeModel]: List of Pydantic models representing all plate types.
+            str: Formatted string table of plate types.
+        """
+        with self.session_maker() as db_session:
+            stmt = select(PlateTypeDBModel)
+            plate_types = db_session.execute(stmt).scalars().all()
+            plate_type_list = [
+                PlateTypeModel.model_validate(plate_type) for plate_type in plate_types
+            ]
+
+            return plate_type_list
+
+    def tabulate_plate_type_list(self, plate_types: List[PlateTypeModel] = None) -> str:
+        """
+        Prints a formatted string table of plate types.
+
+        Returns:
+            str: Formatted string table of plate types.
+        """
+        if not plate_types:
+            plate_types = self.get_plate_types()
+        if not plate_types:
+            return "No plate types found."
+
+        header = f"{'ID':<5} {'Substrate':<15} {'Gasket':<15} {'Count':<6}"
+        separator = "-" * len(header)
+        rows = [
+            f"{plate.id:<5} {plate.substrate:<15} {plate.gasket:<15} {plate.count:<6}"
+            for plate in plate_types
+        ]
+
+        return "\n".join([header, separator] + rows)
 
 
 class WellTypeService:

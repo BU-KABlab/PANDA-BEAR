@@ -1,16 +1,16 @@
 """A class to hold all of the instruments"""
 
 import logging
+import os
 from dataclasses import dataclass
 from logging import Logger
 from typing import Union
 
 import PySpin
+from sartorius import Scale
+from sartorius.mock import Scale as MockScale
 
-from hardware.gamry_potentiostat import gamry_control
 from hardware.panda_pipette.syringepump import MockPump, SyringePump
-from hardware.sartorius.sartorius import Scale
-from hardware.sartorius.sartorius.mock import Scale as MockScale
 from panda_lib.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
 from panda_lib.labware.deck import Deck
 from panda_lib.labware.labware_definitions import LabwareRegistry
@@ -19,12 +19,17 @@ from panda_lib.labware.wellplates import Wellplate
 from panda_lib.panda_gantry import MockPandaMill as MockMill
 from panda_lib.panda_gantry import PandaMill as Mill
 from panda_lib.slack_tools.slackbot_module import SlackBot
-from panda_lib.tools import ArduinoLink, MockArduinoLink, OBSController
+from panda_lib.tools import ArduinoLink, MockArduinoLink
 from shared_utilities.config.config_tools import (
     read_camera_type,
     read_config_value,
     read_webcam_settings,
 )
+
+if os.name == "nt":
+    from hardware.gamry_potentiostat import gamry_control
+else:
+    pass
 
 
 @dataclass
@@ -81,7 +86,6 @@ class Monitoring:
     """A class to hold all of the monitoring tools"""
 
     slack_monitor: SlackBot = None
-    obs: OBSController = None
 
 
 def connect_to_instruments(
@@ -148,7 +152,7 @@ def connect_to_instruments(
         logger.debug("Connecting to mill")
         instruments.mill = Mill()
         instruments.mill.connect_to_mill()
-        # instruments.mill.homing_sequence()
+        instruments.mill.homing_sequence()
     except Exception as error:
         logger.error("No mill connected, %s", error)
         instruments.mill = None
@@ -184,53 +188,58 @@ def connect_to_instruments(
         incomplete = True
 
     # Check for camera based on the configuration
-    if camera_type.lower() == "webcam":
-        try:
-            logger.debug("Connecting to Webcam")
-            webcam_id, resolution = read_webcam_settings()
-            instruments.opencv_camera = OpenCVCamera(
-                camera_id=webcam_id, resolution=resolution
-            )
+    if camera_type:
+        if camera_type.lower() == "webcam":
+            try:
+                logger.debug("Connecting to Webcam")
+                webcam_id, resolution = read_webcam_settings()
+                instruments.opencv_camera = OpenCVCamera(
+                    camera_id=webcam_id, resolution=resolution
+                )
 
-            if not instruments.opencv_camera.connect():
-                logger.error(f"Failed to connect to webcam with ID {webcam_id}")
+                if not instruments.opencv_camera.connect():
+                    logger.error(f"Failed to connect to webcam with ID {webcam_id}")
+                    instruments.opencv_camera = None
+                    incomplete = True
+                else:
+                    logger.debug(
+                        f"Connected to webcam ID {webcam_id} at resolution {resolution}"
+                    )
+            except Exception as error:
+                logger.error(f"No webcam connected, {error}")
                 instruments.opencv_camera = None
                 incomplete = True
-            else:
-                logger.debug(
-                    f"Connected to webcam ID {webcam_id} at resolution {resolution}"
-                )
-        except Exception as error:
-            logger.error(f"No webcam connected, {error}")
-            instruments.opencv_camera = None
-            incomplete = True
-    else:
-        # Default to FLIR camera
-        try:
-            logger.debug("Connecting to FLIR Camera")
-            system = PySpin.System.GetInstance()
-            cam_list = system.GetCameras()
-            if cam_list.GetSize() == 0:
-                logger.error("No FLIR Camera connected")
-                instruments.flir_camera = None
-            else:
-                instruments.flir_camera = cam_list.GetByIndex(0)
-                # instruments.flir_camera.Init()
-                cam_list.Clear()
-                system.ReleaseInstance()
+        else:
+            # Default to FLIR camera
+            try:
+                logger.debug("Connecting to FLIR Camera")
+                system = PySpin.System.GetInstance()
+                cam_list = system.GetCameras()
+                if cam_list.GetSize() == 0:
+                    logger.error("No FLIR Camera connected")
+                    instruments.flir_camera = None
+                else:
+                    instruments.flir_camera = cam_list.GetByIndex(0)
+                    # instruments.flir_camera.Init()
+                    cam_list.Clear()
+                    system.ReleaseInstance()
 
-                logger.debug("Connected to FLIR Camera")
-        except Exception as error:
-            logger.error("No FLIR Camera connected, %s", error)
-            instruments.flir_camera = None
-            incomplete = True
+                    logger.debug("Connected to FLIR Camera")
+            except Exception as error:
+                logger.error("No FLIR Camera connected, %s", error)
+                instruments.flir_camera = None
+                incomplete = True
+    else:
+        logger.error("No camera type specified in the configuration file")
+        instruments.flir_camera = None
+        incomplete = False
 
     # Connect to PSTAT
 
     # Connect to Arduino
     try:
         logger.debug("Connecting to Arduino")
-        arduino = ArduinoLink()
+        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
         if not arduino.configured:
             logger.error("No Arduino connected")
             incomplete = True
@@ -253,13 +262,14 @@ def test_instrument_connections(
     use_mock_instruments: bool = True,
     logger: Logger = logging.getLogger("panda"),
 ) -> tuple[Toolkit, bool]:
-    """Connects to each instrument, but does not trigger any action. Only looks for connection to be established.
+    """Connects to each instrument, but does not trigger any action. Only tests if connection can be established.
     Args:
         use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to True.
         logger (Logger, optional): The logger object. Defaults to "panda" logger.
 
     Returns:
-        tuple[Toolkit, bool]: A tuple containing the Toolkit object and a boolean indicating if all instruments were connected successfully."""
+        tuple[Toolkit, bool]: A tuple containing the Toolkit object and a boolean indicating if all instruments were connected successfully.
+    """
     instruments = Toolkit(
         mill=None,
         scale=None,
@@ -277,6 +287,7 @@ def test_instrument_connections(
     # Track connected and disconnected instruments for summary
     connected_instruments = []
     disconnected_instruments = []
+
     # Determine which type of camera to use
     camera_type = read_camera_type()
     logger.debug(f"Camera type set to: {camera_type}")
@@ -286,10 +297,8 @@ def test_instrument_connections(
         print("Using mock instruments")
         instruments.mill = MockMill()
         instruments.mill.connect_to_mill()
-        # instruments.scale = MockScale()
         instruments.pump = MockPump()
         instruments.arduino = MockArduinoLink()
-        # pstat = echem_mock.GamryPotentiostat.connect()
 
         # Setup mock camera based on the config
         if camera_type.lower() == "webcam":
@@ -308,39 +317,39 @@ def test_instrument_connections(
     print("Checking mill connection...", end="\r", flush=True)
     try:
         logger.debug("Connecting to mill")
-        instruments.mill = Mill()
-        instruments.mill.connect_to_mill()
+        mill = Mill()
+        mill.connect_to_mill()
         print("Mill connected                        ", flush=True)
         connected_instruments.append("Mill")
+        mill.disconnect()
     except Exception as error:
         logger.error("No mill connected, %s", error)
-        instruments.mill = None
         print("Mill not found                        ", flush=True)
         disconnected_instruments.append("Mill")
         incomplete = True
 
+    # Scale connection
     print("Checking scale connection...", end="\r", flush=True)
     try:
-        if not read_config_value("SCALE", "port"):
+        port = read_config_value("SCALE", "port")
+        if not port:
             raise Exception("No scale port specified in the configuration file")
         logger.debug("Connecting to scale")
-        scale = Scale(address=read_config_value("SCALE", "port"))
-        info_dict = scale.get_info()
-        model = info_dict["model"]
-        serial = info_dict["serial"]
-        software = info_dict["software"]
-        if not model:
-            logger.error("No scale connected")
-            print("Scale not found                        ", flush=True)
-            disconnected_instruments.append("Scale")
-            incomplete = True
-        else:
-            logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
+        scale = Scale(address=port)
+        if scale.hw.open:
+            info_dict = scale.get_info()
+            model = info_dict["model"]
+            if not model:
+                scale.hw.close()
+                raise Exception("Scale connected but no model information returned")
+            logger.debug("Connected to scale: %s", model)
             print("Scale connected                        ", flush=True)
             connected_instruments.append("Scale")
+            scale.hw.close()
+        else:
+            raise Exception("Failed to open connection to scale")
     except Exception as error:
         logger.error("No scale connected, %s", error)
-        instruments.scale = None
         print("Scale not found                        ", flush=True)
         disconnected_instruments.append("Scale")
         incomplete = True
@@ -349,13 +358,16 @@ def test_instrument_connections(
     print("Checking pump connection...", end="\r", flush=True)
     try:
         logger.debug("Connecting to pump")
-        instruments.pump = SyringePump()
-        logger.debug("Connected to pump at %s", instruments.pump.pump.address)
-        print("Pump connected                        ", flush=True)
-        connected_instruments.append("Pump")
+        pump = SyringePump()
+        if pump.connected:
+            logger.debug("Connected to pump at %s", pump.pump.address)
+            print("Pump connected                        ", flush=True)
+            connected_instruments.append("Pump")
+        else:
+            raise Exception("Failed to connect to pump")
+        pump.close()
     except Exception as error:
         logger.error("No pump connected, %s", error)
-        instruments.pump = None
         print("Pump not found                        ", flush=True)
         disconnected_instruments.append("Pump")
         incomplete = True
@@ -366,27 +378,21 @@ def test_instrument_connections(
         try:
             logger.debug("Connecting to Webcam")
             webcam_id, resolution = read_webcam_settings()
-            instruments.opencv_camera = OpenCVCamera(
-                camera_id=webcam_id, resolution=resolution
-            )
+            camera = OpenCVCamera(camera_id=webcam_id, resolution=resolution)
 
-            if not instruments.opencv_camera.connect():
-                logger.error(f"Failed to connect to webcam with ID {webcam_id}")
-                print("Webcam not found                        ", flush=True)
-                disconnected_instruments.append("Webcam")
-                instruments.opencv_camera = None
-                incomplete = True
-            else:
-                logger.debug(
-                    f"Connected to webcam ID {webcam_id} at resolution {resolution}"
-                )
-                print("Webcam connected                        ", flush=True)
-                connected_instruments.append("Webcam")
-                # Disconnect immediately after testing connection
-                instruments.opencv_camera.disconnect()
+            if not camera.connect():
+                raise Exception(f"Failed to connect to webcam with ID {webcam_id}")
+
+            logger.debug(
+                f"Connected to webcam ID {webcam_id} at resolution {resolution}"
+            )
+            print("Webcam connected                        ", flush=True)
+            connected_instruments.append("Webcam")
+            camera.close()
         except Exception as error:
             logger.error(f"No webcam connected, {error}")
-            instruments.opencv_camera = None
+            print("Webcam not found                        ", flush=True)
+            disconnected_instruments.append("Webcam")
             incomplete = True
     else:
         # Default to FLIR camera
@@ -395,24 +401,18 @@ def test_instrument_connections(
             system = PySpin.System.GetInstance()
             cam_list = system.GetCameras()
             if cam_list.GetSize() == 0:
-                logger.error("No FLIR Camera connected")
-                print("FLIR Camera not found                        ", flush=True)
-                disconnected_instruments.append("FLIR Camera")
-                instruments.flir_camera = None
-                incomplete = True
-            else:
-                instruments.flir_camera = cam_list.GetByIndex(0)
-                # instruments.flir_camera.Init()
-                cam_list.Clear()
-                system.ReleaseInstance()
+                raise Exception("No FLIR Camera found")
 
-                logger.debug("Connected to FLIR Camera")
-                print("FLIR Camera connected                        ", flush=True)
-                connected_instruments.append("FLIR Camera")
+            camera = cam_list.GetByIndex(0)
+            logger.debug("Connected to FLIR Camera")
+            print("FLIR Camera connected                        ", flush=True)
+            connected_instruments.append("FLIR Camera")
 
+            # Clean up
+            cam_list.Clear()
+            system.ReleaseInstance()
         except Exception as error:
             logger.error("No FLIR Camera connected, %s", error)
-            instruments.flir_camera = None
             print("FLIR Camera not found                        ", flush=True)
             disconnected_instruments.append("FLIR Camera")
             incomplete = True
@@ -420,18 +420,26 @@ def test_instrument_connections(
     # Potentiostat connection
     print("Checking Potentiostat connection...", end="\r", flush=True)
     try:
-        logger.debug("Connecting to Potentiostat")
-        connected = gamry_control.pstatconnect()
-        if not connected:
-            logger.error("No Potentiostat connected")
-            print("Potentiostat not found                        ", flush=True)
-            disconnected_instruments.append("Potentiostat")
-            incomplete = True
-        else:
+        if os.name == "nt":
+            logger.debug("Connecting to Potentiostat")
+            connected = gamry_control.pstatconnect()
+            if not connected:
+                raise Exception("Failed to connect to Potentiostat")
+
             logger.debug("Connected to Potentiostat")
-            gamry_control.pstatdisconnect()
             print("Potentiostat connected                        ", flush=True)
             connected_instruments.append("Potentiostat")
+            gamry_control.pstatdisconnect()
+        else:
+            logger.debug(
+                "Gamry Potentiostat connection not available on non-Windows OS"
+            )
+            print(
+                "Gamry Potentiostat connection not available on non-Windows OS",
+                flush=True,
+            )
+            connected_instruments.append("Potentiostat")
+            incomplete = True
     except Exception as error:
         logger.error("Error connecting to Potentiostat, %s", error)
         print("Potentiostat not found                        ", flush=True)
@@ -442,18 +450,14 @@ def test_instrument_connections(
     print("Checking Arduino connection...", end="\r", flush=True)
     try:
         logger.debug("Connecting to Arduino")
-        with ArduinoLink() as arduino:
-            if not arduino.configured:
-                logger.error("No Arduino connected")
-                incomplete = True
-                instruments.arduino = None
-                print("Arduino not found                        ", flush=True)
-                disconnected_instruments.append("Arduino")
-            else:
-                logger.debug("Connected to Arduino")
-                instruments.arduino = arduino
-                print("Arduino connected                        ", flush=True)
-                connected_instruments.append("Arduino")
+        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
+        if not arduino.configured:
+            raise Exception("Arduino not properly configured")
+
+        logger.debug("Connected to Arduino")
+        print("Arduino connected                        ", flush=True)
+        connected_instruments.append("Arduino")
+        arduino.close()
     except Exception as error:
         logger.error("Error connecting to Arduino, %s", error)
         print("Arduino not found                        ", flush=True)
@@ -488,6 +492,10 @@ def disconnect_from_instruments(instruments: Toolkit):
         instruments.mill.disconnect()
     # if instruments.flir_camera: instruments.flir_camera.DeInit()
     if instruments.opencv_camera:
-        instruments.opencv_camera.disconnect()
+        instruments.opencv_camera.close()
     if instruments.arduino:
         instruments.arduino.close()
+    if instruments.scale:
+        instruments.scale.hw.close()
+    if instruments.pump:
+        instruments.pump.close()

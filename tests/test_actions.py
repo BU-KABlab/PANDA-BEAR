@@ -1,7 +1,7 @@
 import logging
 
 # from datetime import datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -98,11 +98,24 @@ def test_handle_source_vessels(temp_test_db, src_vessel):
 def test_pipette_action(toolkit: Toolkit, src_vessel: StockVial, dst_vessel: Well):
     desired_volume = 100.0
 
-    _pipette_action(toolkit, src_vessel, dst_vessel, desired_volume)
-    assert toolkit.pump.pipette.volume == 0.0
-    assert toolkit.pump.pipette.volume_ml == 0.0
-    assert src_vessel.volume == 19900.0
-    assert dst_vessel.well_data.volume == 100.0
+    # Directly patch the instance method on toolkit.arduino
+    with patch.object(
+        toolkit.arduino, "async_line_break", new_callable=AsyncMock
+    ) as mock_line_break:
+        # Configure mock to return True first, then False
+        mock_line_break.side_effect = [True, False]
+
+        _pipette_action(toolkit, src_vessel, dst_vessel, desired_volume)
+        assert toolkit.pump.pipette.volume == 0.0
+        assert toolkit.pump.pipette.volume_ml == 0.0
+        assert src_vessel.volume == 19900.0
+        assert dst_vessel.well_data.volume == 100.0
+
+        # Verify async_line_break was called
+        assert mock_line_break.call_count > 0
+
+        # If you also need to verify async_send was called, you would need to mock that too
+        # with a separate patch.object call
 
 
 def test_volume_correction():

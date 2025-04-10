@@ -16,6 +16,10 @@ from hardware.panda_pipette import (
     select_pipette_status,
 )
 from hardware_calibration.mill_calibration_and_positioning import calibrate_mill
+from hardware_calibration import (
+    line_break_validation,
+    decapper_testing,
+)
 from menu.license_text import show_conditions, show_warranty
 from panda_lib import (
     SystemState,
@@ -59,6 +63,8 @@ status_queue: Queue = Queue()
 experiment_choices = ["0", "1"]
 analysis_choices = ["10"]
 blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
+global prj_id
+prj_id = None
 
 
 # def run_panda_sdl_with_ml():
@@ -155,15 +161,19 @@ def run_experiment():
 
 def run_queue():
     """Runs the queue."""
-    queue = print_queue_info()
-
+    global prj_id
+    queue = sql_queue.select_queue(project_id=prj_id)
+    queue_ids = [item[0] for item in queue]
+    if not queue_ids:
+        print("No experiments in the queue.")
+        return
     exp_processes = Process(
         target=experiment_loop.sila_experiment_loop_worker,
         kwargs={
             "status_queue": status_queue,
             "command_queue": exp_cmd_queue,
             "process_id": ProcessIDs.CONTROL_LOOP,
-            "specific_experiment_ids": queue,
+            "specific_experiment_ids": queue_ids,
         },
     )
     exp_processes.start()
@@ -300,7 +310,8 @@ def print_wellplate_info():
 
 def print_queue_info() -> list[str]:
     """Prints a summary of the current queue."""
-    current_queue = sql_queue.select_queue()
+    global prj_id
+    current_queue = sql_queue.select_queue(project_id=prj_id)
     print("Current Queue:")
     print("Experiment ID-Project ID-Campaign ID-Priority-Well ID")
     exp_ids = []
@@ -344,6 +355,51 @@ def change_wellplate_location():
     """Changes the location of the current wellplate."""
 
     wellplates.change_wellplate_location()
+
+
+def add_new_wellplate():
+    """Adds a new wellplate."""
+
+    while True:
+        try:
+            plate_id = int(input("Enter the new wellplate ID: ").strip().lower())
+            if WellplateService.check_plate_exists(plate_id):
+                print(f"Wellplate {plate_id} already exists.")
+                continue
+            break
+
+        except ValueError:
+            print("Invalid input. Please try again.")
+        except EOFError:
+            print("Invalid input. Please try again.")
+            continue
+
+    print("Available wellplate types:")
+    print(WellplateService.tabulate_plate_type_list())
+
+    plate_type = int(input("Enter the new wellplate type: ").strip().lower())
+
+    new_plate = wellplates.Wellplate(
+        create_new=True, plate_id=plate_id, type_id=plate_type
+    )
+
+    if new_plate:
+        print(f"New wellplate loaded: {new_plate.plate_data.id}")
+        new_plate.activate_plate()
+
+        # Confirm the plate is active
+        active_plate = WellplateService().get_active_plate()
+        if active_plate.id == new_plate.plate_data.id:
+            print(f"Wellplate {plate_id} is active")
+            print(
+                f"Location of A1: {new_plate.plate_data.a1_x}, {new_plate.plate_data.a1_y}"
+            )
+        else:
+            print(f"Problem with activating wellplate {plate_id}")
+        input("Press Enter to continue...")
+    else:
+        print("Failed to create new wellplate.")
+        input("Press Enter to continue...")
 
 
 def run_experiment_generator():
@@ -487,14 +543,14 @@ def instrument_check():
     """Runs the instrument check."""
     sql_system_state.set_system_status(SystemState.BUSY, "running instrument check")
     try:
-        instruments, all_found = toolkit.test_instrument_connections(False)
+        all_found = toolkit.test_instrument_connections(False)
         if all_found:
             input("Press Enter to continue...")
         else:
             input("Press Enter to continue...")
-    finally:
-        experiment_loop.disconnect_from_instruments(instruments)
-    return
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        input("Press Enter to continue...")
 
 
 def import_vial_data():
@@ -574,6 +630,13 @@ def list_analysis_script_ids():
 
     input("Press Enter to continue...")
 
+def decapper_test():
+    """Runs the decapper testing."""
+    decapper_testing.main()
+
+def linebreak_test():
+    """Runs the line break testing."""
+    line_break_validation.main()
 
 def main_menu(reduced: bool = False) -> Tuple[callable, str]:
     """Main menu for PANDA_SDL."""
@@ -587,8 +650,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "2.1": change_wellplate_location,
         "2.2": remove_wellplate_from_database,
         "2.3": print_wellplate_info,
-        "2.5": remove_training_data,
-        "2.6": remove_testing_experiments,
+        "2.4": add_new_wellplate,
         "2.7": update_well_status,
         "3": reset_vials_stock,
         "3.1": reset_vials_waste,
@@ -599,10 +661,15 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "4": print_queue_info,
         "4.1": run_experiment_generator,
         "4.2": remove_experiment_from_database,
+        "4.3": remove_training_data,
+        "4.4": remove_testing_experiments,
         "5": change_pipette_tip,
         "6": mill_calibration,
+        "6.1": decapper_test,
+        "6.2": linebreak_test,
         "7": test_image,
         "8": instrument_check,
+        "9": change_project_id,  # Add the change_project_id function to the menu
         "10": start_analysis_loop,
         "10.1": stop_analysis_loop,
         "10.2": list_analysis_script_ids,
@@ -613,6 +680,9 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "env": print_config_values,
         "q": exit_program,
     }
+
+    # Update blocking_choices to include the new menu option
+    blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
 
     missing_labware = check_essential_labware()
 
@@ -631,7 +701,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
 
         print(f"""Missing essential labware:
 {", ".join(missing_labware)}
-Experiments and generation are disabled until the labware is present.""")
+Experiments and generation are disabled until the labware is present.\n""")
 
     while True:
         menu_items = list(menu_options.items())
@@ -690,18 +760,12 @@ class ProcessIDs:
 
 def print_disclaimer():
     """Prints the disclaimer."""
-    print(
-        textwrap.dedent(
-            """\n
-PANDA SDL version 1.0.0, Copyright (C) 2024 Gregory Robben, Harley Quinn
-PANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warranty'
-for more details.
-
-This is free software, and you are welcome to redistribute it
-under certain conditions; choose `show_conditions' for details.
+    version = read_config()["PANDA"]["version"]
+    disclaimer = f"""\nPANDA SDL version {version}, Copyright (C) 2024 Gregory Robben, Harley Quinn\nPANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warranty'
+for more details.\n\nThis is free software, and you are welcome to redistribute it
+under certain conditions; choose `show_conditions' for details.\n\n
 """
-        ).strip()
-    )
+    print(textwrap.dedent(disclaimer))
 
 
 def banner():
@@ -731,12 +795,41 @@ def user_sign_in() -> str:
     return user_name.strip().capitalize()
 
 
+def prompt_for_project_id() -> int:
+    """Prompts the user for a project ID."""
+    global prj_id
+    prj_id = input_validation(
+        "Enter the project ID: ", int, None, False, "Invalid Project ID"
+    )
+    return prj_id
+
+
+def change_project_id():
+    """Changes the project ID."""
+    global prj_id
+    prj_id = int(
+        input_validation(
+            "Enter the new project ID: ", int, None, False, "Invalid Project ID"
+        )
+    )
+    print(f"Project ID changed to {prj_id}.")
+
+
 def get_active_db():
     """Get the active database according to the config file."""
     if read_testing_config():
         return read_config()["TESTING"]["testing_db_address"]
     else:
         return read_config()["PRODUCTION"]["production_db_address"]
+
+
+def read_panda_unit_information():
+    """Reads the unit information from the config file."""
+    config = read_config()
+    version = config["PANDA"]["version"]
+    unit_id = config["PANDA"]["unit_id"]
+    unit_name = config["PANDA"]["unit_name"]
+    return unit_id, unit_name, version
 
 
 def check_essential_labware():
@@ -776,7 +869,7 @@ if __name__ == "__main__":
     banner()
 
     try:
-        # user_name = user_sign_in()
+        prj_id = prompt_for_project_id()
         if config.getboolean("OPTIONS", "use_slack"):
             pass
             # slackbot_thread = start_slack_bot(slackThread_running)
@@ -785,7 +878,7 @@ if __name__ == "__main__":
             num, p_type, new_wells = wellplates.read_current_wellplate_info()
             try:
                 current_pipette = select_pipette_status()
-            except AttributeError:
+            except (AttributeError,ValueError):
                 insert_new_pipette()
                 current_pipette = select_pipette_status()
             remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
@@ -795,20 +888,30 @@ if __name__ == "__main__":
             analysis_status = get_process_status(
                 status_queue, ProcessIDs.ANALYSIS, analysis_status
             )
+            unit_id, unit_name, version = read_panda_unit_information()
             # slackbot_status = get_process_status(status_queue, ProcessIDs.SLACKBOT, slackbot_status)
             banner()
             print(
                 f"""
-Welcome!
+====================================================================================================
+PANDA Unit Information
+System Version: {version}
+Unit ID: {unit_id}
+Unit Name: {unit_name}
+====================================================================================================
 Testing mode is {"ENABLED" if read_testing_config() else "DISABLED"}
 DB: {get_active_db()}
-
+Project ID: {prj_id}
+====================================================================================================
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
 The current pipette id is {current_pipette.id} and has {remaining_uses} uses left.
 The queue has {sql_queue.count_queue_length()} experiments.
+Project {prj_id} has {sql_queue.count_queue_length(prj_id)} experiments.
 Process Status:
-    Experiment Loop: {exp_loop_prcss.is_alive() if exp_loop_prcss else False} - {exp_loop_status}
-    Analysis Loop: {analysis_prcss.is_alive() if analysis_prcss else False} - {analysis_status}
+    Experiment Loop Running: {exp_loop_prcss.is_alive() if exp_loop_prcss else False} - {exp_loop_status}
+    Analysis Loop Running: {analysis_prcss.is_alive() if analysis_prcss else False} - {analysis_status}
+====================================================================================================
+PANDA SDL Main Menu
 """
             )
 

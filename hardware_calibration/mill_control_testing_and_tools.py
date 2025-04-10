@@ -21,7 +21,7 @@ from hardware.grbl_cnc_mill import (
     StatusReturnError,
     set_up_mill_logger,
 )
-from panda_lib.actions.actions_default import capture_new_image
+from panda_lib.actions.imaging import capture_new_image
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well
 from panda_lib.labware.wellplates import Wellplates as Wellplate

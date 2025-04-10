@@ -27,6 +27,11 @@ def set_up_mill_logger(
         system_handler = logging.FileHandler(path_to_logs / "mill_control.log")
         system_handler.setFormatter(formatter)
         logger.addHandler(system_handler)
+        # Add a console handler for debugging
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.ERROR)
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
 
     return logger
 

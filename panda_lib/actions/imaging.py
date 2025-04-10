@@ -18,7 +18,6 @@ from ..experiments.experiment_types import (
 )
 from ..imaging import add_data_zone, capture_new_image, image_filepath_generator
 from ..toolkit import Toolkit
-from ..tools import MockOBSController, OBSController
 
 
 class ImageFailure(Exception):
@@ -138,20 +137,6 @@ def image_well(
         logger.debug("Image of well %s captured", instructions.well_id)
 
         instructions.results.append_image_file(filepath, context=step_description)
-
-        # Post to obs
-        try:
-            if config.getboolean("OPTIONS", "testing") or config.getboolean(
-                "OPTIONS", "use_obs"
-            ):
-                obs = MockOBSController()
-            else:
-                obs = OBSController()
-            obs.change_image(new_image_path=filepath)
-        except Exception as e:
-            # Not critical if the image is not posted to OBS
-            logger.exception("Failed to post image to OBS")
-            logger.exception(e)
 
     except ImageFailure as e:
         logger.exception("Failed to image well %s. Error %s occured", well_id, e)

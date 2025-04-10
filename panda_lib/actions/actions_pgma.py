@@ -1,17 +1,18 @@
 """Custom functions for the PANDA_SDL library which are specific to a particular experiment type."""
 
-from panda_lib.actions.actions_default import (
-    CVFailure,
-    EchemExperimentBase,
-    ExperimentStatus,
-    OCPError,
-    Tuple,
-    cv_parameters,
-    cyclic_volt,
-    logger,
-)
+from typing import Tuple
 
-from .electrochemistry import perform_cyclic_voltammetry
+from panda_lib.actions.electrochemistry import (
+    ExperimentStatus,
+    cv_parameters,
+    logger,
+    perform_cyclic_voltammetry,
+)
+from panda_lib.errors import (
+    CVFailure,
+    OCPError,
+)
+from panda_lib.experiments.experiment_types import EchemExperimentBase
 
 
 def cyclic_volt_pgma_fc(
@@ -104,8 +105,8 @@ def cyclic_volt_pgma_pama(
             CVcycle=3,
         )
 
-        cv_instructions = cyclic_volt(
-            cv_instructions=cv_instructions,
+        cv_instructions = perform_cyclic_voltammetry(
+            experiment=cv_instructions,
             file_tag=file_tag,
             # Do not change the instructions initial voltage during custom CV
             # We only change this for the deposition step which is the only step that

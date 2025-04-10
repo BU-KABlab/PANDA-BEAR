@@ -7,7 +7,7 @@ from logging import Logger
 from pathlib import Path
 from typing import Optional
 
-from PySpin import PySpin
+import PySpin
 
 from .flir_camera_tools import (
     file_enumeration,
@@ -36,9 +36,14 @@ def capture_new_image(
     """Capture a new image from the FLIR camera"""
     # Check the file name and ennumerate if it already exists
     file_name = file_enumeration(file_name)
+    result = False  # Initialize result with a default value
     try:
         pyspin_system: PySpin.SystemPtr = PySpin.System.GetInstance()
         camera_list: PySpin.CameraList = pyspin_system.GetCameras()
+        if camera_list.GetSize() == 0:
+            logger.error("No cameras found.")
+            return file_name, result
+
         # Run example on each camera
         for _, camera in enumerate(camera_list):
             camera: PySpin.CameraPtr

@@ -3,16 +3,15 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 """
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
-import os
 import time
 from typing import Optional
 
-import serial
+import nesp_lib
+from nesp_lib.mock import Pump as MockNespLibPump
 
-from hardware.nesp_lib_py import nesp_lib
-from hardware.nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
 from panda_lib.labware import Vial
 from panda_lib.labware import wellplates as wp
+from shared_utilities import get_port_manufacturers, get_ports
 from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import (
     default_logger as pump_control_logger,
@@ -61,6 +60,7 @@ class SyringePump:
         """
         Initialize the pump and set the capacity.
         """
+        self.connected = False
         self.max_pump_rate = config.getfloat(
             "PUMP", "max_pumping_rate", fallback=0.640
         )  # ml/min
@@ -68,6 +68,7 @@ class SyringePump:
             "PUMP", "syringe_capacity", fallback=1.0
         )  # mL
         self.pump = self.set_up_pump()
+
         self.pipette = Pipette()
 
     @timing_wrapper
@@ -77,17 +78,6 @@ class SyringePump:
         Returns:
             Pump: Initialized pump object.
         """
-
-        def get_ports():
-            """List all available ports"""
-            if os.name == "posix":
-                ports = list(serial.tools.list_ports.grep("ttyUSB"))
-            elif os.name == "nt":
-                ports = list(serial.tools.list_ports.grep("COM"))
-            else:
-                raise OSError("Unsupported OS")
-            return [port.device for port in ports]
-
         ports = get_ports()
         if not ports:
             pump_control_logger.error("No ports found")
@@ -100,13 +90,22 @@ class SyringePump:
             ports.remove(initial_port)
             ports.insert(0, initial_port)
 
+        # Check if a port has silicon labs in the name, if so try that first
+        ports_manurfacturers = get_port_manufacturers()
+        for port, manufacturer in ports_manurfacturers.items():
+            if "silicon" in manufacturer.lower():
+                ports.remove(port)
+                ports.insert(0, port)
+                break
+
         last_exception = None
         for port in ports:
             try:
                 pump_control_logger.debug(f"Setting up pump on port {port}...")
                 pump_port = nesp_lib.Port(
-                    port,
-                    config.getint("PUMP", "baudrate", fallback=19200),
+                    name=port,
+                    baud_rate=config.getint("PUMP", "baudrate", fallback=19200),
+                    timeout=5,
                 )
 
                 syringe_pump = nesp_lib.Pump(pump_port)
@@ -119,6 +118,7 @@ class SyringePump:
                 log_msg = f"Pump found at address {syringe_pump.address}"
                 config.set("PUMP", "port", port)
                 pump_control_logger.info(log_msg)
+                self.connected = True
                 time.sleep(2)
                 return syringe_pump
 
@@ -134,6 +134,23 @@ class SyringePump:
             raise Exception(f"All ports exhausted, last error: {last_exception}")
         else:
             raise Exception("All ports exhausted, no pump found")
+
+    def __enter__(self):
+        """Enter the context manager"""
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Exit the context manager"""
+        self.close()
+
+    def close(self):
+        """Disconnect the pump"""
+        if self.pump:
+            if self.pump.close():
+                pump_control_logger.info("Pump port closed")
+                pump_control_logger.info("Pump disconnected")
+        else:
+            pump_control_logger.warning("Pump not connected")
 
     @timing_wrapper
     def withdraw(
@@ -462,9 +479,13 @@ class MockPump(SyringePump):
         syringe_pump.volume_infused_clear()
         syringe_pump.volume_withdrawn_clear()
         log_msg = f"Pump found at address {syringe_pump.address}"
+        self.connected = True
         pump_control_logger.info(log_msg)
         time.sleep(2)
         return syringe_pump
+
+    def close(self):
+        self.connected = False
 
 
 if __name__ == "__main__":

@@ -42,6 +42,12 @@ class MockSerial:
     def flushOutput(self):
         pass
 
+    def flush(self):
+        pass
+
+    def read_all(self):
+        pass
+
     def mock_input(self, data):
         self.input.put(data)
 
@@ -71,7 +77,7 @@ class ArduinoLink:
         self.ser: Serial = None
         self.port_address: str = port_address
         self.baud_rate: int = baud_rate
-        self.timeout: int = 1
+        self.timeout: int = 10
         self.configured: bool = False
         self.ack: str = "OK"
         self._monitor_task = None
@@ -87,7 +93,7 @@ class ArduinoLink:
         """Close the connection to the Arduino when exiting the with statement"""
         self.close()
 
-    def choose_arduino_port(self):
+    def choose_arduino_port(self, interactive: bool = False) -> str:
         """Interactive method to choose the port that the Arduino is connected to"""
         # Check the OS and list the available ports accordingly
         if os.name == "posix":
@@ -97,11 +103,32 @@ class ArduinoLink:
         else:
             print("Unsupported OS")
             return
+        if not interactive:
+            # Look for Arduino LLC in the manufacturer field
+            for port in ports:
+                if "Arduino LLC" in port.manufacturer:
+                    return port.name
 
-        # Look for Arduino LLC in the manufacturer field
-        for port in ports:
-            if "Arduino LLC" in port.manufacturer:
-                return port.name
+        # If interactive, ask the user to choose the port
+        print("Available ports:")
+        for i, port in enumerate(ports):
+            print(f"{i}: {port.device} ({port.description})")
+        while True:
+            try:
+                choice = int(input("Choose the port number: "))
+                if choice < 0 or choice >= len(ports):
+                    print("Invalid choice")
+                    return
+                return ports[choice].device
+            except ValueError:
+                print("Invalid choice")
+
+            except KeyboardInterrupt:
+                print("\nExiting...")
+                return
+            except Exception as e:
+                print(f"Error: {e}")
+                return
 
     def close(self):
         """Close the connection to the Arduino"""
@@ -109,32 +136,47 @@ class ArduinoLink:
 
     def configure(self):
         """Configure the connection to the Arduino"""
-        if self.ser is None:
-            self.ser = Serial(
-                self.choose_arduino_port(), self.baud_rate, timeout=self.timeout
-            )
-        else:
-            self.ser = Serial(self.port_address, self.baud_rate, self.timeout)
+        try:
+            if self.ser is None and self.port_address is None:
+                # If no port address is provided, choose the port interactively
+                self.ser = Serial(
+                    self.choose_arduino_port(), self.baud_rate, timeout=self.timeout
+                )
+            else:
+                self.ser = Serial(
+                    self.port_address, self.baud_rate, timeout=self.timeout
+                )
 
-        if self.ser.is_open:
-            # Look for acknowlegement
-            time.sleep(2)
-            rx = self.ser.read_all().decode().strip()
-            if rx == self.ack:
-                self.configured = True
+            if self.ser.is_open:
+                # Look for acknowlegement
+                time.sleep(20)
+                rx = self.ser.read_all().decode().strip()
+                if self.ack in rx:
+                    self.configured = True
+                else:
+                    self.configured = False
+                    raise ConnectionError
+
+                rx = self.send(PawduinoFunctions.CMD_HELLO.value)
+                if rx == PawduinoReturnCodes.RESP_HELLO.value:
+                    self.configured = True
+                else:
+                    raise ConnectionError
+
             else:
                 self.configured = False
                 raise ConnectionError
 
-            rx = self.send(PawduinoFunctions.HELLO.value)
-            if rx == PawduinoReturnCodes.HELLO.value:
-                self.configured = True
-            else:
-                raise ConnectionError
+        except ConnectionError:
+            # Attempt to connect using the port finder if a port was supplied but didnt work
+            if self.port_address is not None:
+                self.ser = None
+                self.port_address = None
+                self.configure()
+                return
 
-        else:
+        except serial.SerialException:
             self.configured = False
-            raise ConnectionError
 
     def receive(self):
         """Listen to the Arduino and put the messages in the queue"""
@@ -197,6 +239,9 @@ class ArduinoLink:
 
         if rx is None:
             raise ConnectionError
+
+        if ":" in rx:
+            rx = rx.split(":")[-1]
         try:
             return int(rx)
         except (ValueError, TypeError):
@@ -326,8 +371,12 @@ class ArduinoLink:
         else:
             return None
 
-    async def async_line_break(self):
-        """Check if the capper line is broken (cap is present) asynchronously"""
+    async def async_line_break(self) -> bool:
+        """
+        Check if the capper line is broken (cap is present) asynchronously
+
+        Returns True if the line is broken, False if it is not, and None if there was an error
+        """
         value = await self.async_send(PawduinoFunctions.CMD_LINE_BREAK.value)
         if value == PawduinoReturnCodes.RESP_LINE_BREAK.value:
             return True
@@ -413,7 +462,7 @@ class MockArduinoLink(ArduinoLink):
         elif cmd == PawduinoFunctions.CMD_EMAG_OFF.value[0]:
             return PawduinoReturnCodes.RESP_EMAG_OFF.value[0]
         elif cmd == PawduinoFunctions.CMD_LINE_BREAK.value[0]:
-            return PawduinoReturnCodes.RESP_LINE_BREAK.value[0]
+            return True
         elif cmd == PawduinoFunctions.CMD_LINE_TEST.value[0]:
             return PawduinoReturnCodes.RESP_LINE_UNBROKEN.value[0]
         elif cmd == PawduinoFunctions.CMD_PIPETTE_HOME.value[0]:
@@ -430,6 +479,28 @@ class MockArduinoLink(ArduinoLink):
             return PawduinoReturnCodes.RESP_HELLO.value[0]
         else:
             return None
+
+    def receive(self):
+        """Mock receive method"""
+        if not self.arduinoQueue.empty():
+            return self.arduinoQueue.get()
+        return None
+
+    async def async_receive(self):
+        """Mock async receive method"""
+        if not self.arduinoQueue.empty():
+            return self.arduinoQueue.get_nowait()
+        return None
+
+    async def async_send(self, cmd):
+        """Mock async send method"""
+        self.ser.write(str(cmd).encode())
+        if isinstance(cmd, tuple):
+            cmd = cmd[0]
+        return self.send(cmd)
+
+    async def async_line_break(self):
+        return await self.async_send(PawduinoFunctions.CMD_LINE_BREAK.value)
 
 
 class AsyncMockArduinoLink(MockArduinoLink):
@@ -457,19 +528,19 @@ class PawduinoFunctions(enum.Enum):
 
     """
 
-    CMD_WHITE_ON = (1,)
-    CMD_WHITE_OFF = (2,)
-    CMD_CONTACT_ON = (3,)
-    CMD_CONTACT_OFF = (4,)
-    CMD_EMAG_ON = (5,)
-    CMD_EMAG_OFF = (6,)
-    CMD_LINE_BREAK = (7,)
-    CMD_LINE_TEST = (8,)
-    CMD_PIPETTE_HOME = (9,)
-    CMD_PIPETTE_MOVE = (10,)
-    CMD_PIPETTE_ASPIRATE = (11,)
-    CMD_PIPETTE_DISPENSE = (12,)
-    CMD_PIPETTE_STATUS = (13,)
+    CMD_WHITE_ON = 1
+    CMD_WHITE_OFF = 2
+    CMD_CONTACT_ON = 3
+    CMD_CONTACT_OFF = 4
+    CMD_EMAG_ON = 5
+    CMD_EMAG_OFF = 6
+    CMD_LINE_BREAK = 7
+    CMD_LINE_TEST = 8
+    CMD_PIPETTE_HOME = 9
+    CMD_PIPETTE_MOVE = 10
+    CMD_PIPETTE_ASPIRATE = 11
+    CMD_PIPETTE_DISPENSE = 12
+    CMD_PIPETTE_STATUS = 13
     CMD_HELLO = 99
 
 
@@ -487,19 +558,19 @@ class PawduinoReturnCodes(enum.Enum):
 
     """
 
-    RESP_WHITE_ON = (101,)
-    RESP_WHITE_OFF = (102,)
-    RESP_CONTACT_ON = (103,)
-    RESP_CONTACT_OFF = (104,)
-    RESP_EMAG_ON = (105,)
-    RESP_EMAG_OFF = (106,)
-    RESP_LINE_BREAK = (107,)
-    RESP_LINE_UNBROKEN = (108,)
-    RESP_PIPETTE_HOMED = (109,)
-    RESP_PIPETTE_MOVED = (110,)
-    RESP_PIPETTE_ASPIRATED = (111,)
-    RESP_PIPETTE_DISPENSED = (112,)
-    RESP_PIPETTE_STATUS = (113,)
+    RESP_WHITE_ON = 101
+    RESP_WHITE_OFF = 102
+    RESP_CONTACT_ON = 103
+    RESP_CONTACT_OFF = 104
+    RESP_EMAG_ON = 105
+    RESP_EMAG_OFF = 106
+    RESP_LINE_BREAK = 107
+    RESP_LINE_UNBROKEN = 108
+    RESP_PIPETTE_HOMED = 109
+    RESP_PIPETTE_MOVED = 110
+    RESP_PIPETTE_ASPIRATED = 111
+    RESP_PIPETTE_DISPENSED = 112
+    RESP_PIPETTE_STATUS = 113
     RESP_HELLO = 999
 
 
@@ -550,22 +621,22 @@ def run_async_test():
     asyncio.run(async_test_of_pawduino())
 
 
-if __name__ == "__main__":
-    # test_of_pawduino()
-    # run_async_test()
-    async def main():
-        arduino = ArduinoLink()
-        await arduino.start_monitoring()
-        response = await arduino.async_white_lights_on()
-        print(f"Response: {response}")
+# if __name__ == "__main__":
+# test_of_pawduino()
+# run_async_test()
+# async def main():
+#     arduino = ArduinoLink()
+#     await arduino.start_monitoring()
+#     response = await arduino.async_white_lights_on()
+#     print(f"Response: {response}")
 
-        # Listen for incoming messages
-        while True:
-            msg = await arduino.get_next_message(timeout=1.0)
-            if msg is not None:
-                print(f"Received: {msg}")
+#     # Listen for incoming messages
+#     while True:
+#         msg = await arduino.get_next_message(timeout=1.0)
+#         if msg is not None:
+#             print(f"Received: {msg}")
 
-        await arduino.stop_monitoring()
-        arduino.close()
+#     await arduino.stop_monitoring()
+#     arduino.close()
 
-    asyncio.run(main())
+# asyncio.run(main())

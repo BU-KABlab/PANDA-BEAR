@@ -3,17 +3,11 @@
 # Standard imports
 
 # Non-standard imports
-from panda_lib.actions.actions_default import (
-    CAFailure,
-    CVFailure,
-    DepositionFailure,
-    Instruments,
-    OCPError,
-    __flush_v2,
-    __forward_pipette_v2,
-    chrono_amp,
+from panda_lib.actions import (
+    flush_pipette,
     image_well,
     solution_selector,
+    transfer,
     waste_selector,
 )
 from panda_lib.actions.actions_pedot import (
@@ -21,10 +15,19 @@ from panda_lib.actions.actions_pedot import (
     chrono_amp_edot_coloring,
     cyclic_volt_edot_characterizing,
 )
-from panda_lib.experiment_loop import Toolkit
+from panda_lib.actions.electrochemistry import (
+    CAFailure,
+    CVFailure,
+    DepositionFailure,
+    OCPError,
+)
+from panda_lib.actions.electrochemistry import (
+    perform_chronoamperometry as chrono_amp,
+)
 from panda_lib.experiments.experiment_types import EchemExperimentBase, ExperimentStatus
-from panda_lib.labware.vials import Vial2, read_vials
-from panda_lib.utilities import correction_factor, solve_vials_ilp
+from panda_lib.labware.vials import Vial, read_vials
+from panda_lib.toolkit import Toolkit
+from panda_lib.utilities import Instruments, correction_factor, solve_vials_ilp
 
 PROTOCOL_ID = 999
 
@@ -111,7 +114,7 @@ def pedotdeposition(
     # as that is our minimum pipetting volume. However once the calculations are done, the
     # actual volume to be pipetted is calculated using the correction factor.
     stock_vials, _ = read_vials()
-    edot_vials: list[Vial2] = [
+    edot_vials: list[Vial] = [
         vial for vial in stock_vials if vial.name == "edot" and vial.volume > 0
     ]
 
@@ -147,13 +150,12 @@ def pedotdeposition(
     for position, volume in edot_volumes_by_pos.items():
         if volume == 0:
             continue
-        vial: Vial2 = next(vial for vial in edot_vials if vial.position == position)
-        __forward_pipette_v2(
+        vial: Vial = next(vial for vial in edot_vials if vial.position == position)
+        transfer(
             volume=correction_factor(volume, vial.viscosity_cp),
-            from_vessel=vial,
-            to_vessel=toolkit.wellplate.wells[instructions.well_id],
+            src_vessel=vial,
+            dst_vessel=toolkit.wellplate.wells[instructions.well_id],
             toolkit=toolkit,
-            pumping_rate=instructions.pumping_rate,
         )
 
     ## Move the electrode to the well
@@ -199,10 +201,10 @@ def pedotdeposition(
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    __forward_pipette_v2(
+    transfer(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
-        from_vessel=toolkit.wellplate.wells[instructions.well_id],
-        to_vessel=waste_selector(
+        src_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=waste_selector(
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
@@ -211,20 +213,20 @@ def pedotdeposition(
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    __flush_v2(flush_solution_name="rinse", toolkit=toolkit)
+    flush_pipette(flush_with="rinse", toolkit=toolkit)
 
     toolkit.global_logger.info("7. Rinsing the well 4x with rinse")
     instructions.set_status_and_save(ExperimentStatus.RINSING)
     for i in range(4):
         # Pipette the rinse solution into the well
         toolkit.global_logger.info("Rinse %d of 4", i + 1)
-        __forward_pipette_v2(
+        transfer(
             volume=correction_factor(120),
-            from_vessel=solution_selector(
+            src_vessel=solution_selector(
                 "rinse",
                 correction_factor(120),
             ),
-            to_vessel=toolkit.wellplate.wells[instructions.well_id],
+            dst_vessel=toolkit.wellplate.wells[instructions.well_id],
             toolkit=toolkit,
             pumping_rate=toolkit.pump.max_pump_rate,
         )
@@ -235,10 +237,10 @@ def pedotdeposition(
             instrument=Instruments.PIPETTE,
         )
         # Clear the well
-        __forward_pipette_v2(
+        transfer(
             volume=correction_factor(120),
-            from_vessel=toolkit.wellplate.wells[instructions.well_id],
-            to_vessel=waste_selector(
+            src_vessel=toolkit.wellplate.wells[instructions.well_id],
+            dst_vessel=waste_selector(
                 "waste",
                 correction_factor(120),
             ),
@@ -287,15 +289,14 @@ def pedotbleaching(
     toolkit.global_logger.info(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
-    __forward_pipette_v2(
+    transfer(
         volume=correction_factor(120),
-        from_vessel=solution_selector(
+        src_vessel=solution_selector(
             "liclo4",
             correction_factor(120),  # hard code this
         ),
-        to_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=toolkit.wellplate.wells[instructions.well_id],
         toolkit=toolkit,
-        pumping_rate=instructions.pumping_rate,
     )
 
     ## Move the electrode to the well
@@ -337,10 +338,10 @@ def pedotbleaching(
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    __forward_pipette_v2(
+    transfer(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
-        from_vessel=toolkit.wellplate.wells[instructions.well_id],
-        to_vessel=waste_selector(
+        src_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=waste_selector(
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
@@ -349,7 +350,7 @@ def pedotbleaching(
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    __flush_v2(
+    flush_pipette(
         flush_solution_name="rinse",
         toolkit=toolkit,
     )
@@ -397,15 +398,14 @@ def pedotcoloring(
     toolkit.global_logger.info(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
-    __forward_pipette_v2(
+    transfer(
         volume=correction_factor(120),
-        from_vessel=solution_selector(
+        src_vessel=solution_selector(
             "liclo4",
             correction_factor(120),
         ),
-        to_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=toolkit.wellplate.wells[instructions.well_id],
         toolkit=toolkit,
-        pumping_rate=instructions.pumping_rate,
     )
 
     ## Move the electrode to the well
@@ -449,10 +449,10 @@ def pedotcoloring(
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    __forward_pipette_v2(
+    transfer(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
-        from_vessel=toolkit.wellplate.wells[instructions.well_id],
-        to_vessel=waste_selector(
+        src_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=waste_selector(
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
@@ -461,7 +461,7 @@ def pedotcoloring(
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    __flush_v2(
+    flush_pipette(
         flush_solution_name="rinse",
         toolkit=toolkit,
         flush_count=3,
@@ -511,15 +511,14 @@ def pedotcv(
     toolkit.global_logger.info(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
-    __forward_pipette_v2(
+    transfer(
         volume=instructions.solutions["liclo4"],
-        from_vessel=solution_selector(
+        src_vessel=solution_selector(
             "liclo4",
             instructions.solutions["liclo4"],
         ),
-        to_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=toolkit.wellplate.wells[instructions.well_id],
         toolkit=toolkit,
-        pumping_rate=instructions.pumping_rate,
     )
 
     ## Move the electrode to the well
@@ -558,10 +557,10 @@ def pedotcv(
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    __forward_pipette_v2(
+    transfer(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
-        from_vessel=toolkit.wellplate.wells[instructions.well_id],
-        to_vessel=waste_selector(
+        src_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=waste_selector(
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
@@ -570,8 +569,8 @@ def pedotcv(
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    __flush_v2(
-        flush_solution_name="rinse",
+    flush_pipette(
+        flush_with="rinse",
         toolkit=toolkit,
         flush_count=3,
     )
@@ -588,21 +587,21 @@ def pedotcv(
     for i in range(4):
         # Pipette the rinse solution into the well
         toolkit.global_logger.info("Rinse %d of 4", i + 1)
-        __forward_pipette_v2(
+        transfer(
             volume=correction_factor(120),
-            from_vessel=solution_selector(
+            src_vessel=solution_selector(
                 "rinse",
                 correction_factor(120),
             ),
-            to_vessel=toolkit.wellplate.wells[instructions.well_id],
+            dst_vessel=toolkit.wellplate.wells[instructions.well_id],
             toolkit=toolkit,
             pumping_rate=toolkit.pump.max_pump_rate,
         )
         # Clear the well
-        __forward_pipette_v2(
+        transfer(
             volume=correction_factor(120),
-            from_vessel=toolkit.wellplate.wells[instructions.well_id],
-            to_vessel=waste_selector(
+            src_vessel=toolkit.wellplate.wells[instructions.well_id],
+            dst_vessel=waste_selector(
                 "waste",
                 correction_factor(120),
             ),
