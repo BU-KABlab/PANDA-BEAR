@@ -3,316 +3,29 @@ Deck management system for the PANDA instrument.
 Provides a grid-based system for positioning labware on the deck.
 """
 
+import json
 import logging
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import Dict, List
+from pathlib import Path
+from typing import Dict, List, Optional, Union
+
+from .base import (
+    DeckSlot,
+    LabwareCategory,
+    SlotPosition,
+    direction_multipliers,
+    reorient_coordinates,
+)
+from .labware_definition import Labware
+from .models import (
+    Brand,
+    Dimensions,
+    LabwareDefinition,
+    Metadata,
+    Offset,
+    Parameters,
+)
 
 logger = logging.getLogger("panda")
-definition_schema = [
-    "ordering",
-    "brand",
-    "metadata",
-    "dimensions",
-    "wells",
-    "groups",
-    "parameters",
-    "namespace",
-    "version",
-    "schemaVersion",
-    "cornerOffsetFromSlot",
-]
-
-
-class DeckSlot:
-    """Represents a physical slot on the instrument deck."""
-
-    def __init__(
-        self,
-        position: str,
-        row: str,
-        column: int,
-        shape: str,
-        diameter: float,
-        x: float,
-        y: float,
-        z: float,
-    ):
-        """
-        Initialize a deck slot.
-
-        Args:
-            position: String position in format 'A1', 'B2', etc.
-        """
-
-        self.position: str = position
-        self.row: str = row
-        self.column: int = column
-        self.occupied = False
-        self.labware_id = None
-        self.shape: str = shape
-        self.diameter: float = diameter
-        self.x: float = x
-        self.y: float = y
-        self.z: float = z
-
-    @classmethod
-    def from_definition(self, data: dict, position: str) -> "DeckSlot":
-        """Create a Well from a dictionary representation."""
-        return self(
-            position=position,
-            row=position[0],
-            column=int(position[1:]) if len(position) > 1 else None,
-            shape=data["shape"],
-            diameter=data["diameter"],
-            x=data["x"],
-            y=data["y"],
-            z=data["z"],
-        )
-
-    @staticmethod
-    def _validate_position(position: str) -> bool:
-        """Validate that a position string is in the correct format."""
-        if not position or len(position) < 2:
-            return False
-
-        row = position[0].upper()
-        try:
-            col = int(position[1:])
-        except ValueError:
-            return False
-
-        if isinstance(row, str) and len(row) > 2 or col < 1:
-            return False
-
-        return True
-
-    def __repr__(self):
-        status = "occupied" if self.occupied else "empty"
-        return f"<DeckSlot {self.position} ({status})>"
-
-
-class LabwareCategory(Enum):
-    """Types of labware supported by the system."""
-
-    DECK = "deck"
-    WELLPLATE = "wellPlate"
-    VIAL_RACK = "vialRack"
-    CUSTOM = "custom"
-
-
-@dataclass
-class SlotPosition:
-    """Physical coordinates of a position on the deck."""
-
-    x: float
-    y: float
-    z: float
-
-
-@dataclass
-class Dimension:
-    """Dimensions of a labware type."""
-
-    xDimension: float
-    yDimension: float
-    zDimension: float
-
-
-@dataclass
-class Offset:
-    """Offset of a labware type in each axis from a primary slot."""
-
-    x: float
-    y: float
-    z: float
-
-
-@dataclass
-class WellContents:
-    """Contents of a well."""
-
-    name: str
-    volume: float
-    concentration: float
-
-
-@dataclass
-class Well:
-    """Represents a single well in a labware."""
-
-    depth: float
-    total_liquid_volume: float
-    shape: str
-    diameter: float
-    x: float
-    y: float
-    z: float
-    volume: float = 0.0
-    contamination: int = 0
-    contents: WellContents = None
-
-    @classmethod
-    def from_definition(cls, data: dict) -> "Well":
-        """Create a Well from a dictionary representation."""
-        # Verify that the data matches the definition schema
-
-        return cls(
-            depth=data["depth"],
-            total_liquid_volume=data["totalLiquidVolume"],
-            shape=data["shape"],
-            diameter=data["diameter"],
-            x=data["x"],
-            y=data["y"],
-            z=data["z"],
-        )
-
-
-@dataclass
-class Metadata:
-    """Metadata of a labware type."""
-
-    displayName: str
-    displayCategory: str
-    displayVolumeUnits: str
-    tags: List[str]
-
-
-class Labware:
-    """Definition of a labware type from a JSON file.
-
-    Attributes:
-        name: Name of the labware
-        labware_category: Type of labware (wellPlate, vialRack, custom)
-        category: Category of the labware
-        description: Description of the labware
-        brand: Brand of the labware
-        brand_id: Brand identifier
-        position: Default position on the deck
-        reference_point: Reference point for the labware
-        dimensions: Dimensions of the labware
-        slot_offset: Offset of the labware in the slot
-        ordering: Ordering of the wells
-        wells: Dictionary of well definitions
-        orientation: Orientation of the labware
-        metadata: Additional metadata
-
-    """
-
-    def __init__(
-        self,
-        name: str = None,
-        definition: dict = None,
-        orientation: int = 0,
-    ):
-        self.id: str = name
-        self.labware_category: LabwareCategory
-        self.category: str
-        self.description: str
-        self.brand: str
-        self.brand_id: str
-        self.deck_slot_reference: str
-        self.deck_slot_reference_coordinates: SlotPosition
-        self.deck_slots: List[str]
-        self.dimensions: Dimension
-        self.slot_offset: Offset
-        self.ordering: tuple
-        self.order: List[str]
-        self.wells: Dict[str:Well]
-        self.orientation: int = orientation
-        self.metadata: Dict = field(default_factory=dict)
-        self.rows: int
-        self.columns: int
-
-        if definition:
-            ob = self.from_definition(definition)
-            self.labware_category = ob.labware_category
-            self.brand = ob.brand
-            self.brand_id = ob.brand_id
-            self.dimensions = ob.dimensions
-            self.slot_offset = ob.slot_offset
-            self.ordering = ob.ordering
-            self.rows = ob.rows
-            self.columns = ob.columns
-            self.orientation = ob.orientation
-            # Flatten the nested list of well IDs
-            flat_ordering = [well for row in ob.ordering for well in row if well]
-
-            # Sort alphanumerically by row (letter) then column (number)
-            self.order = sorted(
-                flat_ordering,
-                key=lambda x: (
-                    x[0],  # First sort by the letter part
-                    int("".join(filter(str.isdigit, x))),  # Then by the numeric part
-                ),
-            )
-            self.wells = ob.wells
-            self.metadata = ob.metadata
-            self.id = ob.id
-            self.category = ob.category
-
-    @staticmethod
-    def validate_deck_position(position: str) -> bool:
-        """Validate that a position string is a valid deck position."""
-        return DeckSlot._validate_position(position)
-
-    @classmethod
-    def from_definition(self, data: dict) -> "Labware":
-        """Create a LabwareDefinition from a definition dictionary."""
-        # Verify that the data matches the definition schema
-        if not all(key in data for key in definition_schema):
-            logger.error("Invalid labware definition")
-
-        labware = self()
-
-        labware.labware_category = LabwareCategory(data["metadata"]["displayCategory"])
-        labware.brand = data["brand"]["brand"]
-        labware.brand_id = data["brand"]["brandId"]
-        labware.dimensions = Dimension(
-            xDimension=data["dimensions"]["xDimension"],
-            yDimension=data["dimensions"]["yDimension"],
-            zDimension=data["dimensions"]["zDimension"],
-        )
-        labware.slot_offset = Offset(
-            x=data["cornerOffsetFromSlot"]["x"],
-            y=data["cornerOffsetFromSlot"]["y"],
-            z=data["cornerOffsetFromSlot"]["z"],
-        )
-        labware.ordering = data["ordering"]
-        labware.wells = {k: Well.from_definition(v) for k, v in data["wells"].items()}
-        labware.rows = len(data["ordering"])
-        labware.columns = len(data["ordering"][0])
-        labware.orientation = data.get("orientation", 0)
-
-        labware.metadata = Metadata(
-            displayName=data["metadata"]["displayName"],
-            displayCategory=data["metadata"]["displayCategory"],
-            displayVolumeUnits=data["metadata"]["displayVolumeUnits"],
-            tags=data["metadata"]["tags"],
-        )
-        labware.id = data["parameters"]["loadName"]
-        labware.category = data["metadata"]["displayCategory"]
-
-        return labware
-
-    def __str__(self):
-        return f"Labware: {self.id}"
-
-    def well_location(self, well_id: str) -> SlotPosition:
-        """Return the physical location of a well in the labware."""
-        if not self.deck_slot_reference or not self.deck_slot_reference_coordinates:
-            logger.error("Labware not placed on the deck")
-            return None
-        well = self.wells[well_id]
-        x_direction_multiplier, y_direction_multiplier = directionMultipliers(
-            self.orientation
-        )
-
-        reference_slot = self.deck_slot_reference_coordinates
-        true_x = reference_slot.x + well.x * x_direction_multiplier
-        true_y = reference_slot.y + well.y * y_direction_multiplier
-        true_z = reference_slot.z + well.z
-        return SlotPosition(x=true_x, y=true_y, z=true_z)
 
 
 class Deck:
@@ -320,81 +33,167 @@ class Deck:
     Represents the physical deck of the instrument with grid-based slots.
     """
 
-    def __init__(self, definition: dict = None):
+    def __init__(self, definition: Union[dict, LabwareDefinition] = None):
         """Initialize an empty deck."""
         self.slots: Dict[str, DeckSlot] = {}
-        self.dimensions: Dimension = None
+        self.dimensions: Dimensions = None
         self.labware_positions: Dict[str, List[str]] = {}
         self.calibration_offset: Offset = None
         self.metadata: Metadata = None
+        self.deck_slot_reference: str = "A1"
+        self.ordering: List[List[str]] = []
 
         if definition:
-            deck = self.from_definition(definition)
-            self.slots = deck.slots
-            self.dimensions = deck.dimensions
-            self.metadata = deck.metadata
+            if isinstance(definition, LabwareDefinition):
+                self._from_pydantic_definition(definition)
+            else:
+                deck = self.from_definition(definition)
+                self.slots = deck.slots
+                self.dimensions = deck.dimensions
+                self.metadata = deck.metadata
+                self.ordering = deck.ordering
+
+    def _from_pydantic_definition(self, definition: LabwareDefinition) -> None:
+        """Initialize deck from a LabwareDefinition Pydantic model."""
+        # Create slot objects for all positions defined in the ordering
+        for row in definition.ordering:
+            for position in row:
+                if position:  # Skip empty positions
+                    well_def = definition.wells[position]
+                    self.slots[position] = DeckSlot(
+                        position=position,
+                        row=position[0],
+                        column=int(position[1:]),
+                        shape=well_def.shape,
+                        diameter=well_def.diameter,
+                        x=well_def.x,
+                        y=well_def.y,
+                        z=well_def.z,
+                    )
+
+        self.ordering = definition.ordering
+        self.dimensions = definition.dimensions
+        self.metadata = definition.metadata
+        logger.info(f"Deck dimensions loaded: {definition.dimensions}")
+        logger.info(f"Deck metadata loaded: {definition.metadata.displayName}")
 
     @classmethod
-    def from_definition(self, data: dict) -> "Deck":
+    def from_definition(cls, data: dict | LabwareDefinition) -> "Deck":
         """Create a Deck from a definition dictionary."""
-
-        # Verify that the data matches the definition schema
-        if not all(key in data for key in definition_schema):
-            logger.error("Invalid deck definition")
-
-        deck = self()
-
-        # Create slot objects for all positions defined in the ordering
-        for row in data["ordering"]:
-            for position in row:
-                deck.slots[position] = DeckSlot.from_definition(
-                    data["wells"][position], position
-                )
-
-        # Set deck dimensions if needed
-        if "dimensions" in data:
-            deck.dimensions = Dimension(
-                xDimension=data["dimensions"]["xDimension"],
-                yDimension=data["dimensions"]["yDimension"],
-                zDimension=data["dimensions"]["zDimension"],
-            )
-            logger.info(f"Deck dimensions loaded: {data['dimensions']}")
-
-        # Add any additional deck-specific properties from definition
-        if "metadata" in data:
-            deck.metadata = Metadata(
-                displayName=data["metadata"]["displayName"],
-                displayCategory=data["metadata"]["displayCategory"],
-                displayVolumeUnits=data["metadata"]["displayVolumeUnits"],
-                tags=data["metadata"]["tags"],
-            )
-            logger.info(f"Deck metadata loaded: {data['metadata']['displayName']}")
-
+        # Convert to Pydantic model for validation
+        if isinstance(data, dict):
+            pydantic_def = LabwareDefinition.model_validate(data)
+        else:
+            pydantic_def = data
+        # Create deck from validated model
+        deck = cls()
+        deck._from_pydantic_definition(pydantic_def)
         return deck
 
+    def to_definition(self) -> LabwareDefinition:
+        """Convert the Deck to a LabwareDefinition for serialization."""
+        # Convert slots to WellDefinition objects
+        wells = {k: v.to_well_definition() for k, v in self.slots.items()}
+
+        # Create the LabwareDefinition
+        return LabwareDefinition(
+            ordering=self.ordering,
+            brand=Brand(brand="KABlab", brandId=["PANDA-DECK"]),
+            metadata=self.metadata
+            or Metadata(
+                displayName="KABlab PANDA Deck",
+                displayCategory="deck",
+                displayVolumeUnits=None,
+                tags=[],
+            ),
+            dimensions=self.dimensions
+            or Dimensions(xDimension=480, yDimension=485, zDimension=20),
+            wells=wells,
+            parameters=Parameters(loadName="kablab_panda_deck", orientation=0),
+            namespace="panda_v2",
+            version=1,
+            schemaVersion=2,
+            cornerOffsetFromSlot=Offset(x=0, y=0, z=0),
+        )
+
+    def save_definition(self, file_path: Optional[str] = None) -> str:
+        """
+        Save the deck definition to a JSON file.
+
+        Args:
+            file_path: Optional path to save the file. If not provided,
+                      uses the default location in the labware registry.
+
+        Returns:
+            The path where the file was saved
+        """
+        definition = self.to_definition()
+
+        if not file_path:
+            # Import here to avoid circular import
+            from .labware_registry import LabwareRegistry
+
+            # Use default location from LabwareRegistry
+            registry = LabwareRegistry()
+            version_numbers = []
+            # Get all deck definitions
+            deck_labwares = registry.get_by_type(LabwareCategory.DECK)
+
+            # Find highest version number
+            for labware in deck_labwares:
+                if labware.id.startswith("kablab_panda") and "_deck_v" in labware.id:
+                    try:
+                        version = int(labware.id.split("_v")[-1])
+                        version_numbers.append(version)
+                    except ValueError:
+                        pass
+
+            # Increment version
+            new_version = (max(version_numbers) if version_numbers else 0) + 1
+            new_name = f"kablab_panda_v2_deck_v{new_version}"
+
+            # Update definition with new name and version
+            definition.parameters.loadName = new_name
+            definition.version = new_version
+
+            file_path = registry.definitions_dir / f"{new_name}.json"
+        else:
+            file_path = Path(file_path)
+
+        # Ensure directory exists
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Write the file
+        with open(file_path, "w") as f:
+            json.dump(definition.model_dump(exclude_none=True), f, indent=2)
+
+        logger.info(f"Saved deck definition to {file_path}")
+        return str(file_path)
+
     def place_labware(
-        self, labware: Labware, reference_slot: str | DeckSlot, orientation: int = None
+        self,
+        labware: Labware,
+        reference_slot: Union[str, DeckSlot],
+        orientation: int = None,
     ) -> bool:
         """
         Place labware on the deck at the specified slots.
 
         Example:
-        deck.place_labware('plate1', ['A1', 'A2', 'A3'])
+        deck.place_labware(labware, 'A1')
 
         Args:
-            labware_id: Unique identifier for the labware
-            slot_positions: List of slot positions to occupy
+            labware: The labware object to place
+            reference_slot: Reference slot position or DeckSlot object
+            orientation: Optional orientation override (0-3)
 
         Returns:
             True if placement successful, False otherwise
         """
-        # Check if the labware is already placed
-        # if labware.id in self.labware_positions:
-        #     logger.error(f"Labware {labware.id} is already placed on the deck")
-        #     return False
-
         # Check if the reference slot is valid
-        if not DeckSlot._validate_position(reference_slot):
+        if isinstance(reference_slot, str) and not DeckSlot._validate_position(
+            reference_slot
+        ):
             logger.error(f"Invalid reference slot: {reference_slot}")
             return False
 
@@ -413,21 +212,11 @@ class Deck:
         x_dim = labware.dimensions.xDimension  # in mm
         y_dim = labware.dimensions.yDimension  # in mm
         x_dim, y_dim = reorient_coordinates(x_dim, y_dim, orientation)
-        # calculate the area of the labware footprint
-        # if the orientation is 0 or 2, the x dimension is the width of the labware
-        # if the orientation is 0 the footprint grows in the positive x and y directions
-        # if the orientation is 2 the footprint grows in the negative x and positive y directions
-        # if the orientation is 1 or 3, the x dimension is the length of the labware
-        # if the orientation is 1 the footprint grows in the negative x and negative y directions
-        # if the orientation is 3 the footprint grows in the positive x and negative y directions
-        # starting at the reference_slot position, determine the other slots that the labware will occupy
 
         reference_coordinates = (reference_slot.x, reference_slot.y)
-
-        x_direction, y_direction = directionMultipliers(orientation)
+        x_direction, y_direction = direction_multipliers(orientation)
 
         # Calculate bounds using the direction multipliers
-
         bounds_of_x_dimensions = (
             reference_coordinates[0],
             reference_coordinates[0] + (x_dim * x_direction),
@@ -442,25 +231,12 @@ class Deck:
         bounds_of_y_dimensions = sorted(bounds_of_y_dimensions)
 
         for slot in self.slots:
-            self.slots[slot].x
             slot_coordinates = (self.slots[slot].x, self.slots[slot].y)
             if (
-                slot_coordinates[0]
-                >= bounds_of_x_dimensions[
-                    0
-                ]  # slot is greater than or equal to lower x bound
-                and slot_coordinates[0]
-                <= bounds_of_x_dimensions[
-                    1
-                ]  # slot is less than or equal to upper x bound
-                and slot_coordinates[1]
-                >= bounds_of_y_dimensions[
-                    0
-                ]  # slot is greater than or equal to lower y bound
-                and slot_coordinates[1]
-                <= bounds_of_y_dimensions[
-                    1
-                ]  # slot is less than or equal to upper y bound
+                slot_coordinates[0] >= bounds_of_x_dimensions[0]
+                and slot_coordinates[0] <= bounds_of_x_dimensions[1]
+                and slot_coordinates[1] >= bounds_of_y_dimensions[0]
+                and slot_coordinates[1] <= bounds_of_y_dimensions[1]
             ):
                 deck_positions.append(slot)
 
@@ -479,8 +255,9 @@ class Deck:
             x=reference_slot.x, y=reference_slot.y, z=reference_slot.z
         )
         labware.deck_slots = deck_positions
-        for index, position in enumerate(deck_positions):
+        for position in deck_positions:
             self.slots[position].occupied = True
+            self.slots[position].labware_id = labware.id
 
         self.labware_positions[labware.id] = deck_positions
 
@@ -600,7 +377,7 @@ class Deck:
                         ax.text(
                             j + 0.45,
                             i + 0.45,
-                            self.slots[position].well_id,
+                            self.slots[position].labware_id,
                             ha="center",
                             va="center",
                             fontsize=8,
@@ -628,18 +405,41 @@ class Deck:
 
         return fig
 
+    def calculate_slots_from_a1(
+        self,
+        x_coordinate: float,
+        y_coordinate: float,
+        x_spacing: float,
+        y_spacing: float,
+    ) -> str:
+        """
+        Apply the x and y coordinates as the new x,y values of slot A1.
 
-def directionMultipliers(orientation: int) -> tuple:
-    # Define direction multipliers for each orientation
-    x_direction = -1 if orientation in [1, 2] else 1
-    y_direction = -1 if orientation in [2, 3] else 1
+        From this new x,y position, calculate the new positions of all other slots,
+        assuming that the slots are arranged in a grid with the specified spacing and
+        that A1 is the top-left corner and the rows are lettered alphabetically and the columns are numbered.
 
-    return x_direction, y_direction
+        Once calculated, update the x,y coordinates of the slots in the deck definition by creating and registering
+        a new deck labware definition with an incremented version number.
 
+        Returns:
+            Path to the new deck definition file
+        """
+        # Calculate the new coordinates for each slot based on the reference slot and spacing
+        for position, slot in self.slots.items():
+            row_offset = ord(slot.row) - ord("A")
+            col_offset = slot.column - 1
 
-def reorient_coordinates(x: float, y: float, orientation: int) -> tuple:
-    # Define direction multipliers for each orientation
-    if orientation in [1, 3]:
-        x, y = y, x
+            # Calculate new coordinates
+            new_x = x_coordinate + col_offset * x_spacing
+            new_y = y_coordinate + row_offset * y_spacing
 
-    return x, y
+            # Update the slot coordinates
+            slot.x = new_x
+            slot.y = new_y
+            # Keep the z coordinate the same
+
+        # Save the updated deck definition
+        new_file_path = self.save_definition()
+
+        return new_file_path

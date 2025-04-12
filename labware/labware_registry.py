@@ -1,6 +1,6 @@
 """
-Labware definition management for the PANDA system.
-Handles loading and validating labware JSON definitions.
+Labware registry management for the PANDA system.
+Handles loading, storing, and retrieving labware definitions.
 """
 
 import json
@@ -8,7 +8,9 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from .deck import Labware, LabwareCategory
+from .base import LabwareCategory
+from .labware_definition import Labware
+from .models import LabwareDefinition
 
 
 class LabwareRegistry:
@@ -53,14 +55,16 @@ class LabwareRegistry:
         with open(file_path, "r") as f:
             data = json.load(f)
 
-        # definition = Labware.from_definition(data)
-        # self.definitions[definition.id] = definition
+        # Validate the definition using Pydantic
+        validated_def = LabwareDefinition.model_validate(data)
 
-        definition = data
-        self.definitions[data["parameters"]["loadName"]] = data
+        # Convert to Labware object
+        definition = Labware.from_definition(data)
+        self.definitions[validated_def.parameters.loadName] = definition
+
         return definition
 
-    def get_definition(self, name: str) -> Optional[Labware]:
+    def get_definition(self, name: str) -> Optional[LabwareDefinition]:
         """Get a labware definition by name."""
         return self.definitions.get(name)
 
@@ -76,11 +80,14 @@ class LabwareRegistry:
 
     def register_definition(self, definition: Dict) -> Labware:
         """Register a new labware definition from a dictionary."""
+        # Validate the definition using Pydantic
+        validated_def = LabwareDefinition.model_validate(definition)
+
         labware_def = Labware.from_definition(definition)
-        self.definitions[labware_def.name] = labware_def
+        self.definitions[validated_def.parameters.loadName] = labware_def
 
         # Save to file
-        file_path = self.definitions_dir / f"{labware_def.name}.json"
+        file_path = self.definitions_dir / f"{validated_def.parameters.loadName}.json"
         with open(file_path, "w") as f:
             json.dump(definition, f, indent=2)
 
