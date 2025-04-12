@@ -23,6 +23,7 @@ from .models import (
     Metadata,
     Offset,
     Parameters,
+    WellDefinition,
 )
 
 logger = logging.getLogger("panda")
@@ -93,7 +94,9 @@ class Deck:
     def to_definition(self) -> LabwareDefinition:
         """Convert the Deck to a LabwareDefinition for serialization."""
         # Convert slots to WellDefinition objects
-        wells = {k: v.to_well_definition() for k, v in self.slots.items()}
+        wells = {
+            k: WellDefinition(**v.to_well_definition()) for k, v in self.slots.items()
+        }
 
         # Create the LabwareDefinition
         return LabwareDefinition(
@@ -409,8 +412,9 @@ class Deck:
         self,
         x_coordinate: float,
         y_coordinate: float,
-        x_spacing: float,
-        y_spacing: float,
+        z_coordinate: float = -200,
+        x_spacing: float = 25,
+        y_spacing: float = 45,
     ) -> str:
         """
         Apply the x and y coordinates as the new x,y values of slot A1.
@@ -437,6 +441,7 @@ class Deck:
             # Update the slot coordinates
             slot.x = new_x
             slot.y = new_y
+            slot.z = z_coordinate
             # Keep the z coordinate the same
 
         # Save the updated deck definition

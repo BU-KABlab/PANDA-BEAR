@@ -104,6 +104,18 @@ class DeckSlot:
         status = "occupied" if self.occupied else "empty"
         return f"<DeckSlot {self.position} ({status})>"
 
+    def to_well_definition(self) -> dict:
+        """Convert the DeckSlot to a dictionary representation."""
+        return {
+            "depth": self.z,
+            "total_liquid_volume": None,
+            "shape": self.shape,
+            "diameter": self.diameter,
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+        }
+
 
 @dataclass
 class Well:
