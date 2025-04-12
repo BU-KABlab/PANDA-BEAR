@@ -8,6 +8,11 @@ plate = registry.get_definition("kablab_96_wellplate_150ul")
 print("Creating a deck")
 deck = Deck(registry.get_definition("kablab_panda_v2_deck_v1"))
 
+new_deck_def = deck.calculate_slots_from_a1(
+    x_coordinate=-442.5,
+    y_coordinate=-45.5,
+)
+
 # Place labware on the deck
 print("Establishing and placing a wellplate at slot A1")
 deck.place_labware(plate, "A1")
