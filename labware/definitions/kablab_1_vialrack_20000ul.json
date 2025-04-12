@@ -1,0 +1,67 @@
+{
+    "ordering": [
+        [
+            "A1"
+        ]
+    ],
+    "brand": {
+        "brand": "KABlab",
+        "brandId": [
+            "HQLabware-vialrack-1"
+        ]
+    },
+    "metadata": {
+        "displayName": "KABlab 1 Vial Rack with Fisherbrand 20 mL",
+        "displayCategory": "vialRack",
+        "displayVolumeUnits": "µL",
+        "tags": []
+    },
+    "dimensions": {
+        "xDimension": 35,
+        "yDimension": 35,
+        "zDimension": 68
+    },
+    "wells": {
+        "A1": {
+            "depth": 66,
+            "totalLiquidVolume": 20000,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 0,
+            "y": 0,
+            "z": 2
+        }
+    },
+    "groups": [
+        {
+            "brand": {
+                "brand": "Fisherbrand",
+                "brandId": [
+                    "033377"
+                ]
+            },
+            "metadata": {
+                "wellBottomShape": "flat",
+                "displayCategory": "vialRack"
+            },
+            "wells": [
+                "A1"
+            ]
+        }
+    ],
+    "parameters": {
+        "rotation": 0,
+        "quirks": [],
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "loadName": "kablab_1_vialrack_20000ul"
+    },
+    "namespace": "panda_v2",
+    "version": 1,
+    "schemaVersion": 2,
+    "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+    }
+}
