@@ -420,11 +420,30 @@ class Mill:
             config_file_path = Path(__file__).parent / config_file
             with open(config_file_path, "r", encoding="UTF-8") as file:
                 configuration = json.load(file)
-            self.logger.debug("Mill config loaded: %s", configuration)
-            return configuration
-        except FileNotFoundError as err:
+                self.logger.debug("Mill config loaded: %s", configuration)
+                return configuration
+        except FileNotFoundError:
             self.logger.error("Config file not found")
-            raise MillConfigNotFound("Config file not found") from err
+            self.logger.error("Creating default config file")
+            dft_config_file_path = Path(__file__).parent / "default_configuration.json"
+
+            # Better approach: read default and return it directly
+            try:
+                with open(dft_config_file_path, "r", encoding="UTF-8") as dft_file:
+                    default_config = json.load(dft_file)
+
+                # Create the missing config file
+                config_file_path.parent.mkdir(exist_ok=True)
+                with open(config_file_path, "w", encoding="UTF-8") as file:
+                    json.dump(default_config, file, indent=4)
+
+                self.logger.info("Default config file copied to: %s", config_file_path)
+                return default_config
+            except FileNotFoundError as err:
+                self.logger.critical("Default configuration file not found!")
+                raise MillConfigNotFound(
+                    "Neither primary nor default config file found"
+                ) from err
         except Exception as err:
             self.logger.error("Error reading config file: %s", str(err))
             raise MillConfigError("Error reading config file") from err
