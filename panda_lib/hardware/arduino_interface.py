@@ -449,34 +449,34 @@ class MockArduinoLink(ArduinoLink):
         if isinstance(cmd, tuple):
             cmd = cmd[0]  # Handle tuple values from the enum
 
-        if cmd == PawduinoFunctions.CMD_WHITE_ON.value[0]:
-            return PawduinoReturnCodes.RESP_WHITE_ON.value[0]
-        elif cmd == PawduinoFunctions.CMD_WHITE_OFF.value[0]:
-            return PawduinoReturnCodes.RESP_WHITE_OFF.value[0]
-        elif cmd == PawduinoFunctions.CMD_CONTACT_ON.value[0]:
-            return PawduinoReturnCodes.RESP_CONTACT_ON.value[0]
-        elif cmd == PawduinoFunctions.CMD_CONTACT_OFF.value[0]:
-            return PawduinoReturnCodes.RESP_CONTACT_OFF.value[0]
-        elif cmd == PawduinoFunctions.CMD_EMAG_ON.value[0]:
-            return PawduinoReturnCodes.RESP_EMAG_ON.value[0]
-        elif cmd == PawduinoFunctions.CMD_EMAG_OFF.value[0]:
-            return PawduinoReturnCodes.RESP_EMAG_OFF.value[0]
-        elif cmd == PawduinoFunctions.CMD_LINE_BREAK.value[0]:
+        if cmd == PawduinoFunctions.CMD_WHITE_ON.value:
+            return PawduinoReturnCodes.RESP_WHITE_ON.value
+        elif cmd == PawduinoFunctions.CMD_WHITE_OFF.value:
+            return PawduinoReturnCodes.RESP_WHITE_OFF.value
+        elif cmd == PawduinoFunctions.CMD_CONTACT_ON.value:
+            return PawduinoReturnCodes.RESP_CONTACT_ON.value
+        elif cmd == PawduinoFunctions.CMD_CONTACT_OFF.value:
+            return PawduinoReturnCodes.RESP_CONTACT_OFF.value
+        elif cmd == PawduinoFunctions.CMD_EMAG_ON.value:
+            return PawduinoReturnCodes.RESP_EMAG_ON.value
+        elif cmd == PawduinoFunctions.CMD_EMAG_OFF.value:
+            return PawduinoReturnCodes.RESP_EMAG_OFF.value
+        elif cmd == PawduinoFunctions.CMD_LINE_BREAK.value:
             return True
-        elif cmd == PawduinoFunctions.CMD_LINE_TEST.value[0]:
-            return PawduinoReturnCodes.RESP_LINE_UNBROKEN.value[0]
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_HOME.value[0]:
-            return PawduinoReturnCodes.RESP_PIPETTE_HOMED.value[0]
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_MOVE.value[0]:
-            return PawduinoReturnCodes.RESP_PIPETTE_MOVED.value[0]
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_ASPIRATE.value[0]:
-            return PawduinoReturnCodes.RESP_PIPETTE_ASPIRATED.value[0]
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_DISPENSE.value[0]:
-            return PawduinoReturnCodes.RESP_PIPETTE_DISPENSED.value[0]
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_STATUS.value[0]:
-            return PawduinoReturnCodes.RESP_PIPETTE_STATUS.value[0]
-        elif cmd == PawduinoFunctions.CMD_HELLO.value[0]:
-            return PawduinoReturnCodes.RESP_HELLO.value[0]
+        elif cmd == PawduinoFunctions.CMD_LINE_TEST.value:
+            return PawduinoReturnCodes.RESP_LINE_UNBROKEN.value
+        elif cmd == PawduinoFunctions.CMD_PIPETTE_HOME.value:
+            return PawduinoReturnCodes.RESP_PIPETTE_HOMED.value
+        elif cmd == PawduinoFunctions.CMD_PIPETTE_MOVE.value:
+            return PawduinoReturnCodes.RESP_PIPETTE_MOVED.value
+        elif cmd == PawduinoFunctions.CMD_PIPETTE_ASPIRATE.value:
+            return PawduinoReturnCodes.RESP_PIPETTE_ASPIRATED.value
+        elif cmd == PawduinoFunctions.CMD_PIPETTE_DISPENSE.value:
+            return PawduinoReturnCodes.RESP_PIPETTE_DISPENSED.value
+        elif cmd == PawduinoFunctions.CMD_PIPETTE_STATUS.value:
+            return PawduinoReturnCodes.RESP_PIPETTE_STATUS.value
+        elif cmd == PawduinoFunctions.CMD_HELLO.value:
+            return PawduinoReturnCodes.RESP_HELLO.value
         else:
             return None
 
