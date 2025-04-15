@@ -108,19 +108,33 @@ class SlackBot:
             "slack_bot.log", "slack_bot", logging.INFO, logging.ERROR
         )
         self.testing = test
-        if config_options.getboolean("use_slack"):
+
+        # If in test mode or slack is disabled, don't make real API calls
+        use_slack = config_options.getboolean("use_slack") and not self.testing
+
+        if use_slack:
             self.client = WebClient(token=SlackCred.TOKEN)
-            self.auth_test_response = self.client.auth_test()
-            if not self.auth_test_response["ok"]:
-                self.logger.error("Slack connection failed.")
-                return
-            self.user_id = self.auth_test_response["user_id"]
+            try:
+                self.auth_test_response = self.client.auth_test()
+                if not self.auth_test_response["ok"]:
+                    self.logger.error("Slack connection failed.")
+                    self.user_id = None
+                    return
+                self.user_id = self.auth_test_response["user_id"]
+            except SlackApiError as e:
+                self.logger.error(f"Slack API Error: {e}")
+                self.user_id = None
+        else:
+            # Create the client but it will be mocked in tests
+            self.client = WebClient(token="test_token")
+            self.auth_test_response = {"ok": True, "user_id": "test_user"}
+            self.user_id = "test_user"
+            self.logger.info(
+                "Running in test mode or Slack is disabled - no real API calls will be made"
+            )
+
         self.status = 1
-
         self.logger.setLevel(logging.ERROR)
-
-        if not config_options.getboolean("use_slack"):
-            self.testing = True
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.off_duty()
