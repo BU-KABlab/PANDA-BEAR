@@ -95,6 +95,26 @@ def is_testing_mode() -> bool:
     )
 
 
+def get_unit_id() -> int:
+    """Get the current unit ID, respecting testing environment if applicable.
+
+    This function ensures consistent unit ID usage throughout the application,
+    including during test runs when the unit ID is set explicitly in the test
+    environment.
+
+    Returns:
+        int: The unit ID to use in the current context (real or test)
+    """
+    # During testing, always use unit_id from environment if set
+    if is_testing_mode():
+        env_unit_id = os.getenv("PANDA_UNIT_ID")
+        if env_unit_id:
+            return int(env_unit_id)
+
+    # Otherwise use the config file
+    return int(read_config_value("PANDA", "unit_id", 99))
+
+
 def get_config_path() -> str:
     """Get the appropriate config path based on environment"""
     # First check for specific test config path

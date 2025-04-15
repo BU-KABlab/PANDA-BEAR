@@ -36,6 +36,17 @@ def testing_config_file():
     temp_fd, temp_path = tempfile.mkstemp(suffix=".ini", prefix="panda_test_config_")
     os.close(temp_fd)
 
+    # Clear any existing configuration cache
+    try:
+        from shared_utilities.config.config_tools import read_config, reload_config
+
+        # Clear the LRU cache for read_config to force reconfiguration
+        read_config.cache_clear()
+        # Explicitly reload config if needed
+        reload_config()
+    except (ImportError, AttributeError) as e:
+        print(f"Warning: Failed to clear config cache: {e}")
+
     # Write default testing configuration
     with open(temp_path, "w") as f:
         f.write("""

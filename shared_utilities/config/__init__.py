@@ -6,8 +6,14 @@ from .config_tools import (
     read_data_dir,
     read_logging_dir,
     read_testing_config,
+    reload_config,
     test,
     write_testing_config,
+)
+from .test_helpers import (
+    get_original_env,
+    setup_test_config,
+    teardown_test_config,
 )
 
 resolve_config_paths()
@@ -23,4 +29,8 @@ __all__ = [
     "write_testing_config",
     "read_data_dir",
     "read_logging_dir",
+    "reload_config",
+    "setup_test_config",
+    "teardown_test_config",
+    "get_original_env",
 ]

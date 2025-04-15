@@ -1,11 +1,12 @@
 import logging
+import os
 from typing import List, Optional
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
-from shared_utilities.config.config_tools import read_config_value
+from shared_utilities.config.config_tools import read_config_value, read_testing_config
 from shared_utilities.db_setup import SessionLocal
 
 from ..sql_tools.panda_models import PlateTypes as PlateTypeDBModel
@@ -21,6 +22,18 @@ from .schemas import (  # PyDanctic models
     WellReadModel,
     WellWriteModel,
 )
+
+
+def get_unit_id() -> int:
+    """Get the unit ID with appropriate test awareness."""
+    # During testing, always use unit_id from environment if available
+    if read_testing_config() or os.getenv("PYTEST_CURRENT_TEST"):
+        env_unit_id = os.getenv("PANDA_UNIT_ID")
+        if env_unit_id is not None:
+            return int(env_unit_id)
+
+    # Production usage or fallback
+    return int(read_config_value("PANDA", "unit_id", 99))
 
 
 class VialService:
@@ -47,7 +60,7 @@ class VialService:
             try:
                 stmt = select(Vials).filter_by(
                     position=vial_data.position,
-                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                    panda_unit_id=get_unit_id(),
                 )
                 vials = db_session.execute(stmt).scalars().all()
                 for vial in vials:
@@ -59,7 +72,7 @@ class VialService:
 
             try:
                 # Convert Pydantic model to SQLAlchemy model
-                vial_data.panda_unit_id = read_config_value("PANDA", "unit_id", 99)
+                vial_data.panda_unit_id = get_unit_id()
                 vial: Vials = Vials(**vial_data.model_dump())
                 vial.active = 1
                 db_session.add(vial)
@@ -88,13 +101,13 @@ class VialService:
                 stmt = select(Vials).filter_by(
                     name=name,
                     active=active_only,
-                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                    panda_unit_id=get_unit_id(),
                 )
             elif position:
                 stmt = select(Vials).filter_by(
                     position=position,
                     active=active_only,
-                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                    panda_unit_id=get_unit_id(),
                 )
             else:
                 raise ValueError("Either position or name must be provided.")
@@ -125,13 +138,13 @@ class VialService:
                         id=vial_id,
                         position=position,
                         active=1,
-                        panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                        panda_unit_id=get_unit_id(),
                     )
                 else:
                     stmt = select(Vials).filter_by(
                         position=position,
                         active=1,
-                        panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                        panda_unit_id=get_unit_id(),
                     )
                 vial = db_session.execute(stmt).scalar()
                 if not vial:
@@ -163,7 +176,7 @@ class VialService:
             try:
                 stmt = select(Vials).filter_by(
                     position=position,
-                    panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                    panda_unit_id=get_unit_id(),
                 )
                 vial = db_session.execute(stmt).scalar()
                 if not vial:
@@ -184,9 +197,7 @@ class VialService:
             List[VialModel]: List of Pydantic models representing active vials.
         """
         with self.db_session_maker() as db_session:
-            stmt = select(Vials).filter_by(
-                active=1, panda_unit_id=read_config_value("PANDA", "unit_id", 99)
-            )
+            stmt = select(Vials).filter_by(active=1, panda_unit_id=get_unit_id())
             result = db_session.execute(stmt)
             vials = result.scalars().all() if result else []
             vials = [vial for vial in vials if vial.category == cat] if cat else vials
@@ -207,9 +218,7 @@ class VialService:
             List[VialModel]: List of Pydantic models representing all vials.
         """
         with self.db_session_maker() as db_session:
-            stmt = select(Vials).filter_by(
-                panda_unit_id=read_config_value("PANDA", "unit_id", 99)
-            )
+            stmt = select(Vials).filter_by(panda_unit_id=get_unit_id())
             result = db_session.execute(stmt)
             vials = result.scalars().all() if result else []
 
@@ -230,9 +239,7 @@ class VialService:
             List[VialModel]: List of Pydantic models representing inactive vials.
         """
         with self.db_session_maker() as db_session:
-            stmt = select(Vials).filter_by(
-                active=0, panda_unit_id=read_config_value("PANDA", "unit_id", 99)
-            )
+            stmt = select(Vials).filter_by(active=0, panda_unit_id=get_unit_id())
             result = db_session.execute(stmt)
             vials = result.scalars().all() if result else []
 
@@ -370,7 +377,7 @@ class WellplateService:
     def create_plate(self, plate_data: WellplateWriteModel) -> WellPlateDBModel:
         with self.session_maker() as db_session:
             try:
-                plate_data.panda_unit_id = read_config_value("PANDA", "unit_id", 99)
+                plate_data.panda_unit_id = get_unit_id()
                 plate: WellPlateDBModel = WellPlateDBModel(**plate_data.model_dump())
                 db_session.add(plate)
                 db_session.commit()

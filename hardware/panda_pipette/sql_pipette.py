@@ -3,12 +3,13 @@ This module contains functions to interact with the pipette_status table in the 
 """
 
 import json
+import os
 from typing import Union
 
 from sqlalchemy import select
 from sqlalchemy.orm.session import Session, sessionmaker
 
-from shared_utilities.config.config_tools import read_config, read_config_value
+from shared_utilities.config.config_tools import read_config_value, read_testing_config
 from shared_utilities.db_setup import SessionLocal
 
 from .models import (
@@ -16,8 +17,18 @@ from .models import (
     PipetteLog,
 )  # Ensure you import your Base and Pipette model
 
-config = read_config()
-precision = config.getint("OPTIONS", "precision")
+precision = read_config_value("OPTIONS", "precision", 6)
+
+
+def get_unit_id():
+    """Get the current unit ID, respecting tests if applicable."""
+    # During testing, always use unit_id from environment or test config
+    if read_testing_config() or os.getenv("PYTEST_CURRENT_TEST"):
+        env_unit_id = os.getenv("PANDA_UNIT_ID")
+        if env_unit_id is not None:
+            return int(env_unit_id)
+    # Production usage
+    return int(read_config_value("PANDA", "unit_id", 99))
 
 
 def select_pipette_status(
@@ -42,7 +53,7 @@ def select_pipette_status(
                 session.query(Pipette)
                 .filter(
                     Pipette.active == 1,
-                    Pipette.panda_unit_id == read_config_value("PANDA", "unit_id", 99),
+                    Pipette.panda_unit_id == get_unit_id(),
                 )
                 .order_by(Pipette.updated.desc())
                 .first()
@@ -52,13 +63,13 @@ def select_pipette_status(
                 session.query(Pipette)
                 .filter(
                     Pipette.id == pipette_id,
-                    Pipette.panda_unit_id == read_config_value("PANDA", "unit_id", 99),
+                    Pipette.panda_unit_id == get_unit_id(),
                 )
                 .first()
             )
         if pipette_status is None:
             raise ValueError(
-                f"Pipette with ID {pipette_id} not found with PANDA unit {read_config_value('PANDA', 'unit_id', 99)}."
+                f"Pipette with ID {pipette_id} not found with PANDA unit {get_unit_id()}."
             )
 
         if pipette_status.contents:
@@ -103,7 +114,7 @@ def update_pipette_status(
 
         stmt = select(Pipette).where(
             Pipette.id == pipette_id,
-            Pipette.panda_unit_id == read_config_value("PANDA", "unit_id", 99),
+            Pipette.panda_unit_id == get_unit_id(),
         )
         pipette_status = session.execute(stmt).scalar_one_or_none()
         if pipette_status is None:
@@ -170,28 +181,32 @@ def select_current_pipette_id(session_maker: sessionmaker = SessionLocal):
     """
     with session_maker() as session:
         session: Session
-        pipette_status = session.query(Pipette).filter(Pipette.active == 1).first()
+        pipette_status = (
+            session.query(Pipette)
+            .filter(Pipette.active == 1, Pipette.panda_unit_id == get_unit_id())
+            .first()
+        )
         session.close()
     return pipette_status.id
 
 
 def select_current_pipette_uses(session_maker: sessionmaker = SessionLocal):
     """
-    Get the active pipette status from the pipette_status table.
-    And return a pipette record instance to be applied to the pipette that
-    is in memory.
-
+    Get the current use count of the active pipette.
     Args:
         session (Session, optional): The session to use. Defaults to SessionLocal.
-
     Returns:
-        Pipette: The current pipette status.
+        int: The current use count.
     """
     with session_maker() as session:
         session: Session
-        pipette_status = session.query(Pipette).filter(Pipette.active == 1).first()
+        pipette_status = (
+            session.query(Pipette)
+            .filter(Pipette.active == 1, Pipette.panda_unit_id == get_unit_id())
+            .first()
+        )
         session.close()
-    return pipette_status.uses
+    return pipette_status.uses if pipette_status else 0
 
 
 def insert_new_pipette(
@@ -244,7 +259,7 @@ def insert_new_pipette(
                 id=pipette_id,
                 active=1 if activate else 0,
                 uses=0,
-                panda_unit_id=read_config_value("PANDA", "unit_id", 99),
+                panda_unit_id=get_unit_id(),
             )
             session.add(new_pipette)
 
@@ -267,7 +282,9 @@ def activate_pipette(pipette_id: int, session_maker: sessionmaker = SessionLocal
     """
     with session_maker() as session:
         session: Session
-        session.query(Pipette).update({Pipette.active: 0})
+        session.query(Pipette).filter(Pipette.panda_unit_id == get_unit_id()).update(
+            {Pipette.active: 0}
+        )
         session.query(Pipette).filter(Pipette.id == pipette_id).update(
             {Pipette.active: 1}
         )
