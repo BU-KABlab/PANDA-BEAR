@@ -10,6 +10,7 @@ from sqlalchemy import Integer, cast, func, insert, select, update
 from panda_lib.labware import wellplates as wellplate_module
 from panda_lib.sql_tools import sql_reports
 from panda_lib.sql_tools.panda_models import PlateTypes, WellModel, Wellplates
+from panda_lib.sql_tools.sql_queue import get_unit_id
 from shared_utilities.config.config_tools import read_config_value
 from shared_utilities.db_setup import SessionLocal
 
@@ -37,6 +38,7 @@ def check_if_plate_type_exists(type_id: int) -> bool:
             is not None
         )
 
+
 def select_current_wellplate_id() -> int:
     """Get the current wellplate ID.
 
@@ -53,6 +55,8 @@ def select_current_wellplate_id() -> int:
         if result is None:
             return None
         return result.id
+
+
 def check_if_current_wellplate_is_new() -> bool:
     """Check if the current wellplate is new.
 
@@ -141,9 +145,7 @@ def select_current_wellplate_info() -> tuple[int, int, bool]:
         - whether the wellplate is new (bool)
     """
     with SessionLocal() as session:
-        statement = select(Wellplates).filter_by(
-            current=1, panda_unit_id=read_config_value("PANDA", "unit_id", 99)
-        )
+        statement = select(Wellplates).filter_by(current=1, panda_unit_id=get_unit_id())
 
         result: Wellplates = session.execute(statement).scalar()
         current_plate_id = result.id

@@ -14,6 +14,7 @@ Additionally controller should be able to:
 import importlib
 import logging
 import multiprocessing
+import os
 import sys
 import time
 from pathlib import Path
@@ -63,7 +64,11 @@ from panda_lib.toolkit import (
     disconnect_from_instruments,
 )
 from panda_lib.utilities import SystemState
-from shared_utilities.config.config_tools import read_config, read_testing_config
+from shared_utilities.config.config_tools import (
+    read_config,
+    read_config_value,
+    read_testing_config,
+)
 from shared_utilities.db_setup import SessionLocal
 from shared_utilities.log_tools import (
     apply_log_filter,
@@ -74,6 +79,17 @@ from shared_utilities.log_tools import (
 config = read_config()
 logger = setup_default_logger(log_name="panda")
 TESTING = read_testing_config()
+
+
+def get_unit_id() -> int:
+    """Get the current unit ID, respecting tests if applicable."""
+    # During testing, always use unit_id from environment or test config
+    if read_testing_config() or os.getenv("PYTEST_CURRENT_TEST"):
+        env_unit_id = os.getenv("PANDA_UNIT_ID")
+        if env_unit_id is not None:
+            return int(env_unit_id)
+    # Production usage
+    return int(read_config_value("PANDA", "unit_id", 99))
 
 
 def experiment_loop_worker(
@@ -764,7 +780,7 @@ def _establish_system_state(
 
     # if any waste vials are full, send a slack message prompting the user to empty them and confirm if program should continue
     full_waste_vials = [vial for vial in waste_vials_only if vial.volume > 19000]
-    if len(full_waste_vials) == len(waste_vials_only) and len(waste_vials_only)>0:
+    if len(full_waste_vials) == len(waste_vials_only) and len(waste_vials_only) > 0:
         slack.send_message(
             "alert",
             "The following waste vials are full: "
@@ -784,14 +800,15 @@ def _establish_system_state(
         # slack.send_message("alert", "The program is continuing")
         raise ShutDownCommand
 
-
     # read the wellplate json and log the status of each well in a grid
     number_of_clear_wells = 0
     number_of_wells = 0
 
     # Query the number of clear wells in well_status
-    number_of_clear_wells = sql_wellplate.get_number_of_clear_wells()
-    number_of_wells = sql_wellplate.get_number_of_wells()
+    number_of_clear_wells = sql_wellplate.get_number_of_clear_wells(
+        plate_id=wellplate.id
+    )
+    number_of_wells = sql_wellplate.get_number_of_wells(plate_id=wellplate.id)
     # check that wellplate has the appropriate number of wells
     if number_of_wells != len(wellplate.wells):
         logger.error(

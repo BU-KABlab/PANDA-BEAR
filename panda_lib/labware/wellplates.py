@@ -14,7 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
 from panda_lib.errors import OverDraftException, OverFillException
-from panda_lib.labware.services import WellplateService, WellService
+from panda_lib.labware.services import WellplateService, WellService, get_unit_id
 from panda_lib.panda_gantry import Coordinates
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
@@ -23,6 +23,7 @@ from panda_lib.sql_tools.panda_models import (
     WellModel,
     Wellplates,
 )
+from shared_utilities.config.config_tools import read_config_value
 from shared_utilities.db_setup import SessionLocal
 
 from .schemas import (
@@ -32,7 +33,7 @@ from .schemas import (
     WellReadModel,
     WellWriteModel,
 )
-from shared_utilities.config.config_tools import read_config_value
+
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
 
@@ -759,7 +760,9 @@ def change_wellplate_location(db_session: sessionmaker = SessionLocal):
 
     with db_session() as session:
         ## Get the current plate id and location
-        statement = select(Wellplates).filter_by(current=1, panda_unit_id=read_config_value("PANDA","unit_id",99))
+        statement = select(Wellplates).filter_by(
+            current=1, panda_unit_id=read_config_value("PANDA", "unit_id", 99)
+        )
 
         result: Wellplates = session.execute(statement).scalar()
         current_plate_id = result.id
@@ -894,7 +897,9 @@ def read_current_wellplate_info(
 
     try:
         with db_session() as session:
-            statement = select(Wellplates).filter_by(current=1, panda_unit_id=read_config_value("PANDA","unit_id",99))
+            statement = select(Wellplates).filter_by(
+                current=1, panda_unit_id=get_unit_id()
+            )
 
             result: Wellplates = session.execute(statement).scalar_one_or_none()
             current_plate_id = result.id
