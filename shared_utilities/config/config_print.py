@@ -106,7 +106,7 @@ def resolve_config_paths():
     # Print the config file values
     for section in config.sections():
         for key, value in config.items(section):
-            value = value.split(";", 1)[0].strip()
+            value = value.split(";", 1)[0].strip()  # Remove comments
             # Check that the db_address for both testing and production are valid
             if "db_address" in key:
                 try:

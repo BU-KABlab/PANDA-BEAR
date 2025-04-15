@@ -35,13 +35,13 @@ logger = MagicMock(
 
 @pytest.fixture()
 def toolkit():
+    from panda_lib.hardware.arduino_interface import MockArduinoLink as ArduinoLink
     from panda_lib.toolkit import (
         MockMill as Mill,
     )
     from panda_lib.toolkit import (
         MockPump as SyringePump,
     )
-    from panda_lib.tools.pawduino import MockArduinoLink as ArduinoLink
 
     toolkit = Toolkit(
         pump=SyringePump(), mill=Mill(), arduino=ArduinoLink(), scale=MagicMock()

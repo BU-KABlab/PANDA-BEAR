@@ -6,10 +6,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 
+from panda_lib.hardware import arduino_interface
 from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
 from panda_lib.panda_gantry import PandaMill
 from panda_lib.sql_tools.panda_models import Base
-from panda_lib.tools import pawduino
 from shared_utilities.config.config_tools import read_config_value
 
 # Setup an in-memory SQLite database for testing
@@ -53,7 +53,9 @@ def main():
         input("Press Enter to continue...")
         # Set up the hardware connections
         with PandaMill() as mill:
-            with pawduino.ArduinoLink(read_config_value("ARDUINO", "port")) as arduino:
+            with arduino_interface.ArduinoLink(
+                read_config_value("ARDUINO", "port")
+            ) as arduino:
                 # Check the tools in the tool manager
                 print("Tools in the tool manager:")
                 for tool in mill.tool_manager.tool_offsets.values():
@@ -81,7 +83,7 @@ def main():
 def decapping_validation(
     mill: PandaMill,
     vial: StockVial,
-    arduino: pawduino.ArduinoLink,
+    arduino: arduino_interface.ArduinoLink,
     repetitions: int = 10,
     z_start: float = None,
     z_steps: int = 30,  # Total range is 6mm
@@ -160,7 +162,7 @@ def decapping_validation(
 def decapping_sequence(
     mill: PandaMill,
     target_coords: Coordinates,
-    ard_link: pawduino.ArduinoLink,
+    ard_link: arduino_interface.ArduinoLink,
     max_attempts: int = 5,
 ):
     """
@@ -210,7 +212,7 @@ def decapping_sequence(
 def capping_sequence(
     mill: PandaMill,
     target_coords: Coordinates,
-    ard_link: pawduino.ArduinoLink,
+    ard_link: arduino_interface.ArduinoLink,
     max_attempts: int = 5,
 ):
     """

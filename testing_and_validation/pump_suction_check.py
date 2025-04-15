@@ -11,8 +11,8 @@ from panda_lib.experiment_loop import (
     connect_to_instruments,
     disconnect_from_instruments,
 )
+from panda_lib.hardware import Instruments
 from panda_lib.utilities import correction_factor, input_validation
-from panda_lib.tools import Instruments
 
 purge = 40
 drip_stop = 5

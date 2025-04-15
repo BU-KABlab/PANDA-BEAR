@@ -11,13 +11,13 @@ from sartorius import Scale
 from sartorius.mock import Scale as MockScale
 
 from hardware.panda_pipette.syringepump import MockPump, SyringePump
+from panda_lib.hardware import ArduinoLink, MockArduinoLink
 from panda_lib.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Wellplate
 from panda_lib.panda_gantry import MockPandaMill as MockMill
 from panda_lib.panda_gantry import PandaMill as Mill
 from panda_lib.slack_tools.slackbot_module import SlackBot
-from panda_lib.tools import ArduinoLink, MockArduinoLink
 from shared_utilities.config.config_tools import (
     read_camera_type,
     read_config_value,

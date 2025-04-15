@@ -1,5 +1,5 @@
-from config.config_print import print_config_values, resolve_config_paths
-from config.config_tools import (
+from .config.config_print import print_config_values, resolve_config_paths
+from .config.config_tools import (
     get_env_var,
     get_repo_path,
     read_config,
@@ -9,7 +9,7 @@ from config.config_tools import (
     test,
     write_testing_config,
 )
-from log_tools import setup_default_logger
+from .log_tools import setup_default_logger
 
 
 def get_ports():
