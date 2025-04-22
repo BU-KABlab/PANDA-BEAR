@@ -25,7 +25,7 @@ from .pipetting import (
     volume_correction,
 )
 from .vessel_handling import _handle_source_vessels, solution_selector, waste_selector
-
+from .delay_timer import delay_timer as delay
 __all__ = [
     "capping_sequence",
     "perform_chronoamperometry",
@@ -53,4 +53,5 @@ __all__ = [
     "_handle_source_vessels",
     "move_to_vial",
     "move_to_well",
+    "delay",
 ]
