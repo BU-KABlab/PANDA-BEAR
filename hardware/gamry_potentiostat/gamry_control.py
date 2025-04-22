@@ -8,7 +8,7 @@ import threading
 import time
 from decimal import Decimal
 from typing import Tuple
-
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from pydantic import ConfigDict
@@ -234,7 +234,7 @@ def pstatdisconnect():
     PSTAT.Close()
     OPEN_CONNECTION = False
     # del connection
-    time.sleep(15)
+    time.sleep(2)
 
 
 def savedata(complete_file_name):
@@ -245,7 +245,7 @@ def savedata(complete_file_name):
     # column_names = ["Time", "Vf","Vu","Vsig","Ach","Overload","StopTest","Temp"]
     output = pd.DataFrame(DTAQ_SINK.acquired_points)
     # complete_file_name = os.path(complete_file_name)
-    np.savetxt(complete_file_name.with_suffix(".txt"), output)
+    np.savetxt(Path(complete_file_name).with_suffix(".txt"), output,fmt="%s")
     logger.debug("data saved")
 
 

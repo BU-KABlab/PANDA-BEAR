@@ -10,7 +10,7 @@ from pydantic.dataclasses import dataclass
 
 from shared_utilities.config.config_tools import read_config
 
-logger = logging.getLogger("e_panda")
+logger = logging.getLogger("panda")
 config = read_config()
 if config.getboolean("OPTIONS", "testing"):
     PATH_TO_DATA = pathlib.Path(config.get("TESTING", "data_dir"))
