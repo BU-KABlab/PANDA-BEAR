@@ -10,7 +10,7 @@ import sys
 from typing import Type, Union
 
 from .errors import GamryCOMError, GamryError, GamryPlatformError
-
+from .gamry_adapter import GamryAdapter
 logger = logging.getLogger("panda")
 
 # Determine which implementation to use based on platform
@@ -81,4 +81,17 @@ __all__ = [
     "cv_parameters",
     "chrono_parameters",
     "potentiostat_ocp_parameters",
+    "OCP",
+    "activecheck",
+    "check_vf_range",
+    "chrono",
+    "cyclic",
+    "initializepstat",
+    "pstatconnect",
+    "pstatdisconnect",
+    "setfilename",
+    "GamryAdapter",
+    "GamryPotentiostat",
+    "MOCK_MODE",
+    "logger",
 ]
