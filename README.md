@@ -4,6 +4,7 @@
 ![Static Badge](https://img.shields.io/badge/OS-Windows-blue)
 ![Static Badge](https://img.shields.io/badge/OS-Debian-maroon)
 ![Static Badge](https://img.shields.io/badge/Code%20Style-Ruff-purple)
+[![Tests](https://github.com/BU-KABlab/panda-bear/actions/workflows/pytest.yml/badge.svg)](https://github.com/BU-KABlab/panda-bear/actions/workflows/pytest.yml)
 
 Polymer analysis and discovery array (PANDA) self-driving lab (SDL): an automated system for high-throughput electrodeposition and functional characterization of polymer films
 
