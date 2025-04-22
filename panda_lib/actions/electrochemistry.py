@@ -79,16 +79,14 @@ def open_circuit_potential(
     well = "test"
     experiment = "test"
     try:
-        if TESTING:
-            pstat = echem()
-        else:
-            pstat = echem
+        pstat = echem
         pstat.pstatconnect()
         if exp:
             exp.set_status_and_save(ExperimentStatus.OCPCHECK)
             base_filename = pstat.setfilename(
                 exp.experiment_id,
                 file_tag + "_OCP" if file_tag else "OCP",
+                PATH_TO_DATA,
                 exp.project_id,
                 exp.project_campaign_id,
                 exp.well_id,
@@ -99,6 +97,7 @@ def open_circuit_potential(
             base_filename = pstat.setfilename(
                 "test",
                 file_tag + "_OCP" if file_tag else "OCP",
+                PATH_TO_DATA,
                 "test",
                 "test",
                 "test",
@@ -244,6 +243,7 @@ def perform_chronoamperometry(
         base_filename = pstat.setfilename(
             experiment.experiment_id,
             file_tag + "_OCP_CA" if file_tag else "OCP_CA",
+            PATH_TO_DATA,
             experiment.project_id,
             experiment.project_campaign_id,
             experiment.well_id,
@@ -276,6 +276,7 @@ def perform_chronoamperometry(
             deposition_data_file = pstat.setfilename(
                 experiment.experiment_id,
                 file_tag + "_CA" if file_tag else "CA",
+                PATH_TO_DATA,
                 experiment.project_id,
                 experiment.project_campaign_id,
                 experiment.well_id,
@@ -370,6 +371,7 @@ def perform_cyclic_voltammetry(
         ocp_char_file = pstat.setfilename(
             experiment.experiment_id,
             file_tag + "_OCP_CV" if file_tag else "OCP_CV",
+            PATH_TO_DATA,
             experiment.project_id,
             experiment.project_campaign_id,
             experiment.well_id,
@@ -418,6 +420,7 @@ def perform_cyclic_voltammetry(
         characterization_data_file = pstat.setfilename(
             experiment.experiment_id,
             file_tag + "_CV" if file_tag else test_type,
+            PATH_TO_DATA,
             experiment.project_id,
             experiment.project_campaign_id,
             experiment.well_id,
