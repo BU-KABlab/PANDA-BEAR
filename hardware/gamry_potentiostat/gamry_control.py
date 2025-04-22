@@ -504,10 +504,10 @@ if __name__ == "__main__":
         ## echem CA - deposition
         if check_vf_range(COMPLETE_FILE_NAME.with_suffix(".txt")):
             COMPLETE_FILE_NAME = setfilename(10000384, "CV", 16, 2, "B4")
-            cv_parameters = cv_parameters(
+            cv_params = cv_parameters(
                 0.0, 1.0, -0.3, 1.0, 0.025, 0.025, 0.025, 0.002, 3
             )
-            cyclic(cv_parameters)
+            cyclic(cv_params)
             # chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
             logger.debug("made it to try")
             while ACTIVE is True:
