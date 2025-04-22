@@ -25,7 +25,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         # Install the package in development mode along with its dependencies
-        pip install -e . 
+        pip install -e .
+    - name: Create .env file
+      run: |
+        echo "# Environment variables for testing" > .env
+        echo "PANDA_SDL_CONFIG_PATH=panda_test_config_.ini" >> .env
+        # Add any other environment variables your tests need
     - name: Lint with Ruff
       run: |
         # Run Ruff linter on the codebase
@@ -33,3 +38,7 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+    - name: Clean up .env file
+      if: always()
+      run: |
+        rm -f .env
