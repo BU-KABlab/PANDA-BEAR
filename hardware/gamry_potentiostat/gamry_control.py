@@ -14,24 +14,11 @@ import pandas as pd
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
-from shared_utilities.config.config_tools import read_config
 
 from .errors import ErrorCodeLookup, GamryCOMError, check_platform_compatibility
-from .timer import countdown_timer
 
-# Only import comtypes on Windows
-if sys.platform == "win32":
-    import comtypes
-    from comtypes import client
-else:
-    comtypes = None
-    client = None
-
-config = read_config()
-if config.getboolean("OPTIONS", "testing"):
-    PATH_TO_DATA = pathlib.Path(config.get("TESTING", "data_dir"))
-else:
-    PATH_TO_DATA = pathlib.Path(config.get("PRODUCTION", "data_dir"))
+import comtypes
+from comtypes import client
 
 # pylint: disable=global-statement, invalid-name, global-variable-undefined
 
@@ -65,7 +52,20 @@ OPEN_CONNECTION = False
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class cv_parameters:
-    """CV Setup Parameters"""
+    """CV Setup Parameters
+    
+    Parameters:
+        CVvi(float): Initial voltage (V)
+        CVap1(float): First anodic peak (V)
+        CVap2(float): Second anodic peak (V)
+        CVvf(float): Final voltage (V)
+        CVstep(float): Step size (V)
+        CVsr1(float): Scan rate cycle 1 (V/s)
+        CVsr2(float): Scan rate cycle 2 (V/s)
+        CVsr3(float): Scan rate cycle 3 (V/s)
+        CVsamplerate(float): Sample rate (s)
+        CVcycle(int): Number of cycles
+    """
 
     # CV Setup Parameters
     CVvi: float = 0.0  # initial voltage
@@ -82,7 +82,17 @@ class cv_parameters:
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class chrono_parameters:
-    """CA Setup Parameters"""
+    """CA Setup Parameters
+
+    Parameters:
+        CAvi(float): Pre-step voltage (V)
+        CAti(float):  Pre-step delay time (s)
+        CAv1(float):  Step 1 voltage (V)
+        CAt1(float):  Run time (s)
+        CAv2(float):  Step 2 voltage (V)
+        CAt2(float):  Step 2 time (s)
+        CAsamplerate(float): Sample period (s)
+    """
 
     # CA/CP Setup Parameters
     CAvi: float = 0.0  # Pre-step voltage (V)
@@ -103,7 +113,12 @@ class chrono_parameters:
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class potentiostat_ocp_parameters:
-    """OCP Setup Parameters"""
+    """OCP Setup Parameters
+    
+    Parameters:
+        OCPvi(float): Initial voltage (V)
+        OCPti(float): Time interval (s)
+        OCPrate(float): Rate of change (V/s)"""
 
     # OCP Setup Parameters
     OCPvi: float = 0.0
@@ -252,6 +267,7 @@ def savedata(complete_file_name):
 def setfilename(
     experiment_id,
     experiment_type,
+    data_dir,
     project_campaign_id: int = None,
     campaign_id: int = None,
     well_id: str = None,
@@ -262,11 +278,11 @@ def setfilename(
         file_name = f"{experiment_id}_{experiment_type}"
         file_name = file_name.replace(" ", "_")
         file_name_start = file_name + "_0"
-        filepath: pathlib.Path = (PATH_TO_DATA / file_name_start).with_suffix(".txt")
+        filepath: pathlib.Path = (data_dir / file_name_start).with_suffix(".txt")
         i = 1
         while filepath.exists():
             next_file_name = f"{file_name}_{i}"
-            filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(
+            filepath = pathlib.Path(data_dir / str(next_file_name)).with_suffix(
                 ".txt"
             )
             i += 1
@@ -274,12 +290,12 @@ def setfilename(
         file_name = f"{project_campaign_id}_{campaign_id}_{experiment_id}_{well_id}_{experiment_type}"
         file_name = file_name.replace(" ", "_")
         file_name_start = file_name + "_0"
-        filepath: pathlib.Path = (PATH_TO_DATA / file_name_start).with_suffix(".txt")
+        filepath: pathlib.Path = (data_dir / file_name_start).with_suffix(".txt")
         # Check if the file already exists. If it does then add a number to the end of the file name
         i = 1
         while filepath.exists():
             next_file_name = f"{file_name}_{i}"
-            filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(
+            filepath = pathlib.Path(data_dir / str(next_file_name)).with_suffix(
                 ".txt"
             )
             i += 1
@@ -334,18 +350,9 @@ def cyclic(params: cv_parameters):
         + abs(params.CVap2 - params.CVap1)
         + abs(params.CVvf - params.CVap2)
     )
-    time_per_cycle = total_potential_distance * params.CVsamplerate
-    countdown_thread = threading.Thread(
-        target=countdown_timer,
-        args=(time_per_cycle, params.CVcycle),
-        name="countdown_thread",
-    )
-    countdown_thread.start()
 
     DTAQ.Run(True)
 
-    # Join the countdown thread to the main thread
-    countdown_thread.join()
 
     logger.debug("cyclic: made it to run end")
 
@@ -397,21 +404,7 @@ def chrono(params: chrono_parameters):
     PSTAT.SetSignal(SIGNAL)
     PSTAT.SetCell(GAMRY_COM.CellOn)
 
-    # Start a new thread to run a countdown timer
-    countdown_thread = threading.Thread(
-        target=countdown_timer,
-        args=(params.CAti + params.CAt1 + params.CAt2, 1),
-        name="countdown_thread",
-    )
-    countdown_thread.start()
-
     DTAQ.Run(True)
-
-    # Join the countdown thread to the main thread
-    countdown_thread.join()
-
-    # Code for timing started
-    # start_time = time.time()
     logger.debug("chrono: made it to run end")
 
 
@@ -491,7 +484,7 @@ def check_vf_range(filename) -> Tuple[bool, float]:
 if __name__ == "__main__":
     try:
         pstatconnect()  # grab first pstat
-        COMPLETE_FILE_NAME = setfilename(10000384, "OCP", 16, 2, "B4")
+        COMPLETE_FILE_NAME = setfilename(10000384,"OCP", ".",  16, 2, "B4")
         OCP(
             potentiostat_ocp_parameters.OCPvi,
             potentiostat_ocp_parameters.OCPti,
@@ -503,7 +496,7 @@ if __name__ == "__main__":
         # time.sleep(0.5)
         ## echem CA - deposition
         if check_vf_range(COMPLETE_FILE_NAME.with_suffix(".txt")):
-            COMPLETE_FILE_NAME = setfilename(10000384, "CV", 16, 2, "B4")
+            COMPLETE_FILE_NAME = setfilename(10000384, "CV", ".",  16, 2, "B4")
             cv_params = cv_parameters(
                 0.0, 1.0, -0.3, 1.0, 0.025, 0.025, 0.025, 0.002, 3
             )
