@@ -236,9 +236,12 @@ def insert_new_pipette(
     with session_maker() as session:
         session: Session
         if pipette_id is None:
-            pipette_id = (
-                session.query(Pipette).order_by(Pipette.id.desc()).first().id + 1
-            )
+            try:
+                pipette_id = (
+                    session.query(Pipette).order_by(Pipette.id.desc()).first().id + 1
+                )
+            except AttributeError:
+                pipette_id = 1
 
         # Check if the id already exists
         if session.query(Pipette).filter(Pipette.id == pipette_id).first() is not None:
