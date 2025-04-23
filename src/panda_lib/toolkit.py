@@ -13,7 +13,8 @@ from sartorius.mock import Scale as MockScale
 from panda_lib.hardware import ArduinoLink, MockArduinoLink
 from panda_lib.hardware.gantry_interface import MockPandaMill as MockMill
 from panda_lib.hardware.gantry_interface import PandaMill as Mill
-from panda_lib.hardware.panda_pipette.syringepump import MockPump, SyringePump
+from panda_lib.hardware.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
+from panda_lib.hardware.panda_pipettes.syringepump import MockPump, SyringePump
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Wellplate
 from panda_lib.slack_tools.slackbot_module import SlackBot
@@ -65,7 +66,6 @@ class Toolkit:
                 pass
 
         # Fallback to OpenCV
-        from panda_lib.hardware.imaging.open_cv_camera import OpenCVCamera
 
         self.camera = OpenCVCamera()
 
@@ -106,7 +106,6 @@ class Hardware:
                 pass
 
         # Fallback to OpenCV
-        from panda_lib.hardware.imaging.open_cv_camera import OpenCVCamera
 
         self.camera = OpenCVCamera()
 
@@ -160,8 +159,7 @@ def connect_to_instruments(
         wellplate=None,
         global_logger=logger,
         experiment_logger=logger,
-        flir_camera=None,
-        opencv_camera=None,
+        camera=None,
         arduino=None,
     )
 
@@ -181,11 +179,10 @@ def connect_to_instruments(
         # Setup mock camera based on the config
         if camera_type.lower() == "webcam":
             webcam_id, resolution = read_webcam_settings()
-            # instruments.camera = MockOpenCVCamera(
-            #     camera_id=webcam_id, resolution=resolution
-            # )
-            # instruments.camera.connect()
-            # TODO
+            instruments.camera = MockOpenCVCamera(
+                camera_id=webcam_id, resolution=resolution
+            )
+            instruments.camera.connect()
         else:
             # No mock FLIR camera setup needed, it's handled elsewhere
             pass
@@ -239,14 +236,13 @@ def connect_to_instruments(
             try:
                 logger.debug("Connecting to Webcam")
                 webcam_id, resolution = read_webcam_settings()
-                # instruments.camera = OpenCVCamera(
-                #     camera_id=webcam_id, resolution=resolution
-                # )
-                # TODO
+                instruments.opencv_camera = OpenCVCamera(
+                    camera_id=webcam_id, resolution=resolution
+                )
 
-                if not instruments.camera.connect():
+                if not instruments.opencv_camera.connect():
                     logger.error(f"Failed to connect to webcam with ID {webcam_id}")
-                    instruments.camera = None
+                    instruments.opencv_camera = None
                     incomplete = True
                 else:
                     logger.debug(
@@ -254,7 +250,7 @@ def connect_to_instruments(
                     )
             except Exception as error:
                 logger.error(f"No webcam connected, {error}")
-                instruments.camera = None
+                instruments.opencv_camera = None
                 incomplete = True
         else:
             # Default to FLIR camera
@@ -264,9 +260,9 @@ def connect_to_instruments(
                 cam_list = system.GetCameras()
                 if cam_list.GetSize() == 0:
                     logger.error("No FLIR Camera connected")
-                    instruments.camera = None
+                    instruments.flir_camera = None
                 else:
-                    instruments.camera = cam_list.GetByIndex(0)
+                    instruments.flir_camera = cam_list.GetByIndex(0)
                     # instruments.flir_camera.Init()
                     cam_list.Clear()
                     system.ReleaseInstance()
@@ -274,11 +270,11 @@ def connect_to_instruments(
                     logger.debug("Connected to FLIR Camera")
             except Exception as error:
                 logger.error("No FLIR Camera connected, %s", error)
-                instruments.camera = None
+                instruments.flir_camera = None
                 incomplete = True
     else:
         logger.error("No camera type specified in the configuration file")
-        instruments.camera = None
+        instruments.flir_camera = None
         incomplete = False
 
     # Connect to PSTAT
@@ -348,11 +344,10 @@ def test_instrument_connections(
         # Setup mock camera based on the config
         if camera_type.lower() == "webcam":
             webcam_id, resolution = read_webcam_settings()
-            # instruments.camera = MockOpenCVCamera(
-            #     camera_id=webcam_id, resolution=resolution
-            # )
-            # instruments.camera.connect()
-            # TODO
+            instruments.opencv_camera = MockOpenCVCamera(
+                camera_id=webcam_id, resolution=resolution
+            )
+            instruments.opencv_camera.connect()
         print("\nMock instruments initialized successfully!")
         return instruments, True
 
@@ -424,17 +419,17 @@ def test_instrument_connections(
         try:
             logger.debug("Connecting to Webcam")
             webcam_id, resolution = read_webcam_settings()
-            # camera = OpenCVCamera(camera_id=webcam_id, resolution=resolution)
+            camera = OpenCVCamera(camera_id=webcam_id, resolution=resolution)
 
-            # if not camera.connect():
-            #     raise Exception(f"Failed to connect to webcam with ID {webcam_id}")
-            # TODO
+            if not camera.connect():
+                raise Exception(f"Failed to connect to webcam with ID {webcam_id}")
+
             logger.debug(
                 f"Connected to webcam ID {webcam_id} at resolution {resolution}"
             )
             print("Webcam connected                        ", flush=True)
             connected_instruments.append("Webcam")
-            # camera.close() # TODO
+            camera.close()
         except Exception as error:
             logger.error(f"No webcam connected, {error}")
             print("Webcam not found                        ", flush=True)
@@ -465,32 +460,101 @@ def test_instrument_connections(
 
     # Potentiostat connection
     print("Checking Potentiostat connection...", end="\r", flush=True)
-    try:
-        if os.name == "nt":
-            logger.debug("Connecting to Potentiostat")
-            connected = gamry_control.pstatconnect()
-            if not connected:
-                raise Exception("Failed to connect to Potentiostat")
 
-            logger.debug("Connected to Potentiostat")
-            print("Potentiostat connected                        ", flush=True)
-            connected_instruments.append("Potentiostat")
-            gamry_control.pstatdisconnect()
-        else:
-            logger.debug(
-                "Gamry Potentiostat connection not available on non-Windows OS"
-            )
-            print(
-                "Gamry Potentiostat connection not available on non-Windows OS",
-                flush=True,
-            )
-            connected_instruments.append("Potentiostat")
-            incomplete = True
-    except Exception as error:
-        logger.error("Error connecting to Potentiostat, %s", error)
+    # Check the config for the model of the potentiostat
+    potentiostat_model = read_config_value("POTENTIOSTAT", "model")
+    if not potentiostat_model:
+        logger.error("No potentiostat model specified in the configuration file")
         print("Potentiostat not found                        ", flush=True)
         disconnected_instruments.append("Potentiostat")
         incomplete = True
+
+    # Check if the model is supported by the current OS
+    # If gamry, or chi* are not supported on non-windows OS
+    if os.name != "nt" and (
+        "gamry" in potentiostat_model.lower() or "chi" in potentiostat_model.lower()
+    ):
+        logger.error("Potentiostat model not supported on non-Windows OS")
+        print("Potentiostat not found                        ", flush=True)
+        disconnected_instruments.append("Potentiostat")
+        incomplete = True
+
+    if "gamry" in potentiostat_model.lower():
+        try:
+            pstat = gamry_control.pstatconnect()
+            if pstat:
+                logger.debug("Connected to Gamry Potentiostat")
+                print("Potentiostat connected                        ", flush=True)
+                connected_instruments.append("Potentiostat")
+            else:
+                raise Exception("No Gamry Potentiostat found")
+        except Exception as error:
+            logger.error("No Gamry Potentiostat connected, %s", error)
+            print("Potentiostat not found                        ", flush=True)
+            disconnected_instruments.append("Potentiostat")
+            incomplete = True
+        finally:
+            try:
+                gamry_control.pstatdisconnect()
+            except Exception as error:
+                logger.error("Error disconnecting from Gamry Potentiostat, %s", error)
+                print("Error disconnecting from Gamry Potentiostat, %s", error)
+
+    elif "chi" in potentiostat_model.lower():
+        import hardpotato as hp
+
+        try:
+            model = potentiostat_model.lower()
+            # Write the path where the chi software is installed (this line is optional when
+            # using the Pico). Make sure to use / instead of \:
+            path = read_config_value("POTENTIOSTAT", "path")
+            if not path:
+                raise Exception(
+                    "No path specified for the Chi software in the configuration file"
+                )
+            if not os.path.exists(path):
+                raise Exception("Path to Chi software does not exist")
+
+            # Write the path where the data and plots are going to be automatically saved:
+            folder = read_config_value("TESTING", "data_dir")
+            # Setup:
+            connection = hp.potentiostat.Setup(model, path, folder, verbose=0)
+            if connection:
+                logger.debug("Connected to Chi Potentiostat")
+                print("Potentiostat connected                        ", flush=True)
+                connected_instruments.append("Potentiostat")
+            else:
+                raise Exception("No Chi Potentiostat found")
+        except Exception as error:
+            logger.error("No Chi Potentiostat connected, %s", error)
+            print("Potentiostat not found                        ", flush=True)
+            disconnected_instruments.append("Potentiostat")
+            incomplete = True
+
+    elif potentiostat_model.lower() in [
+        "palmsense",
+        "emstat",
+        "pico",
+        "emstat4slr",
+        "emstat4shr",
+    ]:
+        try:
+            import hardpotato as hp
+
+            model = potentiostat_model.lower()
+            # Write the path where the data and plots are going to be automatically saved:
+            connection = hp.potentiostat.Setup(model, folder=None, verbose=0)
+            if connection:
+                logger.debug("Connected to %s Potentiostat", model)
+                print("Potentiostat connected                        ", flush=True)
+                connected_instruments.append("Potentiostat")
+            else:
+                raise Exception("No Potentiostat found")
+        except Exception as error:
+            logger.error("No Potentiostat connected, %s", error)
+            print("Potentiostat not found                        ", flush=True)
+            disconnected_instruments.append("Potentiostat")
+            incomplete = True
 
     # Arduino connection
     print("Checking Arduino connection...", end="\r", flush=True)
