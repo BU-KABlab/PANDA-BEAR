@@ -256,7 +256,7 @@ DROP TABLE IF EXISTS panda_user_projects;
 CREATE TABLE IF NOT EXISTS panda_user_projects (
     user_id    INTEGER CONSTRAINT [User ID Constraint] REFERENCES panda_users (id) ON DELETE CASCADE,
     project_id INTEGER CONSTRAINT [Project ID Constraint] REFERENCES panda_projects (id),
-    current    BOOLEAN DEFAULT ([TRUE]) 
+    current    BOOLEAN DEFAULT 1 
                        NOT NULL ON CONFLICT REPLACE,
     timestamp  TEXT    DEFAULT (CURRENT_TIMESTAMP) 
                        NOT NULL ON CONFLICT REPLACE,
@@ -861,6 +861,169 @@ BEGIN
      WHERE id = NEW.id;
 END;
 
+INSERT INTO panda_wellplate_types (
+                                      id,
+                                      substrate,
+                                      gasket,
+                                      count,
+                                      shape,
+                                      radius_mm,
+                                      x_spacing,
+                                      gasket_height_mm,
+                                      max_liquid_height_mm,
+                                      capacity_ul,
+                                      rows,
+                                      cols,
+                                      y_spacing,
+                                      gasket_length_mm,
+                                      gasket_width_mm,
+                                      x_offset,
+                                      y_offset,
+                                      base_thickness
+                                  )
+                                  VALUES (
+                                      3,
+                                      'gold',
+                                      'pdms',
+                                      96,
+                                      'circular',
+                                      3.25,
+                                      8.9,
+                                      6.0,
+                                      4.5,
+                                      150.0,
+                                      'ABCDEFGH',
+                                      12,
+                                      8.9,
+                                      110.0,
+                                      74.0,
+                                      10.5,
+                                      10.5,
+                                      1.0
+                                  );
+
+INSERT INTO panda_wellplate_types (
+                                      id,
+                                      substrate,
+                                      gasket,
+                                      count,
+                                      shape,
+                                      radius_mm,
+                                      x_spacing,
+                                      gasket_height_mm,
+                                      max_liquid_height_mm,
+                                      capacity_ul,
+                                      rows,
+                                      cols,
+                                      y_spacing,
+                                      gasket_length_mm,
+                                      gasket_width_mm,
+                                      x_offset,
+                                      y_offset,
+                                      base_thickness
+                                  )
+                                  VALUES (
+                                      4,
+                                      'ito',
+                                      'pdms',
+                                      96,
+                                      'circular',
+                                      3.25,
+                                      9.0,
+                                      6.0,
+                                      4.0,
+                                      130.0,
+                                      'ABCDEFGH',
+                                      12,
+                                      9.0,
+                                      110.0,
+                                      74.0,
+                                      5.5,
+                                      5.5,
+                                      1.0
+                                  );
+
+INSERT INTO panda_wellplate_types (
+                                      id,
+                                      substrate,
+                                      gasket,
+                                      count,
+                                      shape,
+                                      radius_mm,
+                                      x_spacing,
+                                      gasket_height_mm,
+                                      max_liquid_height_mm,
+                                      capacity_ul,
+                                      rows,
+                                      cols,
+                                      y_spacing,
+                                      gasket_length_mm,
+                                      gasket_width_mm,
+                                      x_offset,
+                                      y_offset,
+                                      base_thickness
+                                  )
+                                  VALUES (
+                                      5,
+                                      'plastic',
+                                      'standard',
+                                      96,
+                                      'circular',
+                                      3.48,
+                                      9.0,
+                                      10.9,
+                                      8.5,
+                                      500.0,
+                                      'ABCDEFGH',
+                                      12,
+                                      9.0,
+                                      110.0,
+                                      74.0,
+                                      10.5,
+                                      10.5,
+                                      1.0
+                                  );
+
+INSERT INTO panda_wellplate_types (
+                                      id,
+                                      substrate,
+                                      gasket,
+                                      count,
+                                      shape,
+                                      radius_mm,
+                                      x_spacing,
+                                      gasket_height_mm,
+                                      max_liquid_height_mm,
+                                      capacity_ul,
+                                      rows,
+                                      cols,
+                                      y_spacing,
+                                      gasket_length_mm,
+                                      gasket_width_mm,
+                                      x_offset,
+                                      y_offset,
+                                      base_thickness
+                                  )
+                                  VALUES (
+                                      7,
+                                      'gold',
+                                      'pdms',
+                                      50,
+                                      'circular',
+                                      5.0,
+                                      13.5,
+                                      6.0,
+                                      4.5,
+                                      350.0,
+                                      'ABCDE',
+                                      8,
+                                      14.0,
+                                      110.0,
+                                      74.0,
+                                      7.75,
+                                      9.0,
+                                      1.0
+                                  );
 
 COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;
