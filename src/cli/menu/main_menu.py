@@ -357,12 +357,12 @@ def run_experiment_generator():
         print(generator.id, generator.name)
 
     generator_id = input_validation(
-        prompt="Enter the id of the generator you would like to run or 'q' to go back: ",
+        prompt="Enter the id of the generator you would like to run: ",
         valid_types=int,
         menu_items=generator_ids,
         allow_blank=False,
         custom_error="Invalid generator ID",
-        exit_option="q",
+        exit_option=True,
     )
 
     if generator_id == "q":
@@ -639,7 +639,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         # Prevent experiments from being run and prevent generation of experiments
         for key in experiment_choices:
             menu_options.pop(key, None)
-        additional_blocked = ["4.1", "3.0", "3.1", "3.2", "3.3", "1.1", "1.2", "1.3"]
+        additional_blocked = ["4.1", "3.0", "3.1", "1.1", "1.2", "1.3"]
         for key in additional_blocked:
             menu_options.pop(key, None)
 

@@ -1,5 +1,6 @@
 import csv
 import json
+import time
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
@@ -38,7 +39,7 @@ class Vial:
         """
         self._position = position
         if position:
-            self.position: str = position
+            self._position: str = position
         self.session_maker = session_maker
         self.service = VialService(self.session_maker)
         self.vial_data: VialReadModel
@@ -142,8 +143,14 @@ class Vial:
 
     def create_new_vial(self, **kwargs: VialKwargs):
         """Creates a new vial in the database, and loads it back."""
+        if not self._position:
+            # Check if the kwargs contain a position
+            if "position" in kwargs:
+                self._position = kwargs["position"]
+            else:
+                raise ValueError("Position must be provided to create a new vial.")
         new_vial = VialWriteModel(
-            position=self.position,
+            position=self._position,
             category=kwargs.get("category", 0),
             height=kwargs.get("height", 57.0),
             radius=kwargs.get("radius", 13.5),
@@ -156,13 +163,14 @@ class Vial:
             concentration=kwargs.get("concentration", 0.0),
             density=kwargs.get("density", 1.0),
             coordinates=kwargs.get("coordinates", {"x": 0.0, "y": 0.0, "z": 0.0}),
-            name=kwargs.get("name", "default"),
+            name=kwargs.get("name", self._vial_name),
             base_thickness=kwargs.get("base_thickness", 1.0),
             panda_unit_id=read_config_value("PANDA", "unit_id", 1),
         )
         self.vial_data = VialWriteModel.model_validate(
             self.service.create_vial(new_vial)
         )  # type: ignore
+        time.sleep(0.5)  # Wait for the vial to be created in the database
         self.load_vial()
 
     def load_vial(self):
@@ -170,11 +178,11 @@ class Vial:
         if self._vial_name:
             self.vial_data = self.service.get_vial(name=self._vial_name)
         else:
-            self.vial_data = self.service.get_vial(position=self.position)
+            self.vial_data = self.service.get_vial(position=self._position)
 
     def save(self):
         """Updates the database with the current state of the vial."""
-        self.service.update_vial(self.position, self.vial_data.model_dump())
+        self.service.update_vial(self._position, self.vial_data.model_dump())
 
     def add_contents(self, from_vessel: Dict[str, float], volume: float):
         """
@@ -260,7 +268,7 @@ class Vial:
         self.save()
 
     def __repr__(self):
-        return f"<Vial(position={self.position}, volume={self.vial_data.volume}, contents={self.vial_data.contents}. top={self.vial_data.top}, bottom={self.vial_data.bottom})>"
+        return f"<Vial(position={self._position}, volume={self.vial_data.volume}, contents={self.vial_data.contents}. top={self.vial_data.top}, bottom={self.vial_data.bottom})>"
 
 
 class StockVial(Vial):
@@ -380,70 +388,180 @@ def delete_vial_position_and_hx_from_db(
         vial_logger.exception(e)
 
 
-def input_new_vial_values(vialgroup: str) -> None:
-    """For user inputting the new vial values for the state file"""
+# def input_new_vial_values(vialgroup: str) -> None:
+#     """For user inputting the new vial values for the state file"""
 
-    vials = read_vials(vialgroup)[0]
-    vials = sorted(vials, key=lambda x: x.vial_data.position)
-    vial_list = []
-    vial_lines = []
-    ## Print the current vials and their values
-    print("Current vials:")
+#     vials = read_vials(vialgroup)[0]
+#     vials = sorted(vials, key=lambda x: x.vial_data.position)
+#     vial_list = []
+#     vial_lines = []
+#     ## Print the current vials and their values
+#     print("Current vials:")
 
-    max_lengths = [10, 20, 20, 15, 15, 15, 15]  # Initialize max lengths for each column
-    for vial in vials:
-        vial: Vial
-        vial_list.append(vial)
-        values = [
-            vial.vial_data.position,
-            vial.vial_data.name,
-            str(vial.vial_data.contents),
-            vial.vial_data.density,
-            vial.vial_data.volume,
-            vial.vial_data.capacity,
-            vial.vial_data.contamination,
-        ]
-        max_lengths = [
-            max(max_lengths[i], len(str(values[i]))) for i in range(len(values))
-        ]  # Update max lengths
+#     max_lengths = [10, 20, 20, 15, 15, 15, 15]  # Initialize max lengths for each column
+#     for vial in vials:
+#         vial: Vial
+#         vial_list.append(vial)
+#         values = [
+#             vial.vial_data.position,
+#             vial.vial_data.name,
+#             str(vial.vial_data.contents),
+#             vial.vial_data.density,
+#             vial.vial_data.volume,
+#             vial.vial_data.capacity,
+#             vial.vial_data.contamination,
+#         ]
+#         max_lengths = [
+#             max(max_lengths[i], len(str(values[i]))) for i in range(len(values))
+#         ]  # Update max lengths
 
-    for vial in vial_list:
-        values = [
-            vial.vial_data.position,
-            vial.vial_data.name,
-            str(vial.vial_data.contents),
-            vial.vial_data.density,
-            vial.vial_data.volume,
-            vial.vial_data.capacity,
-            vial.vial_data.contamination,
-        ]
-        vial_lines.append(
-            f"{values[0]:<{max_lengths[0]}} {values[1]:<{max_lengths[1]}} {values[2]:<{max_lengths[2]}} {values[3]:<{max_lengths[3]}} {values[4]:<{max_lengths[4]}} {values[5]:<{max_lengths[5]}} {values[6]:<{max_lengths[6]}}"
-        )
+#     for vial in vial_list:
+#         values = [
+#             vial.vial_data.position,
+#             vial.vial_data.name,
+#             str(vial.vial_data.contents),
+#             vial.vial_data.density,
+#             vial.vial_data.volume,
+#             vial.vial_data.capacity,
+#             vial.vial_data.contamination,
+#         ]
+#         vial_lines.append(
+#             f"{values[0]:<{max_lengths[0]}} {values[1]:<{max_lengths[1]}} {values[2]:<{max_lengths[2]}} {values[3]:<{max_lengths[3]}} {values[4]:<{max_lengths[4]}} {values[5]:<{max_lengths[5]}} {values[6]:<{max_lengths[6]}}"
+#         )
 
-    header_string = f"{'Position':<{max_lengths[0]}} {'Name':<{max_lengths[1]}} {'Contents':<{max_lengths[2]}} {'Density':<{max_lengths[3]}} {'Volume':<{max_lengths[4]}} {'Capacity':<{max_lengths[5]}} {'Contamination':<{max_lengths[6]}}"
-    print(header_string)
-    for line in vial_lines:
-        print(line)
+
+#     header_string = f"{'Position':<{max_lengths[0]}} {'Name':<{max_lengths[1]}} {'Contents':<{max_lengths[2]}} {'Density':<{max_lengths[3]}} {'Volume':<{max_lengths[4]}} {'Capacity':<{max_lengths[5]}} {'Contamination':<{max_lengths[6]}}"
+#     print(header_string)
+#     for line in vial_lines:
+#         print(line)
+def enter_new_vial() -> Vial:
+    """Function to enter a new vial into the database."""
+    print(
+        "You may enter a new vial using the default positions:\n\tS0, S1, S2, S3, S4, S5, S6, S7, S8\n\tW0, W1, W2, W3, W4, W5, W6, W7, W8"
+    )
 
     while True:
-        choice = input(
-            "Which vial would you like to change? Enter the position of the vial or 'q' if finished: "
+        position = input("Enter the position of the new vial: ")
+        if position == "q":
+            return None
+
+        # Validate position format
+        if position == "":
+            print("Position cannot be empty. Please enter a new position.")
+            continue
+        if position[0] not in ["S", "W"]:
+            print("Position must start with S or W. Please enter a new position.")
+            continue
+        if not (position[1:].isdigit() and int(position[1:]) < 9):
+            print("Position must end with a digit 0-8. Please enter a new position.")
+            continue
+
+        # Check if position already exists
+        try:
+            existing_vial = Vial(position=position, create_new=False)
+            print(f"Vial {position} already exists. Please enter a new position.")
+            continue
+        except Exception:
+            # Position doesn't exist, we can proceed
+            pass
+
+        print(f"Position {position} is valid. Please enter the values for the vial.")
+        category = 0 if position[0] == "S" else 1
+        name = input("Enter the name of the vial: ")
+
+        # Get contents
+        contents = input("Enter the contents of the vial (in json format): ")
+        if contents == "":
+            contents = "{}"
+        try:
+            contents = json.loads(contents)
+        except json.JSONDecodeError:
+            print("Invalid json format for contents. Please enter a valid json.")
+            continue
+
+        # Get remaining properties
+        density = input("Enter the density of the vial: ") or "1.0"
+        volume = input("Enter the volume of the vial: ") or "0.0"
+        capacity = input("Enter the capacity of the vial: ") or "20000"
+        contamination = 0
+
+        coordinates = input(
+            'Enter the coordinates of the bottom of the vial (in {"x":#,"y":#,"z":#} format): '
         )
+        if coordinates == "":
+            coordinates = {"x": 0.0, "y": 0.0, "z": -200.0}
+        else:
+            try:
+                coordinates = json.loads(coordinates)
+            except json.JSONDecodeError:
+                print("Invalid json format for coordinates. Please enter a valid json.")
+                continue
+
+        base_thickness = input("Enter the base thickness of the vial: ") or "1.0"
+        dead_volume = input("Enter the dead volume of the vial: ") or "0.0"
+        active = 1
+
+        try:
+            vial = Vial(
+                position=position,
+                session_maker=SessionLocal,
+                create_new=True,
+                vial_name=name,
+                category=category,
+                contents=contents,
+                density=float(density),
+                volume=float(volume),
+                capacity=float(capacity),
+                contamination=contamination,
+                coordinates=coordinates,
+                base_thickness=float(base_thickness),
+                dead_volume=float(dead_volume),
+                active=active,
+            )
+            vial_logger.info("Vial %s created successfully", position)
+            print(
+                f"Vial {position} created successfully with the following values:\n"
+                f"\tName: {name}\n"
+                f"\tContents: {contents}\n"
+                f"\tDensity: {density}\n"
+                f"\tVolume: {volume}\n"
+                f"\tCapacity: {capacity}\n"
+                f"\tContamination: {contamination}\n"
+                f"\tCoordinates: {coordinates}\n"
+                f"\tBase thickness: {base_thickness}\n"
+                f"\tDead volume: {dead_volume}"
+            )
+            return vial
+        except Exception as e:
+            vial_logger.error("Error occurred while creating vial %s: %s", position, e)
+            vial_logger.error("Continuing....")
+            vial_logger.exception(e)
+
+
+def update_existing_vial(vials: List[Vial]) -> None:
+    """Function to update an existing vial in the database."""
+    if not vials:
+        print("No existing vials found to update.")
+        return
+
+    while True:
+        choice = input("Enter the position of the vial to update or 'q' to quit: ")
         if choice == "q":
             break
+
         for vial in vials:
-            vial: Vial
             if vial.position == choice:
                 print(
                     "Please enter the new values for the vial, if you leave any blank the value will not be changed"
                 )
-                print(f"\nVial {vial.position}:")
+                print(f"\nUpdating Vial {vial.position}:")
+
                 new_name = input(
                     f"Enter the new name of the vial (Current name is {vial.name}): "
                 )
                 if new_name != "":
                     vial.vial_data.name = new_name
+
                 if vial.category == 0:  # Stock vial
                     current_key = next(iter(vial.contents.keys()))
                     new_key = input(
@@ -452,11 +570,13 @@ def input_new_vial_values(vialgroup: str) -> None:
                     if new_key != "":
                         # Replace the key in the contents dictionary with the new key but old value
                         vial.vial_data.contents = {new_key: vial.contents[current_key]}
+
                 new_density = input(
                     f"Enter the new density of the vial (Current density is {vial.vial_data.density}): "
                 )
                 if new_density != "":
                     vial.vial_data.density = float(new_density)
+
                 new_volume = input(
                     f"Enter the new volume of the vial (Current volume is {vial.volume}): "
                 )
@@ -464,16 +584,16 @@ def input_new_vial_values(vialgroup: str) -> None:
                     vial.vial_data.volume = float(new_volume)
                     if vial.vial_data.category == 0:  # Stock vial
                         # Get the key of the contents
-                        # There should only be one key in the contents dictionary
-                        key = vial.vial_data.contents.keys()
-                        key = next(iter(key))
+                        key = next(iter(vial.vial_data.contents.keys()))
                         # Update the new volume in the contents dictionary
                         vial.vial_data.contents = {key: float(new_volume)}
+
                 new_capacity = input(
                     f"Enter the new capacity of the vial (Current capacity is {vial.capacity}): "
                 )
                 if new_capacity != "":
                     vial.vial_data.capacity = float(new_capacity)
+
                 new_contamination = input(
                     f"Enter the new contamination of the vial (Current contamination is {vial.contamination}): "
                 )
@@ -485,35 +605,95 @@ def input_new_vial_values(vialgroup: str) -> None:
                         continue
 
                 vial.save()
-                # print("\r" + " " * 100 + "\r", end="")  # Clear the previous table
-                print("\nCurrent vials:")
-                print(
-                    f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Density':<15} {'Volume':<15} {'Capacity':<15} {'Contamination':<15}"
-                )
-
-                for vial in vials:
-                    vial: Vial
-                    # if vial.contents is None:
-                    #     vial.contents = {}
-                    # if vial.name is None:
-                    #     # All parameters are blank except for position
-                    #     vial.vial_data.name = ""
-                    #     vial.vial_data.contents = ""
-                    #     vial.vial_data.density = ""
-                    #     vial.vial_data.volume = ""
-                    #     vial.vial_data.capacity = ""
-                    #     vial.vial_data.contamination = ""
-
-                    # contents_str = str(
-                    #     vial.vial_data.contents
-                    # )  # Convert contents dictionary to string
-                    print(
-                        f"{vial.position:<10} {vial.name:<20} {str(vial.vial_data.contents):<20} {vial.vial_data.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
-                    )
+                print(f"Vial {vial.position} updated successfully.")
                 break
         else:
             print("Invalid vial position")
-            continue
+
+
+def input_new_vial_values(vialgroup: str) -> None:
+    """For user inputting the new vial values for the state file"""
+
+    vials = read_vials(vialgroup)[0]
+    vials = sorted(vials, key=lambda x: x.vial_data.position)
+
+    ## Print the current vials and their values
+    print("Current vials:")
+
+    if vials:
+        max_lengths = [
+            10,
+            20,
+            20,
+            15,
+            15,
+            15,
+            15,
+        ]  # Initialize max lengths for each column
+        vial_list = []
+        vial_lines = []
+
+        for vial in vials:
+            vial: Vial
+            vial_list.append(vial)
+            values = [
+                vial.vial_data.position,
+                vial.vial_data.name,
+                str(vial.vial_data.contents),
+                vial.vial_data.density,
+                vial.vial_data.volume,
+                vial.vial_data.capacity,
+                vial.vial_data.contamination,
+            ]
+            max_lengths = [
+                max(max_lengths[i], len(str(values[i]))) for i in range(len(values))
+            ]  # Update max lengths
+
+        for vial in vial_list:
+            values = [
+                vial.vial_data.position,
+                vial.vial_data.name,
+                str(vial.vial_data.contents),
+                vial.vial_data.density,
+                vial.vial_data.volume,
+                vial.vial_data.capacity,
+                vial.vial_data.contamination,
+            ]
+            vial_lines.append(
+                f"{values[0]:<{max_lengths[0]}} {values[1]:<{max_lengths[1]}} {values[2]:<{max_lengths[2]}} {values[3]:<{max_lengths[3]}} {values[4]:<{max_lengths[4]}} {values[5]:<{max_lengths[5]}} {values[6]:<{max_lengths[6]}}"
+            )
+
+        header_string = f"{'Position':<{max_lengths[0]}} {'Name':<{max_lengths[1]}} {'Contents':<{max_lengths[2]}} {'Density':<{max_lengths[3]}} {'Volume':<{max_lengths[4]}} {'Capacity':<{max_lengths[5]}} {'Contamination':<{max_lengths[6]}}"
+        print(header_string)
+        for line in vial_lines:
+            print(line)
+    else:
+        print("No vials found in the database.")
+
+    while True:
+        if not vials:
+            # No vials, go straight to entering a new one
+            vial = enter_new_vial()
+            if vial:
+                vials.append(vial)
+                print("Vial added. Enter another vial or 'q' to quit.")
+            else:
+                break
+        else:
+            # Ask if they want to enter a new vial or update existing
+            choice = input(
+                "Enter 'n' for new vial, 'u' to update existing vial, or 'q' to quit: "
+            )
+            if choice == "q":
+                break
+            elif choice == "n":
+                vial = enter_new_vial()
+                if vial:
+                    vials.append(vial)
+            elif choice == "u":
+                update_existing_vial(vials)
+            else:
+                print("Invalid choice. Please enter 'n', 'u', or 'q'.")
 
 
 def generate_template_vial_csv_file() -> None:
