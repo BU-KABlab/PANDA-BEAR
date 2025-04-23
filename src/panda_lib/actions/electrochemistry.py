@@ -490,7 +490,11 @@ cv = perform_cyclic_voltammetry
 
 
 def move_to_and_perform_cv(
-    exp: EchemExperimentBase, toolkit: Toolkit, file_tag: str, well: Well, log: Logger
+    exp: EchemExperimentBase,
+    toolkit: Toolkit,
+    file_tag: str,
+    well: Well,
+    log: Logger = logger,
 ):
     # CV
     try:
@@ -535,7 +539,11 @@ def move_to_and_perform_cv(
 
 
 def move_to_and_perform_ca(
-    exp: EchemExperimentBase, toolkit: Toolkit, file_tag: str, well: Well, log: Logger
+    exp: EchemExperimentBase,
+    toolkit: Toolkit,
+    file_tag: str,
+    well: Well,
+    log: Logger = logger,
 ):
     # CA
     try:
