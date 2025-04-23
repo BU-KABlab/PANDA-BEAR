@@ -3,7 +3,10 @@
 import json
 from enum import Enum
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Tuple, Union
+
+from panda_lib.types import CoordinatesDict, ToolInfo, JSONSerializable
+
 
 # NOTE these are not mill agnostic, so they should be implemented by whichever
 # project is using this library.
@@ -99,7 +102,7 @@ class Coordinates:
         else:
             raise IndexError("Index out of range")
 
-    def to_dict(self):
+    def to_dict(self) -> CoordinatesDict:
         return {
             "x": self.x,
             "y": self.y,
@@ -107,17 +110,17 @@ class Coordinates:
         }
 
 
-class ToolOffset:
+class ToolOffset(JSONSerializable):
     def __init__(self, name: str, offset: Coordinates):
         self.name: str = name
         self.offset: Coordinates = offset
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: ToolInfo):
         offset = Coordinates(data["x"], data["y"], data["z"])
         return cls(name=data["name"], offset=offset)
 
-    def to_dict(self):
+    def to_dict(self) -> ToolInfo:
         return {
             "name": self.name,
             "x": self.offset.x,
@@ -173,7 +176,7 @@ class ToolManager:
                 [tool.to_dict() for tool in self.tool_offsets.values()], file, indent=4
             )
 
-    def add_tool(self, name: str, offset: Coordinates | tuple[float, float, float]):
+    def add_tool(self, name: str, offset: Union[Coordinates, Tuple[float, float, float]]):
         if not isinstance(name, str):
             try:
                 name = name.value

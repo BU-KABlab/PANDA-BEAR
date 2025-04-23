@@ -1,10 +1,11 @@
 import csv
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from sqlalchemy.orm import sessionmaker
 
+from panda_lib.types import VialKwargs, CoordinatesDict, ChemicalContents
 from panda_lib.utilities import Coordinates, directory_picker, file_picker
 from shared_utilities.config.config_tools import read_config_value
 from shared_utilities.db_setup import SessionLocal
@@ -15,24 +16,6 @@ from .schemas import VialReadModel, VialWriteModel  # Pydantic models
 from .services import VialService
 
 vial_logger = setup_default_logger("vial_logger")
-
-
-# Define TypedDict for Vial kwargs
-class VialKwargs(TypedDict, total=False):
-    category: int
-    height: float
-    radius: float
-    volume: float
-    capacity: float
-    contamination: int
-    dead_volume: float
-    contents: Dict[str, float]
-    viscosity_cp: float
-    concentration: float
-    density: float
-    coordinates: Dict[str, float]
-    name: str
-    base_thickness: float
 
 
 class Vial:

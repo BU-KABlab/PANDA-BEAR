@@ -9,6 +9,7 @@ from .config_tools import (
     reload_config,
     test,
     write_testing_config,
+    is_testing_mode,
 )
 from .test_helpers import (
     get_original_env,
@@ -16,7 +17,9 @@ from .test_helpers import (
     teardown_test_config,
 )
 
-resolve_config_paths()
+# Only resolve config paths when not in testing mode
+if not is_testing_mode():
+    resolve_config_paths()
 
 __all__ = [
     "print_config_values",
@@ -33,4 +36,5 @@ __all__ = [
     "setup_test_config",
     "teardown_test_config",
     "get_original_env",
+    "is_testing_mode",
 ]

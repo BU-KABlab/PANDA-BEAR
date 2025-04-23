@@ -2,6 +2,7 @@ from .config.config_print import print_config_values, resolve_config_paths
 from .config.config_tools import (
     get_env_var,
     get_repo_path,
+    is_testing_mode,
     read_config,
     read_data_dir,
     read_logging_dir,
@@ -62,7 +63,9 @@ def get_port_manufacturers() -> dict[str:str]:
     return manufacturers
 
 
-resolve_config_paths()
+# Only resolve config paths when not in testing mode
+if not is_testing_mode():
+    resolve_config_paths()
 
 __all__ = [
     "print_config_values",
@@ -79,4 +82,5 @@ __all__ = [
     "get_port_names",
     "get_port_manufacturers",
     "setup_default_logger",
+    "is_testing_mode",
 ]

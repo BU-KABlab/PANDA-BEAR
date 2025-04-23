@@ -7,7 +7,7 @@ wellplate and the wells in it.
 import json
 import logging
 from pathlib import Path
-from typing import Optional, Tuple, TypedDict, Union
+from typing import Optional, Tuple, Union
 
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -23,6 +23,7 @@ from panda_lib.sql_tools.panda_models import (
     WellModel,
     Wellplates,
 )
+from panda_lib.types import CoordinatesDict, WellKwargs
 from shared_utilities.config.config_tools import read_config_value
 from shared_utilities.db_setup import SessionLocal
 
@@ -36,35 +37,6 @@ from .schemas import (
 
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
-
-
-# Define TypedDict for Well kwargs
-class WellKwargs(TypedDict, total=False):
-    """
-    TypedDict for Well kwargs
-
-    Attributes:
-    -----------
-    name: str
-    volume: float
-    capacity: float
-    height: float
-    radius: float
-    contamination: int
-    dead_volume: float
-    contents: dict
-    coordinates: dict
-    """
-
-    name: str
-    volume: float
-    capacity: float
-    height: float
-    radius: float
-    contamination: int
-    dead_volume: float
-    contents: dict
-    coordinates: dict
 
 
 class WellplateKwargs(BaseModel, validate_assignment=True):
@@ -416,7 +388,7 @@ class Wellplate:
         """
         # If there is a currently active wellplate, fetch its characteristics
         active_plate = self.service.get_active_plate()
-        if active_plate:
+        if (active_plate):
             kwargs["a1_x"] = active_plate.a1_x
             kwargs["a1_y"] = active_plate.a1_y
             kwargs["orientation"] = active_plate.orientation

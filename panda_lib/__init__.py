@@ -4,9 +4,11 @@ from panda_lib.utilities import Coordinates, Instruments, SystemState, input_val
 
 from . import actions, experiments, sql_tools
 from .print_panda import print_panda
+from . import actions as protocol
 
 __all__ = [
     "actions",
+    "protocol",
     "experiments",
     "sql_tools",
     "print_panda",

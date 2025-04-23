@@ -27,31 +27,45 @@ from .pipetting import (
 from .vessel_handling import _handle_source_vessels, solution_selector, waste_selector
 from .delay_timer import delay_timer as delay
 __all__ = [
-    "capping_sequence",
-    "perform_chronoamperometry",
-    "move_to_and_perform_ca",
-    "move_to_and_perform_cv",
+    # From .actions_pedot
     "chrono_amp_edot_bleaching",
     "chrono_amp_edot_coloring",
-    "perform_cyclic_voltammetry",
-    "capture_new_image",
-    "capping_sequence",
     "cyclic_volt_edot_characterizing",
+    
+    # From .actions_pgma
     "cyclic_volt_pgma_fc",
     "cyclic_volt_pgma_pama",
-    "clear_well",
-    "decapping_sequence",
-    "flush_pipette",
+    
+    # From .electrochemistry
+    "move_to_and_perform_ca",
+    "move_to_and_perform_cv",
+    "perform_chronoamperometry",
+    "perform_cyclic_voltammetry",
+    
+    # From .imaging
+    "capture_new_image",
     "image_well",
+    
+    # From .movement
+    "capping_sequence",
+    "decapping_sequence",
+    "move_to_vial",
+    "move_to_well",
+    
+    # From .pipetting
+    "clear_well",
+    "flush_pipette",
     "mix",
     "purge_pipette",
     "rinse_well",
-    "solution_selector",
     "transfer",
     "volume_correction",
-    "waste_selector",
+    
+    # From .vessel_handling
     "_handle_source_vessels",
-    "move_to_vial",
-    "move_to_well",
+    "solution_selector",
+    "waste_selector",
+    
+    # From .delay_timer
     "delay",
 ]

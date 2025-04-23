@@ -5,8 +5,10 @@ from configparser import ConfigParser
 from pathlib import Path
 
 from dotenv import load_dotenv
-
 load_dotenv()
+from shared_utilities.config.config_tools import is_testing_mode
+
+
 
 
 def load_default_config():
@@ -59,7 +61,8 @@ def print_config_values():
     # Write the updated config file
     config.write(open(CONFIG_FILE, "w", encoding="utf-8"))
 
-    input("\nPress Enter to continue...\n\n")
+    if not is_testing_mode():  # Skip if we're running in testing mode
+        input("\nPress Enter to continue...\n\n")
 
 
 def resolve_config_paths():
@@ -103,6 +106,12 @@ def resolve_config_paths():
                 continue
             # Not checking the value of the key, just that it exists
 
+    # Skip validation and interactive prompts if we're running in testing mode
+    if is_testing_mode():
+        # Just write the config file and return
+        config.write(open(CONFIG_FILE, "w", encoding="utf-8"))
+        return
+    
     # Print the config file values
     for section in config.sections():
         for key, value in config.items(section):
