@@ -27,7 +27,7 @@ from src.panda_lib import (
     toolkit,
 )
 from src.panda_lib.experiments.experiment_types import ExperimentBase
-from src.panda_lib.hardware.panda_pipette import (
+from src.panda_lib.hardware.panda_pipettes import (
     insert_new_pipette,
     select_pipette_status,
 )

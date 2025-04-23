@@ -17,7 +17,7 @@ from panda_lib.actions.vessel_handling import (
 
 # from sqlalchemy import create_engine
 # from sqlalchemy.orm import Session, sessionmaker
-from panda_lib.hardware.panda_pipette import (
+from panda_lib.hardware.panda_pipettes import (
     Pipette,
     # PipetteModel,
 )

@@ -225,7 +225,7 @@ def temp_test_db():
     from sqlalchemy import create_engine, text
     from sqlalchemy.orm import close_all_sessions, sessionmaker
 
-    from panda_lib.hardware.panda_pipette import (
+    from panda_lib.hardware.panda_pipettes import (
         PipetteModel,
     )
     from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
