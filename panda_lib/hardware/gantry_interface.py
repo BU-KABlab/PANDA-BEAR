@@ -5,7 +5,7 @@ from pathlib import Path
 
 from sqlalchemy import select
 
-from hardware.grbl_cnc_mill import (
+from .grbl_cnc_mill import (
     Coordinates,
     Mill,
     MillConnectionError,

@@ -71,7 +71,7 @@ def run(
         wellplate=labware.wellplate,
         global_logger=hardware.global_logger,
         experiment_logger=hardware.experiment_logger,
-        flir_camera=hardware.flir_camera,
+        flir_camera=hardware.camera,
         arduino=hardware.arduino,
     )
     hardware.global_logger.info("Running experiment %s", experiment.experiment_id)

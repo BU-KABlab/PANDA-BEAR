@@ -468,7 +468,7 @@ def sila_experiment_loop_worker(
     hardware = Hardware(
         pump=toolkit.pump,
         mill=toolkit.mill,
-        flir_camera=toolkit.flir_camera,
+        flir_camera=toolkit.camera,
         arduino=toolkit.arduino,
         global_logger=toolkit.global_logger,
     )

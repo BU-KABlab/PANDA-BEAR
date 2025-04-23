@@ -10,7 +10,7 @@ from shared_utilities.config.config_tools import (
 )
 
 from ..labware import Vial, Well
-from ..panda_gantry import PandaMill as Mill
+from ..hardware.gantry_interface import PandaMill as Mill
 from ..toolkit import ArduinoLink
 from ..utilities import Coordinates
 

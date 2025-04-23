@@ -12,12 +12,12 @@ from shared_utilities.config.config_tools import (
 )
 from shared_utilities.log_tools import timing_wrapper
 
-from ..experiments.experiment_types import (
+from panda_lib.experiments.experiment_types import (
     EchemExperimentBase,
     ExperimentStatus,
 )
-from ..imaging import add_data_zone, capture_new_image, image_filepath_generator
-from ..toolkit import Toolkit
+from hardware.imaging import add_data_zone, capture_new_image, image_filepath_generator
+from panda_lib.toolkit import Toolkit
 
 
 class ImageFailure(Exception):
@@ -78,7 +78,7 @@ def image_well(
     - Two images are saved: raw and with data zone overlay
     - Failed image capture will not halt experiment execution
     """
-    if toolkit.flir_camera is None:
+    if toolkit.camera is None:
         logger.warning("No camera connected. Skipping imaging")
         return
 
