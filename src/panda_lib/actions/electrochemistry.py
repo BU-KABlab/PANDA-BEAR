@@ -79,7 +79,11 @@ def open_circuit_potential(
     well = "test"
     experiment = "test"
     try:
-        pstat = echem
+        if TESTING or testing:
+            pstat = echem()
+        else:
+            pstat = echem
+
         pstat.pstatconnect()
         if exp:
             exp.set_status_and_save(ExperimentStatus.OCPCHECK)

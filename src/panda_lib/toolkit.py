@@ -30,17 +30,27 @@ else:
 
 
 class Toolkit:
-    def __init__(self, use_mock_instruments=False):
+    def __init__(self, use_mock_instruments=False, **kwargs):
         # Initialize hardware components with fallbacks
         self.initialize_camera(use_mock_instruments)
+        self.mill = kwargs.get("mill", None)
+        self.scale = kwargs.get("scale", None)
+        self.pump = kwargs.get("pump", None)
+        self.wellplate = kwargs.get("wellplate", None)
+        self.arduino = kwargs.get("arduino", None)
+        self.slack_monitor = kwargs.get("slack_monitor", None)
+        self.global_logger = kwargs.get("global_logger", None)
+        self.experiment_logger = kwargs.get("experiment_logger", None)
 
-    mill: Union[Mill, MockMill, None]
-    scale: Union[Scale, MockScale, None]
-    pump: Union[SyringePump, MockPump, None]
+    mill: Union[Mill, MockMill, None] = None
+    scale: Union[Scale, MockScale, None] = None
+    pump: Union[SyringePump, MockPump, None] = None
     wellplate: Wellplate = None
+    arduino: ArduinoLink = None
     global_logger: Logger = None
     experiment_logger: Logger = None
-    arduino: ArduinoLink = None
+    camera: Union[None, object] = None  # Placeholder for camera object
+    slack_monitor: SlackBot = None
 
     def initialize_camera(self, use_mock=False):
         # Try to use FLIR camera if available, otherwise fall back to OpenCV or mock
@@ -63,9 +73,17 @@ class Toolkit:
 class Hardware:
     """A class to hold all of the hardware"""
 
-    def __init__(self, use_mock_instruments=False):
+    def __init__(self, use_mock_instruments=False, **kwargs):
         # Initialize hardware components with fallbacks
         self.initialize_camera(use_mock_instruments)
+        self.mill = kwargs.get("mill", None)
+        self.scale = kwargs.get("scale", None)
+        self.pump = kwargs.get("pump", None)
+        self.wellplate = kwargs.get("wellplate", None)
+        self.arduino = kwargs.get("arduino", None)
+        self.slack_monitor = kwargs.get("slack_monitor", None)
+        self.global_logger = kwargs.get("global_logger", None)
+        self.experiment_logger = kwargs.get("experiment_logger", None)
 
     mill: Union[Mill, MockMill, None] = None
     scale: Union[Scale, MockScale, None] = None
