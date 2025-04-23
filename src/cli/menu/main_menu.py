@@ -11,13 +11,7 @@ from typing import Tuple
 
 from PIL import Image
 
-from hardware_calibration.mill_calibration_and_positioning import calibrate_mill
-from hardware_calibration import (
-    line_break_validation,
-    decapper_testing,
-)
-from cli.menu.license_text import show_conditions, show_warranty
-from panda_lib import (
+from src.panda_lib import (
     SystemState,
     analysis_worker,
     experiment_loop,
@@ -26,31 +20,37 @@ from panda_lib import (
     load_analyzers,
     print_panda,
     toolkit,
-    
 )
-from panda_lib.hardware.panda_pipette import (
-     insert_new_pipette,
+from src.panda_lib.experiments.experiment_types import ExperimentBase
+from src.panda_lib.hardware.panda_pipette import (
+    insert_new_pipette,
     select_pipette_status,
 )
-from panda_lib.experiments.experiment_types import ExperimentBase
-from panda_lib.labware import vials, wellplates
-from panda_lib.labware.services import WellplateService
-from panda_lib.sql_tools import (
+from src.panda_lib.labware import vials, wellplates
+from src.panda_lib.labware.services import WellplateService
+from src.panda_lib.sql_tools import (
     sql_generator_utilities,
     sql_protocol_utilities,
     sql_queue,
     sql_system_state,
     sql_wellplate,
 )
-from panda_lib.sql_tools.remove_testing_experiments import (
+from src.panda_lib.sql_tools.remove_testing_experiments import (
     main as _remove_testing_experiments,
 )
-from shared_utilities.config import (
+from src.shared_utilities.config import (
     print_config_values,
     read_config,
     read_testing_config,
     write_testing_config,
 )
+
+from .hardware_calibration import (
+    decapper_testing,
+    line_break_validation,
+)
+from .hardware_calibration.mill_calibration_and_positioning import calibrate_mill
+from .menu.license_text import show_conditions, show_warranty
 
 os.environ["KMP_AFFINITY"] = "none"
 exp_loop_prcss: Process = None
@@ -66,6 +66,7 @@ analysis_choices = ["10"]
 blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
 global prj_id
 prj_id = None
+
 
 def run_experiment():
     queue_list = print_queue_info()
@@ -566,13 +567,16 @@ def list_analysis_script_ids():
 
     input("Press Enter to continue...")
 
+
 def decapper_test():
     """Runs the decapper testing."""
     decapper_testing.main()
 
+
 def linebreak_test():
     """Runs the line break testing."""
     line_break_validation.main()
+
 
 def main_menu(reduced: bool = False) -> Tuple[callable, str]:
     """Main menu for PANDA_SDL."""
@@ -796,7 +800,7 @@ def check_essential_labware():
     return missing
 
 
-if __name__ == "__main__":
+def main():
     config = read_config()
     # slackThread_running.set()
     print_disclaimer()
@@ -814,7 +818,7 @@ if __name__ == "__main__":
             num, p_type, new_wells = wellplates.read_current_wellplate_info()
             try:
                 current_pipette = select_pipette_status()
-            except (AttributeError,ValueError):
+            except (AttributeError, ValueError):
                 insert_new_pipette()
                 current_pipette = select_pipette_status()
             remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
