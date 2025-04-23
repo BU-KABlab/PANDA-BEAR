@@ -2,13 +2,13 @@
 
 from typing import Tuple
 
-from src.panda_lib.errors import (
+from panda_lib.errors import (
     CAFailure,
     CVFailure,
     DepositionFailure,
     OCPError,
 )
-from src.panda_lib.experiments.experiment_types import EchemExperimentBase
+from panda_lib.experiments.experiment_types import EchemExperimentBase
 
 from .electrochemistry import (
     ExperimentStatus,
