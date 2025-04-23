@@ -5,12 +5,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import Session, sessionmaker
-from hardware.panda_pipette import (
-    Pipette,
-    # PipetteModel,
-)
 from panda_lib.actions.pipetting import (
     _pipette_action,
     volume_correction,
@@ -19,6 +13,13 @@ from panda_lib.actions.vessel_handling import (
     _handle_source_vessels,
     solution_selector,
     waste_selector,
+)
+
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import Session, sessionmaker
+from panda_lib.hardware.panda_pipette import (
+    Pipette,
+    # PipetteModel,
 )
 from panda_lib.labware import StockVial, Well
 

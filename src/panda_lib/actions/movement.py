@@ -3,6 +3,7 @@ import logging
 from logging import Logger
 from pathlib import Path
 
+from panda_lib.hardware.gantry_interface import PandaMill as Mill
 from shared_utilities.config.config_tools import (
     ConfigParserError,
     read_config,
@@ -10,7 +11,6 @@ from shared_utilities.config.config_tools import (
 )
 
 from ..labware import Vial, Well
-from ..hardware.gantry_interface import PandaMill as Mill
 from ..toolkit import ArduinoLink
 from ..utilities import Coordinates
 

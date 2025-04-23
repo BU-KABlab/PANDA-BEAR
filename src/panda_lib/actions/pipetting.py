@@ -3,8 +3,8 @@ import math
 from pathlib import Path
 from typing import Optional, Union
 
-from hardware.grbl_cnc_mill import Instruments
 from panda_lib.errors import NoAvailableSolution
+from panda_lib.hardware.grbl_cnc_mill import Instruments
 from shared_utilities.config.config_tools import (
     ConfigParserError,
     read_config,

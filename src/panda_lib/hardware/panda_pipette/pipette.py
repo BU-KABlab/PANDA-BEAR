@@ -4,7 +4,7 @@ import json
 import logging
 import time
 
-from hardware.panda_pipette.sql_pipette import (
+from panda_lib.hardware.panda_pipette.sql_pipette import (
     SessionLocal,
     activate_pipette,
     deincrement_use_count,

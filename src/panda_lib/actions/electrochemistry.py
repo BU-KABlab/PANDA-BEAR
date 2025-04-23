@@ -22,17 +22,17 @@ from ..toolkit import Toolkit
 TESTING = read_testing_config()
 
 if TESTING or os.name != "nt":
-    from hardware.gamry_potentiostat.gamry_control_mock import (
+    from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
         GamryPotentiostat as echem,
     )
-    from hardware.gamry_potentiostat.gamry_control_mock import (
+    from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
         chrono_parameters,
         cv_parameters,
         potentiostat_ocp_parameters,
     )
 else:
-    import hardware.gamry_potentiostat.gamry_control as echem
-    from hardware.gamry_potentiostat.gamry_control import (
+    import panda_lib.hardware.gamry_potentiostat.gamry_control as echem
+    from panda_lib.hardware.gamry_potentiostat.gamry_control import (
         chrono_parameters,
         cv_parameters,
         potentiostat_ocp_parameters,

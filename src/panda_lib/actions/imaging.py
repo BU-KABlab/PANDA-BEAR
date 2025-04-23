@@ -4,20 +4,23 @@ from typing import Optional
 
 from PIL import Image
 
-from hardware.grbl_cnc_mill import Instruments
+from panda_lib.experiments.experiment_types import (
+    EchemExperimentBase,
+    ExperimentStatus,
+)
+from panda_lib.hardware.grbl_cnc_mill import Instruments
+from panda_lib.hardware.imaging import (
+    add_data_zone,
+    capture_new_image,
+    image_filepath_generator,
+)
+from panda_lib.toolkit import Toolkit
 from shared_utilities.config.config_tools import (
     ConfigParserError,
     read_config,
     read_testing_config,
 )
 from shared_utilities.log_tools import timing_wrapper
-
-from panda_lib.experiments.experiment_types import (
-    EchemExperimentBase,
-    ExperimentStatus,
-)
-from hardware.imaging import add_data_zone, capture_new_image, image_filepath_generator
-from panda_lib.toolkit import Toolkit
 
 
 class ImageFailure(Exception):

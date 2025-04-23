@@ -5,10 +5,9 @@ from configparser import ConfigParser
 from pathlib import Path
 
 from dotenv import load_dotenv
+
 load_dotenv()
-from shared_utilities.config.config_tools import is_testing_mode
-
-
+from .config_tools import is_testing_mode  # noqa: E402
 
 
 def load_default_config():
@@ -111,7 +110,7 @@ def resolve_config_paths():
         # Just write the config file and return
         config.write(open(CONFIG_FILE, "w", encoding="utf-8"))
         return
-    
+
     # Print the config file values
     for section in config.sections():
         for key, value in config.items(section):

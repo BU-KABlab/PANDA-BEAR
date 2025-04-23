@@ -107,26 +107,8 @@ dev = [
 panda-cli = "cli.main:main"
 panda-db-setup = "panda_lib_db.cli:main"
 
-[tool.setuptools]
-packages = [
-    "cli",
-    "panda_lib",
-    "panda_lib.actions",
-    "panda_lib.experiments",
-    "panda_lib.hardware",
-    "panda_lib.hardware.interfaces",
-    "panda_lib.hardware.pipette",
-    "panda_lib.hardware.mill",
-    "panda_lib.hardware.potentiostat",
-    "panda_lib.hardware.imaging",
-    "panda_lib.labware",
-    "panda_lib.utilities",
-    "panda_lib.sql_tools",
-    "panda_lib.slack_tools",
-    "panda_lib_db",
-    "shared_utilities",
-    "shared_utilities.config",
-]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools.package-data]
 "panda_lib.hardware.mill" = ["*.json", "*.txt"]

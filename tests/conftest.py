@@ -12,10 +12,12 @@ os.environ["PANDA_UNIT_ID"] = "99"  # Set unit ID to match config file
 import pytest
 
 # Add the root directory of your project to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
+)
 
 # Import needed modules after setting path
-from shared_utilities.config.config_tools import reload_config
+from src.shared_utilities.config.config_tools import reload_config
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -170,7 +172,7 @@ offsets = [
 
 
 """)
-    
+
     # Set environment variables for testing
     os.environ["PANDA_TESTING_CONFIG_PATH"] = temp_path
     os.environ["PANDA_TESTING_MODE"] = "1"
@@ -179,13 +181,14 @@ offsets = [
 
     # Force config_tools to use our test config
     os.environ["PANDA_SDL_CONFIG_PATH"] = temp_path
-    
+
     # Clear any existing configuration cache by patching resolve_config_paths
     # This prevents config_print from asking about directories
-    with patch('shared_utilities.config.config_print.resolve_config_paths'):
+    with patch("shared_utilities.config.config_print.resolve_config_paths"):
         # Clear the LRU cache for read_config to force reconfiguration
         try:
             from shared_utilities.config.config_tools import read_config
+
             read_config.cache_clear()
             # Explicitly reload config
             reload_config()
@@ -222,7 +225,7 @@ def temp_test_db():
     from sqlalchemy import create_engine, text
     from sqlalchemy.orm import close_all_sessions, sessionmaker
 
-    from hardware.panda_pipette import (
+    from panda_lib.hardware.panda_pipette import (
         PipetteModel,
     )
     from panda_lib.labware.schemas import VialWriteModel, WellWriteModel

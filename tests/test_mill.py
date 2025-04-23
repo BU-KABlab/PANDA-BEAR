@@ -2,8 +2,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from hardware.grbl_cnc_mill.driver import Mill
-from hardware.grbl_cnc_mill.tools import Coordinates, ToolManager
+from panda_lib.hardware.grbl_cnc_mill.driver import Mill
+from panda_lib.hardware.grbl_cnc_mill.tools import Coordinates, ToolManager
 
 
 @pytest.fixture

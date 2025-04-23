@@ -9,7 +9,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
-from hardware.grbl_cnc_mill import (
+from panda_lib.actions.imaging import capture_new_image
+from panda_lib.hardware.grbl_cnc_mill import (
     CommandExecutionError,
     Instruments,
     LocationNotFound,
@@ -21,7 +22,6 @@ from hardware.grbl_cnc_mill import (
     StatusReturnError,
     set_up_mill_logger,
 )
-from panda_lib.actions.imaging import capture_new_image
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well
 from panda_lib.labware.wellplates import Wellplates as Wellplate
