@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from sqlalchemy.orm import sessionmaker
 
-from panda_lib.types import VialKwargs, CoordinatesDict, ChemicalContents
+from panda_lib.types import VialKwargs
 from panda_lib.utilities import Coordinates, directory_picker, file_picker
 from shared_utilities.config.config_tools import read_config_value
 from shared_utilities.db_setup import SessionLocal
@@ -532,7 +532,6 @@ def generate_template_vial_csv_file() -> None:
         csv_writer = csv.writer(file)
         csv_writer.writerow(
             [
-                "id",
                 "position",
                 "category",
                 "name",
@@ -548,10 +547,6 @@ def generate_template_vial_csv_file() -> None:
                 "coordinates",
                 "base_thickness",
                 "dead_volume",
-                "volume_height",
-                "bottom",
-                "top",
-                "updated",
                 "active",
             ]
         )
@@ -562,7 +557,6 @@ def generate_template_vial_csv_file() -> None:
             vial: Vial
             csv_writer.writerow(
                 [
-                    vial.vial_data.id,
                     vial.vial_data.position,
                     vial.vial_data.category,
                     vial.vial_data.name,
@@ -578,10 +572,6 @@ def generate_template_vial_csv_file() -> None:
                     json.dumps(vial.vial_data.coordinates),
                     vial.vial_data.base_thickness,
                     vial.vial_data.dead_volume,
-                    vial.vial_data.volume_height,
-                    vial.vial_data.bottom,
-                    vial.vial_data.top,
-                    vial.vial_data.updated,
                     vial.vial_data.active,
                 ]
             )
@@ -632,6 +622,8 @@ def import_vial_csv_file(filename: Optional[str] = None) -> None:
                 capacity=float(each_vial["capacity"]),
                 contamination=int(each_vial["contamination"]),
                 dead_volume=float(each_vial["dead_volume"]),
+                active=int(each_vial["active"]),
+                base_thickness=float(each_vial["base_thickness"]),
             )
 
             vial = Vial(
