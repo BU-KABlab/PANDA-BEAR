@@ -2,25 +2,26 @@
 
 from typing import Tuple
 
-from panda_lib.actions.electrochemistry import (
-    ExperimentStatus,
-    chrono_parameters,
-    cv_parameters,
-    logger,
-)
-from panda_lib.actions.electrochemistry import (
-    perform_chronoamperometry as chrono_amp,
-)
-from panda_lib.actions.electrochemistry import (
-    perform_cyclic_voltammetry as cyclic_volt,
-)
-from panda_lib.errors import (
+from src.panda_lib.errors import (
     CAFailure,
     CVFailure,
     DepositionFailure,
     OCPError,
 )
-from panda_lib.experiments.experiment_types import EchemExperimentBase
+from src.panda_lib.experiments.experiment_types import EchemExperimentBase
+
+from .electrochemistry import (
+    ExperimentStatus,
+    chrono_parameters,
+    cv_parameters,
+    logger,
+)
+from .electrochemistry import (
+    perform_chronoamperometry as chrono_amp,
+)
+from .electrochemistry import (
+    perform_cyclic_voltammetry as cyclic_volt,
+)
 
 
 def chrono_amp_edot_bleaching(

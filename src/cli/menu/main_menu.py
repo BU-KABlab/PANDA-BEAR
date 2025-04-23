@@ -11,6 +11,12 @@ from typing import Tuple
 
 from PIL import Image
 
+from cli.hardware_calibration import (
+    decapper_testing,
+    line_break_validation,
+)
+from cli.hardware_calibration.mill_calibration_and_positioning import calibrate_mill
+from cli.menu.license_text import show_conditions, show_warranty
 from src.panda_lib import (
     SystemState,
     analysis_worker,
@@ -18,7 +24,6 @@ from src.panda_lib import (
     imaging,
     input_validation,
     load_analyzers,
-    print_panda,
     toolkit,
 )
 from src.panda_lib.experiments.experiment_types import ExperimentBase
@@ -45,12 +50,7 @@ from src.shared_utilities.config import (
     write_testing_config,
 )
 
-from .hardware_calibration import (
-    decapper_testing,
-    line_break_validation,
-)
-from .hardware_calibration.mill_calibration_and_positioning import calibrate_mill
-from .menu.license_text import show_conditions, show_warranty
+from .print_panda import print_panda
 
 os.environ["KMP_AFFINITY"] = "none"
 exp_loop_prcss: Process = None
@@ -69,6 +69,7 @@ prj_id = None
 
 
 def run_experiment():
+    global exp_loop_prcss
     queue_list = print_queue_info()
     exp_id = int(
         input_validation(
@@ -98,7 +99,7 @@ def run_experiment():
 
 def run_queue():
     """Runs the queue."""
-    global prj_id
+    global prj_id, exp_loop_prcss
     queue = sql_queue.select_queue(project_id=prj_id)
     queue_ids = [item[0] for item in queue]
     if not queue_ids:
@@ -511,6 +512,7 @@ def run_control_loop(uchoice: callable) -> Process:
 
 def start_analysis_loop():
     """Starts the analysis loop."""
+    global analysis_prcss
     sql_system_state.set_system_status(SystemState.BUSY, "starting analysis loop")
     process = Process(target=analysis_worker, args=(status_queue, ProcessIDs.ANALYSIS))
     process.start()
@@ -519,6 +521,7 @@ def start_analysis_loop():
 
 def stop_analysis_loop():
     """Stops the analysis loop."""
+    global analysis_prcss, analysis_status
     if analysis_prcss:
         while (
             get_process_status(status_queue, ProcessIDs.ANALYSIS, analysis_status)
@@ -531,6 +534,7 @@ def stop_analysis_loop():
 
 def stop_control_loop():
     """Stops the control loop."""
+    global exp_loop_prcss, exp_loop_status
     if exp_loop_prcss:
         while (
             get_process_status(status_queue, ProcessIDs.CONTROL_LOOP, exp_loop_status)
@@ -801,6 +805,7 @@ def check_essential_labware():
 
 
 def main():
+    global exp_loop_prcss, exp_loop_status, analysis_prcss, analysis_status, prj_id
     config = read_config()
     # slackThread_running.set()
     print_disclaimer()

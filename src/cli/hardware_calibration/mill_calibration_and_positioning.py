@@ -24,13 +24,14 @@ from typing import Sequence
 from panda_lib.hardware.gantry_interface import Coordinates
 from panda_lib.hardware.gantry_interface import MockPandaMill as MockMill
 from panda_lib.hardware.gantry_interface import PandaMill as Mill
-from panda_lib.imaging import capture_new_image
+from panda_lib.hardware.imaging import capture_new_image
 from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well, Wellplate
 from panda_lib.utilities import Instruments, input_validation
 from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import setup_default_logger
-
+from .decapper_testing import main as decapper_test
+from .line_break_validation import main as line_break_test
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 config = read_config()["MILL"]
 
