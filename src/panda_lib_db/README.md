@@ -72,5 +72,5 @@ By default, the tool will:
 
 ## Database Schema
 
-The database schema is based on the SQLAlchemy models defined in `panda_lib.sql_tools.panda_models`. 
+The database schema is based on the SQLAlchemy models defined in `panda_models`. 
 These models are used to create the database tables and relationships.
