@@ -98,8 +98,9 @@ def resolve_config_paths():
             # Path to the root directory of the package
             root_dir = Path().cwd()
             config_dest = root_dir / filename
-            
-            copyfile("./panda_lib/config/default_config.ini", config_dest)
+            project_root = os.path.dirname(os.path.abspath(__file__))
+            src_filepath = os.path.join(project_root, "default_config.ini")
+            copyfile(src_filepath, config_dest)
             
             # Update the .env file with the new config path
             with open(".env", "r") as f:
