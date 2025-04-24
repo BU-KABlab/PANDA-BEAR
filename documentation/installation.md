@@ -292,7 +292,7 @@ offsets = [
         "y": -1.0,
         "z": 0.0
     }
-]
+    ]
 ```
 
 ## Test Your Installation
