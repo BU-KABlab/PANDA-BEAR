@@ -6,7 +6,23 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+env_found = load_dotenv()
+
+if not env_found:
+    # print("No .env file found. Please create one with the required environment variables.")
+    # make_for_user = input("Create a new .env file? (y/n): ")
+    # if make_for_user.lower() == "y":
+    #     with open(".env", "w") as f:
+    #         f.write("PANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\n")
+    #         f.write("# Temp DB for pytest\nTEMP_DB='0'\n")
+
+    # else:
+    raise FileNotFoundError(
+        "No .env file found. Please create one with the required environment variables:" \
+        "\nPANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\nTEMP_DB='0'"
+    )
+
+
 from .config_tools import is_testing_mode  # noqa: E402
 
 
@@ -67,13 +83,49 @@ def print_config_values():
 def resolve_config_paths():
     # Read the config file
     CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
-    if not CONFIG_FILE:
-        raise ValueError("PANDA_SDL_CONFIG_PATH environment variable not set and or no .env file found.")
-    if not Path(CONFIG_FILE).exists():
-        raise FileNotFoundError(f"Config file not found: {CONFIG_FILE}")
-    config = ConfigParser()
+        if not CONFIG_FILE or not Path(CONFIG_FILE).exists():
+            print("PANDA_SDL_CONFIG_PATH environment variable not set or config file not found.")
+            create = input("Create a new config file? (y/n): ")
+            if create.lower() == "y":
+                # Get the filename from the user
+                filename = input("Enter a name for the config file (default is 'config.ini'): ")
+                if not filename:
+                    filename = "config.ini"
+                
+                # Create a new config file with default values
+                from shutil import copyfile
+                
+                # Path to the root directory of the package
+                root_dir = Path().cwd()
+                config_dest = root_dir / filename
+                
+                copyfile("./panda_lib/config/default_config.ini", config_dest)
+                
+                # Update the .env file with the new config path
+                with open(".env", "r") as f:
+                    env_lines = f.readlines()
+                
+                with open(".env", "w") as f:
+                    for line in env_lines:
+                        if line.startswith("PANDA_SDL_CONFIG_PATH="):
+                            f.write(f"PANDA_SDL_CONFIG_PATH={config_dest}\n")
+                        else:
+                            f.write(line)
+                    
+                    # If PANDA_SDL_CONFIG_PATH wasn't in the file, add it
+                    if not any(line.startswith("PANDA_SDL_CONFIG_PATH=") for line in env_lines):
+                        f.write(f"PANDA_SDL_CONFIG_PATH={config_dest}\n")
+                
+                # Update the environment variable
+                os.environ["PANDA_SDL_CONFIG_PATH"] = str(config_dest)
+                CONFIG_FILE = str(config_dest)
+                
+                print(f"Config file created at {config_dest}.")
+                print(f"Updated .env file with new config path.")
+            
+            config = ConfigParser()
 
-    try:
+        try:
         config.read(CONFIG_FILE)
     except FileNotFoundError:
         print("Config file not found. Generating defualt config file.")
