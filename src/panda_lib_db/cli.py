@@ -19,7 +19,7 @@ def get_default_paths():
     
     # Default paths
     default_db_path = os.path.join(project_root, "panda.db")
-    default_sql_dump = os.path.join(project_root, "sql_scripts", "panda_db_dump.sql")
+    default_sql_dump = os.path.join(project_root,"panda_db_dump.sql")
     
     return default_db_path, default_sql_dump
 
