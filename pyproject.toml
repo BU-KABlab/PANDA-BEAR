@@ -71,7 +71,6 @@ dependencies = [
     "six==1.16.0",
     "slack_sdk>=3.4.0",
     "smmap==5.0.1",
-    "spinnaker-python",
     "SQLAlchemy==2.0.34",
     "sympy==1.13.2",
     "threadpoolctl==3.5.0",
@@ -167,7 +166,7 @@ docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
 [tool.uv.sources]
-spinnaker-python = { path = "P:\\software\\flir\\spinnaker_python-4.0.0.116-cp310-cp310-win_amd64\\spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" }
+#spinnaker-python = { path = "P:\\software\\flir\\spinnaker_python-4.0.0.116-cp310-cp310-win_amd64\\spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" }
 nesp-lib = { git = "https://github.com/BU-KABlab/nesp-lib-py.git" }
 panda_sdl = { workspace = true }
 panda-lib = { workspace = true }
