@@ -1,6 +1,6 @@
 
 from .menu import main_menu
-from .menu.main_menu import main_menu as MainMenu
+from .menu.main_menu import main as MainMenu
 from .hardware_calibration import decapper_testing, line_break_validation, mill_calibration_and_positioning
 
 __all__ = [
