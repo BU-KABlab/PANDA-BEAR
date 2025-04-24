@@ -82,6 +82,7 @@ def print_config_values():
 
 def resolve_config_paths():
     # Read the config file
+    config = ConfigParser()
     CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
     if not CONFIG_FILE or not Path(CONFIG_FILE).exists():
         print("PANDA_SDL_CONFIG_PATH environment variable not set or config file not found.")
