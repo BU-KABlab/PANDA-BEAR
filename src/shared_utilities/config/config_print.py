@@ -83,49 +83,49 @@ def print_config_values():
 def resolve_config_paths():
     # Read the config file
     CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
-        if not CONFIG_FILE or not Path(CONFIG_FILE).exists():
-            print("PANDA_SDL_CONFIG_PATH environment variable not set or config file not found.")
-            create = input("Create a new config file? (y/n): ")
-            if create.lower() == "y":
-                # Get the filename from the user
-                filename = input("Enter a name for the config file (default is 'config.ini'): ")
-                if not filename:
-                    filename = "config.ini"
-                
-                # Create a new config file with default values
-                from shutil import copyfile
-                
-                # Path to the root directory of the package
-                root_dir = Path().cwd()
-                config_dest = root_dir / filename
-                
-                copyfile("./panda_lib/config/default_config.ini", config_dest)
-                
-                # Update the .env file with the new config path
-                with open(".env", "r") as f:
-                    env_lines = f.readlines()
-                
-                with open(".env", "w") as f:
-                    for line in env_lines:
-                        if line.startswith("PANDA_SDL_CONFIG_PATH="):
-                            f.write(f"PANDA_SDL_CONFIG_PATH={config_dest}\n")
-                        else:
-                            f.write(line)
-                    
-                    # If PANDA_SDL_CONFIG_PATH wasn't in the file, add it
-                    if not any(line.startswith("PANDA_SDL_CONFIG_PATH=") for line in env_lines):
-                        f.write(f"PANDA_SDL_CONFIG_PATH={config_dest}\n")
-                
-                # Update the environment variable
-                os.environ["PANDA_SDL_CONFIG_PATH"] = str(config_dest)
-                CONFIG_FILE = str(config_dest)
-                
-                print(f"Config file created at {config_dest}.")
-                print(f"Updated .env file with new config path.")
+    if not CONFIG_FILE or not Path(CONFIG_FILE).exists():
+        print("PANDA_SDL_CONFIG_PATH environment variable not set or config file not found.")
+        create = input("Create a new config file? (y/n): ")
+        if create.lower() == "y":
+            # Get the filename from the user
+            filename = input("Enter a name for the config file (default is 'config.ini'): ")
+            if not filename:
+                filename = "config.ini"
             
-            config = ConfigParser()
+            # Create a new config file with default values
+            from shutil import copyfile
+            
+            # Path to the root directory of the package
+            root_dir = Path().cwd()
+            config_dest = root_dir / filename
+            
+            copyfile("./panda_lib/config/default_config.ini", config_dest)
+            
+            # Update the .env file with the new config path
+            with open(".env", "r") as f:
+                env_lines = f.readlines()
+            
+            with open(".env", "w") as f:
+                for line in env_lines:
+                    if line.startswith("PANDA_SDL_CONFIG_PATH="):
+                        f.write(f"PANDA_SDL_CONFIG_PATH={config_dest}\n")
+                    else:
+                        f.write(line)
+                
+                # If PANDA_SDL_CONFIG_PATH wasn't in the file, add it
+                if not any(line.startswith("PANDA_SDL_CONFIG_PATH=") for line in env_lines):
+                    f.write(f"PANDA_SDL_CONFIG_PATH={config_dest}\n")
+            
+            # Update the environment variable
+            os.environ["PANDA_SDL_CONFIG_PATH"] = str(config_dest)
+            CONFIG_FILE = str(config_dest)
+            
+            print(f"Config file created at {config_dest}.")
+            print("Updated .env file with new config path.")
+        
+        config = ConfigParser()
 
-        try:
+    try:
         config.read(CONFIG_FILE)
     except FileNotFoundError:
         print("Config file not found. Generating defualt config file.")

@@ -3,8 +3,6 @@
 import gc
 import logging
 import pathlib
-import sys
-import threading
 import time
 from decimal import Decimal
 from typing import Tuple
@@ -343,13 +341,6 @@ def cyclic(params: cv_parameters):
     DTAQ.Init(PSTAT)
     PSTAT.SetSignal(SIGNAL)
     PSTAT.SetCell(GAMRY_COM.CellOn)
-
-    # Start a new thread to run a countdown timer
-    total_potential_distance = (
-        abs(params.CVap1 - params.CVvi)
-        + abs(params.CVap2 - params.CVap1)
-        + abs(params.CVvf - params.CVap2)
-    )
 
     DTAQ.Run(True)
 

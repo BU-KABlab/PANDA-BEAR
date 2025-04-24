@@ -14,7 +14,7 @@ import sqlalchemy as sa
 # Import models - assuming they're available in panda_lib.sql_tools
 from .panda_models import Base
 
-def return_sql_dump_file()
+def return_sql_dump_file():
     """Return the path to the SQL dump file."""
     # Get project root - assumes this script is in panda_lib_db folder
     project_root = os.path.dirname(os.path.abspath(__file__))
@@ -110,7 +110,7 @@ def setup_database(db_path, sql_dump=None, drop_existing=False):
             return False
 
         # Initialize database from models
-        engine = init_db_from_models(db_path, drop_all=drop_existing)
+        _ = init_db_from_models(db_path, drop_all=drop_existing)
 
         # Apply SQL dump if provided
         if sql_dump and os.path.exists(sql_dump):

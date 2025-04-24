@@ -1,6 +1,6 @@
 # panda_lib/hardware/imaging/flir_camera.py
 try:
-    import PySpin
+    import PySpin as PySpin
     PYSPIN_AVAILABLE = True
 except ImportError:
     PYSPIN_AVAILABLE = False

@@ -458,7 +458,7 @@ def enter_new_vial() -> Vial:
 
         # Check if position already exists
         try:
-            existing_vial = Vial(position=position, create_new=False)
+            Vial(position=position, create_new=False)
             print(f"Vial {position} already exists. Please enter a new position.")
             continue
         except Exception:
