@@ -67,6 +67,10 @@ def print_config_values():
 def resolve_config_paths():
     # Read the config file
     CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
+    if not CONFIG_FILE:
+        raise ValueError("PANDA_SDL_CONFIG_PATH environment variable not set and or no .env file found.")
+    if not Path(CONFIG_FILE).exists():
+        raise FileNotFoundError(f"Config file not found: {CONFIG_FILE}")
     config = ConfigParser()
 
     try:
@@ -125,11 +129,17 @@ def resolve_config_paths():
                         raise AssertionError
                 except AssertionError:
                     print(f"{key} = Path does not exist: {value}")
-                    generate_blank_db = input("Use default template database? (y/n): ")
+                    generate_blank_db = input("Create the default database? (y/n): ")
                     if generate_blank_db.lower() == "y":
-                        from shutil import copyfile
+                        # from shutil import copyfile
 
-                        copyfile("./panda_lib/config/template.db", ".")
+                        # copyfile("./panda_lib/config/template.db", ".")
+                        from panda_lib_db.db_setup import setup_database, return_sql_dump_file
+                        setup_database(
+                            db_path=value,
+                            sql_dump=return_sql_dump_file(),
+                            drop_existing=True,
+                        )
                     else:
                         raise FileNotFoundError
 
