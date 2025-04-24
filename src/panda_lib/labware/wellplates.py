@@ -374,9 +374,15 @@ class Wellplate:
         else:
             # If loading an existing plate, and not id is provided, read the current plate info
             if plate_id is None:
-                plate_id, _, _ = read_current_wellplate_info(
-                    db_session=self.database_session
-                )
+                try:
+                    plate_id, _, _ = read_current_wellplate_info(
+                        db_session=self.database_session
+            
+                    )
+                except Exception as e:
+                    raise ValueError(
+                        "No plate_id provided and no active plate found in the database."
+                    ) from e
             self.load_plate(plate_id)
 
     def create_new_plate(self, **kwargs: WellplateKwargs):
@@ -886,8 +892,10 @@ def read_current_wellplate_info(
 
         return int(current_plate_id), int(current_type_number), new_wells
     except Exception as e:
-        print(f"Error occurred while reading the current wellplate: {e}")
-        return 0, 0, 0
+        # print(f"Error occurred while reading the current wellplate: {e}")
+        raise ValueError(
+            "No plate_id provided and no active plate found in the database."
+        ) from e
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ from panda_lib.sql_tools import (
 from panda_lib.sql_tools.remove_testing_experiments import (
     main as _remove_testing_experiments,
 )
-from src.shared_utilities.config import (
+from shared_utilities.config import (
     print_config_values,
     read_config,
     read_testing_config,
@@ -228,7 +228,13 @@ def print_wellplate_info():
     Location of A1: x, y
 
     """
-    well_num, plate_type, avail_wells = wellplates.read_current_wellplate_info()
+    try:
+        well_num, plate_type, avail_wells = wellplates.read_current_wellplate_info()
+    except ValueError:
+        well_num = 0
+        plate_type = 0
+        avail_wells = 0
+    
     c_plate = wellplates.Wellplate(type_id=plate_type, plate_id=well_num)
 
     print(
@@ -553,13 +559,16 @@ def stop_process(process: Process):
 
 def update_well_status():
     """Manually update the status of a well on the current wellplate."""
-    wellplate_id = wellplates.read_current_wellplate_info()[0]
-    well_ids = sql_wellplate.select_well_ids(wellplate_id)
-    well_id = input_validation(
-        "Enter the well ID to update: ", str, None, False, "Invalid Well ID", well_ids
-    )
-    status = input_validation("Enter the status of the well: ", str)
-    sql_wellplate.update_well_status(well_id, wellplate_id, status)
+    try:
+        wellplate_id = wellplates.read_current_wellplate_info()[0]
+        well_ids = sql_wellplate.select_well_ids(wellplate_id)
+        well_id = input_validation(
+            "Enter the well ID to update: ", str, None, False, "Invalid Well ID", well_ids
+        )
+        status = input_validation("Enter the status of the well: ", str)
+        sql_wellplate.update_well_status(well_id, wellplate_id, status)
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 def list_analysis_script_ids():
@@ -789,7 +798,11 @@ def check_essential_labware():
         missing.append("waste vials")
 
     # Check if the wellplate is present
-    wellplate_id, _, new_wells = wellplates.read_current_wellplate_info()
+    try:
+        wellplate_id, _, new_wells = wellplates.read_current_wellplate_info()
+    except ValueError:
+        wellplate_id = None
+        new_wells = 0
     if not wellplate_id:
         missing.append("wellplate")
 
@@ -797,9 +810,18 @@ def check_essential_labware():
         missing.append("new wells")
 
     # Check if the pipette is present
-    current_pipette = select_pipette_status()
-    if not current_pipette:
-        missing.append("pipette")
+    try:
+        current_pipette = select_pipette_status()
+        if not current_pipette:
+            missing.append("pipette")
+    except (AttributeError, ValueError):
+        new_pipette = input("Insert new pipette (y/n): ").strip().lower()
+        if new_pipette == "y":
+            insert_new_pipette()
+            current_pipette = select_pipette_status()
+        else:
+            print("No pipette found.")
+            missing.append("pipette")
 
     return missing
 
@@ -817,10 +839,12 @@ def main():
         prj_id = prompt_for_project_id()
         if config.getboolean("OPTIONS", "use_slack"):
             pass
-            # slackbot_thread = start_slack_bot(slackThread_running)
         while True:
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
-            num, p_type, new_wells = wellplates.read_current_wellplate_info()
+            try:
+                num, p_type, new_wells = wellplates.read_current_wellplate_info()
+            except Exception as e:
+                num, p_type, new_wells = 0, 0, 0
             try:
                 current_pipette = select_pipette_status()
             except (AttributeError, ValueError):
