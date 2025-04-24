@@ -11,12 +11,12 @@ from typing import Tuple
 
 from PIL import Image
 
-from cli.hardware_calibration import (
+from panda_lib_cli.hardware_calibration import (
     decapper_testing,
     line_break_validation,
 )
-from cli.hardware_calibration.mill_calibration_and_positioning import calibrate_mill
-from cli.menu.license_text import show_conditions, show_warranty
+from panda_lib_cli.hardware_calibration.mill_calibration_and_positioning import calibrate_mill
+from panda_lib_cli.menu.license_text import show_conditions, show_warranty
 from src.panda_lib import (
     SystemState,
     analysis_worker,

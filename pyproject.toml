@@ -44,7 +44,6 @@ dependencies = [
     "nesp-lib",
     "networkx==3.3",
     "numpy>=1.26.0",
-    "obsws-python==1.7.0",
     "opencv-python==4.10.0.84",
     "packaging==24.1",
     "pandas==2.2.2",
@@ -97,7 +96,7 @@ syringe_pump = ["nesp_lib"]
 dev = ["pytest", "ruff", "mypy", "black"]
 
 [project.scripts]
-panda-cli = "cli.main:main"
+panda-cli = "panda_lib_cli.main:main"
 panda-db-setup = "panda_lib_db.cli:main"
 
 [tool.setuptools.packages.find]
@@ -173,6 +172,4 @@ panda-lib = { workspace = true }
 hardpotato = { git = "https://github.com/BU-KABlab/hardpotato.git" }
 
 [dependency-groups]
-dev = [
-    "panda-lib",
-]
+dev = ["panda-lib"]
