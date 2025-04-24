@@ -87,8 +87,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/PANDA-BEAR"
-"Bug Tracker" = "https://github.com/yourusername/PANDA-BEAR/issues"
+"Homepage" = "https://github.com/BU-KABlab/PANDA-BEAR"
+"Bug Tracker" = "https://github.com/BU-KABlab/PANDA-BEAR/issues"
 
 [project.optional-dependencies]
 flir = []                                 # Empty because PySpin is installed manually
@@ -104,6 +104,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "panda_lib.hardware.mill" = ["*.json", "*.txt"]
+"panda_shared.config" = ["*.ini"]
 
 [tool.pytest.ini_options]
 pythonpath = "panda_lib"

@@ -1,7 +1,8 @@
 """
-PANDA-BEAR Database Library
-
-This package provides tools for setting up and managing PANDA-BEAR databases.
+Database interface for PANDA SDL.
 """
 
-__version__ = "0.1.0"
+from panda_shared.config import load_config
+
+# Load configuration when the database module is imported
+config = load_config()
