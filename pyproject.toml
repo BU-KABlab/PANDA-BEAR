@@ -71,7 +71,7 @@ dependencies = [
     "six==1.16.0",
     "slack_sdk>=3.4.0",
     "smmap==5.0.1",
-    "spinnaker-python",
+    "spinnaker-python>=2.4.0.144",
     "SQLAlchemy==2.0.34",
     "sympy==1.13.2",
     "threadpoolctl==3.5.0",
