@@ -17,7 +17,7 @@ from panda_lib_cli.hardware_calibration import (
 )
 from panda_lib_cli.hardware_calibration.mill_calibration_and_positioning import calibrate_mill
 from panda_lib_cli.menu.license_text import show_conditions, show_warranty
-from src.panda_lib import (
+from panda_lib import (
     SystemState,
     analysis_worker,
     experiment_loop,
@@ -26,21 +26,21 @@ from src.panda_lib import (
     load_analyzers,
     toolkit,
 )
-from src.panda_lib.experiments.experiment_types import ExperimentBase
-from src.panda_lib.hardware.panda_pipettes import (
+from panda_lib.experiments.experiment_types import ExperimentBase
+from panda_lib.hardware.panda_pipettes import (
     insert_new_pipette,
     select_pipette_status,
 )
-from src.panda_lib.labware import vials, wellplates
-from src.panda_lib.labware.services import WellplateService
-from src.panda_lib.sql_tools import (
+from panda_lib.labware import vials, wellplates
+from panda_lib.labware.services import WellplateService
+from panda_lib.sql_tools import (
     sql_generator_utilities,
     sql_protocol_utilities,
     sql_queue,
     sql_system_state,
     sql_wellplate,
 )
-from src.panda_lib.sql_tools.remove_testing_experiments import (
+from panda_lib.sql_tools.remove_testing_experiments import (
     main as _remove_testing_experiments,
 )
 from src.shared_utilities.config import (
