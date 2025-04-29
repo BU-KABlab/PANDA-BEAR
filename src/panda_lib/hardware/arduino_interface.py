@@ -399,20 +399,28 @@ class ArduinoLink:
         """Home the pipette"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_HOME.value)
 
-    def pipette_move(self, distance):
+    def pipette_move(self, distance):  # TODO likely redundant
         """Move the pipette a distance in mm"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_MOVE.value + str(distance))
 
-    def pipette_aspirate(self, volume):
+    def pipette_aspirate(self, volume):  # TODO likely redundant
         """Aspirate a volume in uL"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_ASPIRATE.value + str(volume))
 
-    def pipette_dispense(self, volume):
+    def pipette_dispense(self, volume):  # TODO likely redundant
         """Dispense a volume in uL"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE.value + str(volume))
 
-    def pipette_status(self):
+    def pipette_status(self):  # TODO
         """Get the status of the pipette"""
+        return self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
+
+    def pipette_move_to(self, pos, speed):  # TODO
+        """Move the pipette to a position in mm at a speed in mm/s"""
+        return self.send((PawduinoFunctions.CMD_PIPETTE_MOVE.value, pos, speed))
+
+    def pipette_get_position(self):  # TODO
+        """Get the current position of the pipette"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
 
     def hello(self):

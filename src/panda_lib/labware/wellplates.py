@@ -14,8 +14,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
 from panda_lib.errors import OverDraftException, OverFillException
-from panda_lib.labware.services import WellplateService, WellService, get_unit_id
 from panda_lib.hardware.gantry_interface import Coordinates
+from panda_lib.labware.services import WellplateService, WellService, get_unit_id
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
     ExperimentResults,
@@ -314,6 +314,14 @@ class Well:
         self.well_data.coordinates = new_coordinates
         self.save()
 
+    def get_xyz(self) -> Tuple[float, float, float]:
+        """Get the x, y, z coordinates of the well"""
+        return (
+            self.well_data.coordinates["x"],
+            self.well_data.coordinates["y"],
+            self.well_data.coordinates["z"],
+        )
+
     def __repr__(self):
         return f"<Well(well_id={self.well_id}, volume={self.well_data.volume}, contents={self.well_data.contents})>"
 
@@ -377,7 +385,6 @@ class Wellplate:
                 try:
                     plate_id, _, _ = read_current_wellplate_info(
                         db_session=self.database_session
-            
                     )
                 except Exception as e:
                     raise ValueError(
@@ -394,7 +401,7 @@ class Wellplate:
         """
         # If there is a currently active wellplate, fetch its characteristics
         active_plate = self.service.get_active_plate()
-        if (active_plate):
+        if active_plate:
             kwargs["a1_x"] = active_plate.a1_x
             kwargs["a1_y"] = active_plate.a1_y
             kwargs["orientation"] = active_plate.orientation
@@ -595,6 +602,14 @@ class Wellplate:
     @property
     def echem_height(self):
         return self.plate_data.echem_height + self.plate_data.bottom
+
+    def get_xyz(self) -> Tuple[float, float, float]:
+        """Get the x, y, z coordinates of the wellplate"""
+        return (
+            self.plate_data.coordinates["x"],
+            self.plate_data.coordinates["y"],
+            self.plate_data.coordinates["z"],
+        )
 
     def __repr__(self):
         return f"<Wellplate(id={self.plate_data.id}, type_id={self.plate_data.type_id}, wells={len(self.wells)})>"

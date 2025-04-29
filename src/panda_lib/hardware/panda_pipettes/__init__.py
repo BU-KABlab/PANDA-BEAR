@@ -1,17 +1,26 @@
 """This module is used to control the pipette. It is used to get the status of the pipette and to set the status of the pipette."""
 
-from .pipette import Pipette
-from .sql_pipette import Pipette as PipetteModel
-from .sql_pipette import (
-    activate_pipette,
-    deincrement_use_count,
-    insert_new_pipette,
-    select_current_pipette_id,
-    select_current_pipette_uses,
-    select_pipette_status,
-    update_pipette_status,
-)
-from .state import PipetteState
+from shared_utilities.config.config_tools import read_config_value
+
+pipette_type = read_config_value("PIPETTE", "PIPETTE_TYPE")
+if pipette_type == "WPI":
+    from .wpi_syringe.pipette import Pipette
+    from .wpi_syringe.sql_pipette import Pipette as PipetteModel
+    from .wpi_syringe.sql_pipette import (
+        activate_pipette,
+        deincrement_use_count,
+        insert_new_pipette,
+        select_current_pipette_id,
+        select_current_pipette_uses,
+        select_pipette_status,
+        update_pipette_status,
+    )
+    from .wpi_syringe.state import PipetteState
+elif pipette_type == "OT2":
+    pass
+
+else:
+    raise ValueError(f"Invalid pipette type: {pipette_type}")
 
 __all__ = [
     "Pipette",

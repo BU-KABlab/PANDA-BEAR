@@ -267,6 +267,15 @@ class Vial:
         self.vial_data.contamination = 0
         self.save()
 
+    def get_xyz(self) -> Tuple[float, float, float]:
+        """
+        Returns the x, y, z coordinates of the vial.
+
+        Returns:
+            Tuple[float, float, float]: The x, y, z coordinates of the vial.
+        """
+        return self.x, self.y, self.z
+
     def __repr__(self):
         return f"<Vial(position={self._position}, volume={self.vial_data.volume}, contents={self.vial_data.contents}. top={self.vial_data.top}, bottom={self.vial_data.bottom})>"
 
