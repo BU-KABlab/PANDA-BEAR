@@ -1,12 +1,11 @@
 import logging
-import os
 from typing import List, Optional
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
-from shared_utilities.config.config_tools import read_config_value, read_testing_config
+from shared_utilities.config.config_tools import get_unit_id
 from shared_utilities.db_setup import SessionLocal
 
 from ..sql_tools.panda_models import PlateTypes as PlateTypeDBModel
@@ -22,18 +21,6 @@ from .schemas import (  # PyDanctic models
     WellReadModel,
     WellWriteModel,
 )
-
-
-def get_unit_id() -> int:
-    """Get the unit ID with appropriate test awareness."""
-    # During testing, always use unit_id from environment if available
-    if read_testing_config() or os.getenv("PYTEST_CURRENT_TEST"):
-        env_unit_id = os.getenv("PANDA_UNIT_ID")
-        if env_unit_id is not None:
-            return int(env_unit_id)
-
-    # Production usage or fallback
-    return int(read_config_value("PANDA", "unit_id", 99))
 
 
 class VialService:
