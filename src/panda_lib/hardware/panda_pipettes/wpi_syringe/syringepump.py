@@ -18,7 +18,6 @@ from shared_utilities.log_tools import (
 )
 from shared_utilities.log_tools import (
     setup_default_logger,
-    timing_wrapper,
 )
 
 from .pipette import Pipette
@@ -69,9 +68,6 @@ class SyringePump:
         )  # mL
         self.pump = self.set_up_pump()
 
-        self.pipette = Pipette()
-
-    @timing_wrapper
     def set_up_pump(self):
         """
         Set up the syringe pump using hardcoded settings.
@@ -152,8 +148,7 @@ class SyringePump:
         else:
             pump_control_logger.warning("Pump not connected")
 
-    @timing_wrapper
-    def withdraw(
+    def aspirate(
         self,
         volume_to_withdraw: float,
         solution: Optional[object] = None,
@@ -248,27 +243,7 @@ class SyringePump:
 
         return None
 
-    @timing_wrapper
-    def withdraw_air(self, volume: float) -> None:
-        """Withdraw the given ul of air with the pipette"""
-        volume_ml = round(float(volume / 1000), PRECISION)
-        if volume_ml <= 0:
-            return 1
-        _ = self.run_pump(
-            nesp_lib.PumpingDirection.WITHDRAW, volume_ml, self.max_pump_rate
-        )
-        self.update_pipette_volume(self.pump.volume_withdrawn)
-        pump_control_logger.debug(
-            "Pump has withdrawn: %0.6f ml of air at %fmL/min  Pipette vol: %0.3f ul",
-            self.pump.volume_withdrawn,
-            self.pump.pumping_rate,
-            self.pipette.volume,
-        )
-        self.pump.volume_infused_clear()
-        self.pump.volume_withdrawn_clear()
-        return None
-
-    def infuse(
+    def dispense(
         self,
         volume_to_infuse: float,
         being_infused: Optional[object] = None,
@@ -371,26 +346,6 @@ class SyringePump:
 
         return None
 
-    @timing_wrapper
-    def infuse_air(self, volume: float) -> int:
-        """Infuse the given ul of air with the pipette"""
-        volume_ml = round(float(volume / 1000), PRECISION)
-        if volume_ml > 0:
-            _ = self.run_pump(
-                nesp_lib.PumpingDirection.INFUSE, volume_ml, self.max_pump_rate
-            )
-            self.pipette.volume_ml -= round(self.pump.volume_infused, PRECISION)
-            pump_control_logger.debug(
-                "Pump has infused: %0.6f ml of air at %fmL/min Pipette volume: %0.3f ul",
-                self.pump.volume_infused,
-                self.pump.pumping_rate,
-                self.pipette.volume,
-            )
-            self.pump.volume_infused_clear()
-            self.pump.volume_withdrawn_clear()
-        return 0
-
-    @timing_wrapper
     def run_pump(
         self,
         pump_direction: nesp_lib.PumpingDirection,
@@ -450,7 +405,6 @@ class SyringePump:
 
         return 0
 
-    @timing_wrapper
     def update_pipette_volume(self, volume_ml: float):
         """Change the volume of the pipette in ml"""
         volume_ml = float(volume_ml)
