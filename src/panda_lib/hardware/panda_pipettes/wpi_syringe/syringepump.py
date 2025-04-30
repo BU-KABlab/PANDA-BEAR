@@ -20,7 +20,7 @@ from shared_utilities.log_tools import (
     setup_default_logger,
 )
 
-from .pipette import Pipette
+from ..pipette import Pipette
 
 vessel_logger = setup_default_logger(log_name="vessel")
 
@@ -67,6 +67,8 @@ class SyringePump:
             "PUMP", "syringe_capacity", fallback=1.0
         )  # mL
         self.pump = self.set_up_pump()
+
+        self.pipette = Pipette()
 
     def set_up_pump(self):
         """
@@ -156,88 +158,64 @@ class SyringePump:
     ) -> Optional[object]:
         """
         Withdraw the given volume at the given rate from the specified vessel.
-        Update the volume of the pipette and the solution if given.
+        If no solution is provided it will assume withdrawing air.
+
         Args:
-            volume (float): Volume to be withdrawn in microliters.
-            solution (Vessel object): The vial or well to withdraw from
-            rate (float): Pumping rate in milliliters per minute. None defaults to the max pump rate.
+            volume_to_withdraw (float): Volume to be withdrawn in microliters.
+            solution (Vessel object, optional): The vial or well to withdraw from.
+                If None, air will be withdrawn.
+            rate (float, optional): Pumping rate in milliliters per minute.
+                None defaults to the max pump rate.
 
         Returns:
-            The updated solution object if given one
+            The updated solution object if given one, otherwise None
         """
-        # Perform the withdrawl
-        # TODO Consider tracking the volume of air in the pipette as blowout and dripstop?
         volume_ml = round(float(volume_to_withdraw / 1000), PRECISION)
         if volume_ml <= 0:
             return None
 
-        if solution is not None and isinstance(solution, Vial):
+        # If no solution provided or not a Vial, treat as air withdrawal
+        if solution is None:
+            density = None
+            rate = self.max_pump_rate  # Use max pump rate for air
+        elif isinstance(solution, Vial):
             density = solution.density
         else:
             density = None
-            rate = (
-                self.max_pump_rate
-            )  # if no solution, assume air and use the max pump rate
+            rate = self.max_pump_rate  # Use max pump rate for non-Vial objects
 
-        _ = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density)
-
+        _ = self._run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density)
         volume_withdrawn_ml = round(self.pump.volume_withdrawn, PRECISION)
         volume_withdrawn_ul = round(volume_withdrawn_ml * 1000, PRECISION)
 
-        # Update the pipette volume
+        # Update the pipette and solution based on what was withdrawn
         if isinstance(solution, (Vial, wp.Well)):
-            # If the solution is a vial or well, update the volume and contents
-            # if isinstance(solution.contents, dict):
-            #     # If the solution has multiple contents, calculate the ratio
-            #     # of the solution being withdrawn
-            #     content_ratio = {
-            #         key: value / sum(solution.contents.values())
-            #         for key, value in solution.contents.items()
-            #     }
-            #     # Update the pipette contents according to the ratio
-            #     for key, ratio in content_ratio.items():
-            #         self.pipette.update_contents(
-            #             key, float(ratio * volume_withdrawn_ul)
-            #         )
-            # else:
-            #     # If the solution has a single content, update the pipette contents
-            #     self.pipette.update_contents(solution.contents, volume_withdrawn_ul)
-
-            # Update the solution volume and contents
-            # solution.update_volume(-volume_withdrawn_ul)
-            # solution.update_contents(solution.contents, -volume_withdrawn_ul, save=True)
+            # Remove contents from the solution and add to the pipette
             removed_contents = solution.remove_contents(volume_withdrawn_ul)
             for soln, vol in removed_contents.items():
                 self.pipette.update_contents(soln, vol)
 
-            # log the action and return
             pump_control_logger.debug(
-                "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
-                self.pump.volume_withdrawn,
+                "Pump has withdrawn: %0.6f ml at %fmL/min from %s. Pipette vol: %0.3f ul",
+                volume_withdrawn_ml,
+                self.pump.pumping_rate,
+                solution,
+                self.pipette.volume,
+            )
+        else:
+            # For air or untracked solutions, just update the pipette volume
+            self.pipette.volume = round(
+                self.pipette.volume + volume_withdrawn_ul, PRECISION
+            )
+
+            pump_control_logger.debug(
+                "Pump has withdrawn: %0.6f ml of air at %fmL/min. Pipette vol: %0.3f ul",
+                volume_withdrawn_ml,
                 self.pump.pumping_rate,
                 self.pipette.volume,
             )
-            # Clear the pump's memory so that future operations are fresh
-            self.pump.volume_infused_clear()
-            self.pump.volume_withdrawn_clear()
 
-            return None
-
-        # If the solution is not a vial, or a well, we don't track it
-        # as contents of the pipette but we do track the volume.
-        # This is likely the case for air. Only the volume is updated.
-        self.pipette.volume = round(
-            self.pipette.volume + volume_withdrawn_ul, PRECISION
-        )  # TODO this could be simplified to self.pipette.volume += volume_withdrawn_ul and use a setter
-
-        pump_control_logger.debug(
-            "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
-            self.pump.volume_withdrawn,
-            self.pump.pumping_rate,
-            self.pipette.volume,
-        )
-
-        # Clear the pump's memory so that future operations are fresh
+        # Clear the pump's memory for future operations
         self.pump.volume_infused_clear()
         self.pump.volume_withdrawn_clear()
 
@@ -252,18 +230,18 @@ class SyringePump:
         blowout_ul: float = float(0.0),
     ) -> None:
         """
-        Infuse the given volume at the given rate and depth from the specified position.
+        Infuse the given volume at the given rate. If no parameters except volume are provided,
+        it will infuse air at the maximum pump rate.
+
         Args:
             volume_to_infuse (float): Volume to be infused in microliters.
-            being_infused (Vial object): The solution being infused to get the density
-            infused_into (str or Vial): The destination of the solution (well or vial)
-            rate (float): Pumping rate in milliliters per minute. None defaults to the max pump rate.
-            blowout_ul (float): The volume to blowout in microliters
-            weigh (bool): If true, will weigh the solution before and after infusing and log the difference
-            results (ExperimentResult): The experiment results object to store pumping records
+            being_infused (Vial object, optional): The solution being infused to get the density.
+            infused_into (str or Vial, optional): The destination of the solution (well or vial).
+            rate (float, optional): Pumping rate in milliliters per minute. None defaults to the max pump rate.
+            blowout_ul (float): The volume to blowout in microliters.
 
         Returns:
-            int: The difference in weight if weighing, otherwise 0
+            None
         """
         # Convert volume to microliters
         volume_ml = round(float(volume_to_infuse / 1000), PRECISION)
@@ -273,80 +251,91 @@ class SyringePump:
         if volume_ml <= 0:
             return None
 
-        if being_infused is not None:
-            # Get density and viscosity from the solution being infused
-            if hasattr(being_infused, "density"):
-                density = being_infused.density
-            else:
-                density = None
-            # viscosity = being_infused.viscosity_cp
-        else:
-            density = None
-            # viscosity = None
-            # If no solution is given, assume air and use the max pump rate
+        # Set default rate to max_pump_rate if not specified
         if not rate:
             rate = self.max_pump_rate
 
+        # Handle air infusion case (when only volume is provided)
+        is_air_infusion = being_infused is None and infused_into is None
+
+        if is_air_infusion:
+            # Air infusion case (previously infuse_air)
+            density = None
+        elif being_infused is not None and hasattr(being_infused, "density"):
+            # Get density from the solution being infused
+            density = being_infused.density
+        else:
+            density = None
+
         # Run the pump to infuse the solution
-        _ = self.run_pump(
+        _ = self._run_pump(
             nesp_lib.PumpingDirection.INFUSE,
             volume_ml,
             rate,
             density,
-            blowout_ml,
+            blowout_ml if not is_air_infusion else 0,
         )
 
-        # Update the volume of the pipette with the blowout volume
-        self.pipette.volume -= blowout_ul
+        # Update the volume of the pipette with the blowout volume if not air infusion
+        if not is_air_infusion and blowout_ul > 0:
+            self.pipette.volume -= blowout_ul
 
         # Fetch the total infused volume in milliliters and microliters from the pump
         volume_infused_ml_total = round(self.pump.volume_infused, PRECISION)
         volume_infused_ul_total = round(volume_infused_ml_total * 1000, PRECISION)
+
         # Calculate the infused volume without the blowout volume
-        # volume_infused_ml = round(volume_infused_ml_total - blowout_ml, PRECISION)
-        volume_infused_ul = round(volume_infused_ul_total - blowout_ul, PRECISION)
+        volume_infused_ul = round(
+            volume_infused_ul_total - (blowout_ul if not is_air_infusion else 0),
+            PRECISION,
+        )
 
         # Clear the pump's infused and withdrawn volumes
         self.pump.volume_infused_clear()
         self.pump.volume_withdrawn_clear()
 
-        # Log the infusion details
-        pump_control_logger.debug(
-            "Pump has infused: %0.4f ul (%0.4f ul of solution) at %fmL/min Pipette volume: %0.4f ul",
-            volume_infused_ul_total,
-            volume_infused_ul,
-            self.pump.pumping_rate,
-            self.pipette.volume,
-        )
-
-        if infused_into is not None:
-            # Update the volume and contents of the destination vial or well
-            # infused_into.update_volume(volume_infused_ul)
-            infused_into.add_contents(self.pipette.contents, volume_infused_ul)
-
-            # Calculate the ratio of each content in the pipette
-            if sum(self.pipette.contents.values() or [0]) > 0:
-                content_ratio = {
-                    key: value / sum(self.pipette.contents.values())
-                    for key, value in self.pipette.contents.items()
-                }
-            else:
-                content_ratio = {key: 1 for key in self.pipette.contents.keys()}
-
-            # Update the contents of the pipette based on the content ratio
-            for key, ratio in content_ratio.items():
-                self.pipette.update_contents(
-                    key, -volume_infused_ul * ratio
-                )  # TODO see using vial.remove_contents or vial.add_contents methods
-
+        if is_air_infusion:
+            # Air infusion case
+            self.pipette.volume -= volume_infused_ul_total
+            pump_control_logger.debug(
+                "Pump has infused: %0.6f ml of air at %fmL/min Pipette volume: %0.3f ul",
+                volume_infused_ml_total,
+                self.pump.pumping_rate,
+                self.pipette.volume,
+            )
         else:
-            # Update the volume of the pipette without the infused volume
-            # We don't need to include the blowout because it was accounted for earlier
-            self.pipette.volume -= volume_infused_ul
+            # Solution infusion case
+            pump_control_logger.debug(
+                "Pump has infused: %0.4f ul (%0.4f ul of solution) at %fmL/min Pipette volume: %0.4f ul",
+                volume_infused_ul_total,
+                volume_infused_ul,
+                self.pump.pumping_rate,
+                self.pipette.volume,
+            )
+
+            if infused_into is not None:
+                # Update the volume and contents of the destination vial or well
+                infused_into.add_contents(self.pipette.contents, volume_infused_ul)
+
+                # Calculate the ratio of each content in the pipette
+                if sum(self.pipette.contents.values() or [0]) > 0:
+                    content_ratio = {
+                        key: value / sum(self.pipette.contents.values())
+                        for key, value in self.pipette.contents.items()
+                    }
+                else:
+                    content_ratio = {key: 1 for key in self.pipette.contents.keys()}
+
+                # Update the contents of the pipette based on the content ratio
+                for key, ratio in content_ratio.items():
+                    self.pipette.update_contents(key, -volume_infused_ul * ratio)
+            else:
+                # Update the volume of the pipette without the infused volume
+                self.pipette.volume -= volume_infused_ul
 
         return None
 
-    def run_pump(
+    def _run_pump(
         self,
         pump_direction: nesp_lib.PumpingDirection,
         volume_ml: float,
@@ -404,18 +393,6 @@ class SyringePump:
         pump_control_logger.debug(log_msg)
 
         return 0
-
-    def update_pipette_volume(self, volume_ml: float):
-        """Change the volume of the pipette in ml"""
-        volume_ml = float(volume_ml)
-        if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
-            self.pipette.volume = round(
-                self.pipette.volume - (volume_ml * 1000), PRECISION
-            )
-        else:
-            self.pipette.volume = round(
-                self.pipette.volume + (volume_ml * 1000), PRECISION
-            )
 
 
 class MockPump(SyringePump):
