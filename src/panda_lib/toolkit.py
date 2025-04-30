@@ -14,7 +14,10 @@ from panda_lib.hardware import ArduinoLink, MockArduinoLink
 from panda_lib.hardware.gantry_interface import MockPandaMill as MockMill
 from panda_lib.hardware.gantry_interface import PandaMill as Mill
 from panda_lib.hardware.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
-from panda_lib.hardware.panda_pipettes.syringepump import MockPump, SyringePump
+from panda_lib.hardware.panda_pipettes.wpi_syringe.syringepump import (
+    MockPump,
+    SyringePump,
+)
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Wellplate
 from panda_lib.slack_tools.slackbot_module import SlackBot
