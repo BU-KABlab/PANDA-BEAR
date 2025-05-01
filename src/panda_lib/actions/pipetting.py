@@ -481,7 +481,7 @@ def mix(
     logger.info("Mixing well %s %dx...", well.name, mix_count)
 
     # Withdraw air for blow out volume
-    toolkit.pump.withdraw_air(40)
+    toolkit.pump.withdraw(40)
 
     for i in range(mix_count):
         logger.info("Mixing well %s %d of %d...", well.name, i + 1, mix_count)
@@ -516,7 +516,7 @@ def mix(
             blowout_ul=0,
         )
 
-    toolkit.pump.infuse_air(40)
+    toolkit.pump.infuse(40)
     toolkit.mill.move_to_safe_position()
     return 0
 
