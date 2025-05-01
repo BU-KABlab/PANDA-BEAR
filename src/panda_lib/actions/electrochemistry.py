@@ -332,6 +332,148 @@ def perform_chronoamperometry(
 ca = perform_chronoamperometry
 
 
+def pulsed_chronoamperometry(
+    experiment: EchemExperimentBase,
+    pulse_count: int,
+    pause_time: float,
+    file_tag: Optional[str] = None,
+    custom_parameters: Optional[chrono_parameters] = None,
+) -> EchemExperimentBase:
+    """Perform pulsed chronoamperometry measurement sequence.
+
+    Parameters
+    ----------
+    ca_instructions : EchemExperimentBase
+        Experiment parameters and configuration
+    file_tag : str, optional
+        Additional identifier for output files
+    custom_parameters : chrono_parameters, optional
+        Override default chronoamperometry parameters
+
+    Returns
+    -------
+    EchemExperimentBase
+        Updated experiment instructions with results
+
+    Raises
+    ------
+    OCPFailure
+        If open circuit potential measurement fails
+    CAFailure
+        If chronoamperometry measurement fails
+    DepositionFailure
+        If overall deposition process fails
+    """
+
+    try:
+        if TESTING:
+            pstat = echem()
+        else:
+            pstat = echem
+        pstat.pstatconnect()
+
+        # echem OCP
+        logger.info("Beginning eChem OCP of well: %s", experiment.well_id)
+        experiment.set_status_and_save(ExperimentStatus.OCPCHECK)
+
+        base_filename = pstat.setfilename(
+            experiment.experiment_id,
+            file_tag + "_OCP_CA" if file_tag else "OCP_CA",
+            PATH_TO_DATA,
+            experiment.project_id,
+            experiment.project_campaign_id,
+            experiment.well_id,
+        )
+        ca_results = experiment.results
+        pstat.OCP(
+            potentiostat_ocp_parameters.OCPvi,
+            potentiostat_ocp_parameters.OCPti,
+            potentiostat_ocp_parameters.OCPrate,
+        )  # OCP
+        pstat.activecheck()
+        ocp_dep_pass, ocp_char_final_voltage = pstat.check_vf_range(base_filename)
+        ca_results.set_ocp_ca_file(
+            base_filename, ocp_dep_pass, ocp_char_final_voltage, file_tag
+        )
+        logger.info(
+            "OCP of well %s passed: %s",
+            experiment.well_id,
+            ocp_dep_pass,
+        )
+
+        # echem CA - deposition
+        if not ocp_dep_pass:
+            experiment.set_status_and_save(ExperimentStatus.ERROR)
+            raise OCPError("CA")
+
+        try:
+            experiment.set_status_and_save(ExperimentStatus.EDEPOSITING)
+            logger.info("Beginning eChem deposition of well: %s", experiment.well_id)
+            deposition_data_file = pstat.setfilename(
+                experiment.experiment_id,
+                file_tag + "_CA" if file_tag else "CA",
+                PATH_TO_DATA,
+                experiment.project_id,
+                experiment.project_campaign_id,
+                experiment.well_id,
+            )
+
+            # FEATURE have chrono return the max and min values for the deposition
+            # and save them to the results
+            if custom_parameters:  # if not none then use the custom parameters
+                chrono_params = custom_parameters
+            else:
+                chrono_params = chrono_parameters(
+                    CAvi=experiment.ca_prestep_voltage,
+                    CAti=experiment.ca_prestep_time_delay,
+                    CAv1=experiment.ca_step_1_voltage,
+                    CAt1=experiment.ca_step_1_time,
+                    CAv2=experiment.ca_step_2_voltage,
+                    CAt2=experiment.ca_step_2_time,
+                    CAsamplerate=experiment.ca_sample_period,
+                )  # CA
+
+            for pulse in pulse_count:
+                # Perform the pulse
+                pstat.chrono(chrono_params)
+                pstat.activecheck()
+                ca_results.set_ca_data_file(deposition_data_file, context=file_tag)
+
+                # OCV
+                pstat.OCP(
+                    potentiostat_ocp_parameters.OCPvi,
+                    pause_time,
+                    potentiostat_ocp_parameters.OCPrate,
+                )
+                pstat.activecheck()
+                ca_results.set_ocp_ca_file(base_filename, True, 0.0, file_tag)
+
+        except Exception as e:
+            experiment.set_status_and_save(ExperimentStatus.ERROR)
+            logger.error("Exception occurred during deposition: %s", e)
+            raise CAFailure(experiment.experiment_id, experiment.well_id) from e
+
+    except OCPError as e:
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("OCP of well %s failed", experiment.well_id)
+        raise e
+
+    except CAFailure as e:
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("CA of well %s failed", experiment.well_id)
+        raise e
+
+    except Exception as e:
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("Exception occurred during deposition: %s", e)
+        raise DepositionFailure(experiment.experiment_id, experiment.well_id) from e
+
+    finally:
+        pstat.pstatdisconnect()
+
+    return experiment
+
+
 @timing_wrapper
 def perform_cyclic_voltammetry(
     experiment: EchemExperimentBase,
