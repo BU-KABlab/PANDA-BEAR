@@ -150,7 +150,7 @@ class SyringePump:
         else:
             pump_control_logger.warning("Pump not connected")
 
-    def withdraw(
+    def aspirate(
         self,
         volume_to_withdraw: float,
         solution: Optional[object] = None,
@@ -234,7 +234,7 @@ class SyringePump:
 
         return None
 
-    def infuse(
+    def dispense(
         self,
         volume_to_infuse: float,
         being_infused: Optional[object] = None,

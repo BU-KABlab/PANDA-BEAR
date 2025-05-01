@@ -97,18 +97,18 @@ def _pipette_action(
                 toolkit.arduino,
             )
 
-        toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
+        toolkit.pump.aspirate(volume_to_withdraw=AIR_GAP)
         toolkit.mill.safe_move(
             src_vessel.x,
             src_vessel.y,
             src_vessel.withdrawal_height,
             tool=Instruments.PIPETTE,
         )
-        toolkit.pump.withdraw(volume_to_withdraw=repetition_vol, solution=src_vessel)
+        toolkit.pump.aspirate(volume_to_withdraw=repetition_vol, solution=src_vessel)
         if isinstance(src_vessel, Well):
-            toolkit.pump.withdraw(volume_to_withdraw=20)
+            toolkit.pump.aspirate(volume_to_withdraw=20)
         toolkit.mill.move_to_safe_position()
-        toolkit.pump.withdraw(volume_to_withdraw=DRIP_STOP)
+        toolkit.pump.aspirate(volume_to_withdraw=DRIP_STOP)
 
         if isinstance(src_vessel, StockVial):
             capping_sequence(
@@ -130,7 +130,7 @@ def _pipette_action(
             dst_vessel.top,
             tool=Instruments.PIPETTE,
         )
-        toolkit.pump.infuse(
+        toolkit.pump.dispense(
             volume_to_infuse=repetition_vol,
             being_infused=src_vessel,
             infused_into=dst_vessel,
@@ -144,7 +144,7 @@ def _pipette_action(
         for _, vol in toolkit.pump.pipette.contents.items():
             if vol > 0.0:
                 logger.warning("Pipette has residual volume of %f ul. Purging...", vol)
-                toolkit.pump.infuse(
+                toolkit.pump.dispense(
                     volume_to_infuse=vol,
                     being_infused=None,
                     infused_into=dst_vessel,
@@ -156,7 +156,7 @@ def _pipette_action(
                 "Pipette has residual volume of %f ul. Purging...",
                 toolkit.pump.pipette.volume,
             )
-            toolkit.pump.infuse(
+            toolkit.pump.dispense(
                 volume_to_infuse=toolkit.pump.pipette.volume,
                 being_infused=None,
                 infused_into=dst_vessel,
@@ -412,7 +412,7 @@ def purge_pipette(
     )
 
     # Purge the pipette
-    toolkit.pump.infuse(
+    toolkit.pump.dispense(
         volume_to_infuse=liquid_volume,
         being_infused=None,
         infused_into=purge_vial,
@@ -481,7 +481,7 @@ def mix(
     logger.info("Mixing well %s %dx...", well.name, mix_count)
 
     # Withdraw air for blow out volume
-    toolkit.pump.withdraw(40)
+    toolkit.pump.aspirate(40)
 
     for i in range(mix_count):
         logger.info("Mixing well %s %d of %d...", well.name, i + 1, mix_count)
@@ -494,7 +494,7 @@ def mix(
         )
 
         # Withdraw the solutions from the well
-        toolkit.pump.withdraw(
+        toolkit.pump.aspirate(
             volume_to_withdraw=volume,
             solution=well,
             rate=toolkit.pump.max_pump_rate,
@@ -508,7 +508,7 @@ def mix(
         )
 
         # Deposit the solution back into the well
-        toolkit.pump.infuse(
+        toolkit.pump.dispense(
             volume_to_infuse=volume,
             being_infused=None,
             infused_into=well,
@@ -516,7 +516,7 @@ def mix(
             blowout_ul=0,
         )
 
-    toolkit.pump.infuse(40)
+    toolkit.pump.dispense(40)
     toolkit.mill.move_to_safe_position()
     return 0
 
