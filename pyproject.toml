@@ -165,10 +165,10 @@ docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
 [tool.uv.sources]
-nesp-lib = { git = "https://github.com/BU-KABlab/nesp-lib-py.git" }
 panda_sdl = { workspace = true }
 panda-lib = { workspace = true }
 hardpotato = { git = "https://github.com/BU-KABlab/hardpotato.git" }
+nesp-lib = { git = "https://github.com/BU-KABlab/nesp-lib-py.git" }
 
 [dependency-groups]
 dev = ["panda-lib"]

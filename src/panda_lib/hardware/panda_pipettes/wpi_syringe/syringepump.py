@@ -20,7 +20,7 @@ from shared_utilities.log_tools import (
     setup_default_logger,
 )
 
-from ..pipette import Pipette
+from ..pipette import PipetteDBHandler
 
 vessel_logger = setup_default_logger(log_name="vessel")
 
@@ -68,7 +68,7 @@ class SyringePump:
         )  # mL
         self.pump: nesp_lib.Pump = self.set_up_pump()
 
-        self.pipette = Pipette()
+        self.pipette = PipetteDBHandler()
 
     def set_up_pump(self) -> nesp_lib.Pump:
         """
@@ -444,5 +444,5 @@ if __name__ == "__main__":
     # pump.withdraw(160, rate=0.64)
     # pump.infuse(167.43, rate=0.64, blowout_ul=0)
 
-    pipette = Pipette()
+    pipette = PipetteDBHandler()
     pipette.update_contents("water", 100)

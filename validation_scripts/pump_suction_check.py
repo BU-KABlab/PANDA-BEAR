@@ -39,7 +39,7 @@ def main():
         test_waste = waste_selector("waste", test_volume)
 
         # Withdraw water, raise to z=0, and hold it for 60 seconds
-        toolkit.pump.withdraw(purge)
+        toolkit.pump.aspirate(purge)
 
         toolkit.mill.safe_move(
             test_solution.coordinates.x,
@@ -56,9 +56,9 @@ def main():
             test_solution.coordinates.z_bottom,
             Instruments.PIPETTE,
         )
-        toolkit.pump.withdraw(test_volume, test_solution)
+        toolkit.pump.aspirate(test_volume, test_solution)
         toolkit.mill.move_to_safe_position()
-        toolkit.pump.withdraw(drip_stop)
+        toolkit.pump.aspirate(drip_stop)
 
         toolkit.mill.safe_move(
             test_solution.coordinates.x,
@@ -77,7 +77,7 @@ def main():
             test_waste.coordinates.z_top,
             Instruments.PIPETTE,
         )
-        toolkit.pump.infuse(
+        toolkit.pump.dispense(
             test_volume, test_solution, test_waste, blowout_ul=drip_stop + purge
         )
         # Forward pipette
