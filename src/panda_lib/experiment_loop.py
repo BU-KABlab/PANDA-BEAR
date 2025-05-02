@@ -142,7 +142,7 @@ def experiment_loop_worker(
         stock_vials, waste_vials, toolkit.wellplate = _establish_system_state()
 
         ## Check that the pipette is empty, if not dispose of full volume into waste
-        if toolkit.pump.pipette.volume > 0:
+        if toolkit.pipette.pipette_tracker.volume > 0:
             # obs.place_text_on_screen("Pipette is not empty, purging into waste")
             status_queue.put((process_id, "Purging pipette into waste"))
             purge_pipette(toolkit)
@@ -209,7 +209,7 @@ def experiment_loop_worker(
             well: Well = toolkit.wellplate.wells[current_experiment.well_id]
             if (
                 well.plate_id != toolkit.wellplate.id
-                or current_experiment.plate_type_number != toolkit.wellplate.type_id
+                or current_experiment.wellplate_type_id != toolkit.wellplate.type_id
             ):
                 logger.error(
                     "The experiment object's well type and wellplate id do not match the current wellplate"
@@ -289,7 +289,7 @@ def experiment_loop_worker(
 
             # Get the protocol entry using either the name or id
             protocol_entry: sql_protocol_utilities.ProtocolEntry = (
-                sql_protocol_utilities.select_protocol(current_experiment.protocol_id)
+                sql_protocol_utilities.select_protocol(current_experiment.protocol_name)
             )
 
             # Convert the file path to a module name
@@ -358,9 +358,12 @@ def experiment_loop_worker(
             current_experiment = None  # reset new_experiment to None so that we can check the queue again
             ## Update the system state with new vial and wellplate information
 
-            if toolkit.pump.pipette.volume > 0 and toolkit.pump.pipette.volume_ml < 1:
+            if (
+                toolkit.pipette.pipette_tracker.volume > 0
+                and toolkit.pipette.pipette_tracker.volume_ml < 1
+            ):
                 # assume unreal volume, not actually solution, set to 0
-                toolkit.pump.pipette.reset_contents()
+                toolkit.pipette.pipette_tracker.reset_contents()
             if one_off:
                 break  # break out of the while True loop
 
@@ -466,7 +469,7 @@ def sila_experiment_loop_worker(
 
     toolkit, _ = connect_to_instruments(config.getboolean("OPTIONS", "testing"))
     hardware = Hardware(
-        pump=toolkit.pump,
+        pump=toolkit.pipette,
         mill=toolkit.mill,
         flir_camera=toolkit.camera,
         arduino=toolkit.arduino,
@@ -521,7 +524,7 @@ def sila_experiment_loop_worker(
             exp_obj = None
 
             ## Check that the pipette is empty, if not dispose of full volume into waste
-            if hardware.pump.pipette.volume > 0:
+            if hardware.pipette.pipette_tracker.volume > 0:
                 exp_logger.info("Pipette not empty, purging into waste")
                 set_worker_state(SystemState.PIPETTE_PURGE)
                 purge_pipette(toolkit)
@@ -545,7 +548,7 @@ def sila_experiment_loop_worker(
             )
 
             exp_logger.info("Beginning experiment %d", exp_obj.experiment_id)
-            protocol_function = _fetch_protocol_function(exp_obj.protocol_id)
+            protocol_function = _fetch_protocol_function(exp_obj.protocol_name)
 
             try:
                 protocol_function(
@@ -601,7 +604,10 @@ def sila_experiment_loop_worker(
                 share_to_slack(exp_obj)
 
             ## Clean up the instruments
-            if hardware.pump.pipette.volume > 0 and hardware.pump.pipette.volume_ml < 1:
+            if (
+                hardware.pipette.pipette_tracker.volume > 0
+                and hardware.pipette.pipette_tracker.volume_ml < 1
+            ):
                 # assume unreal volume, not actually solution, set to 0
                 purge_pipette(toolkit)
 
@@ -643,7 +649,7 @@ def _initialize_experiment(
     well = labware.wellplate.wells[exp_obj.well_id]
     if (
         well.plate_id != labware.wellplate.id
-        or exp_obj.plate_type_number != labware.wellplate.type_id
+        or exp_obj.wellplate_type_id != labware.wellplate.type_id
     ):
         raise MismatchWellplateTypeError("Mismatched wellplate type or ID.")
 

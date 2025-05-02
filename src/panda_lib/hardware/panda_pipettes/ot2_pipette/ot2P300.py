@@ -55,21 +55,19 @@ class OT2P300:
 
     def __init__(self):
         """
-        Initialize the Arduino-based pipette driver.
+        Initialize the OT2P300 Pipette interface.
         """
         self.connected = False
         self.arduino = ArduinoInterface()
-        self.pipette = PipetteDBHandler()
-
         # Configuration constants
         self.max_p300_rate = config.getfloat(
             "P300", "max_pipetting_rate", fallback=50.0
         )  # µL/s for Arduino pipette
 
         # Create pipette object to track contents
-        self.pipette = PipetteDBHandler()
-        self.pipette_capacity_ul = config.getfloat(
-            "P300", "pipette_capacity", fallback=300.0
+        self.pipette_tracker = PipetteDBHandler()
+        self.pipette_tracker.set_capacity(
+            config.getfloat("P300", "pipette_capacity", fallback=300.0)
         )  # µL
 
     def __enter__(self):
@@ -112,7 +110,7 @@ class OT2P300:
             return None
 
         # Check if volume would exceed capacity
-        if self.pipette.volume + volume_to_aspirate > self.pipette_capacity_ul:
+        if self.pipette_tracker.volume + volume_to_aspirate > self.pipette_capacity_ul:
             p300_control_logger.warning(
                 f"Cannot aspirate {volume_to_aspirate} µL - would exceed pipette capacity"
             )
@@ -129,16 +127,16 @@ class OT2P300:
             return None
 
         # Update the volume from Arduino's reported value
-        self.pipette.volume = self.arduino.volume
+        self.pipette_tracker.volume = self.arduino.volume
 
         # If we have a solution, update the pipette contents and the solution volume
         if solution is not None and isinstance(solution, (Vial, wp.Well)):
             removed_contents = solution.remove_contents(volume_to_aspirate)
             for soln, vol in removed_contents.items():
-                self.pipette.update_contents(soln, vol)
+                self.pipette_tracker.update_contents(soln, vol)
 
             p300_control_logger.debug(
-                f"Aspirated: {volume_to_aspirate} µL at {rate} µL/s. Pipette vol: {self.pipette.volume} µL"
+                f"Aspirated: {volume_to_aspirate} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
             )
 
         return None
@@ -167,9 +165,9 @@ class OT2P300:
             return None
 
         # Check if we have enough volume
-        if self.pipette.volume < volume_to_dispense:
+        if self.pipette_tracker.volume < volume_to_dispense:
             p300_control_logger.warning(
-                f"Cannot dispense {volume_to_dispense} µL - pipette only contains {self.pipette.volume} µL"
+                f"Cannot dispense {volume_to_dispense} µL - pipette only contains {self.pipette_tracker.volume} µL"
             )
             return None
 
@@ -190,16 +188,16 @@ class OT2P300:
                 p300_control_logger.error("Failed to perform blowout")
 
         # Update the volume from Arduino's reported value
-        original_volume = self.pipette.volume
-        self.pipette.volume = self.arduino.volume
+        original_volume = self.pipette_tracker.volume
+        self.pipette_tracker.volume = self.arduino.volume
 
         # If we have a destination, update its contents based on what was in the pipette
         if dispensed_into is not None and isinstance(dispensed_into, (Vial, wp.Well)):
             # Calculate the ratio of each content in the pipette
-            if sum(self.pipette.contents.values() or [0]) > 0:
+            if sum(self.pipette_tracker.contents.values() or [0]) > 0:
                 content_ratio = {
-                    key: value / sum(self.pipette.contents.values())
-                    for key, value in self.pipette.contents.items()
+                    key: value / sum(self.pipette_tracker.contents.values())
+                    for key, value in self.pipette_tracker.contents.items()
                 }
 
                 # Add the proportional contents to the destination
@@ -213,10 +211,12 @@ class OT2P300:
 
                 # Remove the dispensed contents from the pipette
                 for key, ratio in content_ratio.items():
-                    self.pipette.update_contents(key, -volume_to_dispense * ratio)
+                    self.pipette_tracker.update_contents(
+                        key, -volume_to_dispense * ratio
+                    )
 
         p300_control_logger.debug(
-            f"Dispensed: {volume_to_dispense} µL at {rate} µL/s. Pipette vol: {self.pipette.volume} µL"
+            f"Dispensed: {volume_to_dispense} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
         )
 
         return None
@@ -249,10 +249,10 @@ class OT2P300:
             return False
 
         # Update the volume from Arduino's reported value
-        self.pipette.volume = self.arduino.volume
+        self.pipette_tracker.volume = self.arduino.volume
 
         p300_control_logger.debug(
-            f"Mixed {repetitions} times with {volume} µL at {rate} µL/s. Pipette vol: {self.pipette.volume} µL"
+            f"Mixed {repetitions} times with {volume} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
         )
 
         return True
@@ -268,7 +268,7 @@ class OT2P300:
         success = self.arduino.set_volume(volume_ul)
 
         if success:
-            self.pipette.volume = volume_ul
+            self.pipette_tracker.volume = volume_ul
             p300_control_logger.debug(f"Updated pipette volume to {volume_ul} µL")
         else:
             p300_control_logger.error(f"Failed to set pipette volume to {volume_ul} µL")
@@ -294,7 +294,7 @@ class OT2P300:
 
         if success:
             # Update volume from Arduino
-            self.pipette.volume = self.arduino.volume
+            self.pipette_tracker.volume = self.arduino.volume
             p300_control_logger.debug("Pipette homed successfully")
         else:
             p300_control_logger.error("Failed to home pipette")
@@ -312,7 +312,7 @@ class OT2P300:
 
         if success:
             # Update volume from Arduino
-            self.pipette.volume = self.arduino.volume
+            self.pipette_tracker.volume = self.arduino.volume
             p300_control_logger.debug("Tip attached successfully")
         else:
             p300_control_logger.error("Failed to attach tip")
@@ -330,7 +330,7 @@ class OT2P300:
 
         if success:
             # Update volume from Arduino
-            self.pipette.volume = self.arduino.volume
+            self.pipette_tracker.volume = self.arduino.volume
             p300_control_logger.debug("Tip detached successfully")
         else:
             p300_control_logger.error("Failed to detach tip")
@@ -348,9 +348,9 @@ class OT2P300:
 
         if success:
             # Update volume from Arduino
-            self.pipette.volume = self.arduino.volume
+            self.pipette_tracker.volume = self.arduino.volume
             # Clear contents
-            self.pipette.contents = {}
+            self.pipette_tracker.contents = {}
             p300_control_logger.debug("Pipette reset successfully")
         else:
             p300_control_logger.error("Failed to reset pipette")

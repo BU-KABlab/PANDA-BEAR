@@ -20,7 +20,9 @@ from shared_utilities.db_setup import SessionLocal
 from shared_utilities.log_tools import setup_default_logger, timing_wrapper
 
 from .experiments import (
+    EchemExperimentGenerator,
     ExperimentBase,
+    ExperimentGenerator,
     ExperimentStatus,
     insert_experiments,
     insert_experiments_parameters,
@@ -240,7 +242,7 @@ def validate_experiment_plate(experiment: ExperimentBase) -> bool:
     if experiment.plate_id is None:
         experiment.plate_id, _, _ = select_current_wellplate_info()
     # Check if the plate ID exists
-    if not check_if_plate_type_exists(experiment.plate_type_number):
+    if not check_if_plate_type_exists(experiment.wellplate_type_id):
         logger.error(
             "Plate type %s does not exist, cannot add experiment to queue",
             experiment.plate_id,
@@ -265,16 +267,16 @@ def validate_experiment_plate(experiment: ExperimentBase) -> bool:
         return False
 
     if (
-        plate_info.type_id != experiment.plate_type_number
+        plate_info.type_id != experiment.wellplate_type_id
         or plate_info.id != experiment.plate_id
     ):
         logger.error(
             "Plate %s does not have the correct well type number %s, cannot add experiment to queue",
             experiment.plate_id,
-            experiment.plate_type_number,
+            experiment.wellplate_type_id,
         )
         print(
-            f"Plate {experiment.plate_id} does not have the correct well type number {experiment.plate_type_number}, cannot add experiment to queue"
+            f"Plate {experiment.plate_id} does not have the correct well type number {experiment.wellplate_type_id}, cannot add experiment to queue"
         )
         return False
 
@@ -309,7 +311,10 @@ def assign_well_if_unavailable(experiment: ExperimentBase) -> bool:
 
 @timing_wrapper
 def schedule_experiments(
-    experiments: list[ExperimentBase], override: bool = False
+    experiments: list[
+        Union[ExperimentBase, ExperimentGenerator, EchemExperimentGenerator]
+    ],
+    override: bool = False,
 ) -> int:
     """
     Schedules a list of experiments by assigning each to a wellplate well. Each experiment is assigned to an available well,
@@ -317,28 +322,37 @@ def schedule_experiments(
     unless the override flag is set.
 
     Args:
-        experiments (list[ExperimentBase]): A list of experiments to be added to the queue.
+        experiments (list[Union[ExperimentBase, ExperimentGenerator, EchemExperimentGenerator]]):
+            A list of experiments to be added to the queue. Can be base experiment types or generator types.
         override (bool, optional): If True, overrides the well selection process. Defaults to False.
     Returns:
         int: The number of experiments successfully added to the queue.
     Raises:
         sqlite3.Error: If an error occurs while inserting experiments or their parameters into the database.
-    Notes:
-        - Experiments that are not new or queued are removed from the list.
-        - Experiments with invalid plate types or unavailable wells are removed from the list.
-        - Project IDs not present in the projects table are added.
-        - Experiment solutions are converted to lowercase and stripped of whitespace.
-        - Experiments are individually inserted into the database and their status is updated to queued.
-        - Bulk insertion of experiment parameters is performed after individual experiment insertion.
     """
     if len(experiments) == 0:
         logger.info("No experiments to add to queue")
         return 0
+
+    # Convert any generator types to their respective base types
+    converted_experiments = []
+    for experiment in experiments:
+        experiment.experiment_id = select_next_experiment_id()
+        if isinstance(experiment, EchemExperimentGenerator):
+            converted_experiments.append(experiment.to_echem_experiment_base())
+        elif isinstance(experiment, ExperimentGenerator):
+            converted_experiments.append(experiment.to_experiment_base())
+        else:
+            converted_experiments.append(experiment)
+
+    experiments = converted_experiments
+
     for experiment in experiments:
         try:
             override = experiment.override_well_selection
         except AttributeError:
             pass
+
         if not override:
             ## First check the existing status, if not new or queued, then do not add to queue
             if experiment.status not in [

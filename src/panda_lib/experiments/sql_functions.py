@@ -68,8 +68,8 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
         experiment.experiment_id = experiment_id
         experiment.project_id = result.project_id
         experiment.project_campaign_id = result.project_campaign_id
-        experiment.plate_type_number = result.well_type
-        experiment.protocol_id = result.protocol_id
+        experiment.wellplate_type_id = result.well_type
+        experiment.protocol_name = result.protocol_id
         experiment.priority = result.priority
         experiment.filename = result.filename
         return experiment
@@ -191,8 +191,8 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.experiment_id,
                 experiment.project_id,
                 experiment.project_campaign_id,
-                experiment.plate_type_number,
-                experiment.protocol_id,
+                experiment.wellplate_type_id,
+                experiment.protocol_name,
                 experiment.priority,
                 experiment.filename,
                 datetime.now().isoformat(timespec="seconds"),
@@ -288,8 +288,8 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
             (
                 experiment.project_id,
                 experiment.project_campaign_id,
-                experiment.plate_type_number,
-                experiment.protocol_id,
+                experiment.wellplate_type_id,
+                experiment.protocol_name,
                 experiment.priority,
                 experiment.filename,
                 experiment.experiment_id,

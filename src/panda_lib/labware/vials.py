@@ -37,9 +37,9 @@ class Vial:
             create_new (bool): Whether to create a new vial in the database.
             **kwargs: Additional attributes for creating a new vial.
         """
-        self._position = position
+        self.position = position
         if position:
-            self._position: str = position
+            self.position: str = position
         self.session_maker = session_maker
         self.service = VialService(self.session_maker)
         self.vial_data: VialReadModel
@@ -143,14 +143,14 @@ class Vial:
 
     def create_new_vial(self, **kwargs: VialKwargs):
         """Creates a new vial in the database, and loads it back."""
-        if not self._position:
+        if not self.position:
             # Check if the kwargs contain a position
             if "position" in kwargs:
-                self._position = kwargs["position"]
+                self.position = kwargs["position"]
             else:
                 raise ValueError("Position must be provided to create a new vial.")
         new_vial = VialWriteModel(
-            position=self._position,
+            position=self.position,
             category=kwargs.get("category", 0),
             height=kwargs.get("height", 57.0),
             radius=kwargs.get("radius", 13.5),
@@ -178,11 +178,11 @@ class Vial:
         if self._vial_name:
             self.vial_data = self.service.get_vial(name=self._vial_name)
         else:
-            self.vial_data = self.service.get_vial(position=self._position)
+            self.vial_data = self.service.get_vial(position=self.position)
 
     def save(self):
         """Updates the database with the current state of the vial."""
-        self.service.update_vial(self._position, self.vial_data.model_dump())
+        self.service.update_vial(self.position, self.vial_data.model_dump())
 
     def add_contents(self, from_vessel: Dict[str, float], volume: float):
         """
@@ -277,7 +277,7 @@ class Vial:
         return self.x, self.y, self.z
 
     def __repr__(self):
-        return f"<Vial(position={self._position}, volume={self.vial_data.volume}, contents={self.vial_data.contents}. top={self.vial_data.top}, bottom={self.vial_data.bottom})>"
+        return f"<Vial(position={self.position}, volume={self.vial_data.volume}, contents={self.vial_data.contents}. top={self.vial_data.top}, bottom={self.vial_data.bottom})>"
 
 
 class StockVial(Vial):
