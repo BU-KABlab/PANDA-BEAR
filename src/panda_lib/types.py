@@ -12,15 +12,18 @@ PlateID = int
 ExperimentStatusType = Literal["new", "ready", "running", "done", "error", "cancelled"]
 WellStatusType = Literal["new", "used", "reserved", "error"]
 
+
 # Common structures
 class CoordinatesDict(TypedDict):
     x: float
     y: float
     z: float
 
+
 # Vial and Well related types
 class WellKwargs(TypedDict, total=False):
     """TypedDict for Well constructor keyword arguments"""
+
     name: str
     volume: float
     capacity: float
@@ -31,8 +34,10 @@ class WellKwargs(TypedDict, total=False):
     contents: Dict[str, float]
     coordinates: CoordinatesDict
 
+
 class VialKwargs(TypedDict, total=False):
     """TypedDict for Vial constructor keyword arguments"""
+
     category: int
     height: float
     radius: float
@@ -48,36 +53,45 @@ class VialKwargs(TypedDict, total=False):
     name: str
     base_thickness: float
 
+
 # Hardware types
 class PipetteState(TypedDict):
     """TypedDict for PipetteState"""
+
     capacity_ul: float
     capacity_ml: float
     volume: float
     volume_ml: float
     contents: Dict[str, Any]
 
+
 # Experiment related types
 class ExperimentParameter(TypedDict):
     """TypedDict for experiment parameters"""
+
     experiment_id: int
     parameter_name: str
     parameter_value: Any
 
+
 # Tool related types
 class ToolInfo(TypedDict):
     """TypedDict for tool information"""
+
     name: str
     x: float
     y: float
     z: float
 
+
 # Protocol for JSON serialization
 class JSONSerializable(Protocol):
     """Protocol for objects that can be serialized to JSON"""
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert object to dictionary for JSON serialization"""
         ...
+
 
 def deserialize_json(json_string: str) -> Dict[str, Any]:
     """Helper function to deserialize JSON string to dictionary"""

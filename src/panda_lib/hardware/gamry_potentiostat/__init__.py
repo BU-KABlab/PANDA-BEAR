@@ -11,6 +11,7 @@ from typing import Type, Union
 
 from .errors import GamryCOMError, GamryError, GamryPlatformError
 from .gamry_adapter import GamryAdapter
+
 logger = logging.getLogger("panda")
 
 # Determine which implementation to use based on platform

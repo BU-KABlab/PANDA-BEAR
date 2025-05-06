@@ -15,7 +15,9 @@ from panda_lib_cli.hardware_calibration import (
     decapper_testing,
     line_break_validation,
 )
-from panda_lib_cli.hardware_calibration.mill_calibration_and_positioning import calibrate_mill
+from panda_lib_cli.hardware_calibration.mill_calibration_and_positioning import (
+    calibrate_mill,
+)
 from panda_lib_cli.menu.license_text import show_conditions, show_warranty
 from panda_lib import (
     SystemState,
@@ -234,7 +236,7 @@ def print_wellplate_info():
         well_num = 0
         plate_type = 0
         avail_wells = 0
-    
+
     c_plate = wellplates.Wellplate(type_id=plate_type, plate_id=well_num)
 
     print(
@@ -563,7 +565,12 @@ def update_well_status():
         wellplate_id = wellplates.read_current_wellplate_info()[0]
         well_ids = sql_wellplate.select_well_ids(wellplate_id)
         well_id = input_validation(
-            "Enter the well ID to update: ", str, None, False, "Invalid Well ID", well_ids
+            "Enter the well ID to update: ",
+            str,
+            None,
+            False,
+            "Invalid Well ID",
+            well_ids,
         )
         status = input_validation("Enter the status of the well: ", str)
         sql_wellplate.update_well_status(well_id, wellplate_id, status)

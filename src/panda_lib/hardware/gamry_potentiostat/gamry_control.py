@@ -51,7 +51,7 @@ OPEN_CONNECTION = False
 @dataclass(config=ConfigDict(validate_assignment=True))
 class cv_parameters:
     """CV Setup Parameters
-    
+
     Parameters:
         CVvi(float): Initial voltage (V)
         CVap1(float): First anodic peak (V)
@@ -112,7 +112,7 @@ class chrono_parameters:
 @dataclass(config=ConfigDict(validate_assignment=True))
 class potentiostat_ocp_parameters:
     """OCP Setup Parameters
-    
+
     Parameters:
         OCPvi(float): Initial voltage (V)
         OCPti(float): Time interval (s)
@@ -258,7 +258,7 @@ def savedata(complete_file_name):
     # column_names = ["Time", "Vf","Vu","Vsig","Ach","Overload","StopTest","Temp"]
     output = pd.DataFrame(DTAQ_SINK.acquired_points)
     # complete_file_name = os.path(complete_file_name)
-    np.savetxt(Path(complete_file_name).with_suffix(".txt"), output,fmt="%s")
+    np.savetxt(Path(complete_file_name).with_suffix(".txt"), output, fmt="%s")
     logger.debug("data saved")
 
 
@@ -280,9 +280,7 @@ def setfilename(
         i = 1
         while filepath.exists():
             next_file_name = f"{file_name}_{i}"
-            filepath = pathlib.Path(data_dir / str(next_file_name)).with_suffix(
-                ".txt"
-            )
+            filepath = pathlib.Path(data_dir / str(next_file_name)).with_suffix(".txt")
             i += 1
     else:
         file_name = f"{project_campaign_id}_{campaign_id}_{experiment_id}_{well_id}_{experiment_type}"
@@ -293,9 +291,7 @@ def setfilename(
         i = 1
         while filepath.exists():
             next_file_name = f"{file_name}_{i}"
-            filepath = pathlib.Path(data_dir / str(next_file_name)).with_suffix(
-                ".txt"
-            )
+            filepath = pathlib.Path(data_dir / str(next_file_name)).with_suffix(".txt")
             i += 1
 
     COMPLETE_FILE_NAME = filepath
@@ -343,7 +339,6 @@ def cyclic(params: cv_parameters):
     PSTAT.SetCell(GAMRY_COM.CellOn)
 
     DTAQ.Run(True)
-
 
     logger.debug("cyclic: made it to run end")
 
@@ -475,7 +470,7 @@ def check_vf_range(filename) -> Tuple[bool, float]:
 if __name__ == "__main__":
     try:
         pstatconnect()  # grab first pstat
-        COMPLETE_FILE_NAME = setfilename(10000384,"OCP", ".",  16, 2, "B4")
+        COMPLETE_FILE_NAME = setfilename(10000384, "OCP", ".", 16, 2, "B4")
         OCP(
             potentiostat_ocp_parameters.OCPvi,
             potentiostat_ocp_parameters.OCPti,
@@ -487,7 +482,7 @@ if __name__ == "__main__":
         # time.sleep(0.5)
         ## echem CA - deposition
         if check_vf_range(COMPLETE_FILE_NAME.with_suffix(".txt")):
-            COMPLETE_FILE_NAME = setfilename(10000384, "CV", ".",  16, 2, "B4")
+            COMPLETE_FILE_NAME = setfilename(10000384, "CV", ".", 16, 2, "B4")
             cv_params = cv_parameters(
                 0.0, 1.0, -0.3, 1.0, 0.025, 0.025, 0.025, 0.002, 3
             )
