@@ -7,8 +7,8 @@ from panda_lib.actions import (
     flush_pipette,
     image_well,
     rinse_well,
-    waste_selector,
     transfer,
+    waste_selector,
 )
 
 # If you are using custom actions, import them from the appropriate module.
@@ -67,7 +67,7 @@ def run(
     toolkit = Toolkit(
         mill=hardware.mill,
         scale=hardware.scale,
-        pump=hardware.pump,
+        pump=hardware.pipette,
         wellplate=labware.wellplate,
         global_logger=hardware.global_logger,
         experiment_logger=hardware.experiment_logger,

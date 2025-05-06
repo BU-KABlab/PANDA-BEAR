@@ -2,8 +2,8 @@ from panda_lib import protocol
 
 
 def main(
-    instructions: EchemExperimentBase,
-    toolkit: Toolkit,
+    instructions,
+    toolkit,
 ):
     """
     Main function to run the experiment protocol.
