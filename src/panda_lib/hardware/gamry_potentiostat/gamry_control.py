@@ -15,8 +15,13 @@ from pydantic.dataclasses import dataclass
 
 from .errors import ErrorCodeLookup, GamryCOMError, check_platform_compatibility
 
-import comtypes
-from comtypes import client
+import os
+import sys
+
+if sys.platform == "win32":
+    import comtypes
+    from comtypes import client
+   
 
 # pylint: disable=global-statement, invalid-name, global-variable-undefined
 
