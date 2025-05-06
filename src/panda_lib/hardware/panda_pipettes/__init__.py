@@ -21,8 +21,8 @@ if pipette_type == "WPI":
     from .wpi_syringe.syringepump import SyringePump as Pipette
 
 elif pipette_type == "OT2":
-    from .ot2_pipette.ot2P300 import OT2P300 as Pipette
-    from .ot2_pipette.ot2P300 import MockOT2P300 as MockPipette
+    from .ot2_pipette.pipette import Pipette
+    from .ot2_pipette.pipette import MockPipette
 
 else:
     raise ValueError(f"Invalid pipette type: {pipette_type}")

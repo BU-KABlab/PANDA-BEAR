@@ -58,7 +58,7 @@ class OT2P300:
         Initialize the OT2P300 Pipette interface.
         """
         self.connected = False
-        self.arduino = ArduinoInterface()
+        self.arduino = ArduinoInterface().connect()
         # Configuration constants
         self.max_p300_rate = config.getfloat(
             "P300", "max_pipetting_rate", fallback=50.0

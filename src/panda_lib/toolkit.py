@@ -276,7 +276,7 @@ def connect_to_instruments(
     # Connect to Arduino
     try:
         logger.debug("Connecting to Arduino")
-        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
+        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port")).connect()
         if not arduino.configured:
             logger.error("No Arduino connected")
             incomplete = True
@@ -564,7 +564,7 @@ def test_instrument_connections(
     print("Checking Arduino connection...", end="\r", flush=True)
     try:
         logger.debug("Connecting to Arduino")
-        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
+        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port")).connect()
         if not arduino.configured:
             raise Exception("Arduino not properly configured")
 

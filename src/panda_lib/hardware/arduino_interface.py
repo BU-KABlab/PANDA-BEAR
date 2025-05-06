@@ -102,10 +102,10 @@ class ArduinoLink:
         self._event_queue = asyncio.Queue()
         self.pipette_active = True
         self.logger = logging.getLogger("panda")
-        self.connect()
 
     def __enter__(self):
         """For use in a with statement"""
+        self.connect()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -125,8 +125,7 @@ class ArduinoLink:
         if not interactive:
             # Look for Arduino LLC in the manufacturer field
             for port in ports:
-                if "Arduino LLC" in port.manufacturer:
-                    return port.name
+                return port.name
 
         # If interactive, ask the user to choose the port
         print("Available ports:")
@@ -168,7 +167,7 @@ class ArduinoLink:
 
             if self.ser.is_open:
                 # Look for acknowlegement
-                time.sleep(20)
+                time.sleep(10)
                 rx = self.ser.read_all().decode().strip()
                 if self.ack in rx:
                     self.configured = True
@@ -178,7 +177,7 @@ class ArduinoLink:
                     raise ConnectionError
 
                 rx = self.send(PawduinoFunctions.CMD_HELLO.value)
-                if rx == PawduinoReturnCodes.RESP_HELLO.value:
+                if str(PawduinoReturnCodes.RESP_HELLO.value) in rx:
                     self.configured = True
                     self.connected = True
                 else:
@@ -204,6 +203,12 @@ class ArduinoLink:
         rx = self.ser.readline()
         if rx:
             rxd = rx.decode().strip()
+            if "OK:" in rxd:
+                rxd = rxd.replace("OK:", "")
+            elif "ERR:" in rxd:
+                raise Exception(f"Arduino error: {rxd}")
+            elif "DONE" in rxd:
+                rxd = rxd.replace("DONE", "")
             self.arduinoQueue.put(rxd)
             return rxd
         else:
@@ -370,26 +375,34 @@ class ArduinoLink:
 
     def no_cap(self):
         """Engage the decapper"""
-        return self.send(PawduinoFunctions.CMD_EMAG_ON.value)
+        resp = self.send(PawduinoFunctions.CMD_EMAG_ON.value)
+        time.sleep(0.1)
+        return resp
 
     async def async_no_cap(self):
         """Engage the decapper asynchronously"""
-        return await self.async_send(PawduinoFunctions.CMD_EMAG_ON.value)
-
+        resp = await self.async_send(PawduinoFunctions.CMD_EMAG_ON.value)
+        await asyncio.sleep(0.1)
+        return resp
+    
     def ALL_CAP(self):
         """Disengage the decapper"""
-        return self.send(PawduinoFunctions.CMD_EMAG_OFF.value)
+        resp = self.send(PawduinoFunctions.CMD_EMAG_OFF.value)
+        time.sleep(0.5)
+        return resp
 
     async def async_ALL_CAP(self):
         """Disengage the decapper asynchronously"""
-        return await self.async_send(PawduinoFunctions.CMD_EMAG_OFF.value)
+        resp = await self.async_send(PawduinoFunctions.CMD_EMAG_OFF.value)
+        await asyncio.sleep(0.5)
+        return resp
 
     def line_break(self):
         """Check if the capper line is broken (cap is present)"""
         value = self.send(PawduinoFunctions.CMD_LINE_BREAK.value)
-        if value == PawduinoReturnCodes.RESP_LINE_BREAK.value:
+        if value == str(PawduinoReturnCodes.RESP_LINE_BREAK.value):
             return True
-        elif value == PawduinoReturnCodes.RESP_LINE_UNBROKEN.value:
+        elif value == str(PawduinoReturnCodes.RESP_LINE_UNBROKEN.value):
             return False
         else:
             return None
@@ -401,15 +414,15 @@ class ArduinoLink:
         Returns True if the line is broken, False if it is not, and None if there was an error
         """
         value = await self.async_send(PawduinoFunctions.CMD_LINE_BREAK.value)
-        if value == PawduinoReturnCodes.RESP_LINE_BREAK.value:
+        if value == str(PawduinoReturnCodes.RESP_LINE_BREAK.value):
             return True
-        elif value == PawduinoReturnCodes.RESP_LINE_UNBROKEN.value:
+        elif value == str(PawduinoReturnCodes.RESP_LINE_UNBROKEN.value):
             return False
         else:
             return None
 
     def line_test(self):
-        """Trigger the line break test which runs a the lin break test 10 times, returning the results"""
+        """Trigger the line break test which runs the line break test 10 times, returning the results"""
         i = 10
         value = self.send(PawduinoFunctions.CMD_LINE_TEST.value)
         print(value)
@@ -869,7 +882,7 @@ def test_of_pawduino():
 
 async def async_test_of_pawduino():
     """Test the pawduino sketch asynchronously."""
-    arduino = ArduinoLink()
+    arduino = ArduinoLink().connect()
     try:
         if arduino.configured is False:
             print("Failed to configure the Arduino")

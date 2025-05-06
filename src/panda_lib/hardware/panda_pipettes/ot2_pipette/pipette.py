@@ -351,3 +351,84 @@ class Pipette:
             error_msg = response.get("message", "Unknown error")
             logger.error("Failed to get pipette status: %s", error_msg)
             return {"success": False, "message": error_msg}
+
+class MockPipette:
+    """A mock class for the pipette, used for testing purposes"""
+
+    def __init__(self):
+        self.name = "MockPipette"
+        self.has_tip = False
+        self.is_primed = False
+        self.position = 0.0
+        self.max_volume = 300
+        self.min_volume = 10
+        self.zero_position = 0.0
+        self.blowout_position = 0.0
+        self.drop_tip_position = 0.0
+
+    def aspirate(self, vol: float):
+        """Mock aspirate method"""
+        if self.has_tip:
+            self.position += vol
+            logger.info("Mock aspirated %s uL", vol)
+        else:
+            logger.warning("No tip attached. Cannot aspirate.")
+            raise ToolStateError("No tip attached. Cannot aspirate.")
+        return True 
+    def dispense(self, vol: float):
+        """Mock dispense method"""
+        if self.has_tip:
+            self.position -= vol
+            logger.info("Mock dispensed %s uL", vol)
+        else:
+            logger.warning("No tip attached. Cannot dispense.")
+            raise ToolStateError("No tip attached. Cannot dispense.")
+        return True
+    def blowout(self):
+        """Mock blowout method"""
+        if self.has_tip:
+            logger.info("Mock blowout performed")
+        else:
+            logger.warning("No tip attached. Cannot blowout.")
+            raise ToolStateError("No tip attached. Cannot blowout.")
+        return True
+    def drop_tip(self):
+        """Mock drop tip method"""
+        if self.has_tip:
+            self.has_tip = False
+            logger.info("Mock tip dropped")
+        else:
+            logger.warning("No tip attached. Cannot drop tip.")
+            raise ToolStateError("No tip attached. Cannot drop tip.")
+        return True
+    def home(self):
+        """Mock home method"""
+        self.position = 0.0
+        logger.info("Mock pipette homed")
+        return True
+    def prime(self):
+        """Mock prime method"""
+        self.is_primed = True
+        logger.info("Mock pipette primed")
+        return True
+    def get_status(self):
+        """Mock get status method"""
+        status = {
+            "homed": True,
+            "position": self.position,
+            "max_volume": self.max_volume,
+        }
+        logger.info("Mock pipette status: %s", status)
+        return status
+    def vol2move(self, vol):
+        """Mock volume to move method"""
+        if vol < self.min_volume or vol > self.max_volume:
+            logger.warning(
+                "Volume %s uL is outside pipette range (%s-%s uL)",
+                vol,
+                self.min_volume,
+                self.max_volume,
+            )
+            vol = max(min(vol, self.max_volume), self.min_volume)
+
+        return vol
