@@ -59,10 +59,24 @@ class ArduinoLink:
 
     The class provides the following methods:
     - choose_arduino_port (choose the port that the ardiono is using)
-    - open (opens a connection to the Arduino)
+    - open (opens a connection to the Arduino) *can be used contextually
+    - close (closes the connection to the Arduino) *can be used contextually
     - receive (listens to the Arduino and puts the messages in the queue)
     - configure (configures the Arduino)
-    - send (sends a message to the Arduino and waits for a response)
+    - send (sends a message to the Arduino and waits for a response) *available asynchronously
+    - receive (receives a message from the Arduino) *available asynchronously
+    - start_monitoring (starts a background task to monitor the Arduino messages)
+    - stop_monitoring (stops the background task to monitor the Arduino messages)
+    - get_next_message (gets the next message from the event queue) *available asynchronously
+    
+    Pipette Specific Methods:
+    - home (homes the pipette)
+    - get_status (gets the current status of the pipette)
+    - move_to (moves the pipette to a specific position in mm)
+    - aspirate (aspirates a specific volume in µL)
+    - dispense (dispenses a specific volume in µL)
+    
+
 
     The class provides the following attributes:
     - arduinoPort (the port to which the Arduino is connected)
@@ -78,7 +92,7 @@ class ArduinoLink:
         self.ser: Serial = None
         self.port_address: str = port_address
         self.baud_rate: int = baud_rate
-        self.timeout: int = 10
+        self.timeout: int = 60
         self.configured: bool = False
         self.connected: bool = False
         self.ack: str = "OK"
@@ -86,12 +100,12 @@ class ArduinoLink:
         self._running = False
         self._event_queue = asyncio.Queue()
         self.pipette_active = True
-        self.position = 0.0
-        self.volume = 0.0
-        self.max_volume = 300.0
-        self.min_volume = 20.0
-        self.zero_position = 0.0
-        self.max_position = 60.0
+        # self.position = 0.0
+        # self.volume = 0.0
+        # self.max_volume = 300.0
+        # self.min_volume = 20.0
+        # self.zero_position = 0.0
+        # self.max_position = 60.0
         self.logger = logging.getLogger("panda")
         self.connect()
 
@@ -103,7 +117,7 @@ class ArduinoLink:
         """Close the connection to the Arduino when exiting the with statement"""
         self.close()
 
-    def choose_arduino_port(self, interactive: bool = False) -> str:
+    def _choose_arduino_port(self, interactive: bool = False) -> str:
         """Interactive method to choose the port that the Arduino is connected to"""
         # Check the OS and list the available ports accordingly
         if os.name == "posix":
@@ -150,7 +164,7 @@ class ArduinoLink:
             if self.ser is None and self.port_address is None:
                 # If no port address is provided, choose the port interactively
                 self.ser = Serial(
-                    self.choose_arduino_port(), self.baud_rate, timeout=self.timeout
+                    self._choose_arduino_port(), self.baud_rate, timeout=self.timeout
                 )
             else:
                 self.ser = Serial(
@@ -236,8 +250,7 @@ class ArduinoLink:
 
     def send(self, cmd):
         """Send a message to the Arduino and wait for a response"""
-        self.ser.flush()
-        self.ser.read_all()
+        self.ser.flush() # Flush the input buffer
         msg = str(cmd)
         attempts = 0
         while True and attempts < 3:
@@ -253,11 +266,10 @@ class ArduinoLink:
             raise ConnectionError
 
         if ":" in rx:
-            rx = rx.split(":")[-1]
-        try:
-            return int(rx)
-        except (ValueError, TypeError):
-            return rx
+            sucess = rx.split(":")[0] == "OK"
+            if not sucess:
+                raise Exception(f"Arduino error: {rx}")
+        return rx
 
     async def async_send(self, cmd) -> Union[int, str]:
         """Asynchronous version of send"""
@@ -279,10 +291,14 @@ class ArduinoLink:
 
         if rx is None:
             raise ConnectionError
-        try:
-            return int(rx)
-        except (ValueError, TypeError):
-            return rx
+        
+        else:
+            if ":" in rx:
+                success = rx.split(":")[0] == "OK"
+                if not success:
+                    raise Exception(f"Arduino error: {rx}")
+
+        return rx
 
     async def start_monitoring(self):
         """Start monitoring Arduino messages in the background"""
@@ -407,6 +423,43 @@ class ArduinoLink:
             print(value)
             i -= 1
 
+    def pipette_send(self, cmd) -> str:
+        """Send a command to the pipette
+        
+        Arguments:
+            cmd: The command to send to the pipette
+
+        Returns:
+            str: The response from the pipette
+
+        Raises:
+            Exception: If there is an error during communication with the pipette
+            ConnectionError: If the pipette is not connected or configured properly
+        
+        """
+        try:
+            self.ser.flush()
+            self.ser.read_all()
+            self.ser.write(str(cmd).encode())
+            time.sleep(0.5)
+            rx = self.ser.read_until(b"DONE\n").strip()
+            # Look for OK: or ERR: at beginning
+            if rx.startswith(b"OK:"):
+                rx = rx[3:]
+            elif rx.startswith(b"ERR:"):
+                raise Exception(rx)
+            else:
+                raise ConnectionError
+            return rx.decode()
+
+        except ConnectionError:
+            self.logger.error("Pipette not connected or configured properly")
+            raise ConnectionError("Pipette not connected or configured properly")
+
+        except Exception as e:
+            self.logger.error(f"Error during pipette send: {str(e)}")
+            raise Exception(f"Error during pipette send: {str(e)}")
+
     def home(self) -> bool:
         """
         Home the pipette.
@@ -415,18 +468,11 @@ class ArduinoLink:
             bool: True if homing was successful
         """
         try:
-            response = self.send("H")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position after homing
-                status = self.get_status()
-                if status:
-                    self.position = status.get("position", 0.0)
-                    self.volume = status.get("volume", 0.0)
-            return success
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_HOME.value)
+            return response
         except Exception as e:
             self.logger.error(f"Error during homing: {str(e)}")
-            return False
+            raise Exception(f"Error during homing: {str(e)}")
 
     def get_status(self) -> Dict[str, Any]:
         """
@@ -436,83 +482,63 @@ class ArduinoLink:
             dict: Status information including position and volume
         """
         try:
-            response = self.send("P")
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
             status = {}
-
-            # Parse position from response
-            for line in response.split("\n"):
-                if "Position:" in line:
-                    parts = line.split(":")
-                    if len(parts) > 1:
-                        pos_parts = parts[1].strip().split()
-                        if len(pos_parts) > 0:
-                            status["position"] = float(pos_parts[0])
-
-                if "Volume:" in line:
-                    parts = line.split(":")
-                    if len(parts) > 1:
-                        vol_parts = parts[1].strip().split()
-                        if len(vol_parts) > 0:
-                            status["volume"] = float(vol_parts[0])
-
-            return status
+            
+            # Parse the new format: "OK:isHomed,position,maxVolume"
+            # Example: "1,25,300"
+            if "OK:" in response:
+                parts = response.strip().split(",")
+            if len(parts) >= 3:
+                status["h"] = bool(int(parts[0].strip()))
+                status["p"] = float(parts[1].strip())
+                status["mxv"] = float(parts[2].strip())
         except Exception as e:
             self.logger.error(f"Error getting status: {str(e)}")
             return {}
+        return status
 
-    def move_to(self, position: float, speed: Optional[int] = None) -> bool:
+    def move_to(self, position: float, speed: Optional[int] = None, wait:bool = True) -> bool:
         """
         Move to a specific position in mm.
 
         Args:
             position: Position in mm
             speed: Movement speed (steps/second)
+            wait: Wait for the movement to complete
 
         Returns:
             bool: True if movement was successful
         """
-        cmd = f"M{position}"
+        cmd = f"10{position}"
         if speed:
             cmd += f",{speed}"
-
         try:
-            response = self.send(cmd)
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                self.position = position
-                # Update volume after movement
-                status = self.get_status()
-                if status and "volume" in status:
-                    self.volume = status["volume"]
-            return success
+            response = self.pipette_send(cmd)
+            return response
         except Exception as e:
             self.logger.error(f"Error during movement: {str(e)}")
-            return False
+            raise Exception(f"Error during movement: {str(e)}")
 
-    def set_volume(self, volume: float) -> bool:
+    def move_relative(self, direction, steps, velocity, wait)
         """
-        Set a specific volume in µL.
+        Move the pipette in a specific direction by a certain number of steps.
 
-        Args:
-            volume: Volume in µL
+        Arguments:
+            direction: Direction to move (1 for up, 0 for down)
+            steps: Number of steps to move
+            velocity: Speed of movement (steps/second)
+            wait: Wait for the movement to complete
 
-        Returns:
-            bool: True if volume setting was successful
         """
+        cmd = f"16{direction},{steps},{velocity}"
         try:
-            response = self.send(f"V{volume}")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                self.volume = volume
-                # Update position after volume change
-                status = self.get_status()
-                if status and "position" in status:
-                    self.position = status["position"]
-            return success
+            response = self.pipette_send(cmd)
+            return response
         except Exception as e:
-            self.logger.error(f"Error setting volume: {str(e)}")
-            return False
-
+            self.logger.error(f"Error during movement: {str(e)}")
+            raise Exception(f"Error during movement: {str(e)}")
+        
     def aspirate(self, volume: float, rate: Optional[float] = None) -> bool:
         """
         Aspirate a specific volume in µL.
@@ -524,25 +550,15 @@ class ArduinoLink:
         Returns:
             bool: True if aspiration was successful
         """
-        cmd = f"A{volume}"
+        cmd = f"11{volume}"
         if rate:
             cmd += f",{rate}"
-
         try:
-            response = self.send(cmd)
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after aspiration
-                status = self.get_status()
-                if status:
-                    if "position" in status:
-                        self.position = status["position"]
-                    if "volume" in status:
-                        self.volume = status["volume"]
-            return success
+            response = self.pipette_send(cmd)
+            return response
         except Exception as e:
             self.logger.error(f"Error during aspiration: {str(e)}")
-            return False
+            raise Exception(f"Error during aspiration: {str(e)}")
 
     def dispense(self, volume: float, rate: Optional[float] = None) -> bool:
         """
@@ -555,48 +571,16 @@ class ArduinoLink:
         Returns:
             bool: True if dispensing was successful
         """
-        cmd = f"E{volume}"
+        cmd = f"12{volume}"
         if rate:
             cmd += f",{rate}"
 
         try:
-            response = self.send(cmd)
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after dispensing
-                status = self.get_status()
-                if status:
-                    if "position" in status:
-                        self.position = status["position"]
-                    if "volume" in status:
-                        self.volume = status["volume"]
-            return success
+            response = self.pipette_send(cmd)
+            return response
         except Exception as e:
             self.logger.error(f"Error during dispensing: {str(e)}")
-            return False
-
-    def blowout(self) -> bool:
-        """
-        Perform a blowout to expel all liquid.
-
-        Returns:
-            bool: True if blowout was successful
-        """
-        try:
-            response = self.send("B")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after blowout
-                status = self.get_status()
-                if status:
-                    if "position" in status:
-                        self.position = status["position"]
-                    if "volume" in status:
-                        self.volume = status["volume"]
-            return success
-        except Exception as e:
-            self.logger.error(f"Error during blowout: {str(e)}")
-            return False
+            raise Exception(f"Error during dispensing: {str(e)}")
 
     def mix(
         self, repetitions: int, volume: float, rate: Optional[float] = None
@@ -619,89 +603,11 @@ class ArduinoLink:
             cmd += f",{rate}"
 
         try:
-            response = self.send(cmd)
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after mixing
-                status = self.get_status()
-                if status:
-                    if "position" in status:
-                        self.position = status["position"]
-                    if "volume" in status:
-                        self.volume = status["volume"]
-            return success
+            response = self.pipette_send(cmd)
+            return response
         except Exception as e:
             self.logger.error(f"Error during mixing: {str(e)}")
-            return False
-
-    def attach_tip(self) -> bool:
-        """
-        Attach a new tip (homes the pipette).
-
-        Returns:
-            bool: True if tip attachment was successful
-        """
-        try:
-            response = self.send("T+")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after tip attachment
-                status = self.get_status()
-                if status:
-                    if "position" in status:
-                        self.position = status["position"]
-                    if "volume" in status:
-                        self.volume = status["volume"]
-            return success
-        except Exception as e:
-            self.logger.error(f"Error during tip attachment: {str(e)}")
-            return False
-
-    def detach_tip(self) -> bool:
-        """
-        Detach the current tip (drops tip).
-
-        Returns:
-            bool: True if tip detachment was successful
-        """
-        try:
-            response = self.send("T-")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after tip detachment
-                status = self.get_status()
-                if status:
-                    if "position" in status:
-                        self.position = status["position"]
-                    if "volume" in status:
-                        self.volume = status["volume"]
-            return success
-        except Exception as e:
-            self.logger.error(f"Error during tip detachment: {str(e)}")
-            return False
-
-    def reset(self) -> bool:
-        """
-        Reset the pipette (home and empty).
-
-        Returns:
-            bool: True if reset was successful
-        """
-        try:
-            response = self.send("R")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after reset
-                status = self.get_status()
-                if status:
-                    if "position" in status:
-                        self.position = status["position"]
-                    if "volume" in status:
-                        self.volume = status["volume"]
-            return success
-        except Exception as e:
-            self.logger.error(f"Error during reset: {str(e)}")
-            return False
+            raise Exception(f"Error during mixing: {str(e)}")
 
     def hello(self):
         """Send a hello message to the Arduino"""
@@ -829,9 +735,9 @@ class PawduinoFunctions(enum.Enum):
     CMD_PIPETTE_ASPIRATE = 11
     CMD_PIPETTE_DISPENSE = 12
     CMD_PIPETTE_STATUS = 13
-    CMD_PIPETTE_VOLUME = 14
-    CMD_PIPETTE_POSITION = 15
-
+    CMD_LED_TEST = 14
+    CMD_PIPETTE_MIX = 15
+    CMD_PIPETTE_MOVE_DIRECTION = 16
     CMD_HELLO = 99
 
 
@@ -862,6 +768,9 @@ class PawduinoReturnCodes(enum.Enum):
     RESP_PIPETTE_ASPIRATED = 111
     RESP_PIPETTE_DISPENSED = 112
     RESP_PIPETTE_STATUS = 113
+    RESP_LINE_TEST = 114
+    RESP_PIPETTE_MIX = 115
+    RESP_PIPETTE_MOVE_DIRECTION = 116
     RESP_HELLO = 999
 
 
