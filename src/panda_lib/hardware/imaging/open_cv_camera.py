@@ -3,13 +3,16 @@
 import logging
 import os
 from datetime import datetime
-from typing import Optional, Tuple
+from pathlib import Path
+from typing import Optional, Tuple, Union
 
 import cv2
 import numpy as np
 
+from .interface import CameraInterface
 
-class OpenCVCamera:
+
+class OpenCVCamera(CameraInterface):
     """Class for controlling webcams using OpenCV"""
 
     def __init__(self, camera_id: int = 0, resolution: Tuple[int, int] = (1280, 720)):
@@ -80,7 +83,7 @@ class OpenCVCamera:
 
         return frame
 
-    def save_image(self, image: np.ndarray, path: str) -> bool:
+    def save_image(self, image: np.ndarray, path: Union[str, Path]) -> bool:
         """Save an image to disk
 
         Args:
@@ -91,32 +94,35 @@ class OpenCVCamera:
             bool: True if successful, False otherwise
         """
         try:
+            path = Path(path) if isinstance(path, str) else path
             # Make sure the directory exists
-            os.makedirs(os.path.dirname(path), exist_ok=True)
+            os.makedirs(path.parent, exist_ok=True)
             # Save the image
-            cv2.imwrite(path, image)
+            cv2.imwrite(str(path), image)
             self.logger.info(f"Image saved to {path}")
             return True
         except Exception as e:
             self.logger.error(f"Error saving image: {e}")
             return False
 
-    def capture_and_save(self, path: str) -> bool:
+    def capture_and_save(self, path: Union[str, Path]) -> Tuple[Path, bool]:
         """Capture an image and save it to disk
 
         Args:
             path: The path to save the image to
 
         Returns:
-            bool: True if successful, False otherwise
+            Tuple[Path, bool]: The path of the saved image and a boolean indicating success
         """
+        path = Path(path) if isinstance(path, str) else path
         image = self.capture_image()
         if image is None:
-            return False
-        return self.save_image(image, path)
+            return path, False
+        success = self.save_image(image, path)
+        return path, success
 
 
-class MockOpenCVCamera:
+class MockOpenCVCamera(CameraInterface):
     """Mock OpenCV camera for testing"""
 
     def __init__(self, camera_id: int = 0, resolution: Tuple[int, int] = (1280, 720)):
@@ -190,22 +196,25 @@ class MockOpenCVCamera:
 
         return image
 
-    def save_image(self, image: np.ndarray, path: str) -> bool:
+    def save_image(self, image: np.ndarray, path: Union[str, Path]) -> bool:
         """Save a mock image to disk"""
         try:
+            path = Path(path) if isinstance(path, str) else path
             # Make sure the directory exists
-            os.makedirs(os.path.dirname(path), exist_ok=True)
+            os.makedirs(path.parent, exist_ok=True)
             # Save the image
-            cv2.imwrite(path, image)
+            cv2.imwrite(str(path), image)
             self.logger.info(f"Mock image saved to {path}")
             return True
         except Exception as e:
             self.logger.error(f"Error saving mock image: {e}")
             return False
 
-    def capture_and_save(self, path: str) -> bool:
+    def capture_and_save(self, path: Union[str, Path]) -> Tuple[Path, bool]:
         """Capture a mock image and save it to disk"""
+        path = Path(path) if isinstance(path, str) else path
         image = self.capture_image()
         if image is None:
-            return False
-        return self.save_image(image, path)
+            return path, False
+        success = self.save_image(image, path)
+        return path, success

@@ -2,16 +2,24 @@
 
 import logging
 import os
+from pathlib import Path
 from typing import Optional, Tuple, Union
 
 import numpy as np
-import PySpin
 
-from panda_lib.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
+from .camera_factory import CameraFactory, CameraType
+from .interface import CameraInterface
 from shared_utilities.config.config_tools import read_camera_type, read_webcam_settings
 
+# Check if PySpin is available
+try:
+    import PySpin
+    PYSPIN_AVAILABLE = True
+except ImportError:
+    PYSPIN_AVAILABLE = False
 
-def capture_image_flir(camera: PySpin.Camera) -> Optional[np.ndarray]:
+
+def capture_image_flir(camera: 'PySpin.Camera') -> Optional[np.ndarray]:
     """Capture an image from a FLIR camera
 
     Args:
@@ -20,6 +28,10 @@ def capture_image_flir(camera: PySpin.Camera) -> Optional[np.ndarray]:
     Returns:
         np.ndarray: The captured image, or None if failed
     """
+    if not PYSPIN_AVAILABLE:
+        logging.getLogger("panda.camera").error("PySpin library not available")
+        return None
+        
     logger = logging.getLogger("panda.camera")
 
     if camera is None:
@@ -51,14 +63,14 @@ def capture_image_flir(camera: PySpin.Camera) -> Optional[np.ndarray]:
         camera.DeInit()
 
         return image_data
-    except PySpin.SpinnakerException as ex:
+    except Exception as ex:
         logger.error(f"Error capturing image from FLIR camera: {ex}")
         return None
 
 
 def setup_camera(
     use_mock: bool = False,
-) -> Tuple[Union[PySpin.Camera, OpenCVCamera, MockOpenCVCamera, None], str]:
+) -> Tuple[Union[CameraInterface, None], str]:
     """Set up the appropriate camera based on configuration
 
     Args:
@@ -68,47 +80,55 @@ def setup_camera(
         tuple: (camera_object, camera_type)
     """
     logger = logging.getLogger("panda.camera")
-    camera_type = read_camera_type().lower()
-
-    if camera_type == "webcam":
-        webcam_id, resolution = read_webcam_settings()
-
-        if use_mock:
-            camera = MockOpenCVCamera(camera_id=webcam_id, resolution=resolution)
-        else:
-            camera = OpenCVCamera(camera_id=webcam_id, resolution=resolution)
-
-        if not camera.connect():
-            logger.error(f"Failed to connect to webcam with ID {webcam_id}")
-            return None, camera_type
-
-        return camera, camera_type
+    config_camera_type = read_camera_type().lower()
+    
+    # Map configuration camera type to CameraType enum
+    if config_camera_type == "webcam":
+        camera_type_enum = CameraType.OPENCV
+    elif config_camera_type == "flir":
+        camera_type_enum = CameraType.FLIR
     else:
-        # Default to FLIR camera
-        if use_mock:
-            # No mock implementation for FLIR yet
-            logger.warning("No mock implementation for FLIR camera")
-            return None, camera_type
-
-        try:
-            system = PySpin.System.GetInstance()
-            cam_list = system.GetCameras()
-
-            if cam_list.GetSize() == 0:
-                logger.error("No FLIR Camera found")
-                return None, camera_type
-
-            camera = cam_list.GetByIndex(0)
-            cam_list.Clear()
-
-            return camera, camera_type
-        except Exception as e:
-            logger.error(f"Error setting up FLIR camera: {e}")
-            return None, camera_type
+        # Default to OpenCV
+        logger.warning(f"Unknown camera type '{config_camera_type}', defaulting to OpenCV")
+        camera_type_enum = CameraType.OPENCV
+        config_camera_type = "webcam"
+    
+    # Use the mock camera if requested
+    if use_mock:
+        camera_type_enum = CameraType.MOCK
+    
+    # Create camera based on type
+    if camera_type_enum == CameraType.OPENCV or camera_type_enum == CameraType.MOCK:
+        webcam_id, resolution = read_webcam_settings()
+        camera = CameraFactory.create_camera(
+            camera_type=camera_type_enum, 
+            camera_id=webcam_id, 
+            resolution=resolution
+        )
+    else:  # FLIR camera
+        camera = CameraFactory.create_camera(camera_type=camera_type_enum)
+        
+        # If FLIR camera creation failed, fallback to OpenCV
+        if camera is None:
+            logger.warning("Failed to create FLIR camera, falling back to OpenCV")
+            webcam_id, resolution = read_webcam_settings()
+            camera = CameraFactory.create_camera(
+                camera_type=CameraType.OPENCV,
+                camera_id=webcam_id,
+                resolution=resolution
+            )
+            config_camera_type = "webcam"
+    
+    # Connect to the camera
+    if camera is not None and not camera.connect():
+        logger.error("Failed to connect to camera")
+        return None, config_camera_type
+    
+    return camera, config_camera_type
 
 
 def capture_image(
-    camera: Union[PySpin.Camera, OpenCVCamera, MockOpenCVCamera], camera_type: str
+    camera: CameraInterface, camera_type: str
 ) -> Optional[np.ndarray]:
     """Capture an image from either camera type
 
@@ -121,17 +141,14 @@ def capture_image(
     """
     if camera is None:
         return None
-
-    if camera_type.lower() == "webcam":
-        return camera.capture_image()
-    else:
-        return capture_image_flir(camera)
+    
+    return camera.capture_image()
 
 
 def save_image(
     image: np.ndarray,
-    path: str,
-    camera: Union[OpenCVCamera, MockOpenCVCamera, None] = None,
+    path: Union[str, Path],
+    camera: Optional[CameraInterface] = None,
     camera_type: str = "",
 ) -> bool:
     """Save an image to disk
@@ -139,7 +156,7 @@ def save_image(
     Args:
         image: The image to save
         path: The path to save the image to
-        camera: The camera object (only needed for webcam)
+        camera: The camera object
         camera_type: The type of camera ('flir' or 'webcam')
 
     Returns:
@@ -152,15 +169,16 @@ def save_image(
         return False
 
     try:
-        # If webcam and camera object provided, use its save method
-        if camera_type.lower() == "webcam" and camera is not None:
+        path = Path(path) if isinstance(path, str) else path
+        
+        # If camera object provided, use its save method
+        if camera is not None:
             return camera.save_image(image, path)
 
         # Otherwise use generic approach
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+        os.makedirs(path.parent, exist_ok=True)
         import cv2
-
-        cv2.imwrite(path, image)
+        cv2.imwrite(str(path), image)
         logger.info(f"Image saved to {path}")
         return True
     except Exception as e:
@@ -169,10 +187,10 @@ def save_image(
 
 
 def capture_and_save(
-    camera: Union[PySpin.Camera, OpenCVCamera, MockOpenCVCamera],
+    camera: CameraInterface,
     camera_type: str,
-    path: str,
-) -> bool:
+    path: Union[str, Path],
+) -> Tuple[Path, bool]:
     """Capture an image and save it to disk
 
     Args:
@@ -181,15 +199,11 @@ def capture_and_save(
         path: Path to save the image to
 
     Returns:
-        bool: True if successful, False otherwise
+        Tuple[Path, bool]: The path of the saved image and a boolean indicating success
     """
-    # For webcams, use the built-in method if available
-    if camera_type.lower() == "webcam":
-        return camera.capture_and_save(path)
-
-    # For FLIR or other cameras, use the separate functions
-    image = capture_image(camera, camera_type)
-    if image is None:
-        return False
-
-    return save_image(image, path, camera, camera_type)
+    path = Path(path) if isinstance(path, str) else path
+    
+    if camera is None:
+        return path, False
+    
+    return camera.capture_and_save(path)
