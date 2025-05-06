@@ -6,14 +6,14 @@ from dataclasses import dataclass
 from logging import Logger
 from typing import Union
 
-import PySpin
 from sartorius import Scale
 from sartorius.mock import Scale as MockScale
 
 from panda_lib.hardware import ArduinoLink, MockArduinoLink
 from panda_lib.hardware.gantry_interface import MockPandaMill as MockMill
 from panda_lib.hardware.gantry_interface import PandaMill as Mill
-from panda_lib.hardware.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
+from panda_lib.hardware.imaging.camera_factory import CameraFactory, CameraType
+from panda_lib.hardware.imaging.interface import CameraInterface
 from panda_lib.hardware.panda_pipettes import (
     MockPipette,
     Pipette,
@@ -36,7 +36,9 @@ else:
 class Toolkit:
     def __init__(self, use_mock_instruments=False, **kwargs):
         # Initialize hardware components with fallbacks
-        self.initialize_camera(use_mock_instruments)
+        self.camera = kwargs.get("camera", None)
+        if self.camera is None:
+            self.initialize_camera(use_mock_instruments)
         self.mill = kwargs.get("mill", None)
         self.scale = kwargs.get("scale", None)
         self.pipette = kwargs.get("pump", None)
@@ -53,24 +55,38 @@ class Toolkit:
     arduino: ArduinoLink = None
     global_logger: Logger = None
     experiment_logger: Logger = None
-    camera: Union[None, object] = None  # Placeholder for camera object
+    camera: Union[None, CameraInterface] = None
     slack_monitor: SlackBot = None
 
     def initialize_camera(self, use_mock=False):
-        # Try to use FLIR camera if available, otherwise fall back to OpenCV or mock
-        if not use_mock:
-            try:
-                from panda_lib.hardware.imaging.flir_camera import FlirCamera
-
-                if FlirCamera.is_available():
-                    self.camera = FlirCamera()
-                    return
-            except ImportError:
-                pass
-
-        # Fallback to OpenCV
-
-        self.camera = OpenCVCamera()
+        """Initialize the appropriate camera using the factory"""
+        camera_type = read_camera_type().lower()
+        if use_mock:
+            camera_type_enum = CameraType.MOCK
+        elif camera_type == "flir":
+            camera_type_enum = CameraType.FLIR
+        else:
+            camera_type_enum = CameraType.OPENCV
+            
+        # Get camera parameters
+        if camera_type_enum in [CameraType.OPENCV, CameraType.MOCK]:
+            webcam_id, resolution = read_webcam_settings()
+            self.camera = CameraFactory.create_camera(
+                camera_type=camera_type_enum,
+                camera_id=webcam_id,
+                resolution=resolution
+            )
+        else:
+            self.camera = CameraFactory.create_camera(camera_type=camera_type_enum)
+            
+        # If camera creation failed or PySpin wasn't available, fallback to OpenCV
+        if self.camera is None:
+            webcam_id, resolution = read_webcam_settings()
+            self.camera = CameraFactory.create_camera(
+                camera_type=CameraType.OPENCV if not use_mock else CameraType.MOCK,
+                camera_id=webcam_id,
+                resolution=resolution
+            )
 
 
 class Hardware:
@@ -78,7 +94,9 @@ class Hardware:
 
     def __init__(self, use_mock_instruments=False, **kwargs):
         # Initialize hardware components with fallbacks
-        self.initialize_camera(use_mock_instruments)
+        self.camera = kwargs.get("camera", None)
+        if self.camera is None:
+            self.initialize_camera(use_mock_instruments)
         self.mill = kwargs.get("mill", None)
         self.scale = kwargs.get("scale", None)
         self.pipette = kwargs.get("pump", None)
@@ -92,25 +110,40 @@ class Hardware:
     scale: Union[Scale, MockScale, None] = None
     pipette: Union[Pipette, MockPipette, None] = None
     arduino: ArduinoLink = None
-    # inlcude the global logger so that the hardware can log to the same file
+    # include the global logger so that the hardware can log to the same file
     global_logger: Logger = None
     experiment_logger: Logger = None
+    camera: Union[None, CameraInterface] = None
 
     def initialize_camera(self, use_mock=False):
-        # Try to use FLIR camera if available, otherwise fall back to OpenCV or mock
-        if not use_mock:
-            try:
-                from panda_lib.hardware.imaging.flir_camera import FlirCamera
-
-                if FlirCamera.is_available():
-                    self.camera = FlirCamera()
-                    return
-            except ImportError:
-                pass
-
-        # Fallback to OpenCV
-
-        self.camera = OpenCVCamera()
+        """Initialize the appropriate camera using the factory"""
+        camera_type = read_camera_type().lower()
+        if use_mock:
+            camera_type_enum = CameraType.MOCK
+        elif camera_type == "flir":
+            camera_type_enum = CameraType.FLIR
+        else:
+            camera_type_enum = CameraType.OPENCV
+            
+        # Get camera parameters
+        if camera_type_enum in [CameraType.OPENCV, CameraType.MOCK]:
+            webcam_id, resolution = read_webcam_settings()
+            self.camera = CameraFactory.create_camera(
+                camera_type=camera_type_enum,
+                camera_id=webcam_id,
+                resolution=resolution
+            )
+        else:
+            self.camera = CameraFactory.create_camera(camera_type=camera_type_enum)
+            
+        # If camera creation failed or PySpin wasn't available, fallback to OpenCV
+        if self.camera is None:
+            webcam_id, resolution = read_webcam_settings()
+            self.camera = CameraFactory.create_camera(
+                camera_type=CameraType.OPENCV if not use_mock else CameraType.MOCK,
+                camera_id=webcam_id,
+                resolution=resolution
+            )
 
 
 @dataclass
@@ -156,6 +189,7 @@ def connect_to_instruments(
 
     """
     instruments = Toolkit(
+        use_mock_instruments=use_mock_instruments,
         mill=None,
         scale=None,
         pump=None,
@@ -166,10 +200,6 @@ def connect_to_instruments(
         arduino=None,
     )
 
-    # Determine which type of camera to use
-    camera_type = read_camera_type()
-    logger.debug(f"Camera type set to: {camera_type}")
-
     if use_mock_instruments:
         logger.info("Using mock instruments")
         instruments.mill = MockMill()
@@ -178,18 +208,11 @@ def connect_to_instruments(
         instruments.pipette = MockPipette()
         # pstat = echem_mock.GamryPotentiostat.connect()
         instruments.arduino = MockArduinoLink()
-
-        # Setup mock camera based on the config
-        if camera_type.lower() == "webcam":
-            webcam_id, resolution = read_webcam_settings()
-            instruments.camera = MockOpenCVCamera(
-                camera_id=webcam_id, resolution=resolution
-            )
-            instruments.camera.connect()
-        else:
-            # No mock FLIR camera setup needed, it's handled elsewhere
-            pass
-
+        
+        # Initialize the camera if it wasn't done in the Toolkit constructor
+        if instruments.camera is None:
+            instruments.initialize_camera(use_mock=True)
+            
         return instruments, True
 
     incomplete = False
@@ -233,54 +256,22 @@ def connect_to_instruments(
         # raise error
         incomplete = True
 
-    # Check for camera based on the configuration
-    if camera_type:
-        if camera_type.lower() == "webcam":
-            try:
-                logger.debug("Connecting to Webcam")
-                webcam_id, resolution = read_webcam_settings()
-                instruments.opencv_camera = OpenCVCamera(
-                    camera_id=webcam_id, resolution=resolution
-                )
-
-                if not instruments.opencv_camera.connect():
-                    logger.error(f"Failed to connect to webcam with ID {webcam_id}")
-                    instruments.opencv_camera = None
-                    incomplete = True
-                else:
-                    logger.debug(
-                        f"Connected to webcam ID {webcam_id} at resolution {resolution}"
-                    )
-            except Exception as error:
-                logger.error(f"No webcam connected, {error}")
-                instruments.opencv_camera = None
-                incomplete = True
+    # Initialize the camera
+    logger.debug("Connecting to camera")
+    if instruments.camera is None:
+        instruments.initialize_camera(use_mock=False)
+    
+    # Connect to the camera
+    if instruments.camera is not None:
+        if not instruments.camera.connect():
+            logger.error("Failed to connect to camera")
+            instruments.camera = None
+            incomplete = True
         else:
-            # Default to FLIR camera
-            try:
-                logger.debug("Connecting to FLIR Camera")
-                system = PySpin.System.GetInstance()
-                cam_list = system.GetCameras()
-                if cam_list.GetSize() == 0:
-                    logger.error("No FLIR Camera connected")
-                    instruments.flir_camera = None
-                else:
-                    instruments.flir_camera = cam_list.GetByIndex(0)
-                    # instruments.flir_camera.Init()
-                    cam_list.Clear()
-                    system.ReleaseInstance()
-
-                    logger.debug("Connected to FLIR Camera")
-            except Exception as error:
-                logger.error("No FLIR Camera connected, %s", error)
-                instruments.flir_camera = None
-                incomplete = True
+            logger.debug("Connected to camera")
     else:
-        logger.error("No camera type specified in the configuration file")
-        instruments.flir_camera = None
-        incomplete = False
-
-    # Connect to PSTAT
+        logger.error("Failed to initialize camera")
+        incomplete = True
 
     # Connect to Arduino
     try:
@@ -317,6 +308,7 @@ def test_instrument_connections(
         tuple[Toolkit, bool]: A tuple containing the Toolkit object and a boolean indicating if all instruments were connected successfully.
     """
     instruments = Toolkit(
+        use_mock_instruments=use_mock_instruments,
         mill=None,
         scale=None,
         pump=None,
@@ -324,17 +316,12 @@ def test_instrument_connections(
         arduino=None,
         global_logger=logger,
         experiment_logger=logger,
-        flir_camera=None,
-        opencv_camera=None,
+        camera=None,
     )
 
     # Track connected and disconnected instruments for summary
     connected_instruments = []
     disconnected_instruments = []
-
-    # Determine which type of camera to use
-    camera_type = read_camera_type()
-    logger.debug(f"Camera type set to: {camera_type}")
 
     if use_mock_instruments:
         logger.info("Using mock instruments")
@@ -344,13 +331,10 @@ def test_instrument_connections(
         instruments.pipette = MockPipette()
         instruments.arduino = MockArduinoLink()
 
-        # Setup mock camera based on the config
-        if camera_type.lower() == "webcam":
-            webcam_id, resolution = read_webcam_settings()
-            instruments.opencv_camera = MockOpenCVCamera(
-                camera_id=webcam_id, resolution=resolution
-            )
-            instruments.opencv_camera.connect()
+        # Initialize the camera (mock)
+        instruments.initialize_camera(use_mock=True)
+        connected_instruments = ["Mill", "Pump", "Arduino", "Camera"]
+        
         print("\nMock instruments initialized successfully!")
         return instruments, True
 
@@ -429,48 +413,54 @@ def test_instrument_connections(
 
     # Check for camera based on the configuration
     print("Checking camera connection...", end="\r", flush=True)
-    if camera_type.lower() == "webcam":
-        try:
-            logger.debug("Connecting to Webcam")
+    camera_type = read_camera_type().lower()
+    
+    try:
+        logger.debug(f"Connecting to camera (type: {camera_type})")
+        
+        # Create appropriate camera based on type
+        if camera_type == "flir":
+            camera_type_enum = CameraType.FLIR
+        else:
+            camera_type_enum = CameraType.OPENCV
+            
+        # Create the camera
+        if camera_type_enum == CameraType.OPENCV:
             webcam_id, resolution = read_webcam_settings()
-            camera = OpenCVCamera(camera_id=webcam_id, resolution=resolution)
-
-            if not camera.connect():
-                raise Exception(f"Failed to connect to webcam with ID {webcam_id}")
-
-            logger.debug(
-                f"Connected to webcam ID {webcam_id} at resolution {resolution}"
+            camera = CameraFactory.create_camera(
+                camera_type=camera_type_enum,
+                camera_id=webcam_id,
+                resolution=resolution
             )
-            print("Webcam connected                        ", flush=True)
-            connected_instruments.append("Webcam")
+        else:
+            camera = CameraFactory.create_camera(camera_type=camera_type_enum)
+            
+        # If FLIR camera creation failed but PySpin is available, show specific message
+        if camera is None and camera_type == "flir":
+            from .hardware.imaging.flir_camera import PYSPIN_AVAILABLE
+            if PYSPIN_AVAILABLE:
+                raise Exception("Failed to create FLIR camera (hardware not found)")
+            else:
+                raise Exception("PySpin library not available")
+        
+        # If camera is created but fails to connect
+        if camera is not None and not camera.connect():
+            raise Exception(f"Failed to connect to {camera_type} camera")
+            
+        # At this point, we have a successfully connected camera
+        logger.debug(f"Successfully connected to {camera_type} camera")
+        print(f"{camera_type.capitalize()} camera connected                        ", flush=True)
+        connected_instruments.append(f"{camera_type.capitalize()} Camera")
+        
+        # Clean up
+        if camera is not None:
             camera.close()
-        except Exception as error:
-            logger.error(f"No webcam connected, {error}")
-            print("Webcam not found                        ", flush=True)
-            disconnected_instruments.append("Webcam")
-            incomplete = True
-    else:
-        # Default to FLIR camera
-        try:
-            logger.debug("Connecting to FLIR Camera")
-            system = PySpin.System.GetInstance()
-            cam_list = system.GetCameras()
-            if cam_list.GetSize() == 0:
-                raise Exception("No FLIR Camera found")
-
-            camera = cam_list.GetByIndex(0)
-            logger.debug("Connected to FLIR Camera")
-            print("FLIR Camera connected                        ", flush=True)
-            connected_instruments.append("FLIR Camera")
-
-            # Clean up
-            cam_list.Clear()
-            system.ReleaseInstance()
-        except Exception as error:
-            logger.error("No FLIR Camera connected, %s", error)
-            print("FLIR Camera not found                        ", flush=True)
-            disconnected_instruments.append("FLIR Camera")
-            incomplete = True
+            
+    except Exception as error:
+        logger.error(f"No {camera_type} camera connected: {error}")
+        print(f"{camera_type.capitalize()} camera not found                        ", flush=True)
+        disconnected_instruments.append(f"{camera_type.capitalize()} Camera")
+        incomplete = True
 
     # Potentiostat connection
     print("Checking Potentiostat connection...", end="\r", flush=True)
