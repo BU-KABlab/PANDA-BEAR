@@ -4,10 +4,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 
-from panda_lib.hardware import OBSController, arduino_interface
-from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
-from panda_lib.hardware.gantry_interface import PandaMill
-from panda_lib.sql_tools.panda_models import Base
+from src.panda_lib.hardware import arduino_interface
+from src.panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
+from src.panda_lib.hardware.gantry_interface import PandaMill
+from src.panda_lib.sql_tools.panda_models import Base
+from src.shared_utilities.config.config_tools import read_config_value
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
@@ -22,9 +23,6 @@ pause = 5
 def main():
     # Set up the OBS controller
     try:
-        obs_controller = OBSController()
-        obs_controller.set_recording_file_name("decapper_validation")
-        obs_controller.place_text_on_screen("Decapper validation program")
         # obs_controller.start_recording()
         # populate the database with the vial
         vkwargs = VialKwargs(
@@ -50,7 +48,7 @@ def main():
         print(f"Vial {vial} has been created")
         # Set up the hardware connections
         with PandaMill() as mill:
-            with arduino_interface.ArduinoLink() as arduino:
+            with arduino_interface.ArduinoLink(port_address=read_config_value("ARDUINO", "port")) as arduino:
                 # Check the tools in the tool manager
                 print("Tools in the tool manager:")
                 for tool in mill.tool_manager.tool_offsets.values():
@@ -65,7 +63,7 @@ def main():
                     exit()
 
                 # Run the decapping validation program
-                decapping_validation(mill, vial, arduino, obs_controller)
+                decapping_validation(mill, vial, arduino)
     except Exception as e:
         print(e)
     finally:
@@ -77,7 +75,6 @@ def decapping_validation(
     mill: PandaMill,
     vial: StockVial,
     arduino: arduino_interface.ArduinoLink,
-    obs: OBSController,
 ):
     # Outline of the validation program:
     # 100x decapping and capping of the vial
@@ -85,15 +82,15 @@ def decapping_validation(
     # 100x decapping, bringing the pipette to the vial bottom, and then capping the vial
     arduino.curvature_lights_on()
     # Decap and cap the vial 100 times with progress bar
-    obs.place_text_on_screen(f"Decapping and capping the vial {repetitions} times")
+    print(f"Decapping and capping the vial {repetitions} times")
     for i in tqdm(range(repetitions), desc="Decapping and capping"):
-        obs.place_text_on_screen(
+        print(
             f"Decapping and capping the vial {repetitions} times: decapping \n{i + 1} of {repetitions}"
         )
         decapping_sequence(
             mill, Coordinates(vial.coordinates.x, vial.coordinates.y, vial.top), arduino
         )
-        obs.place_text_on_screen(
+        print(
             f"Decapping and capping the vial {repetitions} times: capping \n{i + 1} of {repetitions}"
         )
         capping_sequence(
@@ -101,25 +98,25 @@ def decapping_validation(
         )
 
     # Pause for 1 hour
-    obs.place_text_on_screen(f"Pausing for {round(pause / 3600, 0)} hour: 3600 seconds")
+    print(f"Pausing for {round(pause / 3600, 0)} hour: 3600 seconds")
     for i in tqdm(range(pause), desc="Pausing for 1 hour"):
-        obs.place_text_on_screen(
+        print(
             f"Pausing for {round(pause / 3600, 0)} hour: {pause - i} seconds"
         )
         time.sleep(1)
 
     # Decap, move the pipette to the vial bottom, and cap the vial 100 times with progress bar
-    obs.place_text_on_screen(
+    print(
         f"Decapping, dipping pipette, and capping the vial {repetitions} times"
     )
     for i in tqdm(range(repetitions), desc="Decapping, moving pipette, and capping"):
-        obs.place_text_on_screen(
+        print(
             f"Decapping, dipping pipette, and capping the vial {repetitions} times: decapping \n{i + 1} of {repetitions}"
         )
         decapping_sequence(
             mill, Coordinates(vial.coordinates.x, vial.coordinates.y, vial.top), arduino
         )
-        obs.place_text_on_screen(
+        print(
             f"Decapping, dipping pipette, and capping the vial {repetitions} times: moving pipette \n{i + 1} of {repetitions}"
         )
         mill.safe_move(
@@ -128,14 +125,14 @@ def decapping_validation(
             vial.bottom,
             tool="pipette",
         )
-        obs.place_text_on_screen(
+        print(
             f"Decapping, dipping pipette, and capping the vial {repetitions} times: capping \n{i + 1} of {repetitions}"
         )
         capping_sequence(
             mill, Coordinates(vial.coordinates.x, vial.coordinates.y, vial.top), arduino
         )
 
-    obs.place_text_on_screen(
+    print(
         f"Decapping and capping the vial {repetitions} times: Done"
     )
     arduino.curvature_lights_off()
