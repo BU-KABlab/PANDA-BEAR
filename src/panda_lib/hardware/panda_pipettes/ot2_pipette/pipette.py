@@ -9,7 +9,7 @@ import json
 import logging
 import os
 
-from panda_lib.hardware.arduino_interface import ArduinoLink
+from ...arduino_interface import ArduinoLink
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def tip_check(func):
                 "Error: No tip is attached. Cannot complete this action"
             )
         else:
-            func(self, *args, **kwargs)
+            return func(self, *args, **kwargs)
 
     return wrapper
 
@@ -55,7 +55,6 @@ class Pipette:
         stepper: ArduinoLink,
     ):
         """Initialize the pipette object
-
 
         :param name: The name associated with the tool (e.g. 'p300_single')
         :type name: str
@@ -89,13 +88,29 @@ class Pipette:
         self.is_primed = False
         self.position = 0.0
         self.stepper: ArduinoLink = stepper
+        self.has_tip = True
+
+        # Initialize the pipette
+        self._initialize()
+
+    def _initialize(self):
+        """Initialize the pipette by checking status and homing if needed"""
+        try:
+            response = self.get_status()
+            # If we get a valid response, check if the pipette is already homed
+            if not response.get("homed", False):
+                logger.info("Pipette not homed, homing now...")
+                self.home()
+        except Exception as e:
+            logger.warning("Error initializing pipette: %s. Will try to home.", str(e))
+            self.home()
 
     @classmethod
     def from_config(
         cls,
         index,
         name,
-        config_file: str = "src\panda_lib\hardware\panda_pipettes\ot2_pipette\definitions\single_channel\P300.json",
+        config_file: str = "src/panda_lib/hardware/panda_pipettes/ot2_pipette/definitions/single_channel/P300.json",
         path: str = os.path.join(os.path.dirname(__file__), "configs"),
     ):
         """Initialize the pipette object from a config file
@@ -120,8 +135,9 @@ class Pipette:
         return cls(index, name, **kwargs)
 
     def post_load(self):
-        """Prime the Pipette after loading it onto the Machine sot hat it is ready to use"""
+        """Prime the Pipette after loading it onto the Machine so that it is ready to use"""
         self.prime()
+        logger.info("Pipette %s loaded and primed", self.name)
 
     def vol2move(self, vol):
         """Converts desired volume in uL to a movement of the pipette motor axis
@@ -131,9 +147,33 @@ class Pipette:
         :return: The corresponding motor movement in mm
         :rtype: float
         """
-        dv = vol * self.mm_to_ul
+        if vol < self.min_volume or vol > self.max_volume:
+            logger.warning(
+                "Volume %s uL is outside pipette range (%s-%s uL)",
+                vol,
+                self.min_volume,
+                self.max_volume,
+            )
+            vol = max(min(vol, self.max_volume), self.min_volume)
 
-        return dv
+        return vol * self.mm_to_ul
+
+    def home(self):
+        """Home the pipette to establish the zero position
+
+        :return: True if homing was successful
+        :rtype: bool
+        """
+        response = self.stepper.pipette_send("9")  # CMD_PIPETTE_HOME
+
+        if not response.get("success", False):
+            error_msg = response.get("message", "Unknown error")
+            logger.error("Failed to home pipette: %s", error_msg)
+            return False
+
+        logger.info("Pipette successfully homed")
+        self.is_primed = False
+        return True
 
     def prime(self, s=2500):
         """Moves the plunger to the low-point on the pipette motor axis to prepare for further commands
@@ -142,8 +182,17 @@ class Pipette:
         :param s: The speed of the plunger movement in mm/min
         :type s: int
         """
-        self.stepper.move_to(v=self.zero_position, s=s, wait=True)
-        self.is_primed = True
+        response = self.stepper.pipette_send(f"10{self.zero_position},{s}")
+
+        if response.get("success", False):
+            self.is_primed = True
+            self.position = self.zero_position
+            logger.info("Pipette primed at position %s mm", self.position)
+        else:
+            error_msg = response.get("message", "Unknown error")
+            logger.error("Failed to prime pipette: %s", error_msg)
+
+        return response.get("success", False)
 
     @tip_check
     def aspirate(self, vol: float, s: int = 2000):
@@ -154,16 +203,22 @@ class Pipette:
         :param s: The speed of the plunger movement in mm/min
         :type s: int
         """
-        if self.is_primed:
-            pass
-        else:
+        if not self.is_primed:
             self.prime()
 
-        distance = self.vol2move(vol) * -1
-        self.get_status()
-        end_pos = self.position + distance
+        # Send the command
+        response = self.stepper.pipette_send(f"11{vol},{s}")
 
-        self.stepper.move_to(end_pos,s, True)
+        if response.get("success", False):
+            # Update position after successful aspiration
+            if "value2" in response:
+                self.position = response["value2"]
+            logger.info("Aspirated %s uL, new position: %s mm", vol, self.position)
+        else:
+            error_msg = response.get("message", "Unknown error")
+            logger.error("Failed to aspirate %s uL: %s", vol, error_msg)
+
+        return response.get("success", False)
 
     @tip_check
     def dispense(self, vol: float, s: int = 2000):
@@ -173,80 +228,98 @@ class Pipette:
         :type vol: float
         :param s: The speed of the plunger movement in mm/min
         :type s: int
-
-        Note:: Ideally the user does not call this functions directly, but instead uses the :method:`dispense` method
         """
-        dv = self.vol2move(vol)
-        self.get_status()
-        end_pos = self.position + dv
+        # Send the command
+        response = self.stepper.pipette_send(f"12{vol},{s}")
 
-        # TODO: Figure out why checks break for transfer, work fine for manually aspirating and dispensing
-        # if end_pos > self.zero_position:
-        #    raise ToolStateError("Error: Pipette does not have anything to dispense")
-        # elif dv > self.zero_position:
-        #    raise ToolStateError ("Error : The volume to be dispensed is greater than what was aspirated")
-        self.stepper.move_to(end_pos,s, True)
+        if response.get("success", False):
+            # Update position after successful dispensing
+            if "value2" in response:
+                self.position = response["value2"]
+            logger.info("Dispensed %s uL, new position: %s mm", vol, self.position)
+        else:
+            error_msg = response.get("message", "Unknown error")
+            logger.error("Failed to dispense %s uL: %s", vol, error_msg)
+
+        return response.get("success", False)
 
     @tip_check
     def blowout(self, s: int = 6000):
         """Blows out any remaining liquid in the pipette tip
 
-        :param s: The speed of the plunger movement in mm/min, defaults to 3000
+        :param s: The speed of the plunger movement in mm/min, defaults to 6000
         :type s: int, optional
         """
-        self.prime()
+        # Blowout is essentially just moving to the blowout position
+        response = self.stepper.pipette_send(f"10{self.blowout_position},{s}")
+
+        if response.get("success", False):
+            self.position = self.blowout_position
+            logger.info("Performed blowout, position: %s mm", self.position)
+        else:
+            error_msg = response.get("message", "Unknown error")
+            logger.error("Failed to perform blowout: %s", error_msg)
+
+        return response.get("success", False)
 
     @tip_check
-    def air_gap(self, vol):
+    def air_gap(self, vol, s: int = 2000):
         """Moves the plunger upwards to aspirate air into the pipette tip
 
         :param vol: The volume of air to aspirate in uL
         :type vol: float
+        :param s: The speed of the plunger movement in mm/min
+        :type s: int, optional
         """
-        # TODO: Add a check to ensure compounded volume does not exceed max volume of pipette
-
-        dv = self.vol2move(vol) * -1
-        self.stepper.move(v=-1 * dv)
+        # Air gap is functionally the same as aspirate, but we might want to differentiate
+        # in logs or behavior later
+        logger.info("Creating air gap of %s uL", vol)
+        return self.aspirate(vol, s)
 
     @tip_check
-    def mix(self, vol: float, n: int, s: int = 5500):  # FIXME
+    def mix(self, vol: float, n: int, s: int = 5500):
         """Mixes liquid by alternating aspirate and dispense steps for the specified number of times
 
         :param vol: The volume of liquid to mix in uL
         :type vol: float
         :param n: The number of times to mix
         :type n: int
+        :param s: The speed of the plunger movement in mm/min, defaults to 5500
+        :type s: int, optional
+        """
+        # Use the built-in mix command if available
+        response = self.stepper.pipette_send(f"15{vol},{n},{s}")
+
+        if response.get("success", False):
+            logger.info("Mixed %s uL %s times at speed %s", vol, n, s)
+        else:
+            # Fall back to manual mixing if the command failed
+            logger.warning("Mix command failed, falling back to manual mixing")
+            for _ in range(n):
+                self.aspirate(vol, s)
+                self.dispense(vol, s)
+
+        return response.get("success", False)
+
+    @tip_check
+    def drop_tip(self, s: int = 5000):
+        """Moves the plunger to eject the pipette tip
+
         :param s: The speed of the plunger movement in mm/min, defaults to 5000
         :type s: int, optional
         """
-        v = self.vol2move(vol) * -1
+        # Move to the drop tip position
+        response = self.stepper.pipette_send(f"10{self.drop_tip_position},{s}")
 
-        self.stepper.pipette_move_to(z=self.current_well.top_ + 1)
-        self.prime()
+        if response.get("success", False):
+            self.has_tip = False
+            self.position = self.drop_tip_position
+            logger.info("Tip dropped")
+        else:
+            error_msg = response.get("message", "Unknown error")
+            logger.error("Failed to drop tip: %s", error_msg)
 
-        # TODO: figure out a better way to indicate mixing height position that is not hardcoded
-        self.stepper.pipette_move_to(z=self.current_well.bottom_ + 1)
-        for i in range(0, n):
-            self._aspirate(vol, s=s)
-            self.prime(s=s)
-
-    @tip_check
-    def _drop_tip(self):
-        """Moves the plunger to eject the pipette tip
-
-        :raises ToolConfigurationError: If the pipette does not have a tip attached
-        """
-        self.stepper.pipette_move_to(v=self.drop_tip_position, s=5000)
-
-    def prime(self):
-        """Moves the plunger to the low-point on the pipette motor axis to prepare for further commands
-        Note::This position should not engage the pipette tip plunger
-
-        :param s: The speed of the plunger movement in mm/min
-        :type s: int
-        """
-        self.stepper.pipette_move_to(v=self.zero_position, s=5000, wait=True)
-        self.is_primed = True
+        return response.get("success", False)
 
     def get_status(self):
         """Returns the current status of the pipette
@@ -254,6 +327,27 @@ class Pipette:
         :return: The current status of the pipette
         :rtype: dict
         """
-        status= self.stepper.get_status()
-        self.position = status["p"]
-        self.max_volume = status["mxv"]
+        response = self.stepper.pipette_send("13")  # CMD_PIPETTE_STATUS
+
+        if response.get("success", False):
+            # Extract key status information
+            if "value1" in response and "value2" in response and "value3" in response:
+                status = {
+                    "homed": bool(response["value1"]),
+                    "position": response["value2"],
+                    "max_volume": response["value3"],
+                }
+
+                # Update the object's state
+                self.position = status["position"]
+                self.max_volume = status["max_volume"]
+
+                logger.debug("Pipette status: %s", status)
+                return status
+            else:
+                # Legacy format support
+                return response
+        else:
+            error_msg = response.get("message", "Unknown error")
+            logger.error("Failed to get pipette status: %s", error_msg)
+            return {"success": False, "message": error_msg}

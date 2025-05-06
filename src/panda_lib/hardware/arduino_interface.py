@@ -75,7 +75,8 @@ class ArduinoLink:
     - move_to (moves the pipette to a specific position in mm)
     - aspirate (aspirates a specific volume in µL)
     - dispense (dispenses a specific volume in µL)
-
+    - mix (mixes by performing multiple aspirate/dispense cycles)
+    - move_relative (moves the pipette in a specific direction by a certain number of steps)
 
 
     The class provides the following attributes:
@@ -100,12 +101,6 @@ class ArduinoLink:
         self._running = False
         self._event_queue = asyncio.Queue()
         self.pipette_active = True
-        # self.position = 0.0
-        # self.volume = 0.0
-        # self.max_volume = 300.0
-        # self.min_volume = 20.0
-        # self.zero_position = 0.0
-        # self.max_position = 60.0
         self.logger = logging.getLogger("panda")
         self.connect()
 
@@ -423,42 +418,122 @@ class ArduinoLink:
             print(value)
             i -= 1
 
-    def pipette_send(self, cmd) -> str:
+    def pipette_send(self, cmd) -> dict:
         """Send a command to the pipette
 
         Arguments:
             cmd: The command to send to the pipette
 
         Returns:
-            str: The response from the pipette
+            dict: The parsed response from the pipette
 
         Raises:
             Exception: If there is an error during communication with the pipette
             ConnectionError: If the pipette is not connected or configured properly
-
         """
         try:
             self.ser.flush()
             self.ser.read_all()
             self.ser.write(str(cmd).encode())
             time.sleep(0.5)
-            rx = self.ser.read_until(b"DONE\n").strip()
-            # Look for OK: or ERR: at beginning
-            if rx.startswith(b"OK:"):
-                rx = rx[3:]
-            elif rx.startswith(b"ERR:"):
-                raise Exception(rx)
-            else:
-                raise ConnectionError
-            return rx.decode()
 
-        except ConnectionError:
+            # Read until we get a newline
+            rx = self.ser.read_until(b"\n").strip()
+
+            # Parse the response
+            if rx.startswith(b"OK:"):
+                response_data = rx[3:].decode()  # Remove OK: prefix
+
+                # Check if this is a JSON-like response
+                if response_data.startswith("{") and response_data.endswith("}"):
+                    return self._parse_json_response(response_data, success=True)
+
+                # Handle legacy format if needed
+                if "DONE" in response_data:
+                    response_data = response_data.replace("DONE", "").strip()
+
+                # Simple comma-separated values format
+                if "," in response_data:
+                    parts = response_data.split(",")
+                    if len(parts) >= 3:
+                        return {
+                            "success": True,
+                            "homed": bool(int(parts[0].strip())),
+                            "position": float(parts[1].strip()),
+                            "max_volume": float(parts[2].strip()),
+                        }
+                return {"success": True, "data": response_data}
+
+            elif rx.startswith(b"ERR:"):
+                response_data = rx[4:].decode()  # Remove ERR: prefix
+
+                # Check if this is a JSON-like response
+                if response_data.startswith("{") and response_data.endswith("}"):
+                    return self._parse_json_response(response_data, success=False)
+
+                # Legacy error format
+                return {"success": False, "error": response_data}
+
+            else:
+                raise ConnectionError(f"Unexpected response format: {rx}")
+
+        except ConnectionError as e:
             self.logger.error("Pipette not connected or configured properly")
-            raise ConnectionError("Pipette not connected or configured properly")
+            raise ConnectionError("Pipette not connected or configured properly") from e
 
         except Exception as e:
-            self.logger.error(f"Error during pipette send: {str(e)}")
-            raise Exception(f"Error during pipette send: {str(e)}")
+            self.logger.error("Error during pipette send: %s", str(e))
+            raise Exception(f"Error during pipette send: {str(e)}") from e
+
+    def _parse_json_response(self, response_str, success=True):
+        """Parse a JSON-like response from the Arduino
+
+        Args:
+            response_str: The JSON-like response string
+            success: Whether this was marked as a success response
+
+        Returns:
+            dict: Parsed response data
+        """
+        result = {"success": success}
+
+        # Remove curly braces
+        content = response_str.strip("{}").strip()
+
+        if not content:
+            return result
+
+        # Parse the key-value pairs
+        parts = content.split(",")
+
+        for part in parts:
+            if ":" not in part:
+                continue
+
+            key, value = part.split(":", 1)
+
+            # Clean up keys and values
+            key = key.strip().strip('"')
+            value = value.strip().strip('"')
+
+            if key == "msg":
+                result["message"] = value
+            elif key == "v":
+                # Parse array values
+                if value.startswith("[") and value.endswith("]"):
+                    values = value.strip("[]").split(",")
+                    if len(values) >= 1:
+                        try:
+                            result["value1"] = float(values[0].strip())
+                            if len(values) >= 2:
+                                result["value2"] = float(values[1].strip())
+                            if len(values) >= 3:
+                                result["value3"] = float(values[2].strip())
+                        except ValueError:
+                            # If any conversion fails, just store the raw values
+                            result["values"] = [v.strip() for v in values]
+
+        return result
 
     def home(self) -> bool:
         """
@@ -471,8 +546,8 @@ class ArduinoLink:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_HOME.value)
             return response
         except Exception as e:
-            self.logger.error(f"Error during homing: {str(e)}")
-            raise Exception(f"Error during homing: {str(e)}")
+            self.logger.error("Error during homing: %s", str(e))
+            raise Exception(f"Error during homing: {str(e)}") from e
 
     def get_status(self) -> Dict[str, Any]:
         """
@@ -484,6 +559,7 @@ class ArduinoLink:
         try:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
             status = {}
+            parts = []
 
             # Parse the new format: "OK:isHomed,position,maxVolume"
             # Example: "1,25,300"
@@ -494,13 +570,11 @@ class ArduinoLink:
                 status["p"] = float(parts[1].strip())
                 status["mxv"] = float(parts[2].strip())
         except Exception as e:
-            self.logger.error(f"Error getting status: {str(e)}")
+            self.logger.error("Error getting status: %s", str(e))
             return {}
         return status
 
-    def move_to(
-        self, position: float, speed: Optional[int] = None, wait: bool = True
-    ) -> bool:
+    def move_to(self, position: float, speed: Optional[int] = None) -> bool:
         """
         Move to a specific position in mm.
 
@@ -519,8 +593,8 @@ class ArduinoLink:
             response = self.pipette_send(cmd)
             return response
         except Exception as e:
-            self.logger.error(f"Error during movement: {str(e)}")
-            raise Exception(f"Error during movement: {str(e)}")
+            self.logger.error("Error during movement: %s",str(e))
+            raise Exception(f"Error during movement: {str(e)}") from e
 
     def move_relative(self, direction, steps, velocity, wait):
         """
@@ -538,8 +612,8 @@ class ArduinoLink:
             response = self.pipette_send(cmd)
             return response
         except Exception as e:
-            self.logger.error(f"Error during movement: {str(e)}")
-            raise Exception(f"Error during movement: {str(e)}")
+            self.logger.error("Error during movement: %s",str(e))
+            raise Exception(f"Error during movement: {str(e)}") from e
 
     def aspirate(self, volume: float, rate: Optional[float] = None) -> bool:
         """
@@ -559,8 +633,8 @@ class ArduinoLink:
             response = self.pipette_send(cmd)
             return response
         except Exception as e:
-            self.logger.error(f"Error during aspiration: {str(e)}")
-            raise Exception(f"Error during aspiration: {str(e)}")
+            self.logger.error("Error during aspiration: %s", str(e))
+            raise Exception(f"Error during aspiration: {str(e)}") from e
 
     def dispense(self, volume: float, rate: Optional[float] = None) -> bool:
         """
@@ -581,7 +655,7 @@ class ArduinoLink:
             response = self.pipette_send(cmd)
             return response
         except Exception as e:
-            self.logger.error(f"Error during dispensing: {str(e)}")
+            self.logger.error("Error during dispensing: %s", str(e))
             raise Exception(f"Error during dispensing: {str(e)}")
 
     def mix(
@@ -608,8 +682,8 @@ class ArduinoLink:
             response = self.pipette_send(cmd)
             return response
         except Exception as e:
-            self.logger.error(f"Error during mixing: {str(e)}")
-            raise Exception(f"Error during mixing: {str(e)}")
+            self.logger.error("Error during mixing: %s", str(e))
+            raise Exception(f"Error during mixing: {str(e)}") from e
 
     def hello(self):
         """Send a hello message to the Arduino"""
@@ -784,7 +858,7 @@ def test_of_pawduino():
             return
         for function in PawduinoFunctions:
             print(
-                f"Sending '{function.name}' to the Arduino. Expecting return code {PawduinoReturnCodes[function.name].value}"
+                f"Sending '{function.name}'. Expecting {PawduinoReturnCodes[function.name].value}"
             )
             response = arduino.send(function.value)
             print(f"Arduino returned: {response}")
