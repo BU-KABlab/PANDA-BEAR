@@ -850,7 +850,7 @@ def main():
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
             try:
                 num, p_type, new_wells = wellplates.read_current_wellplate_info()
-            except Exception as e:
+            except Exception:
                 num, p_type, new_wells = 0, 0, 0
             try:
                 current_pipette = select_pipette_status()
