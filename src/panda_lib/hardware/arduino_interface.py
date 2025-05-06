@@ -68,14 +68,14 @@ class ArduinoLink:
     - start_monitoring (starts a background task to monitor the Arduino messages)
     - stop_monitoring (stops the background task to monitor the Arduino messages)
     - get_next_message (gets the next message from the event queue) *available asynchronously
-    
+
     Pipette Specific Methods:
     - home (homes the pipette)
     - get_status (gets the current status of the pipette)
     - move_to (moves the pipette to a specific position in mm)
     - aspirate (aspirates a specific volume in µL)
     - dispense (dispenses a specific volume in µL)
-    
+
 
 
     The class provides the following attributes:
@@ -250,7 +250,7 @@ class ArduinoLink:
 
     def send(self, cmd):
         """Send a message to the Arduino and wait for a response"""
-        self.ser.flush() # Flush the input buffer
+        self.ser.flush()  # Flush the input buffer
         msg = str(cmd)
         attempts = 0
         while True and attempts < 3:
@@ -291,7 +291,7 @@ class ArduinoLink:
 
         if rx is None:
             raise ConnectionError
-        
+
         else:
             if ":" in rx:
                 success = rx.split(":")[0] == "OK"
@@ -425,7 +425,7 @@ class ArduinoLink:
 
     def pipette_send(self, cmd) -> str:
         """Send a command to the pipette
-        
+
         Arguments:
             cmd: The command to send to the pipette
 
@@ -435,7 +435,7 @@ class ArduinoLink:
         Raises:
             Exception: If there is an error during communication with the pipette
             ConnectionError: If the pipette is not connected or configured properly
-        
+
         """
         try:
             self.ser.flush()
@@ -484,7 +484,7 @@ class ArduinoLink:
         try:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
             status = {}
-            
+
             # Parse the new format: "OK:isHomed,position,maxVolume"
             # Example: "1,25,300"
             if "OK:" in response:
@@ -498,7 +498,9 @@ class ArduinoLink:
             return {}
         return status
 
-    def move_to(self, position: float, speed: Optional[int] = None, wait:bool = True) -> bool:
+    def move_to(
+        self, position: float, speed: Optional[int] = None, wait: bool = True
+    ) -> bool:
         """
         Move to a specific position in mm.
 
@@ -520,7 +522,7 @@ class ArduinoLink:
             self.logger.error(f"Error during movement: {str(e)}")
             raise Exception(f"Error during movement: {str(e)}")
 
-    def move_relative(self, direction, steps, velocity, wait)
+    def move_relative(self, direction, steps, velocity, wait):
         """
         Move the pipette in a specific direction by a certain number of steps.
 
@@ -538,7 +540,7 @@ class ArduinoLink:
         except Exception as e:
             self.logger.error(f"Error during movement: {str(e)}")
             raise Exception(f"Error during movement: {str(e)}")
-        
+
     def aspirate(self, volume: float, rate: Optional[float] = None) -> bool:
         """
         Aspirate a specific volume in µL.
