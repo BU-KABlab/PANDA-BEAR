@@ -103,6 +103,9 @@ class ArduinoLink:
         self.pipette_active = True
         self.logger = logging.getLogger("panda")
 
+        # Automatically connect
+        self.connect()
+
     def __enter__(self):
         """For use in a with statement"""
         self.connect()
@@ -882,7 +885,7 @@ def test_of_pawduino():
 
 async def async_test_of_pawduino():
     """Test the pawduino sketch asynchronously."""
-    arduino = ArduinoLink().connect()
+    arduino = ArduinoLink()
     try:
         if arduino.configured is False:
             print("Failed to configure the Arduino")

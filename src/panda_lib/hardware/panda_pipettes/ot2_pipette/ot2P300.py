@@ -58,7 +58,7 @@ class OT2P300:
         Initialize the OT2P300 Pipette interface.
         """
         self.connected = False
-        self.arduino = ArduinoInterface().connect()
+        self.arduino = ArduinoInterface()
         # Configuration constants
         self.max_p300_rate = config.getfloat(
             "P300", "max_pipetting_rate", fallback=50.0
@@ -515,7 +515,6 @@ class MockOT2P300(OT2P300):
     def _connect_to_arduino(self):
         """Connect to a mock Arduino driver"""
         self.arduino = MockArduinoInterface()
-        self.arduino.connect()
         self.connected = True
         p300_control_logger.info("Connected to mock Arduino pipette driver")
 

@@ -276,7 +276,7 @@ def connect_to_instruments(
     # Connect to Arduino
     try:
         logger.debug("Connecting to Arduino")
-        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port")).connect()
+        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
         if not arduino.configured:
             logger.error("No Arduino connected")
             incomplete = True
@@ -394,21 +394,21 @@ def test_instrument_connections(
         connected_instruments.append("Pump")
 
     else:
-        print("Checking pump connection...", end="\r", flush=True)
+        print("Checking pipette connection...", end="\r", flush=True)
         try:
-            logger.debug("Connecting to pump")
+            logger.debug("Connecting to pipette")
             pipette = Pipette()
             if pipette.connected:
-                logger.debug("Connected to pump at %s", pipette.pump.address)
-                print("Pump connected                        ", flush=True)
-                connected_instruments.append("Pump")
+                logger.debug("Connected to pipette at %s", pipette.pump.address)
+                print("pipette connected                        ", flush=True)
+                connected_instruments.append("pipette")
             else:
-                raise Exception("Failed to connect to pump")
+                raise Exception("Failed to connect to pipette")
             pipette.close()
         except Exception as error:
-            logger.error("No pump connected, %s", error)
-            print("Pump not found                        ", flush=True)
-            disconnected_instruments.append("Pump")
+            logger.error("No pipette connected, %s", error)
+            print("Pipette not found                        ", flush=True)
+            disconnected_instruments.append("Pipette")
             incomplete = True
 
     # Check for camera based on the configuration
@@ -564,7 +564,8 @@ def test_instrument_connections(
     print("Checking Arduino connection...", end="\r", flush=True)
     try:
         logger.debug("Connecting to Arduino")
-        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port")).connect()
+        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
+
         if not arduino.configured:
             raise Exception("Arduino not properly configured")
 
