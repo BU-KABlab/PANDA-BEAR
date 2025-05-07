@@ -108,7 +108,6 @@ class ArduinoLink:
 
     def __enter__(self):
         """For use in a with statement"""
-        self.connect()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
