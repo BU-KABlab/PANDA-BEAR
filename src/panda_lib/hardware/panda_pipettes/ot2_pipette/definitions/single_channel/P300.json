@@ -1,4 +1,5 @@
 {
+    "name": "P300",
     "brand": "Opentrons OT2",
     "model": "P300 Gen 2",
     "max_volume": 300,

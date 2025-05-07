@@ -42,7 +42,6 @@ class Pipette:
 
     def __init__(
         self,
-        index,
         name,
         brand,
         model,
@@ -108,21 +107,36 @@ class Pipette:
     @classmethod
     def from_config(
         cls,
-        index,
-        name,
-        config_file: str = "src/panda_lib/hardware/panda_pipettes/ot2_pipette/definitions/single_channel/P300.json",
-        path: str = os.path.join(os.path.dirname(__file__), "configs"),
-    ):
+        stepper: ArduinoLink,
+        config_file: str = "P300.json",
+        path: str = os.path.join(os.path.dirname(__file__), "definitions", "single_channel"),
+    ) -> "Pipette":
         """Initialize the pipette object from a config file
 
+        Use by calling the class method `from_config` with the appropriate parameters.
+        example:
+        .. code-block:: python
+            pipette = Pipette.from_config(index=0, name="p300_single")
+        This will load the pipette configuration from the specified JSON file.
+        The JSON file should contain the following keys:
+        - `brand`: The brand of the pipette
+        - `model`: The model of the pipette
+        - `max_volume`: The maximum volume of the pipette in uL
+        - `min_volume`: The minimum volume of the pipette in uL
+        - `zero_position`: The position of the plunger before using a :method:`aspirate` step
+        - `blowout_position`: The position of the plunger for running a :method:`blowout` step
+        - `drop_tip_position`: The position of the plunger for running a :method:`drop_tip` step
+        - `mm_to_ul`: The conversion factor for converting motor microsteps in mm to uL
+        
+        
         :param index: The tool index of the pipette on the machine
         :type index: int
         :param name: The tool name
         :type name: str
-        :param config_file: The name of the config file containign the pipette parameters
+        :param config_file: The name of the config file containing the pipette parameters
         :type config_file: str
         :param path: The path to the pipette configuration `.json` files for the tool,
-                defaults to the 'config/' in the science_jubilee/tools/configs directory.
+                defaults to the 'definitions/single_channel/' directory relative to this file.
         :returns: A :class:`Pipette` object
         :rtype: :class:`Pipette`
         """
@@ -132,7 +146,7 @@ class Pipette:
         with open(config) as f:
             kwargs = json.load(f)
 
-        return cls(index, name, **kwargs)
+        return cls(stepper=stepper, **kwargs)
 
     def post_load(self):
         """Prime the Pipette after loading it onto the Machine so that it is ready to use"""

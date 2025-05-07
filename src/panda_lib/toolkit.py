@@ -228,32 +228,25 @@ def connect_to_instruments(
         # raise error
         incomplete = True
 
-    # try:
-    #     logger.debug("Connecting to scale")
-    #     scale = Scale(address="COM6")
-    #     info_dict = scale.get_info()
-    #     model = info_dict["model"]
-    #     serial = info_dict["serial"]
-    #     software = info_dict["software"]
-    #     if not model:
-    #         logger.error("No scale connected")
-    #         # raise Exception("No scale connected")
-    #     logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
-    # except Exception as error:
-    #     logger.error("No scale connected, %s", error)
-    #     instruments.scale = None
-    #     # raise error
-    #     incomplete = True
-
+    # Connect to scale
     try:
-        logger.debug("Connecting to pump")
-        instruments.pipette = Pipette()
-        logger.debug("Connected to pump at %s", instruments.pipette.pump.address)
-
+        logger.debug("Connecting to scale")
+        port = read_config_value("SCALE", "port")
+        if not port:
+            raise Exception("No scale port specified in the configuration file")
+        instruments.scale = Scale(address=port)
+        if instruments.scale.hw.open:
+            info_dict = instruments.scale.get_info()
+            model = info_dict["model"]
+            if not model:
+                instruments.scale.hw.close()
+                raise Exception("Scale connected but no model information returned")
+            logger.debug("Connected to scale: %s", model)
+        else:
+            raise Exception("Failed to open connection to scale")
     except Exception as error:
-        logger.error("No pump connected, %s", error)
-        instruments.pipette = None
-        # raise error
+        logger.error("No scale connected, %s", error)
+        instruments.scale = None
         incomplete = True
 
     # Initialize the camera
@@ -286,6 +279,32 @@ def connect_to_instruments(
     except Exception as error:
         logger.error("Error connecting to Arduino, %s", error)
         incomplete = True
+
+    # Connect to the pump or pipette depending on configuration
+    # Check if the config specifies a syringe pump. If not skip the check
+    syringe_pump = read_config_value("PIPETTE", "PIPETTE_TYPE")
+    pump_port = read_config_value("PUMP", "PORT")
+
+    if not pump_port:
+        logger.warning("No pump port specified in the configuration file. Will check for Pipette")
+        instruments.pipette = None
+        incomplete = True
+    elif syringe_pump in ["OT2", "ot2"]:
+        logger.debug("Connecting to OT2 Pipette")
+        try:
+            if instruments.arduino is None:
+                raise Exception("No Arduino connected")
+            stepper = instruments.arduino
+            instruments.pipette = Pipette.from_config(stepper=stepper)
+            status = instruments.pipette.get_status()
+            if status:
+                logger.debug("Connected to OT2 Pipette")
+            else:
+                raise Exception("Failed to connect to OT2 Pipette")
+        except Exception as error:
+            logger.error("No OT2 Pipette connected, %s", error)
+            instruments.pipette = None
+            incomplete = True
 
     if incomplete:
         print("Not all instruments connected")
@@ -382,34 +401,9 @@ def test_instrument_connections(
         disconnected_instruments.append("Scale")
         incomplete = True
 
-    # Pump connection
-    # Check if the config specifies a syringe pump. If not skip the check
-    syringe_pump = read_config_value("PIPETTE", "PIPETTE_TYPE")
-    if "syringe" not in syringe_pump.lower():
-        logger.debug("No syringe pump specified in the configuration file")
-        print(
-            "Syringe pump not specified in the configuration file, not checking connection",
-            flush=True,
-        )
-        connected_instruments.append("Pump")
+    
 
-    else:
-        print("Checking pipette connection...", end="\r", flush=True)
-        try:
-            logger.debug("Connecting to pipette")
-            pipette = Pipette()
-            if pipette.connected:
-                logger.debug("Connected to pipette at %s", pipette.pump.address)
-                print("pipette connected                        ", flush=True)
-                connected_instruments.append("pipette")
-            else:
-                raise Exception("Failed to connect to pipette")
-            pipette.close()
-        except Exception as error:
-            logger.error("No pipette connected, %s", error)
-            print("Pipette not found                        ", flush=True)
-            disconnected_instruments.append("Pipette")
-            incomplete = True
+    # Camera connection
 
     # Check for camera based on the configuration
     print("Checking camera connection...", end="\r", flush=True)
@@ -577,6 +571,52 @@ def test_instrument_connections(
         logger.error("Error connecting to Arduino, %s", error)
         print("Arduino not found                        ", flush=True)
         disconnected_instruments.append("Arduino")
+        incomplete = True
+
+    # Pump connection
+    # Check if the config specifies a syringe pump. If not skip the check
+    syringe_pump = read_config_value("PIPETTE", "PIPETTE_TYPE")
+    pump_port = read_config_value("PUMP", "PORT")
+    if pump_port:
+        print("Checking pump connection...", end="\r", flush=True)
+        try:
+            logger.debug("Connecting to pump")
+            pipette = Pipette()
+            if pipette.connected:
+                logger.debug("Connected to pump at %s", pipette.pump.address)
+                print("pipette connected                        ", flush=True)
+                connected_instruments.append("pump")
+            else:
+                raise Exception("Failed to connect to pump")
+            pipette.close()
+        except Exception as error:
+            logger.error("No pump connected, %s", error)
+            print("Pipette not found                        ", flush=True)
+            disconnected_instruments.append("pump")
+            incomplete = True
+    elif syringe_pump in ["OT2", "ot2"]:
+        print("Checking OT2 connection...", end="\r", flush=True)
+        try:
+            stepper = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
+            logger.debug("Connecting to OT2 Pipette")
+            pipette = Pipette.from_config(stepper=stepper)
+            status = pipette.get_status()
+            if status:
+                logger.debug("Connected to OT2 Pipette")
+                print("OT2 pipette connected                        ", flush=True)
+                connected_instruments.append("OT2 Pipette")
+            else:
+                raise Exception("Failed to connect to OT2 Pipette")
+        except Exception as error:
+            logger.error("No OT2 Pipette connected, %s", error)
+            print("OT2 pipette not found                        ", flush=True)
+            disconnected_instruments.append("OT2 Pipette")
+            incomplete = True
+    
+    else:
+        print("No pump port nor syringe pump specified in the configuration file", flush=True)
+        logger.warning("No pump port nor syringe pump specified in the configuration file")
+        disconnected_instruments.append("Pump")
         incomplete = True
 
     # Print summary
