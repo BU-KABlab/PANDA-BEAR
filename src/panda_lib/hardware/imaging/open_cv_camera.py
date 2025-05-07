@@ -47,6 +47,7 @@ class OpenCVCamera(CameraInterface):
                 f"Connected to webcam ID {self.camera_id} at resolution {self.resolution}"
             )
             return True
+
         except Exception as e:
             self.logger.error(f"Error connecting to webcam: {e}")
             return False
@@ -57,6 +58,30 @@ class OpenCVCamera(CameraInterface):
             self.camera.release()
             self.camera = None
             self.logger.info("Disconnected from webcam")
+
+    def __enter__(self) -> "OpenCVCamera":
+        """Enter the context manager"""
+        if not self.connect():
+            raise RuntimeError("Failed to connect to webcam")
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        """Exit the context manager"""
+        self.close()
+
+    def detect_camera(self) -> int:
+        """Detect available cameras
+
+        Returns:
+            int: The number of cameras detected
+        """
+        camera_count = 0
+        for i in range(10):
+            camera = cv2.VideoCapture(i)
+            if camera.isOpened():
+                camera_count += 1
+                camera.release()
+        return camera_count
 
     def is_connected(self) -> bool:
         """Check if the camera is connected
