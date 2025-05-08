@@ -19,7 +19,7 @@ import os
 import platform
 import re
 from pathlib import Path
-from typing import Sequence
+from typing import Sequence, Optional
 
 from panda_lib.hardware.gantry_interface import Coordinates
 from panda_lib.hardware.gantry_interface import MockPandaMill as MockMill
@@ -1231,15 +1231,26 @@ menu_options = {
 
 def calibrate_mill(
     use_mock_mill: bool,
-    wellplate: Wellplate,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
+    wellplate: Optional[Wellplate] = None,
+    stock_vials: Optional[Sequence[StockVial]]=None,
+    waste_vials: Optional[Sequence[WasteVial]]=None,
 ):
     """Calibrate the mill to the wellplate and stock vials"""
+    hide_choices = []
     if use_mock_mill:
         mill = MockMill
     else:
         mill = Mill
+
+    if wellplate is None:
+        print("No wellplate provided, hiding well calibration")
+        hide_choices.extend(["3", "4", "5"])
+    if stock_vials is None:
+        print("No stock vials provided, hiding vial calibration")
+        hide_choices.extend(["6"])
+    if waste_vials is None:
+        print("No waste vials provided, hiding vial calibration")
+        hide_choices.extend(["6"])
 
     # Connect to the mill
     with mill() as cncmill:
@@ -1247,6 +1258,8 @@ def calibrate_mill(
             print("\n=====================================")
             print("Welcome to the mill calibration and positioning menu:")
             for key, value in menu_options.items():
+                if key in hide_choices:
+                    continue
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
             if option == "q":
