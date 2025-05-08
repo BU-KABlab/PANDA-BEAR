@@ -409,10 +409,16 @@ def mill_calibration():
     elif mode == "auto":
         print("Automatic control of the mill")
         use_mock_mill = False
-
-    wellplate_to_use = wellplates.Wellplate()
-    stock_vials_to_use = vials.read_vials()[0]
-    waste_vials_to_use = vials.read_vials()[1]
+    try:
+        wellplate_to_use = wellplates.Wellplate()
+    except Exception:
+        wellplate_to_use = None
+    try:
+        stock_vials_to_use = vials.read_vials()[0]
+        waste_vials_to_use = vials.read_vials()[1]
+    except Exception:
+        stock_vials_to_use = None
+        waste_vials_to_use = None
 
     calibrate_mill(
         use_mock_mill, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
