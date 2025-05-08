@@ -1,18 +1,79 @@
-"""
-This module provides a class to link the computer and the Arduino
-"""
-
 import asyncio
 import enum
 import logging
 import os
 import queue
 import time
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 import serial
 import serial.tools.list_ports
 from serial import Serial
+
+
+# Define Enums and Custom Exceptions at the top
+
+
+class PawduinoFunctions(enum.Enum):
+    """Enum for Arduino commands"""
+
+    CMD_HELLO = "0"  # Initial handshake
+    CMD_WHITE_ON = "1"  # Turn on white lights
+    CMD_WHITE_OFF = "2"  # Turn off white lights
+    CMD_CONTACT_ON = "3"  # Turn on contact angle lights (blue/red)
+    CMD_CONTACT_OFF = "4"  # Turn off contact angle lights
+    CMD_EMAG_ON = "5"  # Turn on electromagnet
+    CMD_EMAG_OFF = "6"  # Turn off electromagnet
+    CMD_LINE_BREAK = "7"  # Check line break sensor
+    CMD_LINE_TEST = "8"  # Test line break sensor (sends multiple responses)
+    CMD_PIPETTE_HOME = "10"
+    CMD_PIPETTE_MOVE_TO = "11"  # Expected: 11,pos_mm,speed_opt
+    CMD_PIPETTE_ASPIRATE = "12"  # Expected: 12,vol_uL,rate_opt
+    CMD_PIPETTE_DISPENSE = "13"  # Expected: 13,vol_uL,rate_opt
+    CMD_PIPETTE_STATUS = "14"  # Get pipette status (homed, position, max_volume)
+    CMD_PIPETTE_MIX = "15"  # Expected: 15,repetitions,volume,rate_opt
+    CMD_MOVE_RELATIVE = "16"  # Expected: 16,direction,steps,velocity
+
+
+class PawduinoReturnCodes(enum.Enum):
+    """Enum for Arduino return codes (used in mock and for validation)"""
+
+    RESP_HELLO = "OK:Hello from Pawduino!"
+    RESP_WHITE_ON = "OK:White lights on"
+    RESP_WHITE_OFF = "OK:White lights off"
+    RESP_CONTACT_ON = "OK:Contact lights on"
+    RESP_CONTACT_OFF = "OK:Contact lights off"
+    RESP_EMAG_ON = "OK:Electromagnet on"
+    RESP_EMAG_OFF = "OK:Electromagnet off"
+    RESP_LINE_BREAK = 'OK:{"value1":1}'  # 1 for broken, 0 for unbroken
+    RESP_LINE_UNBROKEN = 'OK:{"value1":0}'
+    RESP_PIPETTE_HOMED = "OK:Pipette homed"
+    RESP_PIPETTE_MOVED = "OK:Pipette moved"
+    RESP_PIPETTE_ASPIRATED = "OK:Pipette aspirated"
+    RESP_PIPETTE_DISPENSED = "OK:Pipette dispensed"
+    RESP_PIPETTE_MIXED = "OK:Pipette mixed"
+    # Example: "OK:{homed:1,pos:10.5,max_vol:200}"
+    RESP_PIPETTE_STATUS = "OK:{homed:1,pos:0.0,max_vol:200.0}"
+
+
+class ArduinoException(Exception):
+    """Base class for Arduino communication errors."""
+
+
+class ArduinoConnectionError(ArduinoException):
+    """Error connecting to the Arduino."""
+
+
+class ArduinoTimeoutError(ArduinoException):
+    """Timeout during communication with Arduino."""
+
+
+class ArduinoResponseError(ArduinoException):
+    """Error in the Arduino's response or unexpected response format."""
+
+
+class ArduinoCommandError(ArduinoException):
+    """Error related to sending a command or the command itself."""
 
 
 class MockSerial:
@@ -31,7 +92,7 @@ class MockSerial:
     def write(self, data):
         self.output.append(data)
 
-    def readline(self):
+    def readline(self, timeout=None):
         try:
             return self.input.get_nowait()
         except queue.Empty:
@@ -57,8 +118,11 @@ class ArduinoLink:
     """
     This class provides a link between the computer and the Arduino
 
+    The primary interface uses synchronous methods that will block until completion.
+    For advanced use cases, asynchronous alternatives are also provided.
+
     The class provides the following methods:
-    - choose_arduino_port (choose the port that the ardiono is using)
+    - choose_arduino_port (choose the port that the Arduino is using)
     - open (opens a connection to the Arduino) *can be used contextually
     - close (closes the connection to the Arduino) *can be used contextually
     - receive (listens to the Arduino and puts the messages in the queue)
@@ -75,9 +139,6 @@ class ArduinoLink:
     - move_to (moves the pipette to a specific position in mm)
     - aspirate (aspirates a specific volume in µL)
     - dispense (dispenses a specific volume in µL)
-    - mix (mixes by performing multiple aspirate/dispense cycles)
-    - move_relative (moves the pipette in a specific direction by a certain number of steps)
-
 
     The class provides the following attributes:
     - arduinoPort (the port to which the Arduino is connected)
@@ -88,48 +149,47 @@ class ArduinoLink:
 
     arduinoQueue = queue.Queue()
 
-    def __init__(self, port_address: str = "COM4", baud_rate: int = 115200):
-        """Initialize the ArduinoLink class"""
-        self.ser: Serial = None
-        self.port_address: str = port_address
+    def __init__(
+        self,
+        port_address: str = "COM4",
+        baud_rate: int = 115200,
+        read_timeout: float = 2.0,
+        max_retries: int = 3,
+    ):
+        self.ser:Serial = None
+        self.port_address: Optional[str] = port_address
         self.baud_rate: int = baud_rate
-        self.timeout: int = 60
+        self.read_timeout: float = read_timeout  # Timeout for serial read operations
+        self.max_retries: int = max_retries  # Max retries for sending a command
         self.configured: bool = False
         self.connected: bool = False
-        self.ack: str = "OK"
         self._monitor_task = None
         self._running = False
-        self._event_queue = asyncio.Queue()
-        self.pipette_active = True
+        self._event_queue: asyncio.Queue = asyncio.Queue()
+        self.pipette_active = True  # Assuming pipette is active by default
         self.logger = logging.getLogger("panda")
-
-        # Automatically connect
         self.connect()
 
     def __enter__(self):
-        """For use in a with statement"""
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        """Close the connection to the Arduino when exiting the with statement"""
         self.close()
 
-    def _choose_arduino_port(self, interactive: bool = False) -> str:
+    def _choose_arduino_port(self, interactive: bool = False) -> Optional[str]:
         """Interactive method to choose the port that the Arduino is connected to"""
-        # Check the OS and list the available ports accordingly
         if os.name == "posix":
             ports = serial.tools.list_ports.grep("ttyACM")
         elif os.name == "nt":
             ports = list(serial.tools.list_ports.grep("COM"))
         else:
             print("Unsupported OS")
-            return
+            return None
         if not interactive:
-            # Look for Arduino LLC in the manufacturer field
             for port in ports:
-                return port.name
+                if "arduino" in port.manufacturer.lower():
+                    return port.name
 
-        # If interactive, ask the user to choose the port
         print("Available ports:")
         for i, port in enumerate(ports):
             print(f"{i}: {port.device} ({port.description})")
@@ -138,169 +198,466 @@ class ArduinoLink:
                 choice = int(input("Choose the port number: "))
                 if choice < 0 or choice >= len(ports):
                     print("Invalid choice")
-                    return
+                    return None
                 return ports[choice].device
             except ValueError:
                 print("Invalid choice")
-
+                return None
             except KeyboardInterrupt:
                 print("\nExiting...")
-                return
+                return None
             except Exception as e:
-                print(f"Error: {e}")
-                return
+                print(f"Error listing ports: {e}")
+                return None
+        return None
 
     def close(self):
-        """Close the connection to the Arduino"""
-        self.ser.close()
+        """Close the connection to the Arduino."""
+        if self._monitor_task and not self._monitor_task.done():
+            self._monitor_task.cancel()
+        if self.ser and self.ser.is_open:
+            try:
+                self.ser.close()
+                self.logger.info("Serial connection closed.")
+            except IOError as e:
+                self.logger.error("Error closing serial port: %s", e)
+        self.connected = False
+        self.configured = False
 
     def connect(self):
-        """Configure the connection to the Arduino"""
-        try:
-            if self.ser is None and self.port_address is None:
-                # If no port address is provided, choose the port interactively
-                self.ser = Serial(
-                    self._choose_arduino_port(), self.baud_rate, timeout=self.timeout
-                )
-            else:
-                self.ser = Serial(
-                    self.port_address, self.baud_rate, timeout=self.timeout
-                )
+        """Establish and configure the connection to the Arduino."""
+        if self.connected and self.configured:
+            self.logger.info("Already connected and configured.")
+            return
 
-            if self.ser.is_open:
-                # Look for acknowlegement
-                time.sleep(10)
-                rx = self.ser.read_all().decode().strip()
-                if self.ack in rx:
-                    self.configured = True
-                    self.connected = True
-                else:
-                    self.configured = False
-                    raise ConnectionError
+        if self.ser and self.ser.is_open:
+            self.ser.close()
 
-                rx = self.send(PawduinoFunctions.CMD_HELLO.value)
-                if str(PawduinoReturnCodes.RESP_HELLO.value) in rx:
-                    self.configured = True
-                    self.connected = True
-                else:
-                    raise ConnectionError
-
-            else:
+        chosen_port = self.port_address
+        if chosen_port is None:
+            self.logger.info("No port address provided, attempting to choose one.")
+            chosen_port = self._choose_arduino_port(
+                interactive=True
+            )  # Make interactive if no port given
+            if chosen_port is None:
+                self.logger.error("No serial port selected. Arduino connection failed.")
+                self.connected = False
                 self.configured = False
-                raise ConnectionError
+                raise ArduinoConnectionError("No serial port selected.")
 
-        except ConnectionError:
-            # Attempt to connect using the port finder if a port was supplied but didnt work
-            if self.port_address is not None:
-                self.ser = None
-                self.port_address = None
-                self.connect()
-                return
+        self.logger.info(
+            "Attempting to connect to Arduino on port: %s at baudrate: %s",
+            chosen_port,
+            self.baud_rate,
+        )
 
-        except serial.SerialException:
+        try:
+            self.ser = Serial(chosen_port, self.baud_rate, timeout=self.read_timeout)
+            if not self.ser.is_open:
+                raise ArduinoConnectionError(
+                    f"Failed to open serial port {chosen_port}"
+                )
+
+            self.port_address = chosen_port
+            self.connected = True
+            self.logger.info(
+                "Serial port opened: %s. Waiting for Arduino to initialize...",
+                chosen_port,
+            )
+            time.sleep(10)
+
+            self.logger.info("Attempting handshake with Arduino...")
+            self.configured = True
+            response = self.send(PawduinoFunctions.CMD_HELLO)
+
+            if response.get("success") and PawduinoReturnCodes.RESP_HELLO.value.split(
+                ":", 1
+            )[1] in response.get("raw_data", ""):
+                self.configured = True
+                self.logger.info(
+                    "Arduino handshake successful. Connected and configured."
+                )
+            else:
+                self.logger.error("Arduino handshake failed. Response: %s", response)
+                self.close()
+                raise ArduinoConnectionError(
+                    f"Handshake failed with Arduino on {chosen_port}. Response: {response.get('raw_data')}"
+                )
+
+        except serial.SerialException as e:
+            self.logger.error("SerialException during connection: %s", e, exc_info=True)
+            self.connected = False
             self.configured = False
+            if self.ser and self.ser.is_open:
+                self.ser.close()
+            raise ArduinoConnectionError(
+                f"Serial error connecting to Arduino on {chosen_port}: {e}"
+            ) from e
+        except ArduinoException as e:
+            self.logger.error(
+                "ArduinoException during connection: %s", e, exc_info=True
+            )
+            self.connected = False
+            self.configured = False
+            if self.ser and self.ser.is_open:
+                self.ser.close()
+            raise
+        except IOError as e:
+            self.logger.error("IOError during connection: %s", e, exc_info=True)
+            self.connected = False
+            self.configured = False
+            if self.ser and self.ser.is_open:
+                self.ser.close()
+            raise ArduinoConnectionError(
+                f"IO error connecting to Arduino on {chosen_port}: {e}"
+            ) from e
 
-    def receive(self):
-        """Listen to the Arduino and put the messages in the queue"""
-        rx = self.ser.readline()
-        if rx:
-            rxd = rx.decode().strip()
-            if "OK:" in rxd:
-                rxd = rxd.replace("OK:", "")
-            elif "ERR:" in rxd:
-                raise Exception(f"Arduino error: {rxd}")
-            elif "DONE" in rxd:
-                rxd = rxd.replace("DONE", "")
-            self.arduinoQueue.put(rxd)
-            return rxd
-        else:
+    def receive(self) -> Optional[str]:
+        """
+        Read a line from the Arduino.
+        Returns the decoded string or None if no data/timeout.
+        """
+        if not self.ser or not self.ser.is_open:
+            self.logger.warning("Receive called but serial port is not open.")
             return None
+        try:
+            line = self.ser.readline()
+            if line:
+                decoded_line = line.decode().strip()
+                self.logger.debug("Arduino Raw Receive: %s", decoded_line)
+                return decoded_line
+            return None
+        except serial.SerialException as e:
+            self.logger.error("SerialException during receive: %s", e)
+            raise ArduinoConnectionError("Serial error during receive") from e
+        except IOError as e:
+            self.logger.error("IOError during receive: %s", e)
+            raise ArduinoConnectionError("IO error during receive") from e
 
     async def async_receive(self) -> Optional[str]:
         """Asynchronous version of receive"""
-        # Create a future to wait for in the event loop
         loop = asyncio.get_event_loop()
         future = loop.run_in_executor(None, self.receive)
         return await future
 
-    def trecieve(self):
-        """Threaded version of receive using the queue.
-        To be started elsewere.
+    def send(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
         """
-        rx = b""
-        while True:
-            rx = self.ser.readline()
-            if rx and rx != b"" and rx != b"\n":
-                rxd = rx.decode().strip()
-                self.arduinoQueue.put(rxd)
-                rx = b""
-            time.sleep(0.1)
+        Send a command to the Arduino and get the response.
+        Handles command construction, retries, and basic response parsing.
 
-    def tsend(self, cmd):
-        """Threaded version of send using the queue.
-        To be started elsewere.
+        Args:
+            cmd_enum_member: The PawduinoFunctions enum member for the command.
+            *args: Any arguments required by the command.
+
+        Returns:
+            A dictionary containing:
+                'success': bool,
+                'raw_data': str (the raw string from Arduino after OK:/ERR:),
+                'parsed_data': dict (if response was JSON-like or key-value),
+                'error_message': str (if ERR: was received)
         """
-        msg = str(cmd)
-        self.ser.flush()
-        self.ser.read_all()
-        self.ser.write(msg.encode())
-        time.sleep(0.5)
-        while self.arduinoQueue.empty():
-            time.sleep(0.1)
-        rx = self.arduinoQueue.get(timeout=1)
-        return rx
+        if (
+            not self.connected
+            or not self.configured
+            or not self.ser
+            or not self.ser.is_open
+        ):
+            self.logger.error("Send attempt while not connected or configured.")
+            raise ArduinoConnectionError("Not connected to Arduino.")
 
-    def send(self, cmd):
-        """Send a message to the Arduino and wait for a response"""
-        self.ser.flush()  # Flush the input buffer
-        msg = str(cmd)
-        attempts = 0
-        while True and attempts < 3:
-            self.ser.write(msg.encode())
-            time.sleep(0.5)
-            rx = self.receive()
-            if rx is not None:
+        command_code = cmd_enum_member.value
+        command_str_parts = [command_code]
+        command_str_parts.extend(map(str, args))
+        command_to_send = ",".join(command_str_parts) + "\n"
+
+        self.logger.debug("Sending to Arduino: %s", command_to_send.strip())
+
+        response_str = None
+        for attempt in range(self.max_retries):
+            try:
+                self.ser.flushInput()
+                self.ser.flushOutput()
+                self.ser.write(command_to_send.encode())
+
+                raw_response_bytes = self.ser.readline()
+
+                if not raw_response_bytes:
+                    self.logger.warning(
+                        "No response from Arduino (attempt %d/%d, timeout: %ss) for: %s",
+                        attempt + 1,
+                        self.max_retries,
+                        self.read_timeout,
+                        command_to_send.strip(),
+                    )
+                    if attempt == self.max_retries - 1:
+                        raise ArduinoTimeoutError(
+                            f"No response after {self.max_retries} attempts for: {command_to_send.strip()}"
+                        )
+                    time.sleep(0.1)
+                    continue
+
+                response_str = raw_response_bytes.decode().strip()
+                self.logger.debug(
+                    "Raw response (attempt %d): %s", attempt + 1, response_str
+                )
                 break
 
-            attempts += 1
+            except serial.SerialTimeoutException:
+                self.logger.warning(
+                    "SerialTimeoutException (attempt %d/%d) for: %s",
+                    attempt + 1,
+                    self.max_retries,
+                    command_to_send.strip(),
+                )
+                if attempt == self.max_retries - 1:
+                    raise ArduinoTimeoutError(
+                        f"SerialTimeoutException after {self.max_retries} attempts for: {command_to_send.strip()}"
+                    ) from None
+                time.sleep(0.1)
+            except serial.SerialException as e:
+                self.logger.error(
+                    "Serial communication error on attempt %d for '%s': %s",
+                    attempt + 1,
+                    command_to_send.strip(),
+                    e,
+                    exc_info=True,
+                )
+                if attempt == self.max_retries - 1:
+                    raise ArduinoConnectionError(
+                        f"Serial communication error for {command_to_send.strip()}: {e}"
+                    ) from e
+                time.sleep(1)
+            except IOError as e:
+                self.logger.error(
+                    "IO error during send (attempt %d) for '%s': %s",
+                    attempt + 1,
+                    command_to_send.strip(),
+                    e,
+                    exc_info=True,
+                )
+                if attempt == self.max_retries - 1:
+                    raise ArduinoConnectionError(
+                        f"IO error for {command_to_send.strip()}: {e}"
+                    ) from e
+                time.sleep(1)
 
-        if rx is None:
-            raise ConnectionError
+        if response_str is None:
+            raise ArduinoTimeoutError(
+                f"No response received for command: {command_to_send.strip()}"
+            )
 
-        if ":" in rx:
-            sucess = rx.split(":")[0] == "OK"
-            if not sucess:
-                raise Exception(f"Arduino error: {rx}")
-        return rx
+        self.logger.debug("Decoded response: '%s'", response_str)
 
-    async def async_send(self, cmd) -> Union[int, str]:
-        """Asynchronous version of send"""
-        loop = asyncio.get_event_loop()
-        self.ser.flush()
-        await loop.run_in_executor(None, self.ser.read_all)
+        parsed_result: Dict[str, Any] = {
+            "success": False,
+            "raw_data": "",
+            "parsed_data": {},
+            "error_message": "",
+        }
 
-        msg = str(cmd)
-        attempts = 0
-        rx = None
-
-        while attempts < 3:
-            await loop.run_in_executor(None, lambda: self.ser.write(msg.encode()))
-            await asyncio.sleep(0.5)
-            rx = await self.async_receive()
-            if rx is not None:
-                break
-            attempts += 1
-
-        if rx is None:
-            raise ConnectionError
-
+        if response_str.startswith("OK:"):
+            parsed_result["success"] = True
+            content = response_str[3:]
+            parsed_result["raw_data"] = content
+            parsed_result["parsed_data"] = self._parse_arduino_response_content(
+                content, command_to_send.strip()
+            )
+        elif response_str.startswith("ERR:"):
+            parsed_result["success"] = False
+            error_content = response_str[4:]
+            parsed_result["raw_data"] = error_content
+            parsed_result["error_message"] = error_content
+            parsed_result["parsed_data"] = self._parse_arduino_response_content(
+                error_content, command_to_send.strip()
+            )
+            self.logger.error(
+                "Arduino returned error: %s for command %s",
+                error_content,
+                command_to_send.strip(),
+            )
         else:
-            if ":" in rx:
-                success = rx.split(":")[0] == "OK"
-                if not success:
-                    raise Exception(f"Arduino error: {rx}")
+            self.logger.error(
+                "Unexpected response format from Arduino: '%s' for command '%s'",
+                response_str,
+                command_to_send.strip(),
+            )
+            parsed_result["success"] = False
+            parsed_result["raw_data"] = response_str
+            parsed_result["error_message"] = "Unexpected response format"
+            parsed_result["parsed_data"] = self._parse_arduino_response_content(
+                response_str, command_to_send.strip()
+            )
 
-        return rx
+        if not parsed_result["success"] and not parsed_result["error_message"]:
+            parsed_result["error_message"] = (
+                f"Command '{command_to_send.strip()}' failed with response: {response_str}"
+            )
+
+        return parsed_result
+
+    async def async_send(
+        self, cmd_enum_member: PawduinoFunctions, *args
+    ) -> Dict[str, Any]:
+        """Asynchronous version of send."""
+        if (
+            not self.connected
+            or not self.configured
+            or not self.ser
+            or not self.ser.is_open
+        ):
+            self.logger.error("Async Send attempt while not connected or configured.")
+            raise ArduinoConnectionError("Not connected to Arduino.")
+
+        command_code = cmd_enum_member.value
+        command_str_parts = [command_code]
+        command_str_parts.extend(map(str, args))
+        command_to_send = ",".join(command_str_parts) + "\n"
+
+        self.logger.debug("Async Sending to Arduino: '%s'", command_to_send.strip())
+
+        loop = asyncio.get_event_loop()
+        response_str = None
+
+        for attempt in range(self.max_retries):
+            try:
+                try:
+                    await loop.run_in_executor(None, self.ser.flushInput)
+                    await loop.run_in_executor(None, self.ser.flushOutput)
+                except Exception as e:
+                    self.logger.warning("Async: Could not flush buffers: %s", e)
+
+                await loop.run_in_executor(
+                    None, lambda: self.ser.write(command_to_send.encode())
+                )
+
+                raw_response_bytes = await loop.run_in_executor(None, self.ser.readline)
+
+                if not raw_response_bytes:
+                    self.logger.warning(
+                        "Async: No response (attempt %d/%d, timeout: %ss) for: %s",
+                        attempt + 1,
+                        self.max_retries,
+                        self.read_timeout,
+                        command_to_send.strip(),
+                    )
+                    if attempt == self.max_retries - 1:
+                        raise ArduinoTimeoutError(
+                            f"Async: No response after {self.max_retries} attempts for: {command_to_send.strip()}"
+                        )
+                    await asyncio.sleep(0.1)
+                    continue
+
+                response_str = raw_response_bytes.decode().strip()
+                self.logger.debug(
+                    "Async Raw response (attempt %d): %s", attempt + 1, response_str
+                )
+                break
+
+            except serial.SerialTimeoutException:
+                self.logger.warning(
+                    "Async: SerialTimeoutException (attempt %d/%d) for: %s",
+                    attempt + 1,
+                    self.max_retries,
+                    command_to_send.strip(),
+                )
+                if attempt == self.max_retries - 1:
+                    raise ArduinoTimeoutError(
+                        f"Async: SerialTimeoutException after {self.max_retries} attempts for: {command_to_send.strip()}"
+                    ) from None
+                await asyncio.sleep(0.1)
+            except serial.SerialException as e:
+                self.logger.error(
+                    "Async: Serial communication error on attempt %d for '%s': %s",
+                    attempt + 1,
+                    command_to_send.strip(),
+                    e,
+                    exc_info=True,
+                )
+                if attempt == self.max_retries - 1:
+                    raise ArduinoConnectionError(
+                        f"Async: Serial communication error for {command_to_send.strip()}: {e}"
+                    ) from e
+                await asyncio.sleep(1)
+            except IOError as e:
+                self.logger.error(
+                    "Async: IO error during send (attempt %d) for '%s': %s",
+                    attempt + 1,
+                    command_to_send.strip(),
+                    e,
+                    exc_info=True,
+                )
+                if attempt == self.max_retries - 1:
+                    raise ArduinoConnectionError(
+                        f"Async: IO error for {command_to_send.strip()}: {e}"
+                    ) from e
+                await asyncio.sleep(1)
+            except Exception as e:
+                self.logger.error(
+                    "Async: Unexpected error during send (attempt %d) for '%s': %s",
+                    attempt + 1,
+                    command_to_send.strip(),
+                    e,
+                    exc_info=True,
+                )
+                if attempt == self.max_retries - 1:
+                    raise ArduinoCommandError(
+                        f"Async: Unexpected error for {command_to_send.strip()}: {e}"
+                    ) from e
+                await asyncio.sleep(1)
+
+        if response_str is None:
+            raise ArduinoTimeoutError(
+                f"Async: No response received for command: {command_to_send.strip()}"
+            )
+
+        self.logger.debug("Async Decoded response: '%s'", response_str)
+
+        parsed_result: Dict[str, Any] = {
+            "success": False,
+            "raw_data": "",
+            "parsed_data": {},
+            "error_message": "",
+        }
+
+        if response_str.startswith("OK:"):
+            parsed_result["success"] = True
+            content = response_str[3:]
+            parsed_result["raw_data"] = content
+            parsed_result["parsed_data"] = self._parse_arduino_response_content(
+                content, command_to_send.strip()
+            )
+        elif response_str.startswith("ERR:"):
+            parsed_result["success"] = False
+            error_content = response_str[4:]
+            parsed_result["raw_data"] = error_content
+            parsed_result["error_message"] = error_content
+            parsed_result["parsed_data"] = self._parse_arduino_response_content(
+                error_content, command_to_send.strip()
+            )
+            self.logger.error(
+                "Async: Arduino returned error: %s for command %s",
+                error_content,
+                command_to_send.strip(),
+            )
+        else:
+            self.logger.error(
+                "Async: Unexpected response format: '%s' for command '%s'",
+                response_str,
+                command_to_send.strip(),
+            )
+            parsed_result["success"] = False
+            parsed_result["raw_data"] = response_str
+            parsed_result["error_message"] = "Unexpected response format"
+            parsed_result["parsed_data"] = self._parse_arduino_response_content(
+                response_str, command_to_send.strip()
+            )
+
+        if not parsed_result["success"] and not parsed_result["error_message"]:
+            parsed_result["error_message"] = (
+                f"Async Command '{command_to_send.strip()}' failed with response: {response_str}"
+            )
+
+        return parsed_result
 
     async def start_monitoring(self):
         """Start monitoring Arduino messages in the background"""
@@ -315,8 +672,14 @@ class ArduinoLink:
                     rx = await self.async_receive()
                     if rx is not None:
                         await self._event_queue.put(rx)
+                except ArduinoConnectionError as e:
+                    self.logger.error("Error in Arduino monitor (Connection): %s", e)
+                    self._running = False
+                    break
                 except Exception as e:
-                    print(f"Error in Arduino monitor: {e}")
+                    self.logger.error(
+                        "Unhandled error in Arduino monitor: %s", e, exc_info=True
+                    )
                     await asyncio.sleep(1)
                 await asyncio.sleep(0.1)
 
@@ -345,210 +708,231 @@ class ArduinoLink:
 
     async def async_white_lights_on(self):
         """Turn on the white lights asynchronously"""
-        return await self.async_send(PawduinoFunctions.CMD_WHITE_ON.value)
+        response = await self.async_send(PawduinoFunctions.CMD_WHITE_ON)
+        return response.get("success", False)
 
     def white_lights_on(self):
         """Turn on the white lights"""
-        return self.send(PawduinoFunctions.CMD_WHITE_ON.value)
+        response = self.send(PawduinoFunctions.CMD_WHITE_ON)
+        return response.get("success", False)
 
     def white_lights_off(self):
         """Turn off the white lights"""
-        return self.send(PawduinoFunctions.CMD_WHITE_OFF.value)
+        response = self.send(PawduinoFunctions.CMD_WHITE_OFF)
+        return response.get("success", False)
 
     async def async_white_lights_off(self):
         """Turn off the white lights asynchronously"""
-        return await self.async_send(PawduinoFunctions.CMD_WHITE_OFF.value)
+        response = await self.async_send(PawduinoFunctions.CMD_WHITE_OFF)
+        return response.get("success", False)
 
     def curvature_lights_on(self):
         """Turn on the rb lights"""
-        return self.send(PawduinoFunctions.CMD_CONTACT_ON.value)
+        response = self.send(PawduinoFunctions.CMD_CONTACT_ON)
+        return response.get("success", False)
 
     async def async_curvature_lights_on(self):
         """Turn on the rb lights asynchronously"""
-        return await self.async_send(PawduinoFunctions.CMD_CONTACT_ON.value)
+        response = await self.async_send(PawduinoFunctions.CMD_CONTACT_ON)
+        return response.get("success", False)
 
     def curvature_lights_off(self):
         """Turn off the rb lights"""
-        return self.send(PawduinoFunctions.CMD_CONTACT_OFF.value)
+        response = self.send(PawduinoFunctions.CMD_CONTACT_OFF)
+        return response.get("success", False)
 
     async def async_curvature_lights_off(self):
         """Turn off the rb lights asynchronously"""
-        return await self.async_send(PawduinoFunctions.CMD_CONTACT_OFF.value)
+        response = await self.async_send(PawduinoFunctions.CMD_CONTACT_OFF)
+        return response.get("success", False)
 
     def no_cap(self):
         """Engage the decapper"""
-        resp = self.send(PawduinoFunctions.CMD_EMAG_ON.value)
-        time.sleep(0.1)
-        return resp
+        response = self.send(PawduinoFunctions.CMD_EMAG_ON)
+        time.sleep(0.5)
+        return response.get("success", False)
 
     async def async_no_cap(self):
         """Engage the decapper asynchronously"""
-        resp = await self.async_send(PawduinoFunctions.CMD_EMAG_ON.value)
-        await asyncio.sleep(0.1)
-        return resp
-    
+        response = await self.async_send(PawduinoFunctions.CMD_EMAG_ON)
+        await asyncio.sleep(0.5)
+        return response.get("success", False)
+
     def ALL_CAP(self):
         """Disengage the decapper"""
-        resp = self.send(PawduinoFunctions.CMD_EMAG_OFF.value)
-        time.sleep(0.5)
-        return resp
+        response = self.send(PawduinoFunctions.CMD_EMAG_OFF)
+        time.sleep(1.5)
+        return response.get("success", False)
 
     async def async_ALL_CAP(self):
         """Disengage the decapper asynchronously"""
-        resp = await self.async_send(PawduinoFunctions.CMD_EMAG_OFF.value)
-        await asyncio.sleep(0.5)
-        return resp
+        response = await self.async_send(PawduinoFunctions.CMD_EMAG_OFF)
+        await asyncio.sleep(1.5)
+        return response.get("success", False)
 
-    def line_break(self):
+    def line_break(self) -> Optional[bool]:
         """Check if the capper line is broken (cap is present)"""
-        value = self.send(PawduinoFunctions.CMD_LINE_BREAK.value)
-        if value == str(PawduinoReturnCodes.RESP_LINE_BREAK.value):
-            return True
-        elif value == str(PawduinoReturnCodes.RESP_LINE_UNBROKEN.value):
-            return False
-        else:
-            return None
+        response = self.send(PawduinoFunctions.CMD_LINE_BREAK)
+        if response.get("success"):
+            parsed = response.get("parsed_data", {})
+            data_val = parsed.get("value1")
+            if data_val == 1:
+                return True
+            elif data_val == 0:
+                return False
+            else:
+                self.logger.warning(
+                    "line_break: successful response but unexpected data: %s in %s",
+                    data_val,
+                    response,
+                )
+                return None
+        return None
 
-    async def async_line_break(self) -> bool:
+    async def async_line_break(self) -> Optional[bool]:
         """
         Check if the capper line is broken (cap is present) asynchronously
-
-        Returns True if the line is broken, False if it is not, and None if there was an error
+        Returns True if the line is broken, False if it is not, and None if there was an error or unexpected data.
         """
-        value = await self.async_send(PawduinoFunctions.CMD_LINE_BREAK.value)
-        if value == str(PawduinoReturnCodes.RESP_LINE_BREAK.value):
-            return True
-        elif value == str(PawduinoReturnCodes.RESP_LINE_UNBROKEN.value):
-            return False
-        else:
-            return None
+        response = await self.async_send(PawduinoFunctions.CMD_LINE_BREAK)
+        if response.get("success"):
+            parsed = response.get("parsed_data", {})
+            data_val = parsed.get("value1")
+            if data_val == 1:
+                return True
+            elif data_val == 0:
+                return False
+            else:
+                self.logger.warning(
+                    "async_line_break: successful response but unexpected data: %s in %s",
+                    data_val,
+                    response,
+                )
+                return None
+        return None
 
     def line_test(self):
-        """Trigger the line break test which runs the line break test 10 times, returning the results"""
-        i = 10
-        value = self.send(PawduinoFunctions.CMD_LINE_TEST.value)
-        print(value)
-        while i > 0:
-            value = self.receive()
-            print(value)
-            i -= 1
-
-    def pipette_send(self, cmd) -> dict:
-        """Send a command to the pipette
-
-        Arguments:
-            cmd: The command to send to the pipette
-
-        Returns:
-            dict: The parsed response from the pipette
-
-        Raises:
-            Exception: If there is an error during communication with the pipette
-            ConnectionError: If the pipette is not connected or configured properly
         """
-        try:
-            self.ser.flush()
-            self.ser.read_all()
-            self.ser.write(str(cmd).encode())
-            time.sleep(0.5)
-
-            # Read until we get a newline
-            rx = self.ser.read_until(b"\n").strip()
-
-            # Parse the response
-            if rx.startswith(b"OK:"):
-                response_data = rx[3:].decode()  # Remove OK: prefix
-
-                # Check if this is a JSON-like response
-                if response_data.startswith("{") and response_data.endswith("}"):
-                    return self._parse_json_response(response_data, success=True)
-
-                # Handle legacy format if needed
-                if "DONE" in response_data:
-                    response_data = response_data.replace("DONE", "").strip()
-
-                # Simple comma-separated values format
-                if "," in response_data:
-                    parts = response_data.split(",")
-                    if len(parts) >= 3:
-                        return {
-                            "success": True,
-                            "homed": bool(int(parts[0].strip())),
-                            "position": float(parts[1].strip()),
-                            "max_volume": float(parts[2].strip()),
-                        }
-                return {"success": True, "data": response_data}
-
-            elif rx.startswith(b"ERR:"):
-                response_data = rx[4:].decode()  # Remove ERR: prefix
-
-                # Check if this is a JSON-like response
-                if response_data.startswith("{") and response_data.endswith("}"):
-                    return self._parse_json_response(response_data, success=False)
-
-                # Legacy error format
-                return {"success": False, "error": response_data}
-
-            else:
-                raise ConnectionError(f"Unexpected response format: {rx}")
-
-        except ConnectionError as e:
-            self.logger.error("Pipette not connected or configured properly")
-            raise ConnectionError("Pipette not connected or configured properly") from e
-
-        except Exception as e:
-            self.logger.error("Error during pipette send: %s", str(e))
-            raise Exception(f"Error during pipette send: {str(e)}") from e
-
-    def _parse_json_response(self, response_str, success=True):
-        """Parse a JSON-like response from the Arduino
-
-        Args:
-            response_str: The JSON-like response string
-            success: Whether this was marked as a success response
-
-        Returns:
-            dict: Parsed response data
+        Trigger the line break test.
+        NOTE: This command sends multiple responses. The current send/receive
+        logic is designed for single request/response. This method needs
+        a dedicated implementation or a change in Arduino sketch behavior.
         """
-        result = {"success": success}
+        self.logger.warning(
+            "line_test sends multiple responses, which is not fully supported by the current 'send' method pattern."
+        )
+        response = self.send(PawduinoFunctions.CMD_LINE_TEST)
+        print(f"Initial response to CMD_LINE_TEST: {response}")
+        raise NotImplementedError(
+            "line_test requires multi-response handling not yet implemented in send/receive."
+        )
 
-        # Remove curly braces
-        content = response_str.strip("{}").strip()
+    def _parse_arduino_response_content(
+        self, content: str, command_str: str = "Unknown Command"
+    ) -> Dict[str, Any]:
+        """
+        Parses the content part of an Arduino response (after OK: or ERR:).
+        Tries to parse as JSON-like ({key:val,...}), then as simple key:value pairs,
+        then as comma-separated values if it's just a list of numbers.
+        """
+        parsed: Dict[str, Any] = {}
+        content = content.strip()
 
         if not content:
-            return result
+            return parsed
 
-        # Parse the key-value pairs
+        if content.startswith("{") and content.endswith("}"):
+            try:
+                inner_content = content[1:-1].strip()
+                if inner_content:
+                    pairs = inner_content.split(",")
+                    for i, part in enumerate(pairs):
+                        if ":" not in part:
+                            if len(pairs) == 1:
+                                parsed[f"value{i+1}"] = self._auto_convert_type(
+                                    part.strip()
+                                )
+                            else:
+                                parsed[f"item{i+1}"] = part.strip()
+                            continue
+
+                        key, value_str = part.split(":", 1)
+                        key = key.strip().strip('"')
+                        value_str = value_str.strip().strip('"')
+
+                        if value_str.startswith("[") and value_str.endswith("]"):
+                            raw_values = value_str[1:-1].split(",")
+                            try:
+                                num_values = [
+                                    self._auto_convert_type(v.strip())
+                                    for v in raw_values
+                                ]
+                                parsed[key] = (
+                                    num_values
+                                    if len(num_values) > 1
+                                    else num_values[0] if num_values else []
+                                )
+                                if key.lower() in ["v", "values", "data"]:
+                                    for i_val, num_val in enumerate(num_values):
+                                        parsed[f"value{i_val+1}"] = num_val
+                            except ValueError:
+                                parsed[key] = [v.strip() for v in raw_values]
+                                if key.lower() in ["v", "values", "data"]:
+                                    for i_val, str_val in enumerate(
+                                        [v.strip() for v in raw_values]
+                                    ):
+                                        parsed[f"value_str{i_val+1}"] = str_val
+                        else:
+                            parsed[key] = self._auto_convert_type(value_str)
+                return parsed
+            except Exception as e:
+                self.logger.warning(
+                    "Could not parse JSON-like content '%s' for command '%s': %s. Treating as raw data.",
+                    content,
+                    command_str,
+                    e,
+                )
+                parsed["raw_value"] = content
+                return parsed
+
         parts = content.split(",")
+        if len(parts) > 1:
+            all_convertible = True
+            converted_values = []
+            for part_val in parts:
+                try:
+                    converted_values.append(self._auto_convert_type(part_val.strip()))
+                except ValueError:
+                    all_convertible = False
+                    break
+            if all_convertible:
+                for i, val in enumerate(converted_values):
+                    parsed[f"value{i+1}"] = val
+                return parsed
 
-        for part in parts:
-            if ":" not in part:
-                continue
+        try:
+            parsed["value1"] = self._auto_convert_type(content)
+        except ValueError:
+            parsed["raw_value"] = content
 
-            key, value = part.split(":", 1)
+        return parsed
 
-            # Clean up keys and values
-            key = key.strip().strip('"')
-            value = value.strip().strip('"')
-
-            if key == "msg":
-                result["message"] = value
-            elif key == "v":
-                # Parse array values
-                if value.startswith("[") and value.endswith("]"):
-                    values = value.strip("[]").split(",")
-                    if len(values) >= 1:
-                        try:
-                            result["value1"] = float(values[0].strip())
-                            if len(values) >= 2:
-                                result["value2"] = float(values[1].strip())
-                            if len(values) >= 3:
-                                result["value3"] = float(values[2].strip())
-                        except ValueError:
-                            # If any conversion fails, just store the raw values
-                            result["values"] = [v.strip() for v in values]
-
-        return result
+    def _auto_convert_type(self, value_str: str) -> Any:
+        """Tries to convert a string to int, then float, otherwise returns string."""
+        value_str = value_str.strip()
+        if not value_str:
+            return value_str
+        if value_str.lower() == "true":
+            return True
+        if value_str.lower() == "false":
+            return False
+        try:
+            return int(value_str)
+        except ValueError:
+            try:
+                return float(value_str)
+            except ValueError:
+                return value_str
 
     def home(self) -> bool:
         """
@@ -557,37 +941,59 @@ class ArduinoLink:
         Returns:
             bool: True if homing was successful
         """
-        try:
-            response = self.send(PawduinoFunctions.CMD_PIPETTE_HOME.value)
-            return response
-        except Exception as e:
-            self.logger.error("Error during homing: %s", str(e))
-            raise Exception(f"Error during homing: {str(e)}") from e
+        response = self.send(PawduinoFunctions.CMD_PIPETTE_HOME)
+        return response.get("success", False)
 
     def get_status(self) -> Dict[str, Any]:
         """
-        Get the current status of the pipette.
+        Get the current status of the pipette (homed, position, max_volume).
 
         Returns:
-            dict: Status information including position and volume
+            A dictionary with status info, e.g.,
+            {'success': True, 'homed': True, 'position': 10.5, 'max_volume': 200.0}
+            Returns {'success': False} on error.
         """
-        try:
-            response = self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
-            status = {}
-            parts = []
+        response = self.send(PawduinoFunctions.CMD_PIPETTE_STATUS)
+        status_data: Dict[str, Any] = {"success": False}
 
-            # Parse the new format: "OK:isHomed,position,maxVolume"
-            # Example: "1,25,300"
-            if "OK:" in response:
-                parts = response.strip().split(",")
-            if len(parts) >= 3:
-                status["h"] = bool(int(parts[0].strip()))
-                status["p"] = float(parts[1].strip())
-                status["mxv"] = float(parts[2].strip())
-        except Exception as e:
-            self.logger.error("Error getting status: %s", str(e))
-            return {}
-        return status
+        if response.get("success"):
+            parsed = response.get("parsed_data", {})
+            if "homed" in parsed and "pos" in parsed and "max_vol" in parsed:
+                try:
+                    status_data["success"] = True
+                    status_data["homed"] = bool(parsed["homed"])
+                    status_data["position"] = float(parsed["pos"])
+                    status_data["max_volume"] = float(parsed["max_vol"])
+                except (ValueError, TypeError) as e:
+                    self.logger.error(
+                        "Error parsing numeric status values %s: %s", parsed, e
+                    )
+                    status_data["success"] = False
+                    status_data["error_message"] = "Failed to parse status values"
+            elif "value1" in parsed and "value2" in parsed and "value3" in parsed:
+                try:
+                    status_data["success"] = True
+                    status_data["homed"] = bool(parsed["value1"])
+                    status_data["position"] = float(parsed["value2"])
+                    status_data["max_volume"] = float(parsed["value3"])
+                except (ValueError, TypeError) as e:
+                    self.logger.error(
+                        "Error parsing status from parsed_csv %s: %s", parsed, e
+                    )
+                    status_data["success"] = False
+                    status_data["error_message"] = "Failed to parse CSV status values"
+            else:
+                self.logger.warning(
+                    "Could not determine pipette status from successful response: %s",
+                    response,
+                )
+                status_data["error_message"] = "Unexpected status format"
+        else:
+            status_data["error_message"] = response.get(
+                "error_message", "Failed to get status"
+            )
+
+        return status_data
 
     def move_to(self, position: float, speed: Optional[int] = None) -> bool:
         """
@@ -595,40 +1001,31 @@ class ArduinoLink:
 
         Args:
             position: Position in mm
-            speed: Movement speed (steps/second)
-            wait: Wait for the movement to complete
+            speed: Movement speed (steps/second) (optional)
 
         Returns:
             bool: True if movement was successful
         """
-        cmd = f"10{position}"
-        if speed:
-            cmd += f",{speed}"
-        try:
-            response = self.pipette_send(cmd)
-            return response
-        except Exception as e:
-            self.logger.error("Error during movement: %s",str(e))
-            raise Exception(f"Error during movement: {str(e)}") from e
+        if speed is not None:
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_MOVE_TO, position, speed)
+        else:
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_MOVE_TO, position)
+        return response.get("success", False)
 
-    def move_relative(self, direction, steps, velocity, wait):
+    def move_relative(self, direction: int, steps: int, velocity: int) -> bool:
         """
-        Move the pipette in a specific direction by a certain number of steps.
-
-        Arguments:
-            direction: Direction to move (1 for up, 0 for down)
-            steps: Number of steps to move
-            velocity: Speed of movement (steps/second)
-            wait: Wait for the movement to complete
-
+        Move the pipette by a relative number of steps.
+        Args:
+            direction: 0 or 1
+            steps: number of steps
+            velocity: steps per second
+        Returns:
+            bool: True if successful
         """
-        cmd = f"16{direction},{steps},{velocity}"
-        try:
-            response = self.pipette_send(cmd)
-            return response
-        except Exception as e:
-            self.logger.error("Error during movement: %s",str(e))
-            raise Exception(f"Error during movement: {str(e)}") from e
+        response = self.send(
+            PawduinoFunctions.CMD_MOVE_RELATIVE, direction, steps, velocity
+        )
+        return response.get("success", False)
 
     def aspirate(self, volume: float, rate: Optional[float] = None) -> bool:
         """
@@ -636,20 +1033,16 @@ class ArduinoLink:
 
         Args:
             volume: Volume to aspirate in µL
-            rate: Aspiration rate in µL/s
+            rate: Aspiration rate in µL/s (optional)
 
         Returns:
             bool: True if aspiration was successful
         """
-        cmd = f"11{volume}"
-        if rate:
-            cmd += f",{rate}"
-        try:
-            response = self.pipette_send(cmd)
-            return response
-        except Exception as e:
-            self.logger.error("Error during aspiration: %s", str(e))
-            raise Exception(f"Error during aspiration: {str(e)}") from e
+        if rate is not None:
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_ASPIRATE, volume, rate)
+        else:
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_ASPIRATE, volume)
+        return response.get("success", False)
 
     def dispense(self, volume: float, rate: Optional[float] = None) -> bool:
         """
@@ -657,21 +1050,16 @@ class ArduinoLink:
 
         Args:
             volume: Volume to dispense in µL
-            rate: Dispensing rate in µL/s
+            rate: Dispensing rate in µL/s (optional)
 
         Returns:
             bool: True if dispensing was successful
         """
-        cmd = f"12{volume}"
-        if rate:
-            cmd += f",{rate}"
-
-        try:
-            response = self.pipette_send(cmd)
-            return response
-        except Exception as e:
-            self.logger.error("Error during dispensing: %s", str(e))
-            raise Exception(f"Error during dispensing: {str(e)}")
+        if rate is not None:
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE, volume, rate)
+        else:
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE, volume)
+        return response.get("success", False)
 
     def mix(
         self, repetitions: int, volume: float, rate: Optional[float] = None
@@ -682,27 +1070,26 @@ class ArduinoLink:
         Args:
             repetitions: Number of mix cycles
             volume: Volume to mix in µL
-            rate: Mixing rate in µL/s
+            rate: Mixing rate in µL/s (optional)
 
         Returns:
             bool: True if mixing was successful
         """
-        cmd = f"X{repetitions}"
-        if volume:
-            cmd += f",{volume}"
-        if rate:
-            cmd += f",{rate}"
+        if rate is not None:
+            response = self.send(
+                PawduinoFunctions.CMD_PIPETTE_MIX, repetitions, volume, rate
+            )
+        else:
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_MIX, repetitions, volume)
+        return response.get("success", False)
 
-        try:
-            response = self.pipette_send(cmd)
-            return response
-        except Exception as e:
-            self.logger.error("Error during mixing: %s", str(e))
-            raise Exception(f"Error during mixing: {str(e)}") from e
-
-    def hello(self):
-        """Send a hello message to the Arduino"""
-        return self.send(PawduinoFunctions.CMD_HELLO.value)
+    def hello(self) -> bool:
+        """Send a hello message to the Arduino and check response"""
+        response = self.send(PawduinoFunctions.CMD_HELLO)
+        if response.get("success"):
+            expected_msg = PawduinoReturnCodes.RESP_HELLO.value.split(":", 1)[1]
+            return expected_msg in response.get("raw_data", "")
+        return False
 
     def lights_off(self):
         """Turn off all lights"""
@@ -724,145 +1111,116 @@ class MockArduinoLink(ArduinoLink):
     arduinoQueue = queue.Queue()
 
     def __init__(self):
-        """Initialize the MockArduinoLink class"""
+        super().__init__(port_address="mock", read_timeout=0.1, max_retries=1)
         self.configured = True
+        self.connected = True
         self.ser = MockSerial()
+        self.arduinoQueue = queue.Queue()
+        self.logger = logging.getLogger("panda.mock")
+        self.logger.info("MockArduinoLink initialized.")
 
-    def send(self, cmd):
-        """Send a message to the Arduino and wait for a response"""
-        self.ser.write(str(cmd).encode())
-        if isinstance(cmd, tuple):
-            cmd = cmd[0]  # Handle tuple values from the enum
+    def connect(self):
+        self.connected = True
+        self.configured = True
+        self.logger.info("MockArduinoLink connect() called - already mock connected.")
 
-        if cmd == PawduinoFunctions.CMD_WHITE_ON.value:
-            return PawduinoReturnCodes.RESP_WHITE_ON.value
-        elif cmd == PawduinoFunctions.CMD_WHITE_OFF.value:
-            return PawduinoReturnCodes.RESP_WHITE_OFF.value
-        elif cmd == PawduinoFunctions.CMD_CONTACT_ON.value:
-            return PawduinoReturnCodes.RESP_CONTACT_ON.value
-        elif cmd == PawduinoFunctions.CMD_CONTACT_OFF.value:
-            return PawduinoReturnCodes.RESP_CONTACT_OFF.value
-        elif cmd == PawduinoFunctions.CMD_EMAG_ON.value:
-            return PawduinoReturnCodes.RESP_EMAG_ON.value
-        elif cmd == PawduinoFunctions.CMD_EMAG_OFF.value:
-            return PawduinoReturnCodes.RESP_EMAG_OFF.value
-        elif cmd == PawduinoFunctions.CMD_LINE_BREAK.value:
-            return True
-        elif cmd == PawduinoFunctions.CMD_LINE_TEST.value:
-            return PawduinoReturnCodes.RESP_LINE_UNBROKEN.value
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_HOME.value:
-            return PawduinoReturnCodes.RESP_PIPETTE_HOMED.value
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_MOVE_TO.value:
-            return PawduinoReturnCodes.RESP_PIPETTE_MOVED.value
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_ASPIRATE.value:
-            return PawduinoReturnCodes.RESP_PIPETTE_ASPIRATED.value
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_DISPENSE.value:
-            return PawduinoReturnCodes.RESP_PIPETTE_DISPENSED.value
-        elif cmd == PawduinoFunctions.CMD_PIPETTE_STATUS.value:
-            return PawduinoReturnCodes.RESP_PIPETTE_STATUS.value
-        elif cmd == PawduinoFunctions.CMD_HELLO.value:
-            return PawduinoReturnCodes.RESP_HELLO.value
+    def close(self):
+        self.connected = False
+        self.configured = False
+        self.logger.info("MockArduinoLink close() called.")
+
+    def send(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
+        """Mock send method. Returns a predefined response based on the command."""
+        cmd_value = cmd_enum_member.value
+        self.logger.debug("Mock Sending: %s with args %s", cmd_enum_member.name, args)
+
+        response: Dict[str, Any] = {
+            "success": True,
+            "raw_data": "",
+            "parsed_data": {},
+            "error_message": "",
+        }
+
+        if cmd_value == PawduinoFunctions.CMD_HELLO.value:
+            response["raw_data"] = PawduinoReturnCodes.RESP_HELLO.value.split(":", 1)[1]
+            response["parsed_data"] = self._parse_arduino_response_content(
+                response["raw_data"], cmd_enum_member.name
+            )
+        elif cmd_value == PawduinoFunctions.CMD_WHITE_ON.value:
+            response["raw_data"] = "White lights on"
+        elif cmd_value == PawduinoFunctions.CMD_WHITE_OFF.value:
+            response["raw_data"] = "White lights off"
+        elif cmd_value == PawduinoFunctions.CMD_CONTACT_ON.value:
+            response["raw_data"] = "Contact lights on"
+        elif cmd_value == PawduinoFunctions.CMD_CONTACT_OFF.value:
+            response["raw_data"] = "Contact lights off"
+        elif cmd_value == PawduinoFunctions.CMD_EMAG_ON.value:
+            response["raw_data"] = "Electromagnet on"
+        elif cmd_value == PawduinoFunctions.CMD_EMAG_OFF.value:
+            response["raw_data"] = "Electromagnet off"
+        elif cmd_value == PawduinoFunctions.CMD_LINE_BREAK.value:
+            response["raw_data"] = '{"value1":1}'
+            response["parsed_data"] = {"value1": 1}
+        elif cmd_value == PawduinoFunctions.CMD_LINE_TEST.value:
+            response["raw_data"] = "Line test initiated"
+        elif cmd_value == PawduinoFunctions.CMD_PIPETTE_HOME.value:
+            response["raw_data"] = "Pipette homed"
+        elif cmd_value == PawduinoFunctions.CMD_PIPETTE_MOVE_TO.value:
+            response["raw_data"] = f"Moved to {args[0]}"
+        elif cmd_value == PawduinoFunctions.CMD_PIPETTE_ASPIRATE.value:
+            response["raw_data"] = f"Aspirated {args[0]}"
+        elif cmd_value == PawduinoFunctions.CMD_PIPETTE_DISPENSE.value:
+            response["raw_data"] = f"Dispensed {args[0]}"
+        elif cmd_value == PawduinoFunctions.CMD_PIPETTE_MIX.value:
+            response["raw_data"] = f"Mixed {args[0]} times, volume {args[1]}"
+        elif cmd_value == PawduinoFunctions.CMD_PIPETTE_STATUS.value:
+            status_str = "{homed:1,pos:10.0,max_vol:200.0}"
+            response["raw_data"] = status_str
+            response["parsed_data"] = {"homed": True, "pos": 10.0, "max_vol": 200.0}
         else:
-            return None
+            response["success"] = False
+            response["raw_data"] = "Unknown command"
+            response["error_message"] = "Mock: Unknown command"
+
+        if response["success"] and not response["parsed_data"] and response["raw_data"]:
+            response["parsed_data"] = self._parse_arduino_response_content(
+                response["raw_data"], cmd_enum_member.name
+            )
+
+        return response
 
     def receive(self):
-        """Mock receive method"""
         if not self.arduinoQueue.empty():
             return self.arduinoQueue.get()
         return None
 
     async def async_receive(self):
-        """Mock async receive method"""
         if not self.arduinoQueue.empty():
             return self.arduinoQueue.get_nowait()
         return None
 
-    async def async_send(self, cmd):
+    async def async_send(
+        self, cmd_enum_member: PawduinoFunctions, *args
+    ) -> Dict[str, Any]:
         """Mock async send method"""
-        self.ser.write(str(cmd).encode())
-        if isinstance(cmd, tuple):
-            cmd = cmd[0]
-        return self.send(cmd)
+        return self.send(cmd_enum_member, *args)
 
-    async def async_line_break(self):
-        return await self.async_send(PawduinoFunctions.CMD_LINE_BREAK.value)
+    async def async_line_break(self) -> Optional[bool]:
+        return await self.async_send(PawduinoFunctions.CMD_LINE_BREAK)
 
 
 class AsyncMockArduinoLink(MockArduinoLink):
     """Mock version of ArduinoLink that supports async operations"""
 
-    async def async_send(self, cmd):
-        """Async version of send"""
-        return self.send(cmd)
+    async def async_send(
+        self, cmd_enum_member: PawduinoFunctions, *args
+    ) -> Dict[str, Any]:
+        """Async version of send for AsyncMock"""
+        return super().send(cmd_enum_member, *args)
 
-    # Add async versions of all other methods from MockArduinoLink
-
-
-class PawduinoFunctions(enum.Enum):
-    """
-    This class provides the functions that the arduino can perform and the
-    corresponding commands to send to the arduino.
-
-    Currently, the arduino can perform the following functions:
-    - decapper_engage (engages the decapper)
-    - decapper_disengage (disengages the decapper)
-    - white_lights_on (turns on the white light)
-    - white_lights_off (turns off the white light)
-    - rb_lights_on (turns on the rb lights)
-    - rb_lights_off (turns off the rb lights)
-
-    """
-
-    CMD_WHITE_ON = 1
-    CMD_WHITE_OFF = 2
-    CMD_CONTACT_ON = 3
-    CMD_CONTACT_OFF = 4
-    CMD_EMAG_ON = 5
-    CMD_EMAG_OFF = 6
-    CMD_LINE_BREAK = 7
-    CMD_LINE_TEST = 8
-    CMD_PIPETTE_HOME = 9
-    CMD_PIPETTE_MOVE_TO = 10
-    CMD_PIPETTE_ASPIRATE = 11
-    CMD_PIPETTE_DISPENSE = 12
-    CMD_PIPETTE_STATUS = 13
-    CMD_LED_TEST = 14
-    CMD_PIPETTE_MIX = 15
-    CMD_PIPETTE_MOVE_DIRECTION = 16
-    CMD_HELLO = 99
-
-
-class PawduinoReturnCodes(enum.Enum):
-    """
-    This class provides the return codes that the arduino can send back to the computer
-
-    Currently, the arduino can return the following codes:
-    - decapper_engaged (the decapper is engaged)
-    - decapper_disengaged (the decapper is disengaged)
-    - white_lights_on (the white lights are on)
-    - white_lights_off (the white lights are off)
-    - rb_lights_on (the rb lights are on)
-    - rb_lights_off (the rb lights are off)
-
-    """
-
-    RESP_WHITE_ON = 101
-    RESP_WHITE_OFF = 102
-    RESP_CONTACT_ON = 103
-    RESP_CONTACT_OFF = 104
-    RESP_EMAG_ON = 105
-    RESP_EMAG_OFF = 106
-    RESP_LINE_BREAK = 107
-    RESP_LINE_UNBROKEN = 108
-    RESP_PIPETTE_HOMED = 109
-    RESP_PIPETTE_MOVED = 110
-    RESP_PIPETTE_ASPIRATED = 111
-    RESP_PIPETTE_DISPENSED = 112
-    RESP_PIPETTE_STATUS = 113
-    RESP_LINE_TEST = 114
-    RESP_PIPETTE_MIX = 115
-    RESP_PIPETTE_MOVE_DIRECTION = 116
-    RESP_HELLO = 999
+    # Add async versions of all other methods from MockArduinoLink if they need
+    # to differ from just calling the sync version or if specific async mock logic is needed.
+    # For now, most will inherit the MockArduinoLink's behavior which calls the sync send.
 
 
 def test_of_pawduino():
@@ -890,7 +1248,6 @@ async def async_test_of_pawduino():
             print("Failed to configure the Arduino")
             return
 
-        # Start background monitoring
         await arduino.start_monitoring()
 
         for function in PawduinoFunctions:
@@ -898,7 +1255,6 @@ async def async_test_of_pawduino():
             response = await arduino.async_send(function.value)
             print(f"Arduino says: {response}")
 
-        # Stop background monitoring
         await arduino.stop_monitoring()
 
         print("All tests passed")
@@ -906,28 +1262,6 @@ async def async_test_of_pawduino():
         arduino.close()
 
 
-# Function to run the async test from synchronous code
 def run_async_test():
     """Run the async test in an event loop"""
     asyncio.run(async_test_of_pawduino())
-
-
-# if __name__ == "__main__":
-# test_of_pawduino()
-# run_async_test()
-# async def main():
-#     arduino = ArduinoLink()
-#     await arduino.start_monitoring()
-#     response = await arduino.async_white_lights_on()
-#     print(f"Response: {response}")
-
-#     # Listen for incoming messages
-#     while True:
-#         msg = await arduino.get_next_message(timeout=1.0)
-#         if msg is not None:
-#             print(f"Received: {msg}")
-
-#     await arduino.stop_monitoring()
-#     arduino.close()
-
-# asyncio.run(main())
