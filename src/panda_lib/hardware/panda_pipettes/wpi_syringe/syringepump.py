@@ -199,7 +199,6 @@ class SyringePump:
 
         _ = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density)
 
-        _ = self._run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density)
         volume_withdrawn_ml = round(self.pump.volume_withdrawn, PRECISION)
         volume_withdrawn_ul = round(volume_withdrawn_ml * 1000, PRECISION)
 
@@ -215,7 +214,7 @@ class SyringePump:
                 volume_withdrawn_ml,
                 self.pump.pumping_rate,
                 solution,
-                self.pipette.volume,
+                self.pipette_tracker.volume,
             )
 
         else:
@@ -307,7 +306,7 @@ class SyringePump:
             density = None
 
         # Run the pump to infuse the solution
-        _ = self._run_pump(
+        _ = self.run_pump(
             nesp_lib.PumpingDirection.INFUSE,
             volume_ml,
             rate,
@@ -416,6 +415,18 @@ class SyringePump:
         pump_control_logger.debug(log_msg)
 
         return 0
+
+    def update_pipette_volume(self, volume_ml: float):
+        """Change the volume of the pipette in ml"""
+        volume_ml = float(volume_ml)
+        if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
+            self.pipette_tracker.volume = round(
+                self.pipette_tracker.volume - (volume_ml * 1000), PRECISION
+            )
+        else:
+            self.pipette_tracker.volume = round(
+                self.pipette_tracker.volume + (volume_ml * 1000), PRECISION
+            )
 
 
 class MockPump(SyringePump):
