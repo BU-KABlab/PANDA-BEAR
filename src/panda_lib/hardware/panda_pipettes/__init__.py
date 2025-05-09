@@ -15,11 +15,11 @@ from .sql_pipette import (
 from .state import PipetteState
 
 pipette_type = read_config_value("PIPETTE", "PIPETTE_TYPE")
-if pipette_type == "WPI":
-    from .wpi_syringe.pipette import Pipette
+if str(pipette_type).upper() == "WPI":
+    from .wpi_syringe.syringepump import SyringePump as Pipette
 
-elif pipette_type == "OT2":
-    from .ot2_pipette.pipette import Pipette
+elif str(pipette_type).upper() == "OT2":
+    from .ot2_pipette.ot2P300 import OT2P300 as Pipette
 
 else:
     raise ValueError(f"Invalid pipette type: {pipette_type}")
