@@ -2,22 +2,23 @@ import csv
 import time
 from datetime import datetime
 
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
+from typing import Optional
 
-from panda_lib.hardware import arduino_interface
-from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
-from panda_lib.hardware.gantry_interface import PandaMill
-from panda_lib.sql_tools.panda_models import Base
-from shared_utilities.config.config_tools import read_config_value
+from src.panda_lib.hardware import arduino_interface
+from src.panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
+from src.panda_lib.hardware.gantry_interface import PandaMill
+from src.panda_lib.sql_tools.panda_models import Base
+from src.shared_utilities.config.config_tools import read_config_value
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine)
+engine: Engine = create_engine(DATABASE_URL)
+SessionLocal: sessionmaker = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
-
+CAP_NUM = 5  # TODO replace with the actual cap number
 
 def main():
     try:
@@ -37,7 +38,7 @@ def main():
             contamination=0,
             coordinates={
                 "x": -67.5,
-                "y": -45.5,
+                "y": -44.0,
                 "z": -197,
             },  # TODO replace with vial coordinates
             base_thickness=1,
@@ -50,11 +51,12 @@ def main():
         print(
             f"Vial {vial} has been created in memory please place a vial in position s3"
         )
-        input("Press Enter to continue...")
+        global CAP_NUM
+        CAP_NUM = input("Enter the cap number: ")
         # Set up the hardware connections
         with PandaMill() as mill:
             with arduino_interface.ArduinoLink(
-                read_config_value("ARDUINO", "port")
+                port_address = read_config_value("ARDUINO", "port")
             ) as arduino:
                 # Check the tools in the tool manager
                 print("Tools in the tool manager:")
@@ -74,6 +76,12 @@ def main():
 
                 # Run the decapping validation program
                 decapping_validation(mill, vial, arduino)
+
+                print("Decapping validation program complete")
+                print("Please remove the vial from position s3")
+
+                mill.home()
+                arduino.ALL_CAP() #decativate the decapper
     except Exception as e:
         print(e)
     finally:
@@ -84,79 +92,86 @@ def decapping_validation(
     mill: PandaMill,
     vial: StockVial,
     arduino: arduino_interface.ArduinoLink,
-    repetitions: int = 10,
-    z_start: float = None,
+    repetitions: int = 5,
+    z_start: Optional[float] = None,
     z_steps: int = 30,  # Total range is 6mm
     z_increment: float = 0.2,
 ):
-    log_entries = []
-    z_start = z_start if z_start is not None else vial.top
+    try:
+        log_entries = []
+        z_start = z_start if z_start is not None else vial.top
 
-    z_heights_to_test = [z_start + i * z_increment for i in range(z_steps)]
-    print(f"\nStarting decapping/capping tests at Z heights: {z_heights_to_test}")
+        z_heights_to_test = [z_start + i * z_increment for i in range(z_steps)]
+        print(f"\nStarting decapping/capping tests at Z heights: {z_heights_to_test}")
 
-    for z_height in z_heights_to_test:
-        print(f"\n===== Testing at Z height: {z_height}mm =====")
+        for z_height in z_heights_to_test:
+            print(f"\n===== Testing at Z height: {z_height}mm =====")
 
-        for i in tqdm(range(repetitions), desc=f"Decap/Cap at Z ={z_height:.2f}"):
-            trial = i + 1
-            print(
-                f"Decapping and capping the vial {repetitions} times: decapping \n{i + 1} of {repetitions}"
-            )
-
-            cap_picked_up, decap_attempts = decapping_sequence(
-                mill,
-                Coordinates(vial.coordinates.x, vial.coordinates.y, z_height),
-                arduino,
-            )
-
-            if not cap_picked_up:
-                print("ERROR: Decapping failed after max attempts. Pausing test.")
-                input(
-                    "Press Enter to continue after addressing the issue or Ctrl+C to exit."
+            for i in tqdm(range(repetitions), desc=f"Decap/Cap at Z ={z_height:.2f}"):
+                trial = i + 1
+                print(
+                    f"Decapping and capping the vial {repetitions} times: decapping \n{i + 1} of {repetitions}"
                 )
-                continue
 
-            print(
-                f"Decapping and capping the vial {repetitions} times: capping \n{i + 1} of {repetitions}"
-            )
-
-            cap_released, cap_attempts = capping_sequence(
-                mill,
-                Coordinates(vial.coordinates.x, vial.coordinates.y, z_height),
-                arduino,
-            )
-
-            if not cap_released:
-                print("ERROR: Capping failed after max attempts. Pausing test.")
-                input(
-                    "Press Enter to continue after addressing the issue or Ctrl+C to exit."
+                cap_picked_up, decap_attempts = decapping_sequence(
+                    mill,
+                    Coordinates(vial.coordinates.x, vial.coordinates.y, z_height),
+                    arduino,
                 )
-                continue
 
-            log_entries.append(
-                {
-                    "z_height": z_height,
-                    "trial": trial,
-                    "decap_attempts": decap_attempts,
-                    "cap_attempts": cap_attempts,
-                    "timestamp": datetime.now().isoformat(),
-                }
-            )
-    log_filename = f"decapper_validation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-    with open(log_filename, mode="w", newline="") as file:
-        fieldnames = [
-            "z_height",
-            "trial",
-            "decap_attempts",
-            "cap_attempts",
-            "timestamp",
-        ]
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(log_entries)
+                if not cap_picked_up:
+                    print("ERROR: Decapping failed after max attempts. Pausing test.")
+                    input(
+                        "Press Enter to continue after addressing the issue or Ctrl+C to exit."
+                    )
+                    continue
 
-    print(f"Test complete. Combined log saved to {log_filename}")
+                print(
+                    f"Decapping and capping the vial {repetitions} times: capping \n{i + 1} of {repetitions}"
+                )
+
+                cap_released, cap_attempts = capping_sequence(
+                    mill,
+                    Coordinates(vial.coordinates.x, vial.coordinates.y, z_height),
+                    arduino,
+                )
+
+                if not cap_released:
+                    print("ERROR: Capping failed after max attempts. Pausing test.")
+                    input(
+                        "Press Enter to continue after addressing the issue or Ctrl+C to exit."
+                    )
+                    continue
+
+                log_entries.append(
+                    {
+                        "z_height": z_height,
+                        "trial": trial,
+                        "decap_attempts": decap_attempts,
+                        "cap_attempts": cap_attempts,
+                        "timestamp": datetime.now().isoformat(),
+                    }
+                )
+    except KeyboardInterrupt:
+        print("Test interrupted by user.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        print("Test complete. Saving log...")
+        log_filename = f"cap_{CAP_NUM}_decapper_validation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        with open(log_filename, mode="w", newline="") as file:
+            fieldnames = [
+                "z_height",
+                "trial",
+                "decap_attempts",
+                "cap_attempts",
+                "timestamp",
+            ]
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(log_entries)
+
+        print(f"Test complete. Combined log saved to {log_filename}")
 
 
 def decapping_sequence(
@@ -187,7 +202,8 @@ def decapping_sequence(
 
         # Activate the decapper
         rx = ard_link.no_cap()
-        print(f"Decapper activated: {rx == 105}")
+        print(rx)
+        time.sleep(0.5)
         # Move the decapper up 20mm
         mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
 
@@ -239,12 +255,8 @@ def capping_sequence(
         # Deactivate the decapper
         rx = ard_link.ALL_CAP()
         print(f"Decapper deactivated: {rx == 106}")
-
-        # Move the decapper +5mm in the y direction
-        mill.move_to_position(
-            target_coords.x, target_coords.y, target_coords.z, tool="decapper"
-        )
-
+        time.sleep(0.5)
+        
         # Move the decapper to 0 z
         mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
 
