@@ -4,15 +4,16 @@ This module provides a class to link the computer and the Arduino
 
 import asyncio
 import enum
+import logging
 import os
 import queue
 import time
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import serial
 import serial.tools.list_ports
 from serial import Serial
-import logging
+
 
 class MockSerial:
     def __init__(self, *args, **kwargs):
@@ -58,10 +59,24 @@ class ArduinoLink:
 
     The class provides the following methods:
     - choose_arduino_port (choose the port that the ardiono is using)
-    - open (opens a connection to the Arduino)
+    - open (opens a connection to the Arduino) *can be used contextually
+    - close (closes the connection to the Arduino) *can be used contextually
     - receive (listens to the Arduino and puts the messages in the queue)
     - configure (configures the Arduino)
-    - send (sends a message to the Arduino and waits for a response)
+    - send (sends a message to the Arduino and waits for a response) *available asynchronously
+    - receive (receives a message from the Arduino) *available asynchronously
+    - start_monitoring (starts a background task to monitor the Arduino messages)
+    - stop_monitoring (stops the background task to monitor the Arduino messages)
+    - get_next_message (gets the next message from the event queue) *available asynchronously
+
+    Pipette Specific Methods:
+    - home (homes the pipette)
+    - get_status (gets the current status of the pipette)
+    - move_to (moves the pipette to a specific position in mm)
+    - aspirate (aspirates a specific volume in µL)
+    - dispense (dispenses a specific volume in µL)
+
+
 
     The class provides the following attributes:
     - arduinoPort (the port to which the Arduino is connected)
@@ -71,14 +86,13 @@ class ArduinoLink:
     """
 
     arduinoQueue = queue.Queue()
-    
 
     def __init__(self, port_address: str = "COM4", baud_rate: int = 115200):
         """Initialize the ArduinoLink class"""
         self.ser: Serial = None
         self.port_address: str = port_address
         self.baud_rate: int = baud_rate
-        self.timeout: int = 10
+        self.timeout: int = 60
         self.configured: bool = False
         self.connected: bool = False
         self.ack: str = "OK"
@@ -86,9 +100,12 @@ class ArduinoLink:
         self._running = False
         self._event_queue = asyncio.Queue()
         self.pipette_active = True
-        self.pipette_position = 0.0
-        self.pipette_volume = 0.0
-        self.pipette_speed = 0.0
+        # self.position = 0.0
+        # self.volume = 0.0
+        # self.max_volume = 300.0
+        # self.min_volume = 20.0
+        # self.zero_position = 0.0
+        # self.max_position = 60.0
         self.logger = logging.getLogger("panda")
         self.connect()
 
@@ -100,7 +117,7 @@ class ArduinoLink:
         """Close the connection to the Arduino when exiting the with statement"""
         self.close()
 
-    def choose_arduino_port(self, interactive: bool = False) -> str:
+    def _choose_arduino_port(self, interactive: bool = False) -> str:
         """Interactive method to choose the port that the Arduino is connected to"""
         # Check the OS and list the available ports accordingly
         if os.name == "posix":
@@ -147,7 +164,7 @@ class ArduinoLink:
             if self.ser is None and self.port_address is None:
                 # If no port address is provided, choose the port interactively
                 self.ser = Serial(
-                    self.choose_arduino_port(), self.baud_rate, timeout=self.timeout
+                    self._choose_arduino_port(), self.baud_rate, timeout=self.timeout
                 )
             else:
                 self.ser = Serial(
@@ -233,8 +250,7 @@ class ArduinoLink:
 
     def send(self, cmd):
         """Send a message to the Arduino and wait for a response"""
-        self.ser.flush()
-        self.ser.read_all()
+        self.ser.flush()  # Flush the input buffer
         msg = str(cmd)
         attempts = 0
         while True and attempts < 3:
@@ -250,11 +266,10 @@ class ArduinoLink:
             raise ConnectionError
 
         if ":" in rx:
-            rx = rx.split(":")[-1]
-        try:
-            return int(rx)
-        except (ValueError, TypeError):
-            return rx
+            sucess = rx.split(":")[0] == "OK"
+            if not sucess:
+                raise Exception(f"Arduino error: {rx}")
+        return rx
 
     async def async_send(self, cmd) -> Union[int, str]:
         """Asynchronous version of send"""
@@ -276,10 +291,14 @@ class ArduinoLink:
 
         if rx is None:
             raise ConnectionError
-        try:
-            return int(rx)
-        except (ValueError, TypeError):
-            return rx
+
+        else:
+            if ":" in rx:
+                success = rx.split(":")[0] == "OK"
+                if not success:
+                    raise Exception(f"Arduino error: {rx}")
+
+        return rx
 
     async def start_monitoring(self):
         """Start monitoring Arduino messages in the background"""
@@ -404,203 +423,178 @@ class ArduinoLink:
             print(value)
             i -= 1
 
-    def pipette_home(self)->bool:
-        # """Home the pipette"""
-        # return self.send(PawduinoFunctions.CMD_PIPETTE_HOME.value)
+    def pipette_send(self, cmd) -> str:
+        """Send a command to the pipette
+
+        Arguments:
+            cmd: The command to send to the pipette
+
+        Returns:
+            str: The response from the pipette
+
+        Raises:
+            Exception: If there is an error during communication with the pipette
+            ConnectionError: If the pipette is not connected or configured properly
+
+        """
+        try:
+            self.ser.flush()
+            self.ser.read_all()
+            self.ser.write(str(cmd).encode())
+            time.sleep(0.5)
+            rx = self.ser.read_until(b"DONE\n").strip()
+            # Look for OK: or ERR: at beginning
+            if rx.startswith(b"OK:"):
+                rx = rx[3:]
+            elif rx.startswith(b"ERR:"):
+                raise Exception(rx)
+            else:
+                raise ConnectionError
+            return rx.decode()
+
+        except ConnectionError:
+            self.logger.error("Pipette not connected or configured properly")
+            raise ConnectionError("Pipette not connected or configured properly")
+
+        except Exception as e:
+            self.logger.error(f"Error during pipette send: {str(e)}")
+            raise Exception(f"Error during pipette send: {str(e)}")
+
+    def home(self) -> bool:
         """
         Home the pipette.
-        
+
         Returns:
             bool: True if homing was successful
         """
         try:
-            response = self.send("H")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                self.pipette_status()
-            return success
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_HOME.value)
+            return response
         except Exception as e:
             self.logger.error(f"Error during homing: {str(e)}")
-            return False
+            raise Exception(f"Error during homing: {str(e)}")
 
-    def pipette_move(self, position: float, speed: Optional[int] = None) -> bool:
-        # """Move the pipette a distance in mm"""
-        # return self.send(PawduinoFunctions.CMD_PIPETTE_MOVE_TO.value + str(distance))
+    def get_status(self) -> Dict[str, Any]:
+        """
+        Get the current status of the pipette.
+
+        Returns:
+            dict: Status information including position and volume
+        """
+        try:
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
+            status = {}
+
+            # Parse the new format: "OK:isHomed,position,maxVolume"
+            # Example: "1,25,300"
+            if "OK:" in response:
+                parts = response.strip().split(",")
+            if len(parts) >= 3:
+                status["h"] = bool(int(parts[0].strip()))
+                status["p"] = float(parts[1].strip())
+                status["mxv"] = float(parts[2].strip())
+        except Exception as e:
+            self.logger.error(f"Error getting status: {str(e)}")
+            return {}
+        return status
+
+    def move_to(
+        self, position: float, speed: Optional[int] = None, wait: bool = True
+    ) -> bool:
         """
         Move to a specific position in mm.
-        
+
         Args:
             position: Position in mm
             speed: Movement speed (steps/second)
-            
+            wait: Wait for the movement to complete
+
         Returns:
             bool: True if movement was successful
         """
-        cmd = f"M{position}"
+        cmd = f"10{position}"
         if speed:
             cmd += f",{speed}"
-            
         try:
-            response = self.send(cmd)
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                self.pipette_status()
-            return success
-        
+            response = self.pipette_send(cmd)
+            return response
         except Exception as e:
             self.logger.error(f"Error during movement: {str(e)}")
-            return False
+            raise Exception(f"Error during movement: {str(e)}")
 
-    def pipette_aspirate(self, volume: float, rate: Optional[float] = None) -> bool:
-        """Aspirate a volume in uL"""
-        # return self.send(PawduinoFunctions.CMD_PIPETTE_ASPIRATE.value + str(volume))
+    def move_relative(self, direction, steps, velocity, wait):
+        """
+        Move the pipette in a specific direction by a certain number of steps.
+
+        Arguments:
+            direction: Direction to move (1 for up, 0 for down)
+            steps: Number of steps to move
+            velocity: Speed of movement (steps/second)
+            wait: Wait for the movement to complete
+
+        """
+        cmd = f"16{direction},{steps},{velocity}"
+        try:
+            response = self.pipette_send(cmd)
+            return response
+        except Exception as e:
+            self.logger.error(f"Error during movement: {str(e)}")
+            raise Exception(f"Error during movement: {str(e)}")
+
+    def aspirate(self, volume: float, rate: Optional[float] = None) -> bool:
         """
         Aspirate a specific volume in µL.
-        
+
         Args:
             volume: Volume to aspirate in µL
             rate: Aspiration rate in µL/s
-            
+
         Returns:
             bool: True if aspiration was successful
         """
-        cmd = f"A{volume}"
+        cmd = f"11{volume}"
         if rate:
             cmd += f",{rate}"
-            
         try:
-            response = self.send(cmd)
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after aspiration
-                status = self.pipette_status()
-                if status:
-                    if 'position' in status:
-                        self.piette_position = status['position']
-                    if 'volume' in status:
-                        self.piette_volume = status['volume']
-            return success
+            response = self.pipette_send(cmd)
+            return response
         except Exception as e:
             self.logger.error(f"Error during aspiration: {str(e)}")
-            return False
+            raise Exception(f"Error during aspiration: {str(e)}")
 
-    def pipette_dispense(self, volume: float, rate: Optional[float] = None) -> bool:
-        # """Dispense a volume in uL"""
-        # return self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE.value + str(volume))
+    def dispense(self, volume: float, rate: Optional[float] = None) -> bool:
         """
         Dispense a specific volume in µL.
-        
+
         Args:
             volume: Volume to dispense in µL
             rate: Dispensing rate in µL/s
-            
+
         Returns:
             bool: True if dispensing was successful
         """
-        cmd = f"E{volume}"
+        cmd = f"12{volume}"
         if rate:
             cmd += f",{rate}"
-            
+
         try:
-            response = self.send(cmd)
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after dispensing
-                status = self.pipette_status()
-                if status:
-                    if 'position' in status:
-                        self.pipette_position = status['position']
-                    if 'volume' in status:
-                        self.pipette_volume = status['volume']
-            return success
+            response = self.pipette_send(cmd)
+            return response
         except Exception as e:
             self.logger.error(f"Error during dispensing: {str(e)}")
-            return False
+            raise Exception(f"Error during dispensing: {str(e)}")
 
-    def pipette_status(self):  # TODO could this be more generic and get the status of the pipette but also other features?
-        """Get the status of the pipette"""
-        try:
-            status = {}
-            response = self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
-            # Parse position from response
-                for line in response.split('\n'):
-                    if "Position:" in line:
-                        parts = line.split(':')
-                        if len(parts) > 1:
-                            pos_parts = parts[1].strip().split()
-                            if len(pos_parts) > 0:
-                                status['position'] = float(pos_parts[0])
-                                self.pipette_position = status['position']
-                    
-                    if "Volume:" in line:
-                        parts = line.split(':')
-                        if len(parts) > 1:
-                            vol_parts = parts[1].strip().split()
-                            if len(vol_parts) > 0:
-                                status['volume'] = float(vol_parts[0])
-                                self.pipette_volume = status['volume']
-                    
-                return status
-        except Exception as e:
-            self.logger("Error getting pipette status: %s", e)
-            return {}
-    def pipette_move_to(self, pos, speed):  # TODO
-        """Move the pipette to a position in mm at a speed in mm/s"""
-        return self.send((PawduinoFunctions.CMD_PIPETTE_MOVE_TO.value, pos, speed))
-
-    def pipette_get_position(self):  # TODO
-        """Get the current position of the pipette"""
-        return self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
-
-    def pipette_set_volume(self, volume: float):
-        """
-        Set a specific volume in µL.
-        
-        Args:
-            volume: Volume in µL
-            
-        Returns:
-            bool: True if volume setting was successful
-        """
-        try:
-            response = self.send(f"V{volume}")
-            # response = self.send(PawduinoFunctions.CMD_PIPETTE_VOLUME.value + str(volume))
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                self.pipette_volume = volume
-                # Update position after volume change
-                self.pipette_status()
-            return success
-        except Exception as e:
-            .error(f"Error setting volume: {str(e)}")
-            return False
-
-    def pipette_blowout(self) -> bool:
-        """
-        Perform a blowout to expel all liquid.
-        
-        Returns:
-            bool: True if blowout was successful
-        """
-        try:
-            response = self.send("B")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                self.pipette_status()
-            return success
-        except Exception as e:
-            self.logger.error(f"Error during blowout: {str(e)}")
-            return False
-    
-    def pipette_mix(self, repetitions: int, volume: float, rate: Optional[float] = None) -> bool:
+    def mix(
+        self, repetitions: int, volume: float, rate: Optional[float] = None
+    ) -> bool:
         """
         Mix by performing multiple aspirate/dispense cycles.
-        
+
         Args:
             repetitions: Number of mix cycles
             volume: Volume to mix in µL
             rate: Mixing rate in µL/s
-            
+
         Returns:
             bool: True if mixing was successful
         """
@@ -609,86 +603,13 @@ class ArduinoLink:
             cmd += f",{volume}"
         if rate:
             cmd += f",{rate}"
-            
+
         try:
-            response = self.send(cmd)
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after mixing
-                self.pipette_status()
-            return success
+            response = self.pipette_send(cmd)
+            return response
         except Exception as e:
             self.logger.error(f"Error during mixing: {str(e)}")
-            return False
-            
-    def pipette_attach_tip(self) -> bool:
-        """
-        Attach a new tip (homes the pipette).
-        
-        Returns:
-            bool: True if tip attachment was successful
-        """
-        try:
-            response = self.send("T+")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after tip attachment
-                status = self.pipette_status()
-                if status:
-                    if 'position' in status:
-                        self.position = status['position']
-                    if 'volume' in status:
-                        self.volume = status['volume']
-            return success
-        except Exception as e:
-            self.logger.error(f"Error during tip attachment: {str(e)}")
-            return False
-    
-    def pipette_detach_tip(self) -> bool:
-        """
-        Detach the current tip (drops tip).
-        
-        Returns:
-            bool: True if tip detachment was successful
-        """
-        try:
-            response = self.send("T-")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after tip detachment
-                status = self.pipette_status()
-                if status:
-                    if 'position' in status:
-                        self.position = status['position']
-                    if 'volume' in status:
-                        self.volume = status['volume']
-            return success
-        except Exception as e:
-            self.logger.error(f"Error during tip detachment: {str(e)}")
-            return False
-    
-    def pipette_reset(self) -> bool:
-        """
-        Reset the pipette (home and empty).
-        
-        Returns:
-            bool: True if reset was successful
-        """
-        try:
-            response = self.send("R")
-            success = "OK" in response and "ERROR" not in response
-            if success:
-                # Update position and volume after reset
-                status = self.pipette_status()
-                if status:
-                    if 'position' in status:
-                        self.position = status['position']
-                    if 'volume' in status:
-                        self.volume = status['volume']
-            return success
-        except Exception as e:
-            self.logger.error(f"Error during reset: {str(e)}")
-            return False
+            raise Exception(f"Error during mixing: {str(e)}")
 
     def hello(self):
         """Send a hello message to the Arduino"""
@@ -816,9 +737,9 @@ class PawduinoFunctions(enum.Enum):
     CMD_PIPETTE_ASPIRATE = 11
     CMD_PIPETTE_DISPENSE = 12
     CMD_PIPETTE_STATUS = 13
-    CMD_PIPETTE_VOLUME = 14
-    CMD_PIPETTE_POSITION = 15
-
+    CMD_LED_TEST = 14
+    CMD_PIPETTE_MIX = 15
+    CMD_PIPETTE_MOVE_DIRECTION = 16
     CMD_HELLO = 99
 
 
@@ -849,6 +770,9 @@ class PawduinoReturnCodes(enum.Enum):
     RESP_PIPETTE_ASPIRATED = 111
     RESP_PIPETTE_DISPENSED = 112
     RESP_PIPETTE_STATUS = 113
+    RESP_LINE_TEST = 114
+    RESP_PIPETTE_MIX = 115
+    RESP_PIPETTE_MOVE_DIRECTION = 116
     RESP_HELLO = 999
 
 

@@ -54,9 +54,7 @@ class GamryPotentiostat:
             file_name = f"{experiment_id}_{experiment_type}"
             file_name = file_name.replace(" ", "_")
             file_name_start = file_name + "_0"
-            filepath: pathlib.Path = (data_dir / file_name_start).with_suffix(
-                ".txt"
-            )
+            filepath: pathlib.Path = (data_dir / file_name_start).with_suffix(".txt")
             i = 1
             while filepath.exists():
                 next_file_name = f"{file_name}_{i}"
@@ -68,9 +66,7 @@ class GamryPotentiostat:
             file_name = f"{project_campaign_id}_{campaign_id}_{experiment_id}_{well_id}_{experiment_type}"
             file_name = file_name.replace(" ", "_")
             file_name_start = file_name + "_0"
-            filepath: pathlib.Path = (data_dir / file_name_start).with_suffix(
-                ".txt"
-            )
+            filepath: pathlib.Path = (data_dir / file_name_start).with_suffix(".txt")
             # Check if the file already exists. If it does then add a number to the end of the file name
             i = 1
             while filepath.exists():

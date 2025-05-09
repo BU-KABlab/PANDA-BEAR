@@ -32,6 +32,7 @@ from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import setup_default_logger
 from .decapper_testing import main as decapper_test
 from .line_break_validation import main as line_break_test
+
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 config = read_config()["MILL"]
 

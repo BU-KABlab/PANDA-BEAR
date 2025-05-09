@@ -1,12 +1,10 @@
 import logging
 from logging import Logger
-from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
 from sqlalchemy.orm import Session
 
 from shared_utilities.config.config_tools import (
-    ConfigParserError,
     read_config,
     read_testing_config,
 )
@@ -22,20 +20,6 @@ from ..utilities import solve_vials_ilp
 TESTING = read_testing_config()
 
 config = read_config()
-
-# Constants
-try:
-    AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
-    DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
-    if TESTING:
-        PATH_TO_DATA = Path(config.get("TESTING", "data_dir"))
-        PATH_TO_LOGS = Path(config.get("TESTING", "logging_dir"))
-    else:
-        PATH_TO_DATA = Path(config.get("PRODUCTION", "data_dir"))
-        PATH_TO_LOGS = Path(config.get("PRODUCTION", "logging_dir"))
-except ConfigParserError as e:
-    logging.error("Failed to read config file. Error: %s", e)
-    raise e
 
 # Set up logging
 logger = logging.getLogger("panda")

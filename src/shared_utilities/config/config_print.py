@@ -18,7 +18,7 @@ if not env_found:
 
     # else:
     raise FileNotFoundError(
-        "No .env file found. Please create one with the required environment variables:" \
+        "No .env file found. Please create one with the required environment variables:"
         "\nPANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\nTEMP_DB='0'"
     )
 
@@ -85,9 +85,15 @@ def resolve_config_paths():
     config = ConfigParser()
     CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
     if not CONFIG_FILE or not Path(CONFIG_FILE).exists():
-        print("PANDA_SDL_CONFIG_PATH environment variable not set or config file not found.")
-        print("Please refer to the documentation for instructions on how to set up both the .env and .ini file.")
-        print("https://github.com/BU-KABlab/PANDA-BEAR/blob/packaing/documentation/installation.md#env-file")
+        print(
+            "PANDA_SDL_CONFIG_PATH environment variable not set or config file not found."
+        )
+        print(
+            "Please refer to the documentation for instructions on how to set up both the .env and .ini file."
+        )
+        print(
+            "https://github.com/BU-KABlab/PANDA-BEAR/blob/packaing/documentation/installation.md#env-file"
+        )
         exit()
 
     try:
@@ -151,7 +157,11 @@ def resolve_config_paths():
                         # from shutil import copyfile
 
                         # copyfile("./panda_lib/config/template.db", ".")
-                        from panda_lib_db.db_setup import setup_database, return_sql_dump_file
+                        from panda_lib_db.db_setup import (
+                            setup_database,
+                            return_sql_dump_file,
+                        )
+
                         setup_database(
                             db_path=value,
                             sql_dump=return_sql_dump_file(),

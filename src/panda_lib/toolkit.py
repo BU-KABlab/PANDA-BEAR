@@ -14,9 +14,9 @@ from panda_lib.hardware import ArduinoLink, MockArduinoLink
 from panda_lib.hardware.gantry_interface import MockPandaMill as MockMill
 from panda_lib.hardware.gantry_interface import PandaMill as Mill
 from panda_lib.hardware.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
-from panda_lib.hardware.panda_pipettes.wpi_syringe.syringepump import (
-    MockPump,
-    SyringePump,
+from panda_lib.hardware.panda_pipettes import (
+    MockPipette,
+    Pipette,
 )
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Wellplate
@@ -39,7 +39,7 @@ class Toolkit:
         self.initialize_camera(use_mock_instruments)
         self.mill = kwargs.get("mill", None)
         self.scale = kwargs.get("scale", None)
-        self.pump = kwargs.get("pump", None)
+        self.pipette = kwargs.get("pump", None)
         self.wellplate = kwargs.get("wellplate", None)
         self.arduino = kwargs.get("arduino", None)
         self.slack_monitor = kwargs.get("slack_monitor", None)
@@ -48,7 +48,7 @@ class Toolkit:
 
     mill: Union[Mill, MockMill, None] = None
     scale: Union[Scale, MockScale, None] = None
-    pump: Union[SyringePump, MockPump, None] = None
+    pipette: Union[Pipette, MockPipette, None] = None
     wellplate: Wellplate = None
     arduino: ArduinoLink = None
     global_logger: Logger = None
@@ -81,7 +81,7 @@ class Hardware:
         self.initialize_camera(use_mock_instruments)
         self.mill = kwargs.get("mill", None)
         self.scale = kwargs.get("scale", None)
-        self.pump = kwargs.get("pump", None)
+        self.pipette = kwargs.get("pump", None)
         self.wellplate = kwargs.get("wellplate", None)
         self.arduino = kwargs.get("arduino", None)
         self.slack_monitor = kwargs.get("slack_monitor", None)
@@ -90,7 +90,7 @@ class Hardware:
 
     mill: Union[Mill, MockMill, None] = None
     scale: Union[Scale, MockScale, None] = None
-    pump: Union[SyringePump, MockPump, None] = None
+    pipette: Union[Pipette, MockPipette, None] = None
     arduino: ArduinoLink = None
     # inlcude the global logger so that the hardware can log to the same file
     global_logger: Logger = None
@@ -175,7 +175,7 @@ def connect_to_instruments(
         instruments.mill = MockMill()
         instruments.mill.connect_to_mill()
         # instruments.scale = MockScale()
-        instruments.pump = MockPump()
+        instruments.pipette = MockPipette()
         # pstat = echem_mock.GamryPotentiostat.connect()
         instruments.arduino = MockArduinoLink()
 
@@ -224,12 +224,12 @@ def connect_to_instruments(
 
     try:
         logger.debug("Connecting to pump")
-        instruments.pump = SyringePump()
-        logger.debug("Connected to pump at %s", instruments.pump.pump.address)
+        instruments.pipette = Pipette()
+        logger.debug("Connected to pump at %s", instruments.pipette.pump.address)
 
     except Exception as error:
         logger.error("No pump connected, %s", error)
-        instruments.pump = None
+        instruments.pipette = None
         # raise error
         incomplete = True
 
@@ -341,7 +341,7 @@ def test_instrument_connections(
         print("Using mock instruments")
         instruments.mill = MockMill()
         instruments.mill.connect_to_mill()
-        instruments.pump = MockPump()
+        instruments.pipette = MockPipette()
         instruments.arduino = MockArduinoLink()
 
         # Setup mock camera based on the config
@@ -399,22 +399,33 @@ def test_instrument_connections(
         incomplete = True
 
     # Pump connection
-    print("Checking pump connection...", end="\r", flush=True)
-    try:
-        logger.debug("Connecting to pump")
-        pump = SyringePump()
-        if pump.connected:
-            logger.debug("Connected to pump at %s", pump.pump.address)
-            print("Pump connected                        ", flush=True)
-            connected_instruments.append("Pump")
-        else:
-            raise Exception("Failed to connect to pump")
-        pump.close()
-    except Exception as error:
-        logger.error("No pump connected, %s", error)
-        print("Pump not found                        ", flush=True)
-        disconnected_instruments.append("Pump")
-        incomplete = True
+    # Check if the config specifies a syringe pump. If not skip the check
+    syringe_pump = read_config_value("PIPETTE", "PIPETTE_TYPE")
+    if "syringe" not in syringe_pump.lower():
+        logger.debug("No syringe pump specified in the configuration file")
+        print(
+            "Syringe pump not specified in the configuration file, not checking connection",
+            flush=True,
+        )
+        connected_instruments.append("Pump")
+
+    else:
+        print("Checking pump connection...", end="\r", flush=True)
+        try:
+            logger.debug("Connecting to pump")
+            pipette = Pipette()
+            if pipette.connected:
+                logger.debug("Connected to pump at %s", pipette.pump.address)
+                print("Pump connected                        ", flush=True)
+                connected_instruments.append("Pump")
+            else:
+                raise Exception("Failed to connect to pump")
+            pipette.close()
+        except Exception as error:
+            logger.error("No pump connected, %s", error)
+            print("Pump not found                        ", flush=True)
+            disconnected_instruments.append("Pump")
+            incomplete = True
 
     # Check for camera based on the configuration
     print("Checking camera connection...", end="\r", flush=True)
@@ -610,5 +621,5 @@ def disconnect_from_instruments(instruments: Toolkit):
         instruments.arduino.close()
     if instruments.scale:
         instruments.scale.hw.close()
-    if instruments.pump:
-        instruments.pump.close()
+    if instruments.pipette:
+        instruments.pipette.close()

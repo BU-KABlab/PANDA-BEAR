@@ -1,6 +1,7 @@
 from time import sleep
 from tqdm import tqdm
 
+
 def delay_timer(seconds: int) -> None:
     """
     Delay the execution for a specified number of seconds.
@@ -15,5 +16,5 @@ def delay_timer(seconds: int) -> None:
         sleep(1)
 
 
-if __name__ ==  "__main__":
+if __name__ == "__main__":
     delay_timer(5)

@@ -2,6 +2,7 @@
 
 from shared_utilities.config.config_tools import read_config_value
 
+from .pipette import PipetteDBHandler
 from .sql_pipette import Pipette as PipetteModel
 from .sql_pipette import (
     activate_pipette,
@@ -14,12 +15,14 @@ from .sql_pipette import (
 )
 from .state import PipetteState
 
-pipette_type = read_config_value("PIPETTE", "PIPETTE_TYPE")
-if str(pipette_type).upper() == "WPI":
+pipette_type = str(read_config_value("PIPETTE", "pipette_type")).upper()
+if pipette_type == "WPI":
+    from .wpi_syringe.syringepump import MockPump as MockPipette
     from .wpi_syringe.syringepump import SyringePump as Pipette
 
-elif str(pipette_type).upper() == "OT2":
+elif pipette_type == "OT2":
     from .ot2_pipette.ot2P300 import OT2P300 as Pipette
+    from .ot2_pipette.ot2P300 import MockOT2P300 as MockPipette
 
 else:
     raise ValueError(f"Invalid pipette type: {pipette_type}")
@@ -27,6 +30,8 @@ else:
 
 __all__ = [
     "Pipette",
+    "MockPipette",
+    "PipetteDBHandler",
     "PipetteModel",
     "PipetteState",
     "activate_pipette",

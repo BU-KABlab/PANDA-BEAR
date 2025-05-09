@@ -176,7 +176,9 @@ class ToolManager:
                 [tool.to_dict() for tool in self.tool_offsets.values()], file, indent=4
             )
 
-    def add_tool(self, name: str, offset: Union[Coordinates, Tuple[float, float, float]]):
+    def add_tool(
+        self, name: str, offset: Union[Coordinates, Tuple[float, float, float]]
+    ):
         if not isinstance(name, str):
             try:
                 name = name.value

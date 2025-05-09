@@ -18,7 +18,7 @@ from .errors import InvalidPipetteID
 vessel_logger = logging.getLogger("vessel_logger")
 
 
-class Pipette:
+class PipetteDBHandler:
     """Class for storing pipette information"""
 
     def __init__(

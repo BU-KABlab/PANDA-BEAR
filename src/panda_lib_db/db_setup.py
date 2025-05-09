@@ -14,15 +14,17 @@ import sqlalchemy as sa
 # Import models - assuming they're available in panda_lib.sql_tools
 from .panda_models import Base
 
+
 def return_sql_dump_file():
     """Return the path to the SQL dump file."""
     # Get project root - assumes this script is in panda_lib_db folder
     project_root = os.path.dirname(os.path.abspath(__file__))
-    
+
     # Default SQL dump path
     sql_dump_path = os.path.join(project_root, "panda_db_dump.sql")
-    
+
     return sql_dump_path
+
 
 def create_engine(db_path, echo=False):
     """Create a SQLAlchemy engine for the database.

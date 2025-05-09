@@ -18,7 +18,7 @@ from panda_lib.actions.vessel_handling import (
 # from sqlalchemy import create_engine
 # from sqlalchemy.orm import Session, sessionmaker
 from panda_lib.hardware.panda_pipettes import (
-    Pipette,
+    PipetteDBHandler,
     # PipetteModel,
 )
 from panda_lib.labware import StockVial, Well
@@ -41,13 +41,13 @@ def toolkit():
         MockMill as Mill,
     )
     from panda_lib.toolkit import (
-        MockPump as SyringePump,
+        MockPipette as Pipette,
     )
 
     toolkit = Toolkit(
-        pump=SyringePump(), mill=Mill(), arduino=ArduinoLink(), scale=MagicMock()
+        pump=Pipette(), mill=Mill(), arduino=ArduinoLink(), scale=MagicMock()
     )
-    toolkit.pump.pipette = Pipette()
+    toolkit.pipette.pipette_tracker = PipetteDBHandler()
     return toolkit
 
 
@@ -107,8 +107,8 @@ def test_pipette_action(toolkit: Toolkit, src_vessel: StockVial, dst_vessel: Wel
         mock_line_break.side_effect = [True, False]
 
         _pipette_action(toolkit, src_vessel, dst_vessel, desired_volume)
-        assert toolkit.pump.pipette.volume == 0.0
-        assert toolkit.pump.pipette.volume_ml == 0.0
+        assert toolkit.pipette.pipette_tracker.volume == 0.0
+        assert toolkit.pipette.pipette_tracker.volume_ml == 0.0
         assert src_vessel.volume == 19900.0
         assert dst_vessel.well_data.volume == 100.0
 

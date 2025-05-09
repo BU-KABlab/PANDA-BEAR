@@ -59,8 +59,8 @@ class ExperimentBase:
         title="Experiment Name",
         description="Name of the experiment",
     )
-    protocol_id: Union[int, str] = Field(
-        default=999,
+    protocol_name: Union[int, str] = Field(
+        default="999",
         title="Protocol ID",
         description="Identifier for the protocol used in the experiment",
     )
@@ -83,7 +83,7 @@ class ExperimentBase:
         title="Solutions",
         description="Dictionary of solutions used in the experiment",
     )
-    plate_type_number: int = Field(
+    wellplate_type_id: int = Field(
         default=None,
         title="Plate Type Number",
         description="Type number of the wellplate used in the experiment",
@@ -122,8 +122,8 @@ class ExperimentBase:
         title="Plate ID",
         description="Identifier for the plate used in the experiment",
     )
-    override_well_selection: int = Field(
-        default=0,
+    override_well_selection: bool = Field(
+        default=False,
         title="Override Well Selection",
         description="Flag to override well selection (0 is normal, 1 is override)",
     )
@@ -548,6 +548,227 @@ class EchemExperimentBase(ExperimentBase):
     """
 
 
+@dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
+class ExperimentGenerator:
+    """Define the common data used to run and define an experiment"""
+
+    experiment_name: str = Field(
+        default="experiment",
+        title="Experiment Name",
+        description="Name of the experiment",
+    )
+    protocol_file_name: Union[int, str] = Field(
+        default="999",
+        title="Protocol ID",
+        description="Identifier for the protocol used in the experiment",
+    )
+
+    analyzer_file_name: Union[Callable, str, None] = Field(
+        default=None,
+        title="Analyzer",
+        description="Analyzer function or script used for the experiment",
+    )
+    generator_file_name: Union[Callable, str, None] = Field(
+        default=None,
+        title="Generator",
+        description="Generator function or script used for the experiment",
+    )
+    priority: Optional[int] = Field(
+        default=0,
+        title="Priority",
+        description="Priority level of the experiment. 0 is highest",
+    )
+    well_id: Optional[str] = Field(
+        default="A1",
+        title="Well ID",
+        description="Identifier for the well used in the experiment. Example: A1, B2, C3",
+    )
+
+    project_id: int = Field(
+        default=999,
+        title="Project ID",
+        description="Identifier for the project to group experiments by.",
+    )
+
+    wellplate_type_id: int = Field(
+        default=None,
+        title="Plate Type Number",
+        description="Type number of the wellplate used in the experiment",
+    )
+
+    project_campaign_id: int = Field(
+        default=0,
+        title="Project Campaign ID",
+        description="Identifier for the project campaign associated with the experiment",
+    )
+
+    plate_id: Optional[int] = Field(
+        default=None,
+        title="Plate ID",
+        description="Identifier for the plate used in the experiment",
+    )
+    override_well_selection: bool = Field(
+        default=False,
+        title="Override Well Selection",
+        description="Flag to override well selection (0 is normal, 1 is override)",
+    )
+
+    solutions: dict[str, dict[str, Union[int, float]]] = Field(
+        default={},
+        title="Solutions",
+        description="Dictionary of solutions used in the experiment. Example: {'solution1': {'concentration': 0.1, 'volume': 10}}",
+    )
+
+    def to_experiment_base(self) -> ExperimentBase:
+        """Convert the simplified generator to a full ExperimentBase instance"""
+        experiment = ExperimentBase(
+            experiment_name=self.experiment_name,
+            protocol_name=self.protocol_file_name,
+            priority=self.priority,
+            well_id=self.well_id,
+            project_id=self.project_id,
+            solutions=self.solutions,
+            wellplate_type_id=self.wellplate_type_id,
+            project_campaign_id=self.project_campaign_id,
+            plate_id=self.plate_id,
+            override_well_selection=self.override_well_selection,
+            analyzer=self.analyzer_file_name,
+            generator=self.generator_file_name,
+            status=ExperimentStatus.NEW,
+        )
+
+        return experiment
+
+
+@dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
+class EchemExperimentGenerator(ExperimentGenerator):
+    """Define the data that is used to generate an electrochemical experiment.
+
+    This is a simplified version of EchemExperimentBase with only the fields
+    that users need to define their experiments.
+    """
+
+    # Electrochemical parameters
+    ocp: int = 1  # Open Circuit Potential
+    ca: int = 1  # Cyclic Amperometry
+    cv: int = 1  # Cyclic Voltammetry
+    baseline: int = 0  # Baseline
+
+    # Flush parameters
+    flush_sol_name: str = ""  # Flush solution name
+    flush_sol_vol: Union[int, float] = 0  # Flush solution volume
+    flush_count: int = 3  # Flush solution concentration
+
+    # Mix parameters
+    mix: int = 0  # Binary mix or dont mix
+    mix_count: int = 0  # Number of times to mix
+    mix_volume: int = 0  # Volume to mix
+
+    # Rinse parameters
+    rinse_sol_name: str = "rinse"  # Rinse solution name
+    rinse_count: int = 4  # Default rinse count
+    rinse_vol: int = 120  # Default rinse volume
+
+    # CA parameters
+    ca_sample_period: float = float(0.1)  # Deposition sample period
+    ca_prestep_voltage: float = float(0.0)  # Pre-step voltage (V)
+    ca_prestep_time_delay: float = float(0.0)  # Pre-step delay time (s)
+    ca_step_1_voltage: float = float(
+        -1.7
+    )  # Step 1 voltage (V), deposition potential (V)
+    ca_step_1_time: float = float(
+        300.0
+    )  # run time 300 seconds, deposition duration (s)
+    ca_step_2_voltage: float = float(0.0)  # Step 2 voltage (V)
+    ca_step_2_time: float = float(0.0)  # Step 2 time (s)
+    ca_sample_rate: float = float(0.5)  # sample period (s)
+
+    # Characterization parameters
+    char_sol_name: str = ""  # Characterization solution name
+    char_vol: int = 0  # Characterization solution volume
+    char_concentration: float = 1.0  # Characterization solution concentration
+
+    # CV parameters
+    cv_sample_period: float = float(0.1)  # Characterization sample period
+    cv_initial_voltage: float = float(0.0)  # initial voltage
+    cv_first_anodic_peak: float = float(0.5)  # first anodic peak
+    cv_second_anodic_peak: float = float(-0.2)  # second anodic peak
+    cv_final_voltage: float = float(0.0)  # final voltage
+    cv_step_size: float = float(0.01)  # step size
+    cv_cycle_count: int = 3  # number of cycles
+    cv_scan_rate_cycle_1: float = float(0.1)
+    cv_scan_rate_cycle_2: float = None  # Will use cycle_1 value if None
+    cv_scan_rate_cycle_3: float = None  # Will use cycle_1 value if None
+
+    def __post_init__(self):
+        super().__post_init__()
+        # Set default scan rates if not provided
+        if self.cv_scan_rate_cycle_2 is None:
+            self.cv_scan_rate_cycle_2 = self.cv_scan_rate_cycle_1
+        if self.cv_scan_rate_cycle_3 is None:
+            self.cv_scan_rate_cycle_3 = self.cv_scan_rate_cycle_1
+
+    def to_echem_experiment_base(self) -> EchemExperimentBase:
+        """Convert the simplified generator to a full EchemExperimentBase instance"""
+        # First get the base experiment fields
+        base_experiment = self.to_experiment_base()
+
+        # Create the echem experiment with base fields
+        echem_experiment = EchemExperimentBase(
+            experiment_id=base_experiment.experiment_id,
+            experiment_name=base_experiment.experiment_name,
+            protocol_name=base_experiment.protocol_name,
+            priority=base_experiment.priority,
+            well_id=base_experiment.well_id,
+            project_id=base_experiment.project_id,
+            solutions=base_experiment.solutions,
+            wellplate_type_id=base_experiment.wellplate_type_id,
+            project_campaign_id=base_experiment.project_campaign_id,
+            plate_id=base_experiment.plate_id,
+            override_well_selection=base_experiment.override_well_selection,
+            analyzer=base_experiment.analyzer,
+            generator=base_experiment.generator,
+            status=base_experiment.status,
+            # Echem specific fields
+            ocp=self.ocp,
+            ca=self.ca,
+            cv=self.cv,
+            baseline=self.baseline,
+            flush_sol_name=self.flush_sol_name,
+            flush_sol_vol=self.flush_sol_vol,
+            flush_count=self.flush_count,
+            mix=self.mix,
+            mix_count=self.mix_count,
+            mix_volume=self.mix_volume,
+            rinse_sol_name=self.rinse_sol_name,
+            rinse_count=self.rinse_count,
+            rinse_vol=self.rinse_vol,
+            ca_sample_period=self.ca_sample_period,
+            ca_prestep_voltage=self.ca_prestep_voltage,
+            ca_prestep_time_delay=self.ca_prestep_time_delay,
+            ca_step_1_voltage=self.ca_step_1_voltage,
+            ca_step_1_time=self.ca_step_1_time,
+            ca_step_2_voltage=self.ca_step_2_voltage,
+            ca_step_2_time=self.ca_step_2_time,
+            ca_sample_rate=self.ca_sample_rate,
+            char_sol_name=self.char_sol_name,
+            char_vol=self.char_vol,
+            char_concentration=self.char_concentration,
+            cv_sample_period=self.cv_sample_period,
+            cv_initial_voltage=self.cv_initial_voltage,
+            cv_first_anodic_peak=self.cv_first_anodic_peak,
+            cv_second_anodic_peak=self.cv_second_anodic_peak,
+            cv_final_voltage=self.cv_final_voltage,
+            cv_step_size=self.cv_step_size,
+            cv_cycle_count=self.cv_cycle_count,
+            cv_scan_rate_cycle_1=self.cv_scan_rate_cycle_1,
+            cv_scan_rate_cycle_2=self.cv_scan_rate_cycle_2,
+            cv_scan_rate_cycle_3=self.cv_scan_rate_cycle_3,
+        )
+
+        return echem_experiment
+
+
 def _select_next_experiment_id() -> int:
     """Determines the next experiment id by checking the experiment table"""
 
@@ -590,8 +811,8 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
         experiment.experiment_id = experiment_id
         experiment.project_id = result.project_id
         experiment.project_campaign_id = result.project_campaign_id
-        experiment.plate_type_number = result.well_type
-        experiment.protocol_id = result.protocol_id
+        experiment.wellplate_type_id = result.well_type
+        experiment.protocol_name = result.protocol_id
         experiment.priority = result.priority
         experiment.filename = result.filename
         return experiment
@@ -716,8 +937,8 @@ def _insert_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.experiment_id,
                 experiment.project_id,
                 experiment.project_campaign_id,
-                experiment.plate_type_number,
-                experiment.protocol_id,
+                experiment.wellplate_type_id,
+                experiment.protocol_name,
                 experiment.priority,
                 experiment.filename,
                 datetime.now().isoformat(timespec="seconds"),
@@ -813,8 +1034,8 @@ def _update_experiments(experiments: List[ExperimentBase]) -> None:
             (
                 experiment.project_id,
                 experiment.project_campaign_id,
-                experiment.plate_type_number,
-                experiment.protocol_id,
+                experiment.wellplate_type_id,
+                experiment.protocol_name,
                 experiment.priority,
                 experiment.filename,
                 experiment.experiment_id,

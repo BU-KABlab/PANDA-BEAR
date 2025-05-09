@@ -111,8 +111,11 @@ baudrate = 115200
 timeout = 10
 config_file = mill_config.json
 
+[PIPETTE]
+pipette_type = WPI
+                
 [PUMP]
-port = 
+port = COM6
 baudrate = 19200
 timeout = 10
 syringe_inside_diameter = 4.600
