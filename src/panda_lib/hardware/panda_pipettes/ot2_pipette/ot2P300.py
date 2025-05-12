@@ -39,10 +39,10 @@ class OT2P300:
         max_p300_rate (float): Maximum pipetting rate in µL/s
     """
 
-    def __init__(self):
+    def __init__(self, arduino: Optional[ArduinoLink] = None):
         """Initialize the OT2P300 Pipette interface."""
         # Set up Arduino connection
-        self.arduino = ArduinoLink()
+        self.arduino = ArduinoLink() if arduino is None else arduino
 
         # Configuration constants
         self.max_p300_rate = config.getfloat(
@@ -333,10 +333,10 @@ class OT2P300:
 class MockOT2P300(OT2P300):
     """Mock version of OT2P300 for testing"""
 
-    def __init__(self):
+    def __init__(self, arduino: Optional[ArduinoLink] = None):
         """Initialize the mock OT2P300 interface"""
         # Use the mock Arduino interface
-        self.arduino = MockArduinoLink()
+        self.arduino = MockArduinoLink() if arduino is None else arduino
 
         # Configuration constants
         self.max_p300_rate = config.getfloat(
