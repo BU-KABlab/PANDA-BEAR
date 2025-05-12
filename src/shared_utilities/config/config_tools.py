@@ -121,13 +121,20 @@ def get_config_path() -> str:
     if is_testing_mode():
         test_config_path = os.getenv("PANDA_TESTING_CONFIG_PATH")
         if test_config_path and os.path.exists(test_config_path):
+            logger.debug(f"Using test config path: {test_config_path}")
             return test_config_path
+        else:
+            logger.debug(
+                f"Testing mode but no valid test config path found. PANDA_TESTING_CONFIG_PATH={test_config_path}"
+            )
 
     # Otherwise use the standard config path
     var = get_env_var(
         "PANDA_SDL_CONFIG_PATH",
         default=str(get_repo_path() / "config" / "settings.ini"),
     )
+
+    logger.debug(f"Using standard config path: {var}")
 
     # Check if the config path is valid
     if not os.path.exists(var):
@@ -151,14 +158,22 @@ def read_config() -> ConfigParser:
     global _config_cache
 
     config_path = get_config_path()
-
-    # Only reload if config has changed or not loaded
-    if _config_cache is None or not hasattr(_config_cache, "last_modified"):
+    logger.debug(
+        f"Reading config from: {config_path}"
+    )  # Always reload if in testing mode to ensure fresh config
+    if is_testing_mode():
         validate_config_path(config_path)
         config = ConfigParser()
         config.read(config_path)
-
-        # Store last modified time for cache invalidation
+        config.last_modified = os.path.getmtime(config_path)
+        _config_cache = config
+        # In testing mode, return the fresh config directly, not the cache
+        return config
+    # Otherwise use normal caching logic
+    elif _config_cache is None or not hasattr(_config_cache, "last_modified"):
+        validate_config_path(config_path)
+        config = ConfigParser()
+        config.read(config_path)
         config.last_modified = os.path.getmtime(config_path)
         _config_cache = config
     else:
@@ -177,7 +192,14 @@ def reload_config() -> None:
     """Reloads the configuration file and clears the cache."""
     global _config_cache
     _config_cache = None
-    read_config.cache_clear()
+
+    # Clear the lru_cache
+    try:
+        read_config.cache_clear()
+    except AttributeError:
+        logger.debug("read_config.cache_clear() failed, possibly not decorated")
+
+    # Force a read of the config
     read_config()
     logger.info("Configuration reloaded.")
 
