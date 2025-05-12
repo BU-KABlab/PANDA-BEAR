@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from panda_lib.hardware.panda_pipettes import (
-    Pipette,
+    PipetteDBHandler,
     PipetteModel,
     insert_new_pipette,
     select_current_pipette_id,
@@ -16,28 +16,28 @@ from panda_lib.sql_tools.panda_models import Base
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine)
-Base.metadata.create_all(engine)
+pipette_database_engine = create_engine(DATABASE_URL)
+PipetteSessionMaker = sessionmaker(bind=pipette_database_engine)
+Base.metadata.create_all(pipette_database_engine)
 
 # populate the panda_pipette table with a few pipettes
 pipette_data = [
     (
-        1,
-        200,
-        0.2,
-        0,
-        0,
-        {"edot": 0.0, "rinse": 0.0, "liclo4": 0.0},
-        datetime(2024, 12, 27, 1, 52, 35, 723000),
-        0,
-        159,
-        99,
+        1,  # id
+        200,  # capacity_ul
+        0.2,  # capacity_ml
+        0,  # volume_ul
+        0,  # volume_ml
+        {"edot": 0.0, "rinse": 0.0, "liclo4": 0.0},  # contents
+        datetime(2024, 12, 27, 1, 52, 35, 723000),  # updated
+        0,  # active
+        159,  # uses
+        99,  # panda_unit_id
     ),
     (2, 200, 0.2, 0, 0, {}, datetime(2024, 12, 27, 1, 52, 35, 724000), 1, 0, 99),
 ]
 
-with Session(engine) as session_maker:
+with Session(pipette_database_engine) as session_maker:
     for pipette in pipette_data:
         session_maker.add(
             PipetteModel(
@@ -59,7 +59,7 @@ with Session(engine) as session_maker:
 @pytest.fixture(scope="function")
 def session_maker():
     """Create a new database session for a test."""
-    db = SessionLocal
+    db = PipetteSessionMaker
     try:
         yield db
     finally:
@@ -67,7 +67,7 @@ def session_maker():
 
 
 def test_pipette_initialization(session_maker: sessionmaker):
-    pipette: Pipette = Pipette(db_session_maker=session_maker)
+    pipette: PipetteDBHandler = PipetteDBHandler(db_session_maker=session_maker)
     stmt = select(PipetteModel).where(PipetteModel.id == 2)
     pipette_db = session_maker().execute(stmt).scalars().first()
     assert pipette_db.capacity_ml == 0.2
@@ -91,7 +91,7 @@ def test_pipette_initialization(session_maker: sessionmaker):
 
 
 def test_set_capacity(session_maker: Session):
-    pipette: Pipette = Pipette(db_session_maker=session_maker)
+    pipette: PipetteDBHandler = PipetteDBHandler(db_session_maker=session_maker)
     pipette.set_capacity(1000)
     assert pipette.capacity_ul == 1000.0
     assert pipette.capacity_ml == 1.0
@@ -101,7 +101,7 @@ def test_set_capacity(session_maker: Session):
 
 
 def test_update_contents(session_maker: Session):
-    pipette: Pipette = Pipette(db_session_maker=session_maker)
+    pipette: PipetteDBHandler = PipetteDBHandler(db_session_maker=session_maker)
     pipette.update_contents("water", 500)
     assert pipette.contents["water"] == 500.0
     assert pipette.volume == 500.0
@@ -112,7 +112,7 @@ def test_update_contents(session_maker: Session):
 
 
 def test_volume_setter(session_maker: Session):
-    pipette: Pipette = Pipette(db_session_maker=session_maker)
+    pipette: PipetteDBHandler = PipetteDBHandler(db_session_maker=session_maker)
     pipette.volume = 1000
     assert pipette.volume == 1000.0
 
@@ -121,7 +121,7 @@ def test_volume_setter(session_maker: Session):
 
 
 def test_volume_ml_setter(session_maker: Session):
-    pipette: Pipette = Pipette(db_session_maker=session_maker)
+    pipette: PipetteDBHandler = PipetteDBHandler(db_session_maker=session_maker)
     pipette.volume_ml = 1
     assert pipette.volume_ml == 1.0
     assert pipette.volume == 1000.0
@@ -131,7 +131,7 @@ def test_volume_ml_setter(session_maker: Session):
 
 
 def test_reset_contents(session_maker: Session):
-    pipette: Pipette = Pipette(db_session_maker=session_maker)
+    pipette: PipetteDBHandler = PipetteDBHandler(db_session_maker=session_maker)
     pipette.update_contents("water", 500)
     pipette.reset_contents()
     assert pipette.contents == {}
@@ -140,7 +140,7 @@ def test_reset_contents(session_maker: Session):
 
 
 def test_liquid_volume(session_maker: Session):
-    pipette: Pipette = Pipette(db_session_maker=session_maker)
+    pipette: PipetteDBHandler = PipetteDBHandler(db_session_maker=session_maker)
     pipette.reset_contents()
     pipette.update_contents("water", 500)
     pipette.update_contents("ethanol", 300)

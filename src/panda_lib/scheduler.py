@@ -337,7 +337,15 @@ def schedule_experiments(
     # Convert any generator types to their respective base types
     converted_experiments = []
     for experiment in experiments:
-        experiment.experiment_id = select_next_experiment_id()
+        if not isinstance(experiment, (ExperimentBase, ExperimentGenerator)):
+            logger.error(
+                "Experiment %s is not a valid experiment type, skipping",
+                str(experiment),
+            )
+            print(f"Experiment {str(experiment)} is not a valid experiment type")
+            continue
+        if experiment.experiment_id is None:
+            experiment.experiment_id = select_next_experiment_id()
         if isinstance(experiment, EchemExperimentGenerator):
             converted_experiments.append(experiment.to_echem_experiment_base())
         elif isinstance(experiment, ExperimentGenerator):

@@ -3,13 +3,12 @@ This module contains functions to interact with the pipette_status table in the 
 """
 
 import json
-import os
 from typing import Union
 
 from sqlalchemy import select
 from sqlalchemy.orm.session import Session, sessionmaker
 
-from shared_utilities.config.config_tools import read_config_value, read_testing_config
+from shared_utilities.config.config_tools import get_unit_id, read_config_value
 from shared_utilities.db_setup import SessionLocal
 
 from .models import (
@@ -18,17 +17,6 @@ from .models import (
 )  # Ensure you import your Base and Pipette model
 
 precision = read_config_value("OPTIONS", "precision", 6)
-
-
-def get_unit_id():
-    """Get the current unit ID, respecting tests if applicable."""
-    # During testing, always use unit_id from environment or test config
-    if read_testing_config() or os.getenv("PYTEST_CURRENT_TEST"):
-        env_unit_id = os.getenv("PANDA_UNIT_ID")
-        if env_unit_id is not None:
-            return int(env_unit_id)
-    # Production usage
-    return int(read_config_value("PANDA", "unit_id", 99))
 
 
 def select_pipette_status(

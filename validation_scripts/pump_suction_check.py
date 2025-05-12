@@ -8,11 +8,12 @@ from panda_lib.actions import (
 )
 from panda_lib.experiment_loop import (
     _establish_system_state,
+)
+from panda_lib.toolkit import (
     connect_to_instruments,
     disconnect_from_instruments,
 )
-from panda_lib.hardware import Instruments
-from panda_lib.utilities import correction_factor, input_validation
+from panda_lib.utilities import Instruments, correction_factor, input_validation
 
 purge = 40
 drip_stop = 5
@@ -42,18 +43,18 @@ def main():
         toolkit.pipette.aspirate(purge)
 
         toolkit.mill.safe_move(
-            test_solution.coordinates.x,
-            test_solution.coordinates.y,
-            test_solution.coordinates.z_top,
+            test_solution.x,
+            test_solution.y,
+            test_solution.top,
             Instruments.DECAPPER,
         )
 
         toolkit.arduino.no_cap()
 
         toolkit.mill.safe_move(
-            test_solution.coordinates.x,
-            test_solution.coordinates.y,
-            test_solution.coordinates.z_bottom,
+            test_solution.x,
+            test_solution.y,
+            test_solution.bottom,
             Instruments.PIPETTE,
         )
         toolkit.pipette.aspirate(test_volume, test_solution)
@@ -61,9 +62,9 @@ def main():
         toolkit.pipette.aspirate(drip_stop)
 
         toolkit.mill.safe_move(
-            test_solution.coordinates.x,
-            test_solution.coordinates.y,
-            test_solution.coordinates.z_top,
+            test_solution.x,
+            test_solution.y,
+            test_solution.top,
             Instruments.DECAPPER,
         )
 
@@ -72,9 +73,9 @@ def main():
         time.sleep(15)
         input("Press enter to continue...")
         toolkit.mill.safe_move(
-            test_waste.coordinates.x,
-            test_waste.coordinates.y,
-            test_waste.coordinates.z_top,
+            test_waste.x,
+            test_waste.y,
+            test_waste.top,
             Instruments.PIPETTE,
         )
         toolkit.pipette.dispense(

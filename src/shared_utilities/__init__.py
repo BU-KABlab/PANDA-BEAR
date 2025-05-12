@@ -43,7 +43,7 @@ def get_port_names():
     return [port.name for port in ports]
 
 
-def get_port_manufacturers() -> dict[str:str]:
+def get_port_manufacturers() -> dict:
     """List all available port manufacturers"""
     import os
 

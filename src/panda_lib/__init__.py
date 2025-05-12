@@ -7,12 +7,12 @@ from panda_shared.config import load_config
 # Load configuration when the library is imported
 config = load_config()
 
-from panda_lib import actions, experiments, sql_tools
-from panda_lib import actions as protocol
-from panda_lib.experiment_analysis_loop import analysis_worker, load_analyzers
-from panda_lib.hardware import imaging, panda_pipettes
-from panda_lib.toolkit import Toolkit
-from panda_lib.utilities import (
+from . import actions, experiments, sql_tools
+from . import actions as protocol
+from .experiment_analysis_loop import analysis_worker, load_analyzers
+from .hardware import imaging, panda_pipettes
+from .toolkit import Toolkit
+from .utilities import (
     Coordinates,
     Instruments,
     SystemState,

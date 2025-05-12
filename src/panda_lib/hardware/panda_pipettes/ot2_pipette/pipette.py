@@ -109,7 +109,9 @@ class Pipette:
         cls,
         stepper: ArduinoLink,
         config_file: str = "P300.json",
-        path: str = os.path.join(os.path.dirname(__file__), "definitions", "single_channel"),
+        path: str = os.path.join(
+            os.path.dirname(__file__), "definitions", "single_channel"
+        ),
     ) -> "Pipette":
         """Initialize the pipette object from a config file
 
@@ -127,8 +129,8 @@ class Pipette:
         - `blowout_position`: The position of the plunger for running a :method:`blowout` step
         - `drop_tip_position`: The position of the plunger for running a :method:`drop_tip` step
         - `mm_to_ul`: The conversion factor for converting motor microsteps in mm to uL
-        
-        
+
+
         :param index: The tool index of the pipette on the machine
         :type index: int
         :param name: The tool name
@@ -366,6 +368,7 @@ class Pipette:
             logger.error("Failed to get pipette status: %s", error_msg)
             return {"success": False, "message": error_msg}
 
+
 class MockPipette:
     """A mock class for the pipette, used for testing purposes"""
 
@@ -388,7 +391,8 @@ class MockPipette:
         else:
             logger.warning("No tip attached. Cannot aspirate.")
             raise ToolStateError("No tip attached. Cannot aspirate.")
-        return True 
+        return True
+
     def dispense(self, vol: float):
         """Mock dispense method"""
         if self.has_tip:
@@ -398,6 +402,7 @@ class MockPipette:
             logger.warning("No tip attached. Cannot dispense.")
             raise ToolStateError("No tip attached. Cannot dispense.")
         return True
+
     def blowout(self):
         """Mock blowout method"""
         if self.has_tip:
@@ -406,6 +411,7 @@ class MockPipette:
             logger.warning("No tip attached. Cannot blowout.")
             raise ToolStateError("No tip attached. Cannot blowout.")
         return True
+
     def drop_tip(self):
         """Mock drop tip method"""
         if self.has_tip:
@@ -415,16 +421,19 @@ class MockPipette:
             logger.warning("No tip attached. Cannot drop tip.")
             raise ToolStateError("No tip attached. Cannot drop tip.")
         return True
+
     def home(self):
         """Mock home method"""
         self.position = 0.0
         logger.info("Mock pipette homed")
         return True
+
     def prime(self):
         """Mock prime method"""
         self.is_primed = True
         logger.info("Mock pipette primed")
         return True
+
     def get_status(self):
         """Mock get status method"""
         status = {
@@ -434,6 +443,7 @@ class MockPipette:
         }
         logger.info("Mock pipette status: %s", status)
         return status
+
     def vol2move(self, vol):
         """Mock volume to move method"""
         if vol < self.min_volume or vol > self.max_volume:

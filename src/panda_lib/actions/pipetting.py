@@ -1,6 +1,5 @@
 import logging
 import math
-from pathlib import Path
 from typing import Optional, Union
 
 from panda_lib.errors import NoAvailableSolution
@@ -10,7 +9,6 @@ from shared_utilities.config.config_tools import (
     read_config,
     read_testing_config,
 )
-from shared_utilities.log_tools import timing_wrapper
 
 from ..experiments.experiment_types import (
     EchemExperimentBase,
@@ -30,12 +28,6 @@ config = read_config()
 try:
     AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
     DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
-    if TESTING:
-        PATH_TO_DATA = Path(config.get("TESTING", "data_dir"))
-        PATH_TO_LOGS = Path(config.get("TESTING", "logging_dir"))
-    else:
-        PATH_TO_DATA = Path(config.get("PRODUCTION", "data_dir"))
-        PATH_TO_LOGS = Path(config.get("PRODUCTION", "logging_dir"))
 except ConfigParserError as e:
     logging.error("Failed to read config file. Error: %s", e)
     raise e
@@ -172,7 +164,6 @@ def _pipette_action(
             )
 
 
-@timing_wrapper
 def _forward_pipette_v3(
     volume: float,
     src_vessel: Union[str, Well, StockVial],
@@ -268,7 +259,6 @@ def transfer(
     )
 
 
-@timing_wrapper
 def rinse_well(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
@@ -332,7 +322,6 @@ def rinse_well(
     return 0
 
 
-@timing_wrapper
 def flush_pipette(
     flush_with: str,
     toolkit: Toolkit,
@@ -381,7 +370,6 @@ def flush_pipette(
     return 0
 
 
-@timing_wrapper
 def purge_pipette(
     toolkit: Toolkit,
 ):
@@ -427,7 +415,6 @@ def purge_pipette(
     )
 
 
-@timing_wrapper
 def volume_correction(
     volume: float, density: float = None, viscosity: float = None
 ) -> float:
@@ -452,7 +439,6 @@ def volume_correction(
     return float(corrected_volume)
 
 
-@timing_wrapper
 def mix(
     toolkit: Union[Toolkit, Hardware],
     well: Well,

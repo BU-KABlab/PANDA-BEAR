@@ -18,25 +18,13 @@ Otherwise the experiment is not in the queue.
 # in the well_hx table should be added to the queue in some manner but this is not implemented yet.
 
 # from panda_lib.sql_tools.sql_utilities import execute_sql_command, execute_sql_command_no_return
-import os
 import random
 from typing import Optional
 
 from sqlalchemy import and_, select
 
-from shared_utilities.config.config_tools import read_config_value, read_testing_config
+from shared_utilities.config.config_tools import get_unit_id
 from shared_utilities.db_setup import SessionLocal
-
-
-def get_unit_id() -> int:
-    """Get the current unit ID, respecting tests if applicable."""
-    # During testing, always use unit_id from environment or test config
-    if read_testing_config() or os.getenv("PYTEST_CURRENT_TEST"):
-        env_unit_id = os.getenv("PANDA_UNIT_ID")
-        if env_unit_id is not None:
-            return int(env_unit_id)
-    # Production usage
-    return int(read_config_value("PANDA", "unit_id", 99))
 
 
 class Queue:

@@ -158,8 +158,8 @@ def resolve_config_paths():
 
                         # copyfile("./panda_lib/config/template.db", ".")
                         from panda_lib_db.db_setup import (
-                            setup_database,
                             return_sql_dump_file,
+                            setup_database,
                         )
 
                         setup_database(
