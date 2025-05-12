@@ -89,6 +89,7 @@ def _pipette_action(
                 toolkit.arduino,
             )
 
+        # Use standard interface for aspirate
         toolkit.pipette.aspirate(AIR_GAP)
         toolkit.mill.safe_move(
             src_vessel.x,
@@ -116,6 +117,7 @@ def _pipette_action(
                 toolkit.arduino,
             )
 
+        # Use standard interface for dispense
         toolkit.mill.safe_move(
             dst_vessel.x,
             dst_vessel.y,

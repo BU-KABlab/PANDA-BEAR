@@ -4,7 +4,7 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
 import time
-from typing import Optional
+from typing import Optional, Union
 
 import nesp_lib
 from nesp_lib.mock import Pump as MockNespLibPump
@@ -152,24 +152,24 @@ class SyringePump:
 
     def aspirate(
         self,
-        volume_to_withdraw: float,
-        solution: Optional[object] = None,
-        rate: float = None,
-    ) -> Optional[object]:
+        volume_to_aspirate: float,
+        solution: Optional[Union[Vial, wp.Well]] = None,
+        rate: Optional[float] = None,
+    ) -> Optional[Union[Vial, wp.Well]]:
         """
         Withdraw the given volume at the given rate from the specified vessel.
         Update the volume of the pipette and the solution if given.
         If only volume is specified, air is withdrawn.
 
         Args:
-            volume_to_withdraw (float): Volume to be withdrawn in microliters.
-            solution (Vessel object, optional): The vial or well to withdraw from. If None, air is withdrawn.
+            volume_to_aspirate (float): Volume to be withdrawn in microliters.
+            solution (Union[Vial, wp.Well], optional): The vial or well to withdraw from. If None, air is withdrawn.
             rate (float, optional): Pumping rate in milliliters per minute. None defaults to the max pump rate.
 
         Returns:
             The updated solution object if given one, otherwise None
         """
-        volume_ml = round(float(volume_to_withdraw / 1000), PRECISION)
+        volume_ml = round(float(volume_to_aspirate / 1000), PRECISION)
         if volume_ml <= 0:
             return None
 
@@ -237,20 +237,20 @@ class SyringePump:
 
     def dispense(
         self,
-        volume_to_infuse: float,
-        being_infused: Optional[object] = None,
-        infused_into: Optional[object] = None,
-        rate: float = None,
-        blowout_ul: float = float(0.0),
+        volume_to_dispense: float,
+        being_infused: Optional[Union[Vial, wp.Well]] = None,
+        infused_into: Optional[Union[Vial, wp.Well]] = None,
+        rate: Optional[float] = None,
+        blowout_ul: float = 0.0,
     ) -> None:
         """
         Infuse the given volume at the given rate from the specified position.
         If only volume is specified, air is infused.
 
         Args:
-            volume_to_infuse (float): Volume to be infused in microliters.
-            being_infused (Vial object, optional): The solution being infused to get the density
-            infused_into (str or Vial, optional): The destination of the solution (well or vial)
+            volume_to_dispense (float): Volume to be infused in microliters.
+            being_infused (Union[Vial, wp.Well], optional): The solution being infused to get the density
+            infused_into (Union[Vial, wp.Well], optional): The destination of the solution (well or vial)
             rate (float, optional): Pumping rate in milliliters per minute. None defaults to the max pump rate.
             blowout_ul (float): The volume to blowout in microliters
 
@@ -258,7 +258,7 @@ class SyringePump:
             None
         """
         # Convert volume to microliters
-        volume_ml = round(float(volume_to_infuse / 1000), PRECISION)
+        volume_ml = round(float(volume_to_dispense / 1000), PRECISION)
         # Convert blowout volume to milliliters
         blowout_ml = round(float(blowout_ul) / 1000, PRECISION)
 
