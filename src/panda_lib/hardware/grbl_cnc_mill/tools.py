@@ -5,8 +5,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, Tuple, Union
 
-from panda_lib.types import CoordinatesDict, ToolInfo, JSONSerializable
-
+from panda_lib.types import JSONSerializable, ToolInfo
 
 # NOTE these are not mill agnostic, so they should be implemented by whichever
 # project is using this library.
@@ -102,7 +101,7 @@ class Coordinates:
         else:
             raise IndexError("Index out of range")
 
-    def to_dict(self) -> CoordinatesDict:
+    def to_dict(self) -> dict:
         return {
             "x": self.x,
             "y": self.y,
@@ -120,7 +119,7 @@ class ToolOffset(JSONSerializable):
         offset = Coordinates(data["x"], data["y"], data["z"])
         return cls(name=data["name"], offset=offset)
 
-    def to_dict(self) -> ToolInfo:
+    def to_dict(self) -> dict:
         return {
             "name": self.name,
             "x": self.offset.x,

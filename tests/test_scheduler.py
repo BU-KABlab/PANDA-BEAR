@@ -47,10 +47,11 @@ def test_schedule_experiment_existing_experiment(temp_test_db):
     """
     Tests scheduling an experiment that already exists in the database.
     """
-    from panda_lib.scheduler import schedule_experiment
+    from panda_lib.scheduler import select_next_experiment_id
 
+    exp_id = select_next_experiment_id()
     experiment = ExperimentBase(
-        experiment_id=1,
+        experiment_id=exp_id,
         project_id=1,
         project_campaign_id=1,
         plate_id=1,
@@ -63,8 +64,9 @@ def test_schedule_experiment_existing_experiment(temp_test_db):
         created="2022-01-01T00:00:00Z",
         updated="2022-01-01T00:00:00Z",
     )
-    schedule_experiment(experiment)
-    result = schedule_experiment(experiment)
+    initial_result = schedule_experiments([experiment])
+    assert initial_result == 1
+    result = schedule_experiments([experiment])
     assert result == 0
 
 

@@ -163,7 +163,7 @@ class Pipette:
         self.get_status()
         end_pos = self.position + distance
 
-        self.stepper.move_to(end_pos,s, True)
+        self.stepper.move_to(end_pos, s, True)
 
     @tip_check
     def dispense(self, vol: float, s: int = 2000):
@@ -185,7 +185,7 @@ class Pipette:
         #    raise ToolStateError("Error: Pipette does not have anything to dispense")
         # elif dv > self.zero_position:
         #    raise ToolStateError ("Error : The volume to be dispensed is greater than what was aspirated")
-        self.stepper.move_to(end_pos,s, True)
+        self.stepper.move_to(end_pos, s, True)
 
     @tip_check
     def blowout(self, s: int = 6000):
@@ -254,6 +254,6 @@ class Pipette:
         :return: The current status of the pipette
         :rtype: dict
         """
-        status= self.stepper.get_status()
+        status = self.stepper.get_status()
         self.position = status["p"]
         self.max_volume = status["mxv"]

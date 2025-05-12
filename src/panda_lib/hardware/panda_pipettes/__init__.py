@@ -1,6 +1,6 @@
 """This module is used to control the pipette. It is used to get the status of the pipette and to set the status of the pipette."""
 
-from shared_utilities.config.config_tools import read_config_value
+from shared_utilities.config.config_tools import read_config_value, read_testing_config
 
 from .pipette import PipetteDBHandler
 from .sql_pipette import Pipette as PipetteModel
@@ -17,12 +17,16 @@ from .state import PipetteState
 
 pipette_type = str(read_config_value("PIPETTE", "pipette_type")).upper()
 if pipette_type == "WPI":
-    from .wpi_syringe.syringepump import MockPump as MockPipette
-    from .wpi_syringe.syringepump import SyringePump as Pipette
+    if read_testing_config():
+        from .wpi_syringe.syringepump import MockPump as Pipette
+    else:
+        from .wpi_syringe.syringepump import SyringePump as Pipette
 
 elif pipette_type == "OT2":
-    from .ot2_pipette.ot2P300 import OT2P300 as Pipette
-    from .ot2_pipette.ot2P300 import MockOT2P300 as MockPipette
+    if read_testing_config():
+        from .ot2_pipette.ot2P300 import MockOT2P300 as Pipette
+    else:
+        from .ot2_pipette.ot2P300 import OT2P300 as Pipette
 
 else:
     raise ValueError(f"Invalid pipette type: {pipette_type}")

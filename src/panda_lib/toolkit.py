@@ -15,7 +15,6 @@ from panda_lib.hardware.gantry_interface import MockPandaMill as MockMill
 from panda_lib.hardware.gantry_interface import PandaMill as Mill
 from panda_lib.hardware.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
 from panda_lib.hardware.panda_pipettes import (
-    MockPipette,
     Pipette,
 )
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
@@ -48,7 +47,7 @@ class Toolkit:
 
     mill: Union[Mill, MockMill, None] = None
     scale: Union[Scale, MockScale, None] = None
-    pipette: Union[Pipette, MockPipette, None] = None
+    pipette: Union[Pipette, None] = None
     wellplate: Wellplate = None
     arduino: ArduinoLink = None
     global_logger: Logger = None
@@ -90,7 +89,7 @@ class Hardware:
 
     mill: Union[Mill, MockMill, None] = None
     scale: Union[Scale, MockScale, None] = None
-    pipette: Union[Pipette, MockPipette, None] = None
+    pipette: Union[Pipette, None] = None
     arduino: ArduinoLink = None
     # inlcude the global logger so that the hardware can log to the same file
     global_logger: Logger = None
@@ -175,7 +174,7 @@ def connect_to_instruments(
         instruments.mill = MockMill()
         instruments.mill.connect_to_mill()
         # instruments.scale = MockScale()
-        instruments.pipette = MockPipette()
+        instruments.pipette = Pipette()
         # pstat = echem_mock.GamryPotentiostat.connect()
         instruments.arduino = MockArduinoLink()
 
@@ -341,7 +340,7 @@ def test_instrument_connections(
         print("Using mock instruments")
         instruments.mill = MockMill()
         instruments.mill.connect_to_mill()
-        instruments.pipette = MockPipette()
+        instruments.pipette = Pipette()
         instruments.arduino = MockArduinoLink()
 
         # Setup mock camera based on the config

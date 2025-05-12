@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 _config_cache = None
 
 
-def get_env_var(env_var_name: str, default: str = None) -> Optional[str]:
+def get_env_var(env_var_name: str, default: Optional[str] = None) -> Optional[str]:
     """Returns the value of an environment variable.
 
     Args:
@@ -124,10 +124,17 @@ def get_config_path() -> str:
             return test_config_path
 
     # Otherwise use the standard config path
-    return get_env_var(
+    var = get_env_var(
         "PANDA_SDL_CONFIG_PATH",
         default=str(get_repo_path() / "config" / "settings.ini"),
     )
+
+    # Check if the config path is valid
+    if not os.path.exists(var):
+        raise FileNotFoundError(
+            f"Configuration file not found at {var}. Please check the path."
+        )
+    return str(var)
 
 
 @lru_cache(maxsize=1)
@@ -225,9 +232,11 @@ def write_config_value(section: str, key: str, value: str) -> None:
         value: Value to write
     """
     config_path = get_env_var("PANDA_SDL_CONFIG_PATH")
-    validate_config_path(config_path)
-
-    config = read_config()
+    if config_path:
+        validate_config_path(config_path)
+        config = read_config()
+    else:
+        raise FileNotFoundError("Configuration file path not specified.")
 
     # Ensure section exists
     if not config.has_section(section):

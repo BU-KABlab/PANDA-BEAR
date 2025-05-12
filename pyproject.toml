@@ -107,7 +107,7 @@ where = ["src"]
 "panda_shared.config" = ["*.ini"]
 
 [tool.pytest.ini_options]
-pythonpath = "panda_lib"
+pythonpath = "src"
 
 [tool.mypy]
 python_version = "3.10"

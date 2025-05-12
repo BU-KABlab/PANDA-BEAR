@@ -9,6 +9,9 @@ from shared_utilities.config.config_tools import (
     read_config,
     read_testing_config,
 )
+
+config = read_config()
+TESTING = read_testing_config()
 from shared_utilities.log_tools import timing_wrapper
 
 from ..errors import CAFailure, CVFailure, DepositionFailure, OCPError, OCPFailure
@@ -18,8 +21,6 @@ from ..experiments.experiment_types import (
 )
 from ..labware.wellplates import Well
 from ..toolkit import Toolkit
-
-TESTING = read_testing_config()
 
 if TESTING or os.name != "nt":
     from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
@@ -38,7 +39,6 @@ else:
         potentiostat_ocp_parameters,
     )
 
-config = read_config()
 
 # Constants
 try:
