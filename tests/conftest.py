@@ -674,7 +674,7 @@ def temp_test_db():
         import time
 
         # Wait a moment for connections to close
-        time.sleep(1)
+        time.sleep(5)
         try:
             os.remove("temp.db")
         except PermissionError:

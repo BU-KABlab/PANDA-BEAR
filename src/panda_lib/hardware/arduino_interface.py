@@ -10,7 +10,6 @@ import serial
 import serial.tools.list_ports
 from serial import Serial
 
-
 # Define Enums and Custom Exceptions at the top
 
 
@@ -156,7 +155,7 @@ class ArduinoLink:
         read_timeout: float = 2.0,
         max_retries: int = 3,
     ):
-        self.ser:Serial = None
+        self.ser: Serial = None
         self.port_address: Optional[str] = port_address
         self.baud_rate: int = baud_rate
         self.read_timeout: float = read_timeout  # Timeout for serial read operations
@@ -849,11 +848,11 @@ class ArduinoLink:
                     for i, part in enumerate(pairs):
                         if ":" not in part:
                             if len(pairs) == 1:
-                                parsed[f"value{i+1}"] = self._auto_convert_type(
+                                parsed[f"value{i + 1}"] = self._auto_convert_type(
                                     part.strip()
                                 )
                             else:
-                                parsed[f"item{i+1}"] = part.strip()
+                                parsed[f"item{i + 1}"] = part.strip()
                             continue
 
                         key, value_str = part.split(":", 1)
@@ -870,18 +869,20 @@ class ArduinoLink:
                                 parsed[key] = (
                                     num_values
                                     if len(num_values) > 1
-                                    else num_values[0] if num_values else []
+                                    else num_values[0]
+                                    if num_values
+                                    else []
                                 )
                                 if key.lower() in ["v", "values", "data"]:
                                     for i_val, num_val in enumerate(num_values):
-                                        parsed[f"value{i_val+1}"] = num_val
+                                        parsed[f"value{i_val + 1}"] = num_val
                             except ValueError:
                                 parsed[key] = [v.strip() for v in raw_values]
                                 if key.lower() in ["v", "values", "data"]:
                                     for i_val, str_val in enumerate(
                                         [v.strip() for v in raw_values]
                                     ):
-                                        parsed[f"value_str{i_val+1}"] = str_val
+                                        parsed[f"value_str{i_val + 1}"] = str_val
                         else:
                             parsed[key] = self._auto_convert_type(value_str)
                 return parsed
@@ -907,7 +908,7 @@ class ArduinoLink:
                     break
             if all_convertible:
                 for i, val in enumerate(converted_values):
-                    parsed[f"value{i+1}"] = val
+                    parsed[f"value{i + 1}"] = val
                 return parsed
 
         try:
@@ -942,6 +943,13 @@ class ArduinoLink:
             bool: True if homing was successful
         """
         response = self.send(PawduinoFunctions.CMD_PIPETTE_HOME)
+        return response.get("success", False)
+
+    def prime(self) -> bool:
+        """
+        Prime the pipette, by moving to the 0 volume position
+        """
+        response = self.move_to()
         return response.get("success", False)
 
     def get_status(self) -> Dict[str, Any]:
@@ -1110,14 +1118,26 @@ class MockArduinoLink(ArduinoLink):
 
     arduinoQueue = queue.Queue()
 
-    def __init__(self):
-        super().__init__(port_address="mock", read_timeout=0.1, max_retries=1)
-        self.configured = True
-        self.connected = True
-        self.ser = MockSerial()
-        self.arduinoQueue = queue.Queue()
-        self.logger = logging.getLogger("panda.mock")
-        self.logger.info("MockArduinoLink initialized.")
+    def __init__(
+        self,
+        port_address: str = "/dev/ttyUSB0",
+        baud_rate: int = 115200,
+        read_timeout: float = 2.0,
+        max_retries: int = 3,
+    ):
+        self.ser: Serial = None
+        self.port_address: Optional[str] = port_address
+        self.baud_rate: int = baud_rate
+        self.read_timeout: float = read_timeout  # Timeout for serial read operations
+        self.max_retries: int = max_retries  # Max retries for sending a command
+        self.configured: bool = False
+        self.connected: bool = False
+        self._monitor_task = None
+        self._running = False
+        self._event_queue: asyncio.Queue = asyncio.Queue()
+        self.pipette_active = True  # Assuming pipette is active by default
+        self.logger = logging.getLogger("panda")
+        self.connect()
 
     def connect(self):
         self.connected = True

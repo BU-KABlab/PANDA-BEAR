@@ -9,7 +9,7 @@ import json
 import logging
 import os
 
-from ...arduino_interface import ArduinoLink
+from ...arduino_interface import ArduinoLink, MockArduinoLink
 
 logger = logging.getLogger(__name__)
 
@@ -180,7 +180,7 @@ class Pipette:
         :return: True if homing was successful
         :rtype: bool
         """
-        response = self.stepper.pipette_send("9")  # CMD_PIPETTE_HOME
+        response = self.stepper.send("9")  # CMD_PIPETTE_HOME
 
         if not response.get("success", False):
             error_msg = response.get("message", "Unknown error")
@@ -198,7 +198,7 @@ class Pipette:
         :param s: The speed of the plunger movement in mm/min
         :type s: int
         """
-        response = self.stepper.pipette_send(f"10{self.zero_position},{s}")
+        response = self.stepper.send(f"10{self.zero_position},{s}")
 
         if response.get("success", False):
             self.is_primed = True
@@ -223,7 +223,7 @@ class Pipette:
             self.prime()
 
         # Send the command
-        response = self.stepper.pipette_send(f"11{vol},{s}")
+        response = self.stepper.send(f"11{vol},{s}")
 
         if response.get("success", False):
             # Update position after successful aspiration
@@ -246,7 +246,7 @@ class Pipette:
         :type s: int
         """
         # Send the command
-        response = self.stepper.pipette_send(f"12{vol},{s}")
+        response = self.stepper.send(f"12{vol},{s}")
 
         if response.get("success", False):
             # Update position after successful dispensing
@@ -267,7 +267,7 @@ class Pipette:
         :type s: int, optional
         """
         # Blowout is essentially just moving to the blowout position
-        response = self.stepper.pipette_send(f"10{self.blowout_position},{s}")
+        response = self.stepper.send(f"10{self.blowout_position},{s}")
 
         if response.get("success", False):
             self.position = self.blowout_position
@@ -304,18 +304,18 @@ class Pipette:
         :type s: int, optional
         """
         # Use the built-in mix command if available
-        response = self.stepper.pipette_send(f"15{vol},{n},{s}")
+        response = self.stepper.send(f"15{n},{vol},{s}")
 
         if response.get("success", False):
             logger.info("Mixed %s uL %s times at speed %s", vol, n, s)
+            return True
         else:
             # Fall back to manual mixing if the command failed
             logger.warning("Mix command failed, falling back to manual mixing")
             for _ in range(n):
                 self.aspirate(vol, s)
                 self.dispense(vol, s)
-
-        return response.get("success", False)
+            return True
 
     @tip_check
     def drop_tip(self, s: int = 5000):
@@ -325,7 +325,7 @@ class Pipette:
         :type s: int, optional
         """
         # Move to the drop tip position
-        response = self.stepper.pipette_send(f"10{self.drop_tip_position},{s}")
+        response = self.stepper.send(f"10{self.drop_tip_position},{s}")
 
         if response.get("success", False):
             self.has_tip = False
@@ -343,7 +343,7 @@ class Pipette:
         :return: The current status of the pipette
         :rtype: dict
         """
-        response = self.stepper.pipette_send("13")  # CMD_PIPETTE_STATUS
+        response = self.stepper.send("13")  # CMD_PIPETTE_STATUS
 
         if response.get("success", False):
             # Extract key status information
@@ -372,18 +372,79 @@ class Pipette:
 class MockPipette:
     """A mock class for the pipette, used for testing purposes"""
 
-    def __init__(self):
+    def __init__(
+        self,
+        name,
+        brand,
+        model,
+        max_volume=300,
+        min_volume=10,
+        zero_position=0.0,
+        blowout_position=0.0,
+        drop_tip_position=0.0,
+        mm_to_ul=1.0,
+        stepper: MockArduinoLink = None,
+    ):
         self.name = "MockPipette"
-        self.has_tip = False
-        self.is_primed = False
+        self.brand = brand
+        self.model = model
         self.position = 0.0
         self.max_volume = 300
         self.min_volume = 10
         self.zero_position = 0.0
         self.blowout_position = 0.0
         self.drop_tip_position = 0.0
+        self.stepper: MockArduinoLink = None
+        self.has_tip = False
+        self.is_primed = False
 
-    def aspirate(self, vol: float):
+    @classmethod
+    def from_config(
+        cls,
+        stepper: MockArduinoLink,
+        config_file: str = "P300.json",
+        path: str = os.path.join(
+            os.path.dirname(__file__), "definitions", "single_channel"
+        ),
+    ) -> "Pipette":
+        """Initialize the pipette object from a config file
+
+        Use by calling the class method `from_config` with the appropriate parameters.
+        example:
+        .. code-block:: python
+            pipette = Pipette.from_config(index=0, name="p300_single")
+        This will load the pipette configuration from the specified JSON file.
+        The JSON file should contain the following keys:
+        - `brand`: The brand of the pipette
+        - `model`: The model of the pipette
+        - `max_volume`: The maximum volume of the pipette in uL
+        - `min_volume`: The minimum volume of the pipette in uL
+        - `zero_position`: The position of the plunger before using a :method:`aspirate` step
+        - `blowout_position`: The position of the plunger for running a :method:`blowout` step
+        - `drop_tip_position`: The position of the plunger for running a :method:`drop_tip` step
+        - `mm_to_ul`: The conversion factor for converting motor microsteps in mm to uL
+
+
+        :param index: The tool index of the pipette on the machine
+        :type index: int
+        :param name: The tool name
+        :type name: str
+        :param config_file: The name of the config file containing the pipette parameters
+        :type config_file: str
+        :param path: The path to the pipette configuration `.json` files for the tool,
+                defaults to the 'definitions/single_channel/' directory relative to this file.
+        :returns: A :class:`Pipette` object
+        :rtype: :class:`Pipette`
+        """
+        if config_file[-4:] != "json":
+            config_file = config_file + ".json"
+        config = os.path.join(path, config_file)
+        with open(config) as f:
+            kwargs = json.load(f)
+
+        return cls(stepper=stepper, **kwargs)
+
+    def aspirate(self, vol: float, s: int = 2000):
         """Mock aspirate method"""
         if self.has_tip:
             self.position += vol
@@ -393,7 +454,7 @@ class MockPipette:
             raise ToolStateError("No tip attached. Cannot aspirate.")
         return True
 
-    def dispense(self, vol: float):
+    def dispense(self, vol: float, s: int = 2000):
         """Mock dispense method"""
         if self.has_tip:
             self.position -= vol
@@ -403,7 +464,7 @@ class MockPipette:
             raise ToolStateError("No tip attached. Cannot dispense.")
         return True
 
-    def blowout(self):
+    def blowout(self, s: int = 6000):
         """Mock blowout method"""
         if self.has_tip:
             logger.info("Mock blowout performed")
@@ -412,7 +473,7 @@ class MockPipette:
             raise ToolStateError("No tip attached. Cannot blowout.")
         return True
 
-    def drop_tip(self):
+    def drop_tip(self, s: int = 5000):
         """Mock drop tip method"""
         if self.has_tip:
             self.has_tip = False
@@ -428,7 +489,7 @@ class MockPipette:
         logger.info("Mock pipette homed")
         return True
 
-    def prime(self):
+    def prime(self, s=2500):
         """Mock prime method"""
         self.is_primed = True
         logger.info("Mock pipette primed")

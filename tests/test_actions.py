@@ -40,9 +40,7 @@ def toolkit():
     from panda_lib.toolkit import (
         MockMill as Mill,
     )
-    from panda_lib.toolkit import (
-        Pipette,
-    )
+    from panda_lib.toolkit import Pipette
 
     toolkit = Toolkit(
         pump=Pipette(), mill=Mill(), arduino=ArduinoLink(), scale=MagicMock()

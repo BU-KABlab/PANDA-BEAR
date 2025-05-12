@@ -1,11 +1,11 @@
 """
-A "driver" class for controlling an Arduino-based pipette driver via serial communication
+A class for controlling an OT2 P300 pipette via an Arduino while tracking vessel contents
 """
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
-from typing import Optional
+from typing import Any, Dict, Optional, Union
 
-from panda_lib.hardware.arduino_interface import ArduinoLink as ArduinoInterface
+from panda_lib.hardware.arduino_interface import ArduinoLink, MockArduinoLink
 from panda_lib.labware import Vial
 from panda_lib.labware import wellplates as wp
 from shared_utilities.config.config_tools import read_config
@@ -17,58 +17,56 @@ from shared_utilities.log_tools import (
 )
 
 from ..pipette import PipetteDBHandler
+from .pipette_driver import MockPipette, Pipette
 
 vessel_logger = setup_default_logger(log_name="vessel")
 
 config = read_config()
 PRECISION = config.getint("OPTIONS", "precision")
 
-# Arduino-specific constants
-ARDUINO_BAUDRATE = 115200
-ARDUINO_TIMEOUT = 5
-MAX_CONNECTION_ATTEMPTS = 3
-COMMAND_TIMEOUT = 60  # seconds
-SERIAL_DELAY = 0.1  # seconds between commands
-
 
 class OT2P300:
     """
-    Class for controlling an Arduino-based pipette using the ArduinoInterface
+    OT2P300 class for controlling a pipette that integrates:
+    1. ArduinoLink for hardware communication via pipette_driver
+    2. PipetteDBHandler for volume/content tracking in the database
+    3. Vessel integration for content tracking between vessels
 
     Attributes:
-        arduino (ArduinoInterface): Arduino communication interface
-        connected (bool): Whether the connection is established
-        pipette (Pipette): Pipette object to track contents and volume
-        pipette_capacity_ul (float): Maximum volume of the pipette in microliters
-
-    Methods:
-        aspirate(volume, rate): Aspirate the given volume at the given rate.
-        dispense(volume, rate): Dispense the given volume at the given rate.
-        mix(repetitions, volume, rate): Mix the solution in the pipette.
-        update_pipette_volume(volume_ul): Set the volume of the pipette in ul.
-        set_pipette_capacity(capacity_ul): Set the capacity of the pipette in ul.
-
-    Exceptions:
-        OverFillException: Raised when a pipette tip is over filled.
-        OverDraftException: Raised when a pipette tip is over drawn.
+        arduino (ArduinoLink): Low-level Arduino communication interface
+        pipette_driver (Pipette): Pipette driver for hardware control
+        pipette_tracker (PipetteDBHandler): Database handler for tracking pipette state
+        max_p300_rate (float): Maximum pipetting rate in µL/s
     """
 
     def __init__(self):
-        """
-        Initialize the OT2P300 Pipette interface.
-        """
-        self.connected = False
-        self.arduino = ArduinoInterface()
+        """Initialize the OT2P300 Pipette interface."""
+        # Set up Arduino connection
+        self.arduino = ArduinoLink()
+
         # Configuration constants
         self.max_p300_rate = config.getfloat(
             "P300", "max_pipetting_rate", fallback=50.0
         )  # µL/s for Arduino pipette
 
-        # Create pipette object to track contents
+        # Create pipette driver for hardware control
+        self.pipette_driver = Pipette.from_config(
+            stepper=self.arduino,
+            config_file="P300_config.json",
+        )
+
+        # Confirm that the driver is initialized
+        if not self.pipette_driver or not self.pipette_driver.stepper:
+            p300_control_logger.error("Failed to initialize pipette driver")
+            raise RuntimeError("Pipette driver initialization failed")
+
+        # Set up database tracker for volumes and contents
         self.pipette_tracker = PipetteDBHandler()
         self.pipette_tracker.set_capacity(
             config.getfloat("P300", "pipette_capacity", fallback=300.0)
         )  # µL
+
+        p300_control_logger.info("OT2P300 initialized")
 
     def __enter__(self):
         """Enter the context manager"""
@@ -79,19 +77,15 @@ class OT2P300:
         self.close()
 
     def close(self):
-        """Disconnect from the Arduino"""
-        # if self.arduino:
-        #     self.arduino.disconnect()
-        #     self.connected = False
-        #     p300_control_logger.info("Disconnected from Arduino pipette driver")
-        pass
+        """Clean up resources - not much needed since Arduino cleanup happens at process exit"""
+        p300_control_logger.info("OT2P300 closed")
 
     def aspirate(
         self,
         volume_to_aspirate: float,
-        solution: Optional[object] = None,
+        solution: Optional[Union[Vial, wp.Well]] = None,
         rate: Optional[float] = None,
-    ) -> Optional[object]:
+    ) -> Optional[Union[Vial, wp.Well]]:
         """
         Aspirate the given volume at the given rate from the specified vessel.
         Update the volume of the pipette and the solution if given.
@@ -110,24 +104,24 @@ class OT2P300:
             return None
 
         # Check if volume would exceed capacity
-        if self.pipette_tracker.volume + volume_to_aspirate > self.pipette_capacity_ul:
+        if (
+            self.pipette_tracker.volume + volume_to_aspirate
+            > self.pipette_tracker.capacity_ul
+        ):
             p300_control_logger.warning(
                 f"Cannot aspirate {volume_to_aspirate} µL - would exceed pipette capacity"
             )
             return None
 
-        # Use the Arduino to aspirate
-        if not rate:
-            rate = self.max_p300_rate
-
-        success = self.arduino.aspirate(volume_to_aspirate, rate)
+        # Use the pipette driver to aspirate
+        success = self.pipette_driver.aspirate(vol=volume_to_aspirate, s=rate)
 
         if not success:
             p300_control_logger.error(f"Failed to aspirate {volume_to_aspirate} µL")
             return None
 
-        # Update the volume from Arduino's reported value
-        self.pipette_tracker.volume = self.arduino.volume
+        # Update the database tracker with the volume change
+        self.pipette_tracker.volume += volume_to_aspirate
 
         # If we have a solution, update the pipette contents and the solution volume
         if solution is not None and isinstance(solution, (Vial, wp.Well)):
@@ -139,23 +133,23 @@ class OT2P300:
                 f"Aspirated: {volume_to_aspirate} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
             )
 
-        return None
+        return solution
 
     def dispense(
         self,
         volume_to_dispense: float,
-        being_dispensed: Optional[object] = None,
-        dispensed_into: Optional[object] = None,
+        being_infused: Optional[Union[Vial, wp.Well]] = None,
+        infused_into: Optional[Union[Vial, wp.Well]] = None,
         rate: Optional[float] = None,
-        blowout_ul: float = float(0.0),
+        blowout_ul: float = 0.0,
     ) -> None:
         """
         Dispense the given volume at the given rate.
 
         Args:
             volume_to_dispense (float): Volume to be dispensed in microliters.
-            being_dispensed (Vial object): The solution being dispensed to get the density
-            dispensed_into (str or Vial): The destination of the solution (well or vial)
+            being_infused (Vial object): The solution being dispensed to get the density
+            infused_into (str or Vial): The destination of the solution (well or vial)
             rate (float): Pumping rate in µL/second. None defaults to the max p300 rate.
             blowout_ul (float): The volume to blowout in microliters
         """
@@ -171,11 +165,8 @@ class OT2P300:
             )
             return None
 
-        # Use the Arduino to dispense
-        if not rate:
-            rate = self.max_p300_rate
-
-        success = self.arduino.dispense(volume_to_dispense, rate)
+        # Use the pipette driver to dispense
+        success = self.pipette_driver.dispense(volume_to_dispense, rate)
 
         if not success:
             p300_control_logger.error(f"Failed to dispense {volume_to_dispense} µL")
@@ -183,16 +174,16 @@ class OT2P300:
 
         # If blowout is requested, perform it
         if blowout_ul > 0:
-            blowout_success = self.arduino.blowout()
+            blowout_success = self.pipette_driver.blowout()
             if not blowout_success:
                 p300_control_logger.error("Failed to perform blowout")
 
-        # Update the volume from Arduino's reported value
+        # Update the volume in the database tracker
         original_volume = self.pipette_tracker.volume
-        self.pipette_tracker.volume = self.arduino.volume
+        self.pipette_tracker.volume = original_volume - volume_to_dispense
 
         # If we have a destination, update its contents based on what was in the pipette
-        if dispensed_into is not None and isinstance(dispensed_into, (Vial, wp.Well)):
+        if infused_into is not None and isinstance(infused_into, (Vial, wp.Well)):
             # Calculate the ratio of each content in the pipette
             if sum(self.pipette_tracker.contents.values() or [0]) > 0:
                 content_ratio = {
@@ -201,7 +192,7 @@ class OT2P300:
                 }
 
                 # Add the proportional contents to the destination
-                dispensed_into.add_contents(
+                infused_into.add_contents(
                     {
                         key: ratio * volume_to_dispense
                         for key, ratio in content_ratio.items()
@@ -221,7 +212,9 @@ class OT2P300:
 
         return None
 
-    def mix(self, repetitions: int, volume: float, rate: float = None) -> bool:
+    def mix(
+        self, repetitions: int, volume: float, rate: Optional[float] = None
+    ) -> bool:
         """
         Mix the solution by repeated aspirating and dispensing.
 
@@ -236,11 +229,11 @@ class OT2P300:
         if volume <= 0 or repetitions <= 0:
             return False
 
-        # Use Arduino's built-in mixing command
+        # Use the pipette driver's mix command
         if not rate:
             rate = self.max_p300_rate
 
-        success = self.arduino.mix(repetitions, volume, rate)
+        success = self.pipette_driver.mix(volume, repetitions, rate)
 
         if not success:
             p300_control_logger.error(
@@ -248,299 +241,117 @@ class OT2P300:
             )
             return False
 
-        # Update the volume from Arduino's reported value
-        self.pipette_tracker.volume = self.arduino.volume
-
+        # Volume shouldn't change after mixing
         p300_control_logger.debug(
             f"Mixed {repetitions} times with {volume} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
         )
 
         return True
 
-    def update_pipette_volume(self, volume_ul: float):
+    def reset_contents(self) -> bool:
         """
-        Update the pipette volume
-
-        Args:
-            volume_ul (float): New volume in µL
-        """
-        # Set the volume directly on the Arduino
-        success = self.arduino.set_volume(volume_ul)
-
-        if success:
-            self.pipette_tracker.volume = volume_ul
-            p300_control_logger.debug(f"Updated pipette volume to {volume_ul} µL")
-        else:
-            p300_control_logger.error(f"Failed to set pipette volume to {volume_ul} µL")
-
-    def set_pipette_capacity(self, capacity_ul: float):
-        """
-        Set the maximum capacity of the pipette
-
-        Args:
-            capacity_ul (float): Maximum capacity in µL
-        """
-        self.pipette_capacity_ul = capacity_ul
-        p300_control_logger.debug(f"Set pipette capacity to {capacity_ul} µL")
-
-    def home_pipette(self) -> bool:
-        """
-        Home the pipette
+        Reset the pipette contents tracking (but not physical position)
 
         Returns:
-            bool: True if homing was successful
+            bool: True if successful
         """
-        success = self.arduino.home()
-
-        if success:
-            # Update volume from Arduino
-            self.pipette_tracker.volume = self.arduino.volume
-            p300_control_logger.debug("Pipette homed successfully")
-        else:
-            p300_control_logger.error("Failed to home pipette")
-
-        return success
-
-    def attach_tip(self) -> bool:
-        """
-        Attach a new tip
-
-        Returns:
-            bool: True if tip attachment was successful
-        """
-        success = self.arduino.attach_tip()
-
-        if success:
-            # Update volume from Arduino
-            self.pipette_tracker.volume = self.arduino.volume
-            p300_control_logger.debug("Tip attached successfully")
-        else:
-            p300_control_logger.error("Failed to attach tip")
-
-        return success
-
-    def detach_tip(self) -> bool:
-        """
-        Detach the current tip
-
-        Returns:
-            bool: True if tip detachment was successful
-        """
-        success = self.arduino.detach_tip()
-
-        if success:
-            # Update volume from Arduino
-            self.pipette_tracker.volume = self.arduino.volume
-            p300_control_logger.debug("Tip detached successfully")
-        else:
-            p300_control_logger.error("Failed to detach tip")
-
-        return success
+        self.pipette_tracker.reset_contents()
+        return True
 
     def reset_pipette(self) -> bool:
         """
-        Reset the pipette (home and empty)
+        Reset the pipette by homing and priming it
 
         Returns:
             bool: True if reset was successful
         """
-        success = self.arduino.reset()
+        # First home the pipette
+        home_success = self.pipette_driver.home()
+        if not home_success:
+            p300_control_logger.error("Failed to home pipette")
+            return False
+
+        # Then prime it
+        prime_success = self.pipette_driver.prime()
+        if not prime_success:
+            p300_control_logger.error("Failed to prime pipette")
+            return False
+
+        # Reset the database volume tracker
+        self.pipette_tracker.volume = 0.0
+        self.pipette_tracker.reset_contents()
+
+        p300_control_logger.debug("Pipette reset successfully")
+        return True
+
+    def blowout(self) -> bool:
+        """
+        Perform a blowout operation to expel any remaining liquid
+
+        Returns:
+            bool: True if successful
+        """
+        success = self.pipette_driver.blowout()
 
         if success:
-            # Update volume from Arduino
-            self.pipette_tracker.volume = self.arduino.volume
-            # Clear contents
-            self.pipette_tracker.contents = {}
-            p300_control_logger.debug("Pipette reset successfully")
+            # Reset volume after blowout
+            original_volume = self.pipette_tracker.volume
+            self.pipette_tracker.volume = 0.0
+            # Reset contents
+            self.pipette_tracker.reset_contents()
+            p300_control_logger.debug(f"Performed blowout of {original_volume} µL")
         else:
-            p300_control_logger.error("Failed to reset pipette")
+            p300_control_logger.error("Failed to perform blowout")
 
         return success
 
+    def get_status(self) -> Dict[str, Any]:
+        """
+        Get the current status of the pipette.
 
-class MockArduinoInterface(ArduinoInterface):
-    """Mock Arduino driver for testing"""
+        Returns:
+            Dict[str, Any]: Dictionary with status information
+        """
+        # Get hardware status from the driver
+        driver_status = self.pipette_driver.get_status()
 
-    def __init__(self, port=None, baudrate=ARDUINO_BAUDRATE, timeout=ARDUINO_TIMEOUT):
-        """Initialize the mock Arduino connection."""
-        super().__init__(port, baudrate, timeout)
-        self.position = 0.0
-        self.volume = 0.0
-        self.connected = False
-        self.max_volume = 300.0
-        self.min_volume = 20.0
-        self.zero_position = 0.0
-        self.max_position = 60.0
+        # Combine with database tracker status
+        status = {
+            "success": driver_status.get("success", False),
+            "homed": driver_status.get("homed", False),
+            "position": driver_status.get("position", 0.0),
+            "hardware_max_volume": driver_status.get("max_volume", 0.0),
+            "current_volume": self.pipette_tracker.volume,
+            "db_max_volume": self.pipette_tracker.capacity_ul,
+            "has_tip": self.pipette_driver.has_tip,
+            "contents": self.pipette_tracker.contents,
+        }
 
-    def connect(self, port=None):
-        """Mock connection to Arduino"""
-        self.connected = True
-        p300_control_logger.info("Connected to mock Arduino pipette driver")
-        return True
-
-    def disconnect(self):
-        """Mock disconnect from Arduino"""
-        self.connected = False
-        p300_control_logger.info("Disconnected from mock Arduino pipette driver")
-
-    def send_command(self, cmd: str, timeout=COMMAND_TIMEOUT) -> str:
-        """Mock sending a command to Arduino"""
-        p300_control_logger.debug(f"Mock sending command: {cmd}")
-
-        # Process the command based on first character
-        if cmd.startswith("H"):
-            # Home command
-            self.position = 0.0
-            self.volume = 0.0
-            return "Homing pipette...\nHoming complete - position set to 0\nOK"
-
-        elif cmd.startswith("P"):
-            # Status command
-            return f"=== Pipette Status ===\nPosition: {self.position} mm\nVolume: {self.volume} µL\nTip attached: Yes\nMotor enabled: Yes\nLimit switch: Not triggered\nOK"
-
-        elif cmd.startswith("M"):
-            # Move command
-            try:
-                parts = cmd[1:].split(",")
-                target_position = float(parts[0])
-                self.position = target_position
-                # Calculate volume based on position
-                ratio = (self.position - self.zero_position) / (
-                    self.max_position - self.zero_position
-                )
-                self.volume = self.min_volume + ratio * (
-                    self.max_volume - self.min_volume
-                )
-                return f"Moving to position: {target_position} mm\nMove complete. Position: {self.position} mm, Volume: {self.volume} µL\nOK"
-            except Exception:
-                return "ERROR: Invalid move command"
-
-        elif cmd.startswith("V"):
-            # Set volume command
-            try:
-                volume = float(cmd[1:])
-                self.volume = volume
-                # Calculate position based on volume
-                ratio = (self.volume - self.min_volume) / (
-                    self.max_volume - self.min_volume
-                )
-                self.position = self.zero_position + ratio * (
-                    self.max_position - self.zero_position
-                )
-                return (
-                    f"Setting volume to {volume} µL\nPosition: {self.position} mm\nOK"
-                )
-            except Exception:
-                return "ERROR: Invalid volume command"
-
-        elif cmd.startswith("A"):
-            # Aspirate command
-            try:
-                parts = cmd[1:].split(",")
-                volume = float(parts[0])
-                if self.volume + volume > self.max_volume:
-                    return f"ERROR: Cannot aspirate {volume} µL - would exceed capacity"
-                self.volume += volume
-                # Calculate position based on volume
-                ratio = (self.volume - self.min_volume) / (
-                    self.max_volume - self.min_volume
-                )
-                self.position = self.zero_position + ratio * (
-                    self.max_position - self.zero_position
-                )
-                return f"Aspirating {volume} µL\nPosition: {self.position} mm, Volume: {self.volume} µL\nOK"
-            except Exception:
-                return "ERROR: Invalid aspirate command"
-
-        elif cmd.startswith("E"):
-            # Dispense command
-            try:
-                parts = cmd[1:].split(",")
-                volume = float(parts[0])
-                if self.volume - volume < 0:
-                    return f"ERROR: Cannot dispense {volume} µL - insufficient volume"
-                self.volume -= volume
-                # Calculate position based on volume
-                ratio = (self.volume - self.min_volume) / (
-                    self.max_volume - self.min_volume
-                )
-                self.position = self.zero_position + ratio * (
-                    self.max_position - self.zero_position
-                )
-                return f"Dispensing {volume} µL\nPosition: {self.position} mm, Volume: {self.volume} µL\nOK"
-            except Exception:
-                return "ERROR: Invalid dispense command"
-
-        elif cmd.startswith("B"):
-            # Blowout command
-            self.volume = 0
-            self.position = self.max_position
-            return (
-                "Performing blowout...\nPosition: {self.position} mm, Volume: 0 µL\nOK"
-            )
-
-        elif cmd.startswith("X"):
-            # Mix command
-            return "Mixing...\nMixing complete\nOK"
-
-        elif cmd.startswith("T+"):
-            # Attach tip
-            self.position = 0.0
-            self.volume = 0.0
-            return "Attaching new tip...\nTip attached successfully\nOK"
-
-        elif cmd.startswith("T-"):
-            # Detach tip
-            self.position = self.max_position
-            self.volume = 0.0
-            return "Detaching tip...\nTip detached\nOK"
-
-        elif cmd.startswith("R"):
-            # Reset
-            self.position = 0.0
-            self.volume = 0.0
-            return "Resetting pipette...\nOK"
-
-        elif cmd.startswith("?"):
-            # Help
-            return "Pipette Driver v1.1\n=== Pipette Driver Commands ===\nOK"
-
-        else:
-            return "ERROR: Unknown command"
+        return status
 
 
 class MockOT2P300(OT2P300):
-    """Mock P300 class for testing"""
+    """Mock version of OT2P300 for testing"""
 
-    def _connect_to_arduino(self):
-        """Connect to a mock Arduino driver"""
-        self.arduino = MockArduinoInterface()
-        self.connected = True
-        p300_control_logger.info("Connected to mock Arduino pipette driver")
+    def __init__(self):
+        """Initialize the mock OT2P300 interface"""
+        # Use the mock Arduino interface
+        self.arduino = MockArduinoLink()
 
-    def close(self):
-        """Disconnect from the mock Arduino"""
-        if self.arduino:
-            self.arduino.disconnect()
-            self.connected = False
-            p300_control_logger.info("Disconnected from mock Arduino pipette driver")
+        # Configuration constants
+        self.max_p300_rate = config.getfloat(
+            "P300", "max_pipetting_rate", fallback=50.0
+        )  # µL/s for Arduino pipette
 
+        # Use the mock pipette driver
+        self.pipette_driver = MockPipette.from_config(
+            stepper=self.arduino,
+            config_file="P300.json",
+        )
+        self.pipette_driver.has_tip = True  # Default to having a tip
 
-if __name__ == "__main__":
-    # Initialize logger
-    setup_default_logger(log_name="arduino_pipette_test")
+        # Set up database tracker
+        self.pipette_tracker = PipetteDBHandler()
+        self.pipette_tracker.set_capacity(300.0)  # µL
 
-    # Test with mock pipette
-    with MockOT2P300() as p300:
-        # Test basic operations
-        p300.home_pipette()
-        p300.aspirate(100)
-        p300.dispense(50)
-        p300.mix(3, 20)
-
-    # Test with real OT2P300 (uncomment to use)
-    # with OT2P300() as p300:
-    #     p300.home_pipette()
-    #     p300.aspirate(100)
-    #     p300.dispense(50)
-    #     p300.mix(3, 20)
+        p300_control_logger.info("Mock OT2P300 initialized")
