@@ -41,7 +41,7 @@ def toolkit():
         MockMill as Mill,
     )
     from panda_lib.toolkit import (
-        MockPipette as Pipette,
+        Pipette,
     )
 
     toolkit = Toolkit(
