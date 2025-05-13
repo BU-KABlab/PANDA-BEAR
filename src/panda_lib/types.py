@@ -22,7 +22,21 @@ class CoordinatesDict(TypedDict):
 
 # Vial and Well related types
 class WellKwargs(TypedDict, total=False):
-    """TypedDict for Well constructor keyword arguments"""
+    """
+    TypedDict for Well constructor keyword arguments
+
+    Attributes:
+        name (str): Name of the well
+        volume (float): Volume of the well
+        capacity (float): Capacity of the well
+        height (float): Height of the well
+        radius (float): Radius of the well
+        contamination (int): Contamination level
+        dead_volume (float): Dead volume in the well
+        contents (Dict[str, float]): Chemical contents in the well
+        coordinates (Dict[str, float]): Coordinates of the well
+    
+    """
 
     name: str
     volume: float
