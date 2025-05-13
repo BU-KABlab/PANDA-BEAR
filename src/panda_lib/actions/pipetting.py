@@ -135,28 +135,28 @@ def _pipette_action(
             ),
         )
 
-        for _, vol in toolkit.pipette.pipette_tracker.contents.items():
-            if vol > 0.0:
-                logger.warning("Pipette has residual volume of %f ul. Purging...", vol)
-                toolkit.pipette.dispense(
-                    volume_to_dispense=vol,
-                    being_infused=None,
-                    infused_into=dst_vessel,
-                    blowout_ul=vol,
-                )
+        # for _, vol in toolkit.pipette.pipette_tracker.contents.items():
+        #     if vol > 0.0:
+        #         logger.warning("Pipette has residual volume of %f ul. Purging...", vol)
+        #         toolkit.pipette.dispense(
+        #             volume_to_dispense=vol,
+        #             being_infused=None,
+        #             infused_into=dst_vessel,
+        #             blowout_ul=vol,
+        #         )
 
-        if toolkit.pipette.pipette_tracker.volume > 0.0:
-            logger.warning(
-                "Pipette has residual volume of %f ul. Purging...",
-                toolkit.pipette.pipette_tracker.volume,
-            )
-            toolkit.pipette.dispense(
-                volume_to_dispense=toolkit.pipette.pipette_tracker.volume,
-                being_infused=None,
-                infused_into=dst_vessel,
-                blowout_ul=toolkit.pipette.pipette_tracker.volume,
-            )
-            toolkit.pipette.pipette_tracker.volume = 0.0
+        # if toolkit.pipette.pipette_tracker.volume > 0.0:
+        #     logger.warning(
+        #         "Pipette has residual volume of %f ul. Purging...",
+        #         toolkit.pipette.pipette_tracker.volume,
+        #     )
+        #     toolkit.pipette.dispense(
+        #         volume_to_dispense=toolkit.pipette.pipette_tracker.volume,
+        #         being_infused=None,
+        #         infused_into=dst_vessel,
+        #         blowout_ul=toolkit.pipette.pipette_tracker.volume,
+        #     )
+        #     toolkit.pipette.pipette_tracker.volume = 0.0
 
         if isinstance(dst_vessel, WasteVial):
             capping_sequence(

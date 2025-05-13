@@ -72,7 +72,7 @@ def _handle_source_vessels(
         selected_source_vessels = [
             vial
             for vial in stock_vials
-            if vial.name == src_vessel and vial.volume > 0.0
+            if vial.name.lower() == src_vessel and vial.volume > 0.0
         ]
 
         if not selected_source_vessels:

@@ -321,6 +321,9 @@ class ArduinoLink:
             
         Returns:
             A dictionary with the processed response data
+
+        Raises:
+
         """
         self.logger.debug("Processing response: '%s'", response_str)
 
@@ -833,6 +836,16 @@ class ArduinoLink:
         Parses the content part of an Arduino response (after OK: or ERR:).
         Tries to parse as JSON-like ({key:val,...}), then as simple key:value pairs,
         then as comma-separated values if it's just a list of numbers.
+
+        Arguments:
+            content: The content string to parse
+            command_str: The command string that was sent (for logging)
+
+        Returns:
+            A dictionary with parsed key-value pairs or a list of values.
+
+        Raises:
+            ValueError: If the content cannot be parsed.
         """
         parsed: Dict[str, Any] = {}
         content = content.strip()

@@ -82,7 +82,7 @@ class Pipette:
         self.zero_position = zero_position
         self.blowout_position = blowout_position
         self.drop_tip_position = drop_tip_position
-        self.mm_to_ul = mm_to_ul
+        self.mm_per_ul = mm_to_ul
         self.has_tip = False
         self.is_primed = False
         self.position = 0.0
@@ -101,15 +101,27 @@ class Pipette:
                 logger.info("Pipette not homed, homing now...")
                 success = self.home()
                 if success:
-                    self.post_load()
+                    logger.info("Pipette homed successfully\nPriming pipette...")
+                    self.prime()
                 else:
                     raise ToolStateError("Failed to home pipette")
             else:
                 logger.info("Pipette already homed")
-                self.post_load()
+                if self.is_primed:
+                    logger.info("Pipette already primed")
+                else:
+                    logger.info("Priming pipette...")
+                    self.prime()
         except Exception as e:
             logger.warning("Error initializing pipette: %s. Will try to home.", str(e))
-            self.home()
+            try:
+                self.home()
+                self.prime()
+                logger.info("Pipette initialized successfully")
+            except Exception as e:
+                logger.error("Failed to initialize pipette: %s", str(e))
+                raise ToolStateError("Failed to initialize pipette") from e
+        logger.info("Pipette %s initialized successfully", self.name)
 
     @classmethod
     def from_config(
@@ -179,7 +191,7 @@ class Pipette:
             )
             vol = max(min(vol, self.max_volume), self.min_volume)
 
-        return vol * self.mm_to_ul
+        return vol * self.mm_per_ul
 
     def home(self):
         """Home the pipette to establish the zero position
@@ -190,12 +202,11 @@ class Pipette:
         response = self.stepper.send(CMD.CMD_PIPETTE_HOME)
 
         if not response.get("success", False):
-            error_msg = response.get("message", "Unknown error")
-            logger.error("Failed to home pipette: %s", error_msg)
+            error_msg = response.get("error", "Unknown error")
+            logger.error("Error: %s", error_msg)
             return False
 
         logger.info("Pipette successfully homed")
-        self.is_primed = False
         return True
 
     def prime(self, s=2500):
@@ -275,7 +286,7 @@ class Pipette:
         """
         # Blowout is essentially just moving to the blowout position
         response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO,self.blowout_position,s)
-
+        
         if response.get("success", False):
             self.position = self.blowout_position
             logger.info("Performed blowout, position: %s mm", self.position)

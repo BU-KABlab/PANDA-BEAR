@@ -120,9 +120,6 @@ class OT2P300:
             p300_control_logger.error(f"Failed to aspirate {volume_to_aspirate} µL")
             return None
 
-        # Update the database tracker with the volume change
-        self.pipette_tracker.volume += volume_to_aspirate
-
         # If we have a solution, update the pipette contents and the solution volume
         if solution is not None and isinstance(solution, (Vial, wp.Well)):
             removed_contents = solution.remove_contents(volume_to_aspirate)
@@ -132,7 +129,12 @@ class OT2P300:
             p300_control_logger.debug(
                 f"Aspirated: {volume_to_aspirate} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
             )
-
+        else:
+            # If no solution is provided, just update the pipette volume
+            self.pipette_tracker.volume += volume_to_aspirate
+            p300_control_logger.debug(
+                f"Aspirated: {volume_to_aspirate} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
+            )
         return solution
 
     def dispense(
@@ -167,7 +169,8 @@ class OT2P300:
 
         # Use the pipette driver to dispense
         success = self.pipette_driver.dispense(volume_to_dispense, rate)
-
+        status = self.pipette_driver.get_status()
+        print(status)
         if not success:
             p300_control_logger.error(f"Failed to dispense {volume_to_dispense} µL")
             return None
@@ -177,11 +180,9 @@ class OT2P300:
             blowout_success = self.pipette_driver.blowout()
             if not blowout_success:
                 p300_control_logger.error("Failed to perform blowout")
-
-        # Update the volume in the database tracker
-        original_volume = self.pipette_tracker.volume
-        self.pipette_tracker.volume = original_volume - volume_to_dispense
-
+            # return to zero position after blowout
+            self.pipette_driver.prime()
+                    
         # If we have a destination, update its contents based on what was in the pipette
         if infused_into is not None and isinstance(infused_into, (Vial, wp.Well)):
             # Calculate the ratio of each content in the pipette
@@ -205,6 +206,9 @@ class OT2P300:
                     self.pipette_tracker.update_contents(
                         key, -volume_to_dispense * ratio
                     )
+            else:
+                # If no contents, just remove the volume from the pipette
+                self.pipette_tracker.volume -= volume_to_dispense
 
         p300_control_logger.debug(
             f"Dispensed: {volume_to_dispense} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"

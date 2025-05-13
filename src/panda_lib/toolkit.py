@@ -33,7 +33,22 @@ else:
 
 class Toolkit:
     def __init__(self, use_mock_instruments=False, **kwargs):
-        # Initialize hardware components with fallbacks
+        """
+        Initialize hardware components with fallbacks
+
+        Args:
+            use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to False.
+            **kwargs: Additional keyword arguments for hardware components.
+                - mill: The mill object (PandaMill or MockPandaMill)
+                - scale: The scale object (Scale or MockScale)
+                - pipette: The pipette object (Pipette)
+                - wellplate: The wellplate object (Wellplate)
+                - arduino: The Arduino object (ArduinoLink)
+                - slack_monitor: The Slack monitor object (SlackBot)
+                - global_logger: The global logger object (Logger)
+                - experiment_logger: The experiment logger object (Logger)
+
+        """
         self.camera = kwargs.get("camera", None)
         if self.camera is None:
             self.initialize_camera(use_mock_instruments)

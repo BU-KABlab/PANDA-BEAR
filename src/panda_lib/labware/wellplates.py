@@ -205,6 +205,16 @@ class Well:
             plate_type = self.service.fetch_well_type_characteristics(
                 db_session=self.session_maker, plate_id=self.plate_id
             )
+            # Remove plate_type attributes from kwargs
+        for key in [
+            "base_thickness",
+            "height",
+            "radius",
+            "capacity",
+            "gasket_height_mm",
+            "radius_mm",
+        ]:
+            kwargs.pop(key, None)
         new_well = WellWriteModel(
             well_id=self.well_id,
             plate_id=self.plate_id,
