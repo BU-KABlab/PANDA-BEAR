@@ -311,141 +311,18 @@ class ArduinoLink:
                 f"IO error connecting to Arduino on {chosen_port}: {e}"
             ) from e
 
-    def receive(self) -> Optional[str]:
+    def _process_response(self, response_str: str, command_to_send: str) -> Dict[str, Any]:
         """
-        Read a line from the Arduino.
-        Returns the decoded string or None if no data/timeout.
-        """
-        if not self.ser or not self.ser.is_open:
-            self.logger.warning("Receive called but serial port is not open.")
-            return None
-        try:
-            line = self.ser.readline()
-            if line:
-                decoded_line = line.decode().strip()
-                self.logger.debug("Arduino Raw Receive: %s", decoded_line)
-                return decoded_line
-            return None
-        except serial.SerialException as e:
-            self.logger.error("SerialException during receive: %s", e)
-            raise ArduinoConnectionError("Serial error during receive") from e
-        except IOError as e:
-            self.logger.error("IOError during receive: %s", e)
-            raise ArduinoConnectionError("IO error during receive") from e
-
-    async def async_receive(self) -> Optional[str]:
-        """Asynchronous version of receive"""
-        loop = asyncio.get_event_loop()
-        future = loop.run_in_executor(None, self.receive)
-        return await future
-
-    def send(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
-        """
-        Send a command to the Arduino and get the response.
-        Handles command construction, retries, and basic response parsing.
-
+        Process the response string from the Arduino and return a standardized result dictionary.
+        
         Args:
-            cmd_enum_member: The PawduinoFunctions enum member for the command.
-            *args: Any arguments required by the command.
-
+            response_str: The response string from the Arduino
+            command_to_send: The command that was sent
+            
         Returns:
-            A dictionary containing:
-                'success': bool,
-                'raw_data': str (the raw string from Arduino after OK:/ERR:),
-                'parsed_data': dict (if response was JSON-like or key-value),
-                'error_message': str (if ERR: was received)
+            A dictionary with the processed response data
         """
-        if (
-            not self.connected
-            or not self.configured
-            or not self.ser
-            or not self.ser.is_open
-        ):
-            self.logger.error("Send attempt while not connected or configured.")
-            raise ArduinoConnectionError("Not connected to Arduino.")
-
-        command_code = cmd_enum_member.value
-        command_str_parts = [command_code]
-        command_str_parts.extend(map(str, args))
-        command_to_send = ",".join(command_str_parts) + "\n"
-
-        self.logger.debug("Sending to Arduino: %s", command_to_send.strip())
-
-        response_str = None
-        for attempt in range(self.max_retries):
-            try:
-                self.ser.flushInput()
-                self.ser.flushOutput()
-                self.ser.write(command_to_send.encode())
-
-                raw_response_bytes = self.ser.readline()
-
-                if not raw_response_bytes:
-                    self.logger.warning(
-                        "No response from Arduino (attempt %d/%d, timeout: %ss) for: %s",
-                        attempt + 1,
-                        self.max_retries,
-                        self.read_timeout,
-                        command_to_send.strip(),
-                    )
-                    if attempt == self.max_retries - 1:
-                        raise ArduinoTimeoutError(
-                            f"No response after {self.max_retries} attempts for: {command_to_send.strip()}"
-                        )
-                    time.sleep(0.1)
-                    continue
-
-                response_str = raw_response_bytes.decode().strip()
-                self.logger.debug(
-                    "Raw response (attempt %d): %s", attempt + 1, response_str
-                )
-                break
-
-            except serial.SerialTimeoutException:
-                self.logger.warning(
-                    "SerialTimeoutException (attempt %d/%d) for: %s",
-                    attempt + 1,
-                    self.max_retries,
-                    command_to_send.strip(),
-                )
-                if attempt == self.max_retries - 1:
-                    raise ArduinoTimeoutError(
-                        f"SerialTimeoutException after {self.max_retries} attempts for: {command_to_send.strip()}"
-                    ) from None
-                time.sleep(0.1)
-            except serial.SerialException as e:
-                self.logger.error(
-                    "Serial communication error on attempt %d for '%s': %s",
-                    attempt + 1,
-                    command_to_send.strip(),
-                    e,
-                    exc_info=True,
-                )
-                if attempt == self.max_retries - 1:
-                    raise ArduinoConnectionError(
-                        f"Serial communication error for {command_to_send.strip()}: {e}"
-                    ) from e
-                time.sleep(1)
-            except IOError as e:
-                self.logger.error(
-                    "IO error during send (attempt %d) for '%s': %s",
-                    attempt + 1,
-                    command_to_send.strip(),
-                    e,
-                    exc_info=True,
-                )
-                if attempt == self.max_retries - 1:
-                    raise ArduinoConnectionError(
-                        f"IO error for {command_to_send.strip()}: {e}"
-                    ) from e
-                time.sleep(1)
-
-        if response_str is None:
-            raise ArduinoTimeoutError(
-                f"No response received for command: {command_to_send.strip()}"
-            )
-
-        self.logger.debug("Decoded response: '%s'", response_str)
+        self.logger.debug("Processing response: '%s'", response_str)
 
         parsed_result: Dict[str, Any] = {
             "success": False,
@@ -494,10 +371,169 @@ class ArduinoLink:
 
         return parsed_result
 
+    def receive(self) -> Optional[str]:
+        """
+        Read a line from the Arduino.
+        Returns the decoded string or None if no data/timeout.
+        """
+        if not self.ser or not self.ser.is_open:
+            self.logger.warning("Receive called but serial port is not open.")
+            return None
+        try:
+            line = self.ser.readline()
+            if line:
+                decoded_line = line.decode().strip()
+                self.logger.debug("Arduino Raw Receive: %s", decoded_line)
+                return decoded_line
+            return None
+        except serial.SerialException as e:
+            self.logger.error("SerialException during receive: %s", e)
+            raise ArduinoConnectionError("Serial error during receive") from e
+        except IOError as e:
+            self.logger.error("IOError during receive: %s", e)
+            raise ArduinoConnectionError("IO error during receive") from e
+
+    async def async_receive(self) -> Optional[str]:
+        """Asynchronous version of receive"""
+        loop = asyncio.get_event_loop()
+        future = loop.run_in_executor(None, self.receive)
+        return await future
+
+    def send(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
+        """
+        Send a command to the Arduino and get the response.
+        Handles command construction, retries, and basic response parsing.
+        Will block until a properly formatted response (starting with OK: or ERR:) is received,
+        or until the total timeout of 60 seconds is reached.
+
+        Args:
+            cmd_enum_member: The PawduinoFunctions enum member for the command.
+            *args: Any arguments required by the command.
+
+        Returns:
+            A dictionary containing:
+                'success': bool,
+                'raw_data': str (the raw string from Arduino after OK:/ERR:),
+                'parsed_data': dict (if response was JSON-like or key-value),
+                'error_message': str (if ERR: was received)
+        """
+        if (
+            not self.connected
+            or not self.configured
+            or not self.ser
+            or not self.ser.is_open
+        ):
+            self.logger.error("Send attempt while not connected or configured.")
+            raise ArduinoConnectionError("Not connected to Arduino.")
+
+        command_code = cmd_enum_member.value
+        command_str_parts = [command_code]
+        command_str_parts.extend(map(str, args))
+        command_to_send = ",".join(command_str_parts) + "\n"
+
+        self.logger.debug("Sending to Arduino: %s", command_to_send.strip())
+
+        # Set up total timeout of 60 seconds
+        start_time = time.time()
+        max_total_time = 60.0  # 1 minute total timeout
+        response_str = None
+        
+        while time.time() - start_time < max_total_time:
+            try:
+                self.ser.flushInput()
+                self.ser.flushOutput()
+                self.ser.write(command_to_send.encode())
+
+                attempt_start_time = time.time()
+                attempts_remaining = True
+                
+                # Keep reading until we get a properly formatted response or timeout
+                while attempts_remaining and time.time() - start_time < max_total_time:
+                    # Blocking read until a line ending is received
+                    raw_response_bytes = self.ser.readline()
+
+                    if not raw_response_bytes:
+                        elapsed = time.time() - attempt_start_time
+                        self.logger.warning(
+                            "No response from Arduino (elapsed: %.2fs, timeout: %ss) for: %s",
+                            elapsed,
+                            max_total_time,
+                            command_to_send.strip(),
+                        )
+                        
+                        # # If we've been waiting too long for this attempt, reset and try again
+                        # if elapsed >= max_total_time * 2:
+                        #     attempts_remaining = False
+                            
+                        time.sleep(1)
+                        continue
+
+                    response_str = raw_response_bytes.decode().strip()
+                    self.logger.debug(
+                        "Raw response: %s (elapsed: %.2fs)", 
+                        response_str,
+                        time.time() - start_time
+                    )
+
+                    # Only accept responses that start with OK: or ERR:
+                    if response_str.startswith("OK:") or response_str.startswith("ERR:"):
+                        return self._process_response(response_str, command_to_send)
+                    else:
+                        self.logger.warning(
+                            "Received malformed response: %s, continuing to wait for proper response",
+                            response_str,
+                        )
+                        # Keep trying with the current attempt
+                        time.sleep(1)
+
+            except serial.SerialTimeoutException:
+                self.logger.warning(
+                    "SerialTimeoutException (elapsed: %.2fs) for: %s",
+                    time.time() - start_time,
+                    command_to_send.strip(),
+                )
+                time.sleep(0.1)
+            except serial.SerialException as e:
+                self.logger.error(
+                    "Serial communication error (elapsed: %.2fs) for '%s': %s",
+                    time.time() - start_time,
+                    command_to_send.strip(),
+                    e,
+                    exc_info=True,
+                )
+                time.sleep(1)
+            except IOError as e:
+                self.logger.error(
+                    "IO error during send (elapsed: %.2fs) for '%s': %s",
+                    time.time() - start_time,
+                    command_to_send.strip(),
+                    e,
+                    exc_info=True,
+                )
+                time.sleep(1)
+                
+            # Small delay before retrying
+            time.sleep(0.2)
+            
+        # If we get here, we've reached the 1-minute timeout without a properly formatted response
+        elapsed = time.time() - start_time
+        self.logger.error(
+            "Total timeout exceeded (%.2f seconds) waiting for response to: %s",
+            elapsed,
+            command_to_send.strip()
+        )
+        raise ArduinoTimeoutError(
+            f"Timeout after {elapsed:.1f} seconds waiting for properly formatted response for: {command_to_send.strip()}"
+        )
+
     async def async_send(
         self, cmd_enum_member: PawduinoFunctions, *args
     ) -> Dict[str, Any]:
-        """Asynchronous version of send."""
+        """
+        Asynchronous version of send. Sends a command to the Arduino and blocks until a
+        properly formatted response (starting with OK: or ERR:) is received,
+        or until the total timeout of 60 seconds is reached.
+        """
         if (
             not self.connected
             or not self.configured
@@ -514,10 +550,13 @@ class ArduinoLink:
 
         self.logger.debug("Async Sending to Arduino: '%s'", command_to_send.strip())
 
+        # Set up total timeout of 60 seconds
+        start_time = time.time()
+        max_total_time = 60.0  # 1 minute total timeout
         loop = asyncio.get_event_loop()
         response_str = None
-
-        for attempt in range(self.max_retries):
+        
+        while time.time() - start_time < max_total_time:
             try:
                 try:
                     await loop.run_in_executor(None, self.ser.flushInput)
@@ -529,134 +568,95 @@ class ArduinoLink:
                     None, lambda: self.ser.write(command_to_send.encode())
                 )
 
-                raw_response_bytes = await loop.run_in_executor(None, self.ser.readline)
+                attempt_start_time = time.time()
+                attempts_remaining = True
+                
+                # Keep reading until we get a properly formatted response or timeout
+                while attempts_remaining and time.time() - start_time < max_total_time:
+                    raw_response_bytes = await loop.run_in_executor(None, self.ser.readline)
 
-                if not raw_response_bytes:
-                    self.logger.warning(
-                        "Async: No response (attempt %d/%d, timeout: %ss) for: %s",
-                        attempt + 1,
-                        self.max_retries,
-                        self.read_timeout,
-                        command_to_send.strip(),
-                    )
-                    if attempt == self.max_retries - 1:
-                        raise ArduinoTimeoutError(
-                            f"Async: No response after {self.max_retries} attempts for: {command_to_send.strip()}"
+                    if not raw_response_bytes:
+                        elapsed = time.time() - attempt_start_time
+                        self.logger.warning(
+                            "Async: No response (elapsed: %.2fs, timeout: %ss) for: %s",
+                            elapsed,
+                            self.read_timeout,
+                            command_to_send.strip(),
                         )
-                    await asyncio.sleep(0.1)
-                    continue
+                        
+                        # If we've been waiting too long for this attempt, reset and try again
+                        if elapsed > self.read_timeout * 2:
+                            attempts_remaining = False
+                            
+                        await asyncio.sleep(0.1)
+                        continue
 
-                response_str = raw_response_bytes.decode().strip()
-                self.logger.debug(
-                    "Async Raw response (attempt %d): %s", attempt + 1, response_str
-                )
-                break
+                    response_str = raw_response_bytes.decode().strip()
+                    self.logger.debug(
+                        "Async Raw response: %s (elapsed: %.2fs)", 
+                        response_str,
+                        time.time() - start_time
+                    )
+
+                    # Only accept responses that start with OK: or ERR:
+                    if response_str.startswith("OK:") or response_str.startswith("ERR:"):
+                        return self._process_response(response_str, command_to_send)
+                    else:
+                        self.logger.warning(
+                            "Async: Received malformed response: %s, continuing to wait for proper response",
+                            response_str,
+                        )
+                        # Keep trying with the current attempt
+                        await asyncio.sleep(0.1)
 
             except serial.SerialTimeoutException:
                 self.logger.warning(
-                    "Async: SerialTimeoutException (attempt %d/%d) for: %s",
-                    attempt + 1,
-                    self.max_retries,
+                    "Async: SerialTimeoutException (elapsed: %.2fs) for: %s",
+                    time.time() - start_time,
                     command_to_send.strip(),
                 )
-                if attempt == self.max_retries - 1:
-                    raise ArduinoTimeoutError(
-                        f"Async: SerialTimeoutException after {self.max_retries} attempts for: {command_to_send.strip()}"
-                    ) from None
                 await asyncio.sleep(0.1)
             except serial.SerialException as e:
                 self.logger.error(
-                    "Async: Serial communication error on attempt %d for '%s': %s",
-                    attempt + 1,
+                    "Async: Serial communication error (elapsed: %.2fs) for '%s': %s",
+                    time.time() - start_time,
                     command_to_send.strip(),
                     e,
                     exc_info=True,
                 )
-                if attempt == self.max_retries - 1:
-                    raise ArduinoConnectionError(
-                        f"Async: Serial communication error for {command_to_send.strip()}: {e}"
-                    ) from e
                 await asyncio.sleep(1)
             except IOError as e:
                 self.logger.error(
-                    "Async: IO error during send (attempt %d) for '%s': %s",
-                    attempt + 1,
+                    "Async: IO error during send (elapsed: %.2fs) for '%s': %s",
+                    time.time() - start_time,
                     command_to_send.strip(),
                     e,
                     exc_info=True,
                 )
-                if attempt == self.max_retries - 1:
-                    raise ArduinoConnectionError(
-                        f"Async: IO error for {command_to_send.strip()}: {e}"
-                    ) from e
                 await asyncio.sleep(1)
             except Exception as e:
                 self.logger.error(
-                    "Async: Unexpected error during send (attempt %d) for '%s': %s",
-                    attempt + 1,
+                    "Async: Unexpected error during send (elapsed: %.2fs) for '%s': %s",
+                    time.time() - start_time,
                     command_to_send.strip(),
                     e,
                     exc_info=True,
                 )
-                if attempt == self.max_retries - 1:
-                    raise ArduinoCommandError(
-                        f"Async: Unexpected error for {command_to_send.strip()}: {e}"
-                    ) from e
                 await asyncio.sleep(1)
-
-        if response_str is None:
-            raise ArduinoTimeoutError(
-                f"Async: No response received for command: {command_to_send.strip()}"
-            )
-
-        self.logger.debug("Async Decoded response: '%s'", response_str)
-
-        parsed_result: Dict[str, Any] = {
-            "success": False,
-            "raw_data": "",
-            "parsed_data": {},
-            "error_message": "",
-        }
-
-        if response_str.startswith("OK:"):
-            parsed_result["success"] = True
-            content = response_str[3:]
-            parsed_result["raw_data"] = content
-            parsed_result["parsed_data"] = self._parse_arduino_response_content(
-                content, command_to_send.strip()
-            )
-        elif response_str.startswith("ERR:"):
-            parsed_result["success"] = False
-            error_content = response_str[4:]
-            parsed_result["raw_data"] = error_content
-            parsed_result["error_message"] = error_content
-            parsed_result["parsed_data"] = self._parse_arduino_response_content(
-                error_content, command_to_send.strip()
-            )
-            self.logger.error(
-                "Async: Arduino returned error: %s for command %s",
-                error_content,
-                command_to_send.strip(),
-            )
-        else:
-            self.logger.error(
-                "Async: Unexpected response format: '%s' for command '%s'",
-                response_str,
-                command_to_send.strip(),
-            )
-            parsed_result["success"] = False
-            parsed_result["raw_data"] = response_str
-            parsed_result["error_message"] = "Unexpected response format"
-            parsed_result["parsed_data"] = self._parse_arduino_response_content(
-                response_str, command_to_send.strip()
-            )
-
-        if not parsed_result["success"] and not parsed_result["error_message"]:
-            parsed_result["error_message"] = (
-                f"Async Command '{command_to_send.strip()}' failed with response: {response_str}"
-            )
-
-        return parsed_result
+                
+            # Small delay before retrying
+            await asyncio.sleep(0.2)
+            
+        # If we get here, we've reached the 1-minute timeout without a properly formatted response
+        elapsed = time.time() - start_time
+        self.logger.error(
+            "Async: Total timeout exceeded (%.2f seconds) waiting for response to: %s",
+            elapsed,
+            command_to_send.strip()
+        )
+        raise ArduinoTimeoutError(
+            f"Async: Timeout after {elapsed:.1f} seconds waiting for properly formatted response for: {command_to_send.strip()}"
+        )
 
     async def start_monitoring(self):
         """Start monitoring Arduino messages in the background"""
@@ -934,6 +934,66 @@ class ArduinoLink:
                 return float(value_str)
             except ValueError:
                 return value_str
+
+    def _process_response(self, response_str: str, command_to_send: str) -> Dict[str, Any]:
+        """
+        Process the response string from the Arduino and return a standardized result dictionary.
+        
+        Args:
+            response_str: The response string from the Arduino
+            command_to_send: The command that was sent
+            
+        Returns:
+            A dictionary with the processed response data
+        """
+        self.logger.debug("Processing response: '%s'", response_str)
+
+        parsed_result: Dict[str, Any] = {
+            "success": False,
+            "raw_data": "",
+            "parsed_data": {},
+            "error_message": "",
+        }
+
+        if response_str.startswith("OK:"):
+            parsed_result["success"] = True
+            content = response_str[3:]
+            parsed_result["raw_data"] = content
+            parsed_result["parsed_data"] = self._parse_arduino_response_content(
+                content, command_to_send.strip()
+            )
+        elif response_str.startswith("ERR:"):
+            parsed_result["success"] = False
+            error_content = response_str[4:]
+            parsed_result["raw_data"] = error_content
+            parsed_result["error_message"] = error_content
+            parsed_result["parsed_data"] = self._parse_arduino_response_content(
+                error_content, command_to_send.strip()
+            )
+            self.logger.error(
+                "Arduino returned error: %s for command %s",
+                error_content,
+                command_to_send.strip(),
+            )
+        else:
+            self.logger.error(
+                "Unexpected response format from Arduino: '%s' for command '%s'",
+                response_str,
+                command_to_send.strip(),
+            )
+            parsed_result["success"] = False
+            parsed_result["raw_data"] = response_str
+            parsed_result["error_message"] = "Unexpected response format"
+            parsed_result["parsed_data"] = self._parse_arduino_response_content(
+                response_str, command_to_send.strip()
+            )
+
+        if not parsed_result["success"] and not parsed_result["error_message"]:
+            parsed_result["error_message"] = (
+                f"Command '{command_to_send.strip()}' failed with response: {response_str}"
+            )
+
+        return parsed_result
 
     def home(self) -> bool:
         """

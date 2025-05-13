@@ -52,7 +52,7 @@ class OT2P300:
         # Create pipette driver for hardware control
         self.pipette_driver = Pipette.from_config(
             stepper=self.arduino,
-            config_file="P300_config.json",
+            config_file="P300.json",
         )
 
         # Confirm that the driver is initialized

@@ -9,7 +9,7 @@ import json
 import logging
 import os
 
-from ...arduino_interface import ArduinoLink, MockArduinoLink
+from ...arduino_interface import ArduinoLink, MockArduinoLink, PawduinoFunctions as CMD
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +99,14 @@ class Pipette:
             # If we get a valid response, check if the pipette is already homed
             if not response.get("homed", False):
                 logger.info("Pipette not homed, homing now...")
-                self.home()
+                success = self.home()
+                if success:
+                    self.post_load()
+                else:
+                    raise ToolStateError("Failed to home pipette")
+            else:
+                logger.info("Pipette already homed")
+                self.post_load()
         except Exception as e:
             logger.warning("Error initializing pipette: %s. Will try to home.", str(e))
             self.home()
@@ -180,7 +187,7 @@ class Pipette:
         :return: True if homing was successful
         :rtype: bool
         """
-        response = self.stepper.send("9")  # CMD_PIPETTE_HOME
+        response = self.stepper.send(CMD.CMD_PIPETTE_HOME)
 
         if not response.get("success", False):
             error_msg = response.get("message", "Unknown error")
@@ -198,7 +205,7 @@ class Pipette:
         :param s: The speed of the plunger movement in mm/min
         :type s: int
         """
-        response = self.stepper.send(f"10{self.zero_position},{s}")
+        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO,self.zero_position,s)
 
         if response.get("success", False):
             self.is_primed = True
@@ -223,7 +230,7 @@ class Pipette:
             self.prime()
 
         # Send the command
-        response = self.stepper.send(f"11{vol},{s}")
+        response = self.stepper.send(CMD.CMD_PIPETTE_ASPIRATE,vol,s)
 
         if response.get("success", False):
             # Update position after successful aspiration
@@ -246,7 +253,7 @@ class Pipette:
         :type s: int
         """
         # Send the command
-        response = self.stepper.send(f"12{vol},{s}")
+        response = self.stepper.send(CMD.CMD_PIPETTE_DISPENSE,vol,s)
 
         if response.get("success", False):
             # Update position after successful dispensing
@@ -267,7 +274,7 @@ class Pipette:
         :type s: int, optional
         """
         # Blowout is essentially just moving to the blowout position
-        response = self.stepper.send(f"10{self.blowout_position},{s}")
+        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO,self.blowout_position,s)
 
         if response.get("success", False):
             self.position = self.blowout_position
@@ -304,7 +311,7 @@ class Pipette:
         :type s: int, optional
         """
         # Use the built-in mix command if available
-        response = self.stepper.send(f"15{n},{vol},{s}")
+        response = self.stepper.send(CMD.CMD_PIPETTE_MIX,n,vol,s)
 
         if response.get("success", False):
             logger.info("Mixed %s uL %s times at speed %s", vol, n, s)
@@ -325,7 +332,7 @@ class Pipette:
         :type s: int, optional
         """
         # Move to the drop tip position
-        response = self.stepper.send(f"10{self.drop_tip_position},{s}")
+        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO,self.drop_tip_position,s)
 
         if response.get("success", False):
             self.has_tip = False
@@ -343,7 +350,7 @@ class Pipette:
         :return: The current status of the pipette
         :rtype: dict
         """
-        response = self.stepper.send("13")  # CMD_PIPETTE_STATUS
+        response = self.stepper.send(CMD.CMD_PIPETTE_STATUS)
 
         if response.get("success", False):
             # Extract key status information
