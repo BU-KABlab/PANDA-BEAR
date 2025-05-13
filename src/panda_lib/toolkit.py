@@ -84,6 +84,19 @@ class Toolkit:
                 resolution=resolution,
             )
 
+    def disconnect(self):
+        """Disconnect from the instruments"""
+        if self.mill:
+            self.mill.disconnect()
+        # if self.flir_camera: self.flir_camera.DeInit()
+        if self.camera:
+            self.camera.close()
+        if self.arduino:
+            self.arduino.close()
+        if self.scale:
+            self.scale.hw.close()
+        if self.pipette:
+            self.pipette.close()
 
 class Hardware:
     """A class to hold all of the hardware"""
