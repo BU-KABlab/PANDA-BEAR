@@ -89,66 +89,94 @@ class SyringePump:
 
     def set_up_pump(self) -> nesp_lib.Pump:
         """
-        Set up the syringe pump using hardcoded settings.
+        Set up the syringe pump by attempting to connect to available serial ports.
+        The connection order prioritizes:
+        1. The port specified in the configuration.
+        2. Ports identified with "Silicon Labs" manufacturer.
+        3. Any other available serial ports.
+
         Returns:
-            Pump: Initialized pump object.
+            nesp_lib.Pump: Initialized pump object.
+
+        Raises:
+            nesp_lib.AddressException: If no pump is found or connection fails on all tried ports.
         """
-        ports = get_ports()
-        if not ports:
-            pump_control_logger.error("No ports found")
-            raise Exception("No ports found")
+        all_available_ports = get_ports()
+        if not all_available_ports:
+            pump_control_logger.error("No serial ports found.")
+            raise nesp_lib.AddressException("No serial ports found.")
 
-        # Try the configured port first if it exists
-        initial_port = config.get("PUMP", "port", fallback=None)
-        if initial_port in ports:
-            # Move the initial port to the front of the list
-            ports.remove(initial_port)
-            ports.insert(0, initial_port)
+        ports_to_try_ordered = []
+        attempted_ports_set = set()
 
-        # Check if a port has silicon labs in the name, if so try that first
-        ports_manurfacturers = get_port_manufacturers()
-        for port, manufacturer in ports_manurfacturers.items():
-            if "silicon" in manufacturer.lower():
-                ports.remove(port)
-                ports.insert(0, port)
-                break
+        # 1. Add configured port
+        configured_port = config.get("PUMP", "port", fallback=None)
+        if configured_port and configured_port in all_available_ports:
+            if configured_port not in attempted_ports_set:
+                ports_to_try_ordered.append(configured_port)
+                attempted_ports_set.add(configured_port)
+
+        # 2. Add Silicon Labs ports
+        ports_manufacturers = get_port_manufacturers()
+        for port, manufacturer in ports_manufacturers.items():
+            if "silicon labs" in manufacturer.lower() and port in all_available_ports:
+                if port not in attempted_ports_set:
+                    ports_to_try_ordered.append(port)
+                    attempted_ports_set.add(port)
+
+        # 3. Add remaining available ports
+        for port in all_available_ports:
+            if port not in attempted_ports_set:
+                ports_to_try_ordered.append(port)
+                attempted_ports_set.add(
+                    port
+                )  # Add to set to be complete, though list is built
+
+        if not ports_to_try_ordered:
+            pump_control_logger.error(
+                "No suitable ports to try after ordering and filtering. "
+                "Check port availability and configuration."
+            )
+            raise nesp_lib.AddressException(
+                "No suitable ports identified for connection attempt."
+            )
 
         last_exception = None
-        for port in ports:
+        for port_to_attempt in ports_to_try_ordered:
+            pump_control_logger.info(
+                f"Attempting to connect to pump on port: {port_to_attempt}"
+            )
             try:
-                pump_control_logger.debug(f"Setting up pump on port {port}...")
-                pump_port = nesp_lib.Port(
-                    name=port,
-                    baud_rate=config.getint("PUMP", "baudrate", fallback=19200),
-                    timeout=5,
+                pump = nesp_lib.Pump(port_to_attempt)
+                pump_control_logger.info(
+                    f"Successfully connected to pump on {port_to_attempt}"
                 )
-
-                syringe_pump = nesp_lib.Pump(pump_port)
-                syringe_pump.syringe_diameter = config.getfloat(
-                    "PUMP", "syringe_inside_diameter", fallback=4.600
-                )  # millimeters
-                syringe_pump.pumping_rate = self.max_pump_rate
-                syringe_pump.volume_infused_clear()
-                syringe_pump.volume_withdrawn_clear()
-                log_msg = f"Pump found at address {syringe_pump.address}"
-                config.set("PUMP", "port", port)
-                pump_control_logger.info(log_msg)
                 self.connected = True
-                time.sleep(2)
-                return syringe_pump
-
-            except Exception as e:
+                # Perform any initial pump configuration if needed here
+                # e.g., pump.set_diameter(...), pump.set_rate_units(...)
+                # For now, assuming nesp_lib handles or pump is pre-configured.
+                return pump
+            except Exception as e:  # pylint: disable=broad-except
+                pump_control_logger.warning(
+                    f"Failed to connect on port {port_to_attempt}: {e}"
+                )
                 last_exception = e
-                pump_control_logger.error(f"Error setting up pump on port {port}: {e}")
-                pump_control_logger.exception(e)
-                continue
+                # self.connected remains False or is handled by __init__ default
 
-        # If we've tried all ports and none worked
-        pump_control_logger.error("All ports exhausted, no pump found")
+        # If loop completes, all attempts failed
+        pump_control_logger.error(
+            "All connection attempts failed. No pump could be initialized."
+        )
         if last_exception:
-            raise Exception(f"All ports exhausted, last error: {last_exception}")
+            raise nesp_lib.AddressException(
+                f"Failed to connect to pump on any port. Last error: {last_exception}"
+            ) from last_exception
         else:
-            raise Exception("All ports exhausted, no pump found")
+            # This case should ideally not be reached if ports_to_try_ordered was not empty.
+            raise nesp_lib.AddressException(
+                "Failed to connect to pump on any port, and no specific "
+                "exception was caught during attempts (unexpected state)."
+            )
 
     def __enter__(self):
         """Enter the context manager"""
@@ -159,13 +187,27 @@ class SyringePump:
         self.close()
 
     def close(self):
-        """Disconnect the pump"""
-        if self.pump:
-            if self.pump.close():
-                pump_control_logger.info("Pump port closed")
-                pump_control_logger.info("Pump disconnected")
+        """Disconnect the pump and update connection status."""
+        if hasattr(self, "pump") and self.pump:
+            if self.connected:
+                pump_control_logger.info(
+                    f"Closing connection to pump on port {self.pump.port}..."
+                )
+                try:
+                    self.pump.close()
+                    self.connected = False
+                    pump_control_logger.info("Pump connection closed successfully.")
+                except Exception as e:  # pylint: disable=broad-except
+                    # Catch a more specific error if nesp_lib provides one for close failures
+                    pump_control_logger.error(
+                        f"Error closing pump connection on port {self.pump.port}: {e}"
+                    )
+            else:
+                pump_control_logger.info(
+                    "Pump object exists but was not marked as connected. No action taken to close."
+                )
         else:
-            pump_control_logger.warning("Pump not connected")
+            pump_control_logger.info("No pump instance or connection to close.")
 
     def aspirate(
         self,
