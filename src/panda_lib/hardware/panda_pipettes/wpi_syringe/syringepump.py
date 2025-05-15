@@ -100,6 +100,8 @@ class SyringePump:
 
         self.pump: nesp_lib.Pump = self.set_up_pump()
         self.pipette_tracker = PipetteDBHandler()
+        if self.pipette_tracker.volume == 0:
+            self.prime()
 
     def set_up_pump(self) -> nesp_lib.Pump:
         """
@@ -357,6 +359,7 @@ class SyringePump:
         volume_to_aspirate: float,
         solution: Optional[Union[Vial, wp.Well]] = None,
         rate: Optional[float] = None,
+        drip_stop: bool = False,
     ) -> Optional[Union[Vial, wp.Well]]:
         """
         Withdraw the given volume at the given rate from the specified vessel.
@@ -474,6 +477,14 @@ class SyringePump:
             # Clear the pump's memory
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
+
+            # If a drip stop is requested, perform it
+            if drip_stop:
+                drip_stop_success = self.drip_stop()
+                if not drip_stop_success:
+                    pump_control_logger.warning(
+                        "Failed to perform drip stop after aspiration"
+                    )
 
             return solution
         except Exception as e:
@@ -678,9 +689,9 @@ class SyringePump:
         else:
             self.pump.pumping_rate = float(rate)
         action = (
-            "Withdrawing"
+            "Aspirating"
             if pump_direction == nesp_lib.PumpingDirection.WITHDRAW
-            else "Infusing"
+            else "Dispensing"
         )
 
         pump_control_logger.info(
@@ -758,34 +769,156 @@ class SyringePump:
 
 
 class MockPump(SyringePump):
-    """Mock pump class for testing"""
+    """
+    Mock implementation of the SyringePump class for testing.
+
+    Simulates the behavior of a real syringe pump without requiring hardware connection.
+    Maintains accurate volume tracking, state management, and simulated timing.
+    """
+
+    def __init__(self):
+        """Initialize the mock pump with same parameters as real pump but use mock hardware"""
+        self.connected = False
+        # Configuration constants
+        self.max_pump_rate = config.getfloat(
+            "PUMP", "max_pumping_rate", fallback=0.640
+        )  # ml/min
+        self.syringe_capacity = config.getfloat(
+            "PUMP", "syringe_capacity", fallback=1.0
+        )  # mL
+
+        # Liquid handling specific constants
+        self.prime_volume_ul = config.getfloat(
+            "PUMP", "prime_volume_ul", fallback=20.0
+        )  # µL
+        self.drip_stop_volume_ul = config.getfloat(
+            "PUMP", "drip_stop_volume_ul", fallback=10.0
+        )  # µL
+
+        # Tracking flags - same as real pump
+        self.is_primed = False
+        self.has_drip_stop = False
+        self._drip_stop_volume = 0.0
+
+        # Add unit conversion constants for clarity
+        self.UL_TO_ML = 0.001  # Conversion factor from µL to mL
+        self.ML_TO_UL = 1000.0  # Conversion factor from mL to µL
+
+        # Initialize the mock pump hardware
+        self.pump = self.set_up_pump()
+
+        # Initialize the pipette tracker
+        self.pipette_tracker = PipetteDBHandler()
+
+        # Prime by default to match real pump behavior
+        if self.pipette_tracker.volume == 0:
+            self.prime()
 
     def set_up_pump(self):
         """
-        Set up the syringe pump using hardcoded settings.
+        Set up a mock syringe pump.
         Returns:
-            Pump: Initialized pump object.
+            Pump: Initialized mock pump object.
         """
-        pump_control_logger.info("Setting up pump...")
+        pump_control_logger.info("Setting up mock pump...")
+
+        # Create the mock pump with the same properties as a real one
         syringe_pump = MockNespLibPump()
-        syringe_pump.syringe_diameter = 4.600  # millimeters #4.643 #4.685
+        syringe_pump.syringe_diameter = config.getfloat(
+            "PUMP", "syringe_inside_diameter", fallback=4.600
+        )  # millimeters
+        syringe_pump.pumping_rate = self.max_pump_rate
         syringe_pump.volume_infused_clear()
         syringe_pump.volume_withdrawn_clear()
-        log_msg = f"Pump found at address {syringe_pump.address}"
+
+        # Set the address to indicate it's a mock
+        syringe_pump.address = "MOCK-PUMP-01"
+        log_msg = f"Mock pump created with address {syringe_pump.address}"
         self.connected = True
         pump_control_logger.info(log_msg)
-        time.sleep(2)
+
+        # Simulate connection delay
+        time.sleep(0.1)  # Reduced delay for tests
+
         return syringe_pump
 
+    def run_pump(
+        self,
+        pump_direction: nesp_lib.PumpingDirection,
+        volume_ml: float,
+        rate=None,
+        density=None,
+        blowout_ml=float(0.0),
+    ) -> float:
+        """
+        Mock implementation of run_pump with simulated timing.
+
+        Args:
+            pump_direction: Direction to pump (withdraw/infuse)
+            volume_ml: Volume to pump in milliliters
+            rate: Pumping rate in mL/min
+            density: Density of the liquid (not used in mock)
+            blowout_ml: Additional volume for blowout
+
+        Returns:
+            float: Always returns 0 for success
+        """
+        # Convert inputs to correct types like the real implementation
+        volume_ml = float(volume_ml)
+        blowout_ml = float(blowout_ml)
+
+        # Skip if volume is invalid
+        if volume_ml <= 0:
+            return 0
+
+        # Configure the mock pump
+        if self.pump.pumping_direction != pump_direction:
+            self.pump.pumping_direction = pump_direction
+
+        self.pump.pumping_volume = round(float(volume_ml + blowout_ml), PRECISION)
+
+        # Set pumping rate
+        if rate is None:
+            self.pump.pumping_rate = float(self.max_pump_rate)
+        else:
+            self.pump.pumping_rate = float(rate)
+
+        # Log the operation
+        action = (
+            "Aspirating"
+            if pump_direction == nesp_lib.PumpingDirection.WITHDRAW
+            else "Dispensing"
+        )
+        pump_control_logger.info(
+            f"{action} {self.pump.pumping_volume} ml ({volume_ml} of solution) at {self.pump.pumping_rate} mL/min..."
+        )
+
+        # Calculate how long the operation would take and simulate that delay
+        operation_time_sec = (volume_ml / self.pump.pumping_rate) * 60
+        # Use a shorter delay for testing
+        simulated_delay = min(operation_time_sec * 0.1, 0.5)  # Max 0.5s delay for tests
+        time.sleep(simulated_delay)
+
+        # Set the appropriate volume that was pumped
+        if pump_direction == nesp_lib.PumpingDirection.WITHDRAW:
+            self.pump.volume_withdrawn = volume_ml
+            action_volume = self.pump.volume_withdrawn
+            action_type = "aspirated"
+        else:  # INFUSE
+            self.pump.volume_infused = volume_ml
+            action_volume = self.pump.volume_infused
+            action_type = "dispensed"
+
+        # Log the completion
+        log_msg = f"Mock pump has {action_type}: {action_volume} ml"
+        pump_control_logger.debug(log_msg)
+
+        return 0
+
     def close(self):
-        self.connected = False
+        """Clean up the mock pump resources"""
+        if self.connected:
+            pump_control_logger.info("Mock pump disconnected")
+            self.connected = False
 
-
-if __name__ == "__main__":
-    # test_mixing()
-    # _mock_pump_testing_routine()
-    # pump.aspirate(160, rate=0.64)
-    # pump.dispense(167.43, rate=0.64, blowout_ul=0)
-
-    pipette = PipetteDBHandler()
-    pipette.update_contents("water", 100)
+    # All other methods are inherited from SyringePump and work with the mock pump
