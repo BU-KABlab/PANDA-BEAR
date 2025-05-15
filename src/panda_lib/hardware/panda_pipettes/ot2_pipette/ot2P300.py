@@ -202,12 +202,6 @@ class OT2P300:
             )
             return None
 
-        if blowout_ul < 0:
-            p300_control_logger.warning(
-                f"Cannot have negative blowout volume: {blowout_ul} µL"
-            )
-            blowout_ul = 0.0
-
         # Check if we have enough volume
         if self.pipette_tracker.volume < volume_to_dispense:
             p300_control_logger.warning(
@@ -216,9 +210,7 @@ class OT2P300:
             return None
 
         # Calculate the total volume dispensed (including blowout)
-        total_volume_dispensed = volume_to_dispense + (
-            blowout_ul if blowout_ul > 0 else 0
-        )
+        total_volume_dispensed = volume_to_dispense
 
         # Log the dispensing operation with details
         p300_control_logger.info(
