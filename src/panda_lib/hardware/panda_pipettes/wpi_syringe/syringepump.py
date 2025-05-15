@@ -1,5 +1,17 @@
 """
-A "driver" class for controlling a new era A-1000 syringe pump using the nesp-lib library
+A driver class for controlling a New Era A-1000 syringe pump using the nesp-lib library.
+
+This module provides a comprehensive interface for controlling syringe pumps for precise
+liquid handling operations in automated laboratory settings. It manages connection,
+configuration, and operation of New Era pumps while tracking pipette volumes and contents.
+
+Key features:
+- Automatic port detection and connection to syringe pumps
+- Volume tracking with precision control
+- Content tracking between vessels during liquid transfers
+- Bidirectional operation (aspirate/dispense)
+- Error handling for common pump operation issues
+- Context manager support for clean resource management
 """
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
@@ -43,8 +55,8 @@ class SyringePump:
         pipette_volume_ml (float): Current volume of the pipette in milliliters.
 
     Methods:
-        withdraw(volume, rate): Withdraw the given volume at the given rate.
-        infuse(volume, rate): Infuse the given volume at the given rate.
+        aspirate(volume, rate): Withdraw the given volume at the given rate.
+        dispense(volume, rate): Infuse the given volume at the given rate.
         purge(purge_vial, pump, purge_volume, pumping_rate): Perform purging from the pipette.
         mix(repetitions, volume, rate): Mix the solution in the pipette by withdrawing and infusing the solution.
         update_pipette_volume(volume_ul): Set the volume of the pipette in ul.
@@ -60,14 +72,19 @@ class SyringePump:
         Initialize the pump and set the capacity.
         """
         self.connected = False
+        # Configuration constants
         self.max_pump_rate = config.getfloat(
             "PUMP", "max_pumping_rate", fallback=0.640
         )  # ml/min
         self.syringe_capacity = config.getfloat(
             "PUMP", "syringe_capacity", fallback=1.0
         )  # mL
-        self.pump: nesp_lib.Pump = self.set_up_pump()
 
+        # Add unit conversion constants for clarity
+        self.UL_TO_ML = 0.001  # Conversion factor from µL to mL
+        self.ML_TO_UL = 1000.0  # Conversion factor from mL to µL
+
+        self.pump: nesp_lib.Pump = self.set_up_pump()
         self.pipette_tracker = PipetteDBHandler()
 
     def set_up_pump(self) -> nesp_lib.Pump:
@@ -159,81 +176,123 @@ class SyringePump:
         """
         Withdraw the given volume at the given rate from the specified vessel.
         Update the volume of the pipette and the solution if given.
-        If only volume is specified, air is withdrawn.
+        If only volume is specified, air is aspirated.
 
         Args:
-            volume_to_aspirate (float): Volume to be withdrawn in microliters.
-            solution (Union[Vial, wp.Well], optional): The vial or well to withdraw from. If None, air is withdrawn.
+            volume_to_aspirate (float): Volume to be aspirated in microliters.
+            solution (Union[Vial, wp.Well], optional): The vial or well to aspirate from. If None, air is aspirated.
             rate (float, optional): Pumping rate in milliliters per minute. None defaults to the max pump rate.
 
         Returns:
             The updated solution object if given one, otherwise None
+
+        Raises:
+            ValueError: If volume is negative or invalid
         """
-        volume_ml = round(float(volume_to_aspirate / 1000), PRECISION)
-        if volume_ml <= 0:
+        # Validate inputs
+        try:
+            volume_to_aspirate = float(volume_to_aspirate)
+            if rate is not None:
+                rate = float(rate)
+            else:
+                rate = self.max_pump_rate
+        except (ValueError, TypeError) as e:
+            pump_control_logger.error(f"Invalid aspirate parameters: {e}")
             return None
+
+        if volume_to_aspirate <= 0:
+            pump_control_logger.warning(
+                f"Cannot aspirate {volume_to_aspirate} µL - volume must be positive"
+            )
+            return None
+
+        # Check if solution is a valid container type when provided
+        if solution is not None and not isinstance(solution, (Vial, wp.Well)):
+            pump_control_logger.error(
+                f"Invalid solution container type: {type(solution)}"
+            )
+            return None
+
+        # Convert volume to milliliters using the helper method
+        volume_ml = self._ul_to_ml(volume_to_aspirate)
+
+        # Log the operation
+        pump_control_logger.info(
+            f"Aspirating {volume_to_aspirate} µL ({volume_ml} mL) at {rate} mL/min"
+            + (f" from {solution}" if solution else " of air")
+        )
 
         # If no solution is provided, assume air withdrawal
         if solution is None:
             # Use max pump rate for air
-            _ = self.run_pump(
-                nesp_lib.PumpingDirection.WITHDRAW, volume_ml, self.max_pump_rate
-            )
-            self.update_pipette_volume(self.pump.volume_withdrawn)
-            pump_control_logger.debug(
-                "Pump has withdrawn: %0.6f ml of air at %fmL/min  Pipette vol: %0.3f ul",
-                self.pump.volume_withdrawn,
-                self.pump.pumping_rate,
-                self.pipette_tracker.volume,
-            )
-            self.pump.volume_infused_clear()
-            self.pump.volume_withdrawn_clear()
+            try:
+                _ = self.run_pump(
+                    nesp_lib.PumpingDirection.WITHDRAW, volume_ml, self.max_pump_rate
+                )
+                self.update_pipette_volume(self.pump.volume_withdrawn)
+                pump_control_logger.debug(
+                    "Pump has aspirated: %0.6f ml of air at %fmL/min  Pipette vol: %0.3f ul",
+                    self.pump.volume_withdrawn,
+                    self.pump.pumping_rate,
+                    self.pipette_tracker.volume,
+                )
+                self.pump.volume_infused_clear()
+                self.pump.volume_withdrawn_clear()
+            except Exception as e:
+                pump_control_logger.error(f"Error during air aspiration: {e}")
             return None
 
         # If solution is provided, proceed with regular solution withdrawal
-        if isinstance(solution, Vial):
-            density = solution.density
-        else:
-            density = None
-            rate = self.max_pump_rate if rate is None else rate
+        try:
+            if isinstance(solution, Vial):
+                density = solution.density
+            else:
+                density = None
+                rate = self.max_pump_rate if rate is None else rate
 
-        _ = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density)
-
-        volume_withdrawn_ml = round(self.pump.volume_withdrawn, PRECISION)
-        volume_withdrawn_ul = round(volume_withdrawn_ml * 1000, PRECISION)
-
-        # Update the pipette and solution based on what was withdrawn
-        if isinstance(solution, (Vial, wp.Well)):
-            # Update the solution volume and contents
-            removed_contents = solution.remove_contents(volume_withdrawn_ul)
-            for soln, vol in removed_contents.items():
-                self.pipette_tracker.update_contents(soln, vol)
-
-            pump_control_logger.debug(
-                "Pump has withdrawn: %0.6f ml at %fmL/min from %s. Pipette vol: %0.3f ul",
-                volume_withdrawn_ml,
-                self.pump.pumping_rate,
-                solution,
-                self.pipette_tracker.volume,
+            _ = self.run_pump(
+                nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density
             )
 
-        else:
-            # If the solution is not a vial or well, only update the volume
-            self.pipette_tracker.volume = round(
-                self.pipette_tracker.volume + volume_withdrawn_ul, PRECISION
-            )
+            volume_withdrawn_ml = round(self.pump.volume_withdrawn, PRECISION)
+            volume_withdrawn_ul = self._ml_to_ul(volume_withdrawn_ml)
 
-            pump_control_logger.debug(
-                "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
-                self.pump.volume_withdrawn,
-                self.pump.pumping_rate,
-                self.pipette_tracker.volume,
-            )
-        # Clear the pump's memory
-        self.pump.volume_infused_clear()
-        self.pump.volume_withdrawn_clear()
+            # Update the pipette and solution based on what was aspirated
+            if isinstance(solution, (Vial, wp.Well)):
+                # Update the solution volume and contents
+                removed_contents = solution.remove_contents(volume_withdrawn_ul)
+                for soln, vol in removed_contents.items():
+                    self.pipette_tracker.update_contents(soln, vol)
 
-        return None
+                pump_control_logger.debug(
+                    "Pump has aspirated: %0.6f ml at %fmL/min from %s. Pipette vol: %0.3f ul",
+                    volume_withdrawn_ml,
+                    self.pump.pumping_rate,
+                    solution,
+                    self.pipette_tracker.volume,
+                )
+
+            else:
+                # If the solution is not a vial or well, only update the volume
+                self.pipette_tracker.volume = round(
+                    self.pipette_tracker.volume + volume_withdrawn_ul, PRECISION
+                )
+
+                pump_control_logger.debug(
+                    "Pump has aspirated: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
+                    self.pump.volume_withdrawn,
+                    self.pump.pumping_rate,
+                    self.pipette_tracker.volume,
+                )
+
+            # Clear the pump's memory
+            self.pump.volume_infused_clear()
+            self.pump.volume_withdrawn_clear()
+
+            return solution
+        except Exception as e:
+            pump_control_logger.error(f"Error during aspiration: {e}")
+            return None
 
     def dispense(
         self,
@@ -245,11 +304,11 @@ class SyringePump:
     ) -> None:
         """
         Infuse the given volume at the given rate from the specified position.
-        If only volume is specified, air is infused.
+        If only volume is specified, air is dispensed.
 
         Args:
-            volume_to_dispense (float): Volume to be infused in microliters.
-            being_infused (Union[Vial, wp.Well], optional): The solution being infused to get the density
+            volume_to_dispense (float): Volume to be dispensed in microliters.
+            being_infused (Union[Vial, wp.Well], optional): The solution being dispensed to get the density
             infused_into (Union[Vial, wp.Well], optional): The destination of the solution (well or vial)
             rate (float, optional): Pumping rate in milliliters per minute. None defaults to the max pump rate.
             blowout_ul (float): The volume to blowout in microliters
@@ -275,7 +334,7 @@ class SyringePump:
                     self.pump.volume_infused * 1000, PRECISION
                 )
                 pump_control_logger.debug(
-                    "Pump has infused: %0.6f ml of air at %fmL/min Pipette volume: %0.3f ul",
+                    "Pump has dispensed: %0.6f ml of air at %fmL/min Pipette volume: %0.3f ul",
                     self.pump.volume_infused,
                     self.pump.pumping_rate,
                     self.pipette_tracker.volume,
@@ -300,12 +359,12 @@ class SyringePump:
             # Air infusion case (previously infuse_air)
             density = None
         elif being_infused is not None and hasattr(being_infused, "density"):
-            # Get density from the solution being infused
+            # Get density from the solution being dispensed
             density = being_infused.density
         else:
             density = None
 
-        # Run the pump to infuse the solution
+        # Run the pump to dispense the solution
         _ = self.run_pump(
             nesp_lib.PumpingDirection.INFUSE,
             volume_ml,
@@ -317,18 +376,18 @@ class SyringePump:
         # Update the volume of the pipette with the blowout volume
         self.pipette_tracker.volume -= blowout_ul
 
-        # Fetch the total infused volume in milliliters and microliters from the pump
+        # Fetch the total dispensed volume in milliliters and microliters from the pump
         volume_infused_ml_total = round(self.pump.volume_infused, PRECISION)
         volume_infused_ul_total = round(volume_infused_ml_total * 1000, PRECISION)
         volume_infused_ul = round(volume_infused_ul_total - blowout_ul, PRECISION)
 
-        # Clear the pump's infused and withdrawn volumes
+        # Clear the pump's dispensed and aspirated volumes
         self.pump.volume_infused_clear()
         self.pump.volume_withdrawn_clear()
 
         # Log the infusion details
         pump_control_logger.debug(
-            "Pump has infused: %0.4f ul (%0.4f ul of solution) at %fmL/min Pipette volume: %0.4f ul",
+            "Pump has dispensed: %0.4f ul (%0.4f ul of solution) at %fmL/min Pipette volume: %0.4f ul",
             volume_infused_ul_total,
             volume_infused_ul,
             self.pump.pumping_rate,
@@ -352,7 +411,7 @@ class SyringePump:
             for key, ratio in content_ratio.items():
                 self.pipette_tracker.update_contents(key, -volume_infused_ul * ratio)
         else:
-            # Update the volume of the pipette without the infused volume
+            # Update the volume of the pipette without the dispensed volume
             self.pipette_tracker.volume -= volume_infused_ul
 
         return None
@@ -402,9 +461,9 @@ class SyringePump:
             pass
 
         action_type = (
-            "infused"
+            "dispensed"
             if pump_direction == nesp_lib.PumpingDirection.INFUSE
-            else "withdrawn"
+            else "aspirated"
         )
         action_volume = (
             self.pump.volume_infused
@@ -427,6 +486,40 @@ class SyringePump:
             self.pipette_tracker.volume = round(
                 self.pipette_tracker.volume + (volume_ml * 1000), PRECISION
             )
+
+    def _ul_to_ml(self, volume_ul: float) -> float:
+        """
+        Convert volume from microliters to milliliters.
+
+        Args:
+            volume_ul (float): Volume in microliters
+
+        Returns:
+            float: Volume in milliliters with appropriate precision
+        """
+        try:
+            volume_ul = float(volume_ul)
+            return round(volume_ul * self.UL_TO_ML, PRECISION)
+        except (ValueError, TypeError) as e:
+            pump_control_logger.error(f"Error converting volume to mL: {e}")
+            return 0.0
+
+    def _ml_to_ul(self, volume_ml: float) -> float:
+        """
+        Convert volume from milliliters to microliters.
+
+        Args:
+            volume_ml (float): Volume in milliliters
+
+        Returns:
+            float: Volume in microliters with appropriate precision
+        """
+        try:
+            volume_ml = float(volume_ml)
+            return round(volume_ml * self.ML_TO_UL, PRECISION)
+        except (ValueError, TypeError) as e:
+            pump_control_logger.error(f"Error converting volume to µL: {e}")
+            return 0.0
 
 
 class MockPump(SyringePump):
@@ -456,8 +549,8 @@ class MockPump(SyringePump):
 if __name__ == "__main__":
     # test_mixing()
     # _mock_pump_testing_routine()
-    # pump.withdraw(160, rate=0.64)
-    # pump.infuse(167.43, rate=0.64, blowout_ul=0)
+    # pump.aspirate(160, rate=0.64)
+    # pump.dispense(167.43, rate=0.64, blowout_ul=0)
 
     pipette = PipetteDBHandler()
     pipette.update_contents("water", 100)
