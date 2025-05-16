@@ -228,7 +228,7 @@ def pedotdeposition(
             ),
             dst_vessel=toolkit.wellplate.wells[instructions.well_id],
             toolkit=toolkit,
-            pumping_rate=toolkit.pump.max_pump_rate,
+            pumping_rate=toolkit.pipette.max_pump_rate,
         )
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
@@ -595,7 +595,7 @@ def pedotcv(
             ),
             dst_vessel=toolkit.wellplate.wells[instructions.well_id],
             toolkit=toolkit,
-            pumping_rate=toolkit.pump.max_pump_rate,
+            pumping_rate=toolkit.pipette.max_pump_rate,
         )
         # Clear the well
         transfer(

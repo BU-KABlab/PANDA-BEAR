@@ -73,7 +73,7 @@ def test_panda_grbl_wrapper():
     - It has methods for electrode rinsing and resting
     - On disconnect, it moves the electrode to the rest position
     """
-    from panda_lib import panda_gantry as grbl
+    from panda_lib.hardware import gantry_interface as grbl
 
     # Set up the mill connection
     mill = grbl.PandaMill()
@@ -120,7 +120,7 @@ def test_panda_grbl_wrapper():
 
 
 def test_movement_around_deck():
-    from panda_lib import panda_gantry as grbl
+    from panda_lib.hardware import gantry_interface as grbl
     # from panda_lib.labware.wellplate import Wellplate, Well
     # from panda_lib.labware.vials import Vial, StockVial, WasteVial, read_vials
 
@@ -172,7 +172,7 @@ def test_movement_around_deck():
 
 
 def test_new_command_concatenation():
-    from panda_lib import panda_gantry as grbl
+    from panda_lib.hardware import gantry_interface as grbl
 
     with grbl.PandaMill() as mill:
         mill.safe_move(-100, -100, -50, tool="center")
@@ -181,7 +181,7 @@ def test_new_command_concatenation():
 
 
 def current_status_check():
-    from panda_lib import panda_gantry as grbl
+    from panda_lib.hardware import gantry_interface as grbl
 
     mill = grbl.PandaMill()
     mill.connect_to_mill()

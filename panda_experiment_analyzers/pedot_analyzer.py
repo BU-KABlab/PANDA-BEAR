@@ -112,7 +112,7 @@ def generator(
     experiment_id = scheduler.determine_next_experiment_id()
     experiment = experiment_types.EchemExperimentBase(
         experiment_id=experiment_id,
-        protocol_id=15,  # PEDOT protocol v4
+        protocol_name=15,  # PEDOT protocol v4
         well_id="A1",  # Default to A1, let the program decide where else to put it
         well_type_number=4,
         experiment_name=experiment_name,

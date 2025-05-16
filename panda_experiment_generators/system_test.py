@@ -32,10 +32,10 @@ def main():
             experiments.append(
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
-                    protocol_id="system_test",
+                    protocol_name="system_test",
                     analysis_id=999,
                     well_id="A1",
-                    well_type_number=PLATE_TYPE,
+                    wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
                     project_id=PROJECT_ID,
                     project_campaign_id=CAMPAIGN_ID,

@@ -12,7 +12,92 @@ Polymer analysis and discovery array (PANDA) self-driving lab (SDL): an automate
 
 ## Usage
 
-Refer to the End User documenation in the documentation folder.
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/BU-KABlab/PANDA-SDL.git
+   cd PANDA-SDL
+   ```
+
+2. **Install FLIR Spinnaker SDK (Required for camera operations):**
+   - Download the SDK from [FLIR's website](https://www.flir.com/products/spinnaker-sdk/)
+   - Install both the system SDK and Python SDK (for Python 3.10)
+   - Note the path to your Python wheel file (.whl)
+
+3. **Choose your preferred installation method:**
+
+   #### Option A: Using UV (Recommended)
+   
+   a. Install UV:
+   ```bash
+   # Windows (PowerShell)
+   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+   
+   # Linux/macOS
+   curl -sSf https://astral.sh/uv/install.sh | bash
+   ```
+   
+   b. Edit `pyproject.toml` to set the path to your Spinnaker Python wheel:
+   ```toml
+   [tool.uv.sources]
+   spinnaker-python = {path/to/your/spinnaker_python-wheel.whl}
+   ```
+   
+   c. Create and activate a virtual environment:
+   ```bash
+   uv venv panda_sdl --python 3.10
+   
+   # Windows
+   .venv\Scripts\activate
+   
+   # Linux/macOS
+   source .venv/bin/activate
+   ```
+   
+   d. Install dependencies:
+   ```bash
+   uv sync --reinstall
+   ```
+
+   #### Option B: Using pip
+   
+   a. Create a virtual environment:
+   ```bash
+   # Windows
+   python -m venv panda_sdl
+   panda_sdl\Scripts\activate
+   
+   # Linux/macOS
+   python -m venv panda_sdl
+   source panda_sdl/bin/activate
+   ```
+   
+   b. Edit `requirements.txt` to set the path to your Spinnaker Python wheel:
+   ```
+   spinnaker-python @ path/to/your/spinnaker_python-wheel.whl
+   ```
+   
+   c. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure the environment:**
+   
+   a. Create a `.env` file in the project root:
+   ```
+   # Paths
+   PANDA_SDL_CONFIG_PATH = /path/to/your/config.ini
+   
+   # Temp DB for pytest
+   TEMP_DB='0'
+   ```
+   
+   b. Create a config file using the template in `shared_utilities/config/default_config.ini`
+
+
+For detailed information on configuration, usage, and development, see the [documentation](documentation/user_manual.md).
 
 ## Instruments
 

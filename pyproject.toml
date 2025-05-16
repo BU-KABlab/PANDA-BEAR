@@ -1,13 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "panda_lib"
-version = "1.5.0"
-authors = [
-  { name="Gregory Robben", email="grobben@bu.edu" },{name="Harley Quinn", email="hjquinn@bu.edu"}
-]
+version = "2.0"
 description = "A library for operating a PANDA SDL as a standalone device or in a SiLA environment."
 readme = "README.md"
 requires-python = ">=3.10,<3.11"
-
+license = { text = "GPL-2.0" }
+authors = [
+    { name = "Gregory Robben", email = "grobben@bu.edu" },
+    { name = "Harley Quinn", email = "hjquinn@bu.edu" },
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
@@ -25,7 +30,7 @@ dependencies = [
     "GitPython==3.1.43",
     "gpytorch==1.13",
     "greenlet==3.1.0",
-    "hardpotato",
+    "hardpotato==1.4.0",
     "imageio==2.35.1",
     "jaxtyping==0.2.19",
     "Jinja2==3.1.4",
@@ -35,12 +40,10 @@ dependencies = [
     "linear-operator==0.5.3",
     "MarkupSafe==2.1.5",
     "matplotlib==3.9.2",
-    "matplotlib>=3.4.0",
     "mpmath==1.3.0",
-    "nesp-lib",
+    "nesp-lib==0.2.0",
     "networkx==3.3",
-    "numpy>=1.26.0",
-    "obsws-python==1.7.0",
+    "numpy==2.2.5",
     "opencv-python==4.10.0.84",
     "packaging==24.1",
     "pandas==2.2.2",
@@ -57,18 +60,13 @@ dependencies = [
     "pytz==2024.2",
     "regex==2024.7.24",
     "ruff>=0.8.3",
-    "sartorius",
+    "sartorius==0.5.1",
     "scikit-image==0.24.0",
     "scikit-learn==1.5.1",
-    "scipy==1.14.1",
-    "scipy>=1.7.0",
-    "sila2==0.12.2",
-    "sila2[codegen]",
-    "sila2[cryptography]",
+    "scipy>=1.14.1",
     "six==1.16.0",
     "slack_sdk>=3.4.0",
     "smmap==5.0.1",
-    "spinnaker-python",
     "SQLAlchemy==2.0.34",
     "sympy==1.13.2",
     "threadpoolctl==3.5.0",
@@ -86,11 +84,33 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/PANDA-BEAR"
-"Bug Tracker" = "https://github.com/yourusername/PANDA-BEAR/issues"
+"Homepage" = "https://github.com/BU-KABlab/PANDA-BEAR"
+"Bug Tracker" = "https://github.com/BU-KABlab/PANDA-BEAR/issues"
+[project.optional-dependencies]
+flir = []                                                              # Empty because PySpin is installed manually
+syringe_pump = ["nesp_lib>=0.2.0"]
+dev = ["pytest>=8.3.4", "ruff>=0.8.3", "mypy>=1.8.0", "black>=24.3.0"]
+
+[project.scripts]
+panda-cli = "panda_lib_cli.main:main"
+panda-db-setup = "panda_lib_db.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"panda_lib.hardware.mill" = ["*.json", "*.txt"]
+"panda_shared.config" = ["*.ini"]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
 
 [tool.ruff]
-# Exclude a variety of commonly ignored directories.
 exclude = [
     ".bzr",
     ".direnv",
@@ -119,63 +139,32 @@ exclude = [
     "site-packages",
     "venv",
     "nesp_lib",
-    "SpinnakerVideoCapture",
     "sartorius",
 ]
-
-# Same as Black.
 line-length = 88
 indent-width = 4
-
-# Assume Python 3.10
 target-version = "py310"
 
 [tool.ruff.lint]
-# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
-# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
-# McCabe complexity (`C901`) by default.
 select = ["E4", "E7", "E9", "F"]
-#select = ["ALL"]
 ignore = []
-
-# Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
 unfixable = []
-
-# Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.format]
-# Like Black, use double quotes for strings.
 quote-style = "double"
-
-# Like Black, indent with spaces, rather than tabs.
 indent-style = "space"
-
-# Like Black, respect magic trailing commas.
 skip-magic-trailing-comma = false
-
-# Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
-
-# Enable auto-formatting of code examples in docstrings. Markdown,
-# reStructuredText code/literal blocks and doctests are all supported.
-#
-# This is currently disabled by default, but it is planned for this
-# to be opt-out in the future.
 docstring-code-format = true
-
-# Set the line length limit used when formatting code snippets in
-# docstrings.
-#
-# This only has an effect when the `docstring-code-format` setting is
-# enabled.
 docstring-code-line-length = "dynamic"
 
-[tool.pytest.ini_options]
-pythonpath = "panda_lib"
-
 [tool.uv.sources]
-spinnaker-python = { path = "C:\\Users\\lab\\Documents\\Spinnaker\\spinnaker_python-4.2.0.83-cp310-cp310-win_amd64\\spinnaker_python-4.2.0.83-cp310-cp310-win_amd64.whl" }
-hardpotato = { git = "https://github.com/BU-KABlab/hardpotato.git", branch = "testing" }
+panda_sdl = { workspace = true }
+panda-lib = { workspace = true }
+hardpotato = { git = "https://github.com/BU-KABlab/hardpotato.git" }
 nesp-lib = { git = "https://github.com/BU-KABlab/nesp-lib-py.git" }
+
+[dependency-groups]
+dev = ["panda-lib"]
