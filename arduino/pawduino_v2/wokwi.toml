@@ -1,5 +1,0 @@
-[wokwi]
-version=1
-firmware='/build/arduino.avr.uno/pawduino.ino.hex'
-elf='/build/arduino.avr.uno/pawduino.ino.elf'
-rfc2217ServerPort = 4000
