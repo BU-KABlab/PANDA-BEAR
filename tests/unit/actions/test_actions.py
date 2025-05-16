@@ -38,7 +38,7 @@ logger = MagicMock(
 def toolkit():
     from panda_lib.hardware.arduino_interface import MockArduinoLink as ArduinoLink
     from panda_lib.toolkit import (
-        MockMill as Mill,
+        MockPandaMill as Mill,
     )
     from panda_lib.toolkit import Pipette
 

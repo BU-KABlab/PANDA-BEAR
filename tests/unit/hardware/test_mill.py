@@ -41,7 +41,14 @@ def test_move_to_positions_single_target(mock_mill):
     mock_mill.move_to_positions([target], tool="center", safe_move_required=True)
 
     # Verify execute_command was called with the expected commands
-    expected_commands = "G01 Z0\nG01 X-200.0 Y-200.0\nG01 Z-75.0"
+    # Lookup the tool offset for the center in the config
+    offset = mock_mill.tool_manager.get_offset("center")
+    # formulate the expected command based on the offset
+    expected_x = offset.x + target.x
+    expected_y = offset.y + target.y
+    expected_z = offset.z + target.z
+
+    expected_commands = f"G01 Z0\nG01 X{expected_x} Y{expected_y}\nG01 Z{expected_z}"
     mock_mill.ser_mill.write.assert_called_with(
         expected_commands.encode(encoding="ascii") + b"\n"
     )
@@ -56,7 +63,11 @@ def test_move_to_positions_multiple_targets(mock_mill):
     mock_mill.move_to_positions(targets, tool="center", safe_move_required=True)
 
     # Verify execute_command was called with commands for both movements
-    expected_commands = "G01 Z0\nG01 X-200.0 Y-200.0\nG01 Z-75.0\nG01 Z0\nG01 X-300.0 Y-200.0\nG01 Z-100.0"
+    offset = mock_mill.tool_manager.get_offset("center")
+    # formulate the expected command based on the offset
+    expected_y = offset.y + targets[0].y
+
+    expected_commands = f"G01 Z0\nG01 X-200.0 Y{expected_y}\nG01 Z-75.0\nG01 Z0\nG01 X-300.0 Y{expected_y}\nG01 Z-100.0"
     mock_mill.ser_mill.write.assert_called_with(
         expected_commands.encode(encoding="ascii") + b"\n"
     )
@@ -68,7 +79,7 @@ def test_move_to_positions_already_at_target(mock_mill):
     mock_mill.current_coordinates = Mock(return_value=current_pos)
 
     # Try to move to current position
-    mock_mill.move_to_positions([current_pos], tool="center", safe_move_required=True)
+    mock_mill.move_to_positions([current_pos], tool="mill", safe_move_required=True)
 
     # Verify no movement commands were sent
     mock_mill.ser_mill.write.assert_not_called()
@@ -94,7 +105,7 @@ def test_move_to_positions_without_safe_move(mock_mill):
     mock_mill.current_coordinates = Mock(return_value=Coordinates(-100, -100, -50))
     mock_mill.ser_mill.readline.return_value = b"ok\r\n"
     target = Coordinates(x=-200, y=-200, z=-75)
-    mock_mill.move_to_positions([target], tool="center", safe_move_required=False)
+    mock_mill.move_to_positions([target], tool="mill", safe_move_required=False)
 
     # Verify direct movement commands were sent
     expected_commands = "G01 X-200.0\nG01 Y-200.0\nG01 Z-75.0"
