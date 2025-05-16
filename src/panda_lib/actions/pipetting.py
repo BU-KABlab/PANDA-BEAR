@@ -90,7 +90,7 @@ def _pipette_action(
             )
 
         # Use standard interface for aspirate
-        toolkit.pipette.aspirate(AIR_GAP)
+        toolkit.pipette.prime()
         toolkit.mill.safe_move(
             src_vessel.x,
             src_vessel.y,
@@ -101,7 +101,7 @@ def _pipette_action(
         if isinstance(src_vessel, Well):
             toolkit.pipette.aspirate(20)
         toolkit.mill.move_to_safe_position()
-        toolkit.pipette.aspirate(DRIP_STOP)
+        toolkit.pipette.drip_stop()
 
         if isinstance(src_vessel, StockVial):
             capping_sequence(
@@ -128,35 +128,8 @@ def _pipette_action(
             volume_to_dispense=repetition_vol,
             being_infused=src_vessel,
             infused_into=dst_vessel,
-            blowout_ul=(
-                AIR_GAP + DRIP_STOP + 20
-                if isinstance(src_vessel, Well)
-                else AIR_GAP + DRIP_STOP
-            ),
         )
-
-        # for _, vol in toolkit.pipette.pipette_tracker.contents.items():
-        #     if vol > 0.0:
-        #         logger.warning("Pipette has residual volume of %f ul. Purging...", vol)
-        #         toolkit.pipette.dispense(
-        #             volume_to_dispense=vol,
-        #             being_infused=None,
-        #             infused_into=dst_vessel,
-        #             blowout_ul=vol,
-        #         )
-
-        # if toolkit.pipette.pipette_tracker.volume > 0.0:
-        #     logger.warning(
-        #         "Pipette has residual volume of %f ul. Purging...",
-        #         toolkit.pipette.pipette_tracker.volume,
-        #     )
-        #     toolkit.pipette.dispense(
-        #         volume_to_dispense=toolkit.pipette.pipette_tracker.volume,
-        #         being_infused=None,
-        #         infused_into=dst_vessel,
-        #         blowout_ul=toolkit.pipette.pipette_tracker.volume,
-        #     )
-        #     toolkit.pipette.pipette_tracker.volume = 0.0
+        toolkit.pipette.blowout()
 
         if isinstance(dst_vessel, WasteVial):
             capping_sequence(
