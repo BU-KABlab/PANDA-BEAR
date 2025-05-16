@@ -1,5 +1,9 @@
 """
-A class for controlling an OT2 P300 pipette via an Arduino while tracking vessel contents
+A class for controlling an OT2 P300 pipette via an Arduino while tracking vessel contents.
+
+This module provides an interface for controlling ot2p300 pipettes for
+liquid handling operations. It manages connection, configuration, and operation of OT2 P300 pipettes
+while tracking volumes and contents.
 """
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
@@ -37,6 +41,14 @@ class OT2P300:
         pipette_driver (Pipette): Pipette driver for hardware control
         pipette_tracker (PipetteDBHandler): Database handler for tracking pipette state
         max_p300_rate (float): Maximum pipetting rate in µL/s
+
+    Methods:
+        prime(): Prime the pipette by aspirating a configured volume of air.
+        aspirate(volume, rate): Aspirate the given volume at the given rate.
+        drip_stop(): Aspirate a small volume of air to prevent dripping.
+        dispense(volume, rate): Dispense the given volume at the given rate.
+        blowout(reprime): Blow out any remaining volume and optionally reprime.
+        mix(repetitions, volume, rate): Mix the solution by aspirating and dispensing.
     """
 
     def __init__(self, arduino: Optional[ArduinoLink] = None):
@@ -49,10 +61,34 @@ class OT2P300:
             "P300", "max_pipetting_rate", fallback=50.0
         )  # µL/s for Arduino pipette
 
+        # Liquid handling specific constants
+        self.prime_volume_ul = config.getfloat(
+            "P300", "prime_volume_ul", fallback=10.0
+        )  # µL
+        self.drip_stop_volume_ul = config.getfloat(
+            "P300", "drip_stop_volume_ul", fallback=5.0
+        )  # µL
+
+        # Tracking flags
+        self.is_primed = False
+        self.has_drip_stop = False
+        self._drip_stop_volume = 0.0  # Track actual drip stop volume
+
         # Add unit conversion constants for clarity
         self.UL_TO_ML = 0.001  # Conversion factor from µL to mL
         self.ML_TO_UL = 1000.0  # Conversion factor from mL to µL
 
+        # Set up database tracker for volumes and contents
+        self.pipette_tracker = PipetteDBHandler()
+        self.pipette_tracker.set_capacity(
+            config.getfloat("P300", "pipette_capacity", fallback=300.0)
+        )  # µL
+
+        # If there is volume in the pipette, warn the user
+        if self.pipette_tracker.volume > 0:
+            vessel_logger.warning(
+                f"Warning: Pipette volume is {self.pipette_tracker.volume} µL. This may affect operations."
+            )
         # Create pipette driver for hardware control
         self.pipette_driver = Pipette.from_config(
             stepper=self.arduino,
@@ -63,12 +99,6 @@ class OT2P300:
         if not self.pipette_driver or not self.pipette_driver.stepper:
             p300_control_logger.error("Failed to initialize pipette driver")
             raise RuntimeError("Pipette driver initialization failed")
-
-        # Set up database tracker for volumes and contents
-        self.pipette_tracker = PipetteDBHandler()
-        self.pipette_tracker.set_capacity(
-            config.getfloat("P300", "pipette_capacity", fallback=300.0)
-        )  # µL
 
         p300_control_logger.info("OT2P300 initialized")
 
@@ -84,11 +114,105 @@ class OT2P300:
         """Clean up resources - not much needed since Arduino cleanup happens at process exit"""
         p300_control_logger.info("OT2P300 closed")
 
+    def prime(self, volume_ul: Optional[float] = None) -> bool:
+        """
+        Prime the pipette by aspirating a small volume of air.
+        The primed air is used later for blowout operations.
+
+        Args:
+            volume_ul, but will be ignored. The OT2P300 has a configuered prime position. Maintained
+            argument to match the interface of other pipettes.
+
+        Returns:
+            bool: True if priming was successful, False otherwise
+        """
+
+        if self.pipette_driver.is_primed:
+            p300_control_logger.warning(
+                "Pipette is already primed. No need to prime again."
+            )
+            return True
+        try:
+            self.pipette_driver.prime()
+            self.is_primed = True
+            p300_control_logger.info("Pipette primed successfully")
+            # NOTE we do not track the volume of air aspirated here
+
+        except Exception as e:
+            p300_control_logger.error(f"Error during priming: {e}")
+            return False
+
+        return True
+
+    def drip_stop(self, volume_ul: Optional[float] = None) -> bool:
+        """
+        Perform a drip stop operation by aspirating a small amount of air.
+        This prevents dripping when moving between positions.
+
+        Args:
+            volume_ul (float, optional): Air volume to aspirate in microliters.
+                                        If None, uses the configured drip_stop_volume_ul.
+
+        Returns:
+            bool: True if drip stop was successful, False otherwise
+        """
+        # Use configured value if none specified
+        drip_volume = volume_ul if volume_ul is not None else self.drip_stop_volume_ul
+
+        try:
+            drip_volume = float(drip_volume)
+            if drip_volume <= 0:
+                p300_control_logger.warning(
+                    f"Cannot perform drip stop with {drip_volume} µL - volume must be positive"
+                )
+                return False
+
+            # Log the operation
+            p300_control_logger.info(
+                f"Performing drip stop with {drip_volume} µL of air"
+            )
+
+            # Check if volume would exceed capacity
+            if (
+                self.pipette_tracker.volume + drip_volume
+                > self.pipette_tracker.capacity_ul
+            ):
+                p300_control_logger.warning(
+                    f"Cannot perform drip stop with {drip_volume} µL - would exceed pipette capacity"
+                )
+                return False
+
+            # Use the pipette driver to aspirate air
+            success = self.pipette_driver.aspirate(
+                vol=drip_volume, s=self.max_p300_rate
+            )
+
+            if not success:
+                p300_control_logger.error(
+                    f"Failed to perform drip stop with {drip_volume} µL"
+                )
+                return False
+
+            # Store the actual drip stop volume and update tracking
+            self._drip_stop_volume = drip_volume
+            self.pipette_tracker.volume += drip_volume
+            self.has_drip_stop = True
+
+            p300_control_logger.debug(
+                f"Drip stop performed with {drip_volume} µL of air"
+            )
+            return True
+
+        except Exception as e:
+            p300_control_logger.error(f"Error during drip stop: {e}")
+            return False
+
     def aspirate(
         self,
         volume_to_aspirate: float,
         solution: Optional[Union[Vial, wp.Well]] = None,
         rate: Optional[float] = None,
+        drip_stop: bool = False,
     ) -> Optional[Union[Vial, wp.Well]]:
         """
         Aspirate the given volume at the given rate from the specified vessel.
@@ -96,11 +220,12 @@ class OT2P300:
 
         Args:
             volume_to_aspirate (float): Volume to be aspirated in microliters.
-            solution (Vessel object): The vial or well to aspirate from
-            rate (float): Pumping rate in µL/second. None defaults to the max p300 rate.
+            solution (Union[Vial, wp.Well], optional): The vial or well to aspirate from. If None, air is aspirated.
+            rate (float, optional): Pumping rate in µL/second. None defaults to the max p300 rate.
+            drip_stop (bool): Whether to perform a drip stop after aspiration
 
         Returns:
-            The updated solution object if given one
+            The updated solution object if given one, otherwise None
         """
         # Validate inputs
         try:
@@ -138,7 +263,7 @@ class OT2P300:
             > self.pipette_tracker.capacity_ul
         ):
             p300_control_logger.warning(
-                f"Cannot aspirate {volume_to_aspirate} µL - would exceed pipette capacity"
+                f"Cannot aspirate {volume_to_aspirate} µL - would exceed pipette capacity of {self.pipette_tracker.capacity_ul} µL"
             )
             return None
 
@@ -162,8 +287,19 @@ class OT2P300:
             # If no solution is provided, just update the pipette volume
             self.pipette_tracker.volume += volume_to_aspirate
             p300_control_logger.debug(
-                f"Aspirated: {volume_to_aspirate} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
+                f"Aspirated: {volume_to_aspirate} µL of air at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
             )
+
+        # If a drip stop is requested, perform it
+        if (
+            drip_stop and solution is not None
+        ):  # Only do drip stop when aspirating from solution
+            drip_stop_success = self.drip_stop()
+            if not drip_stop_success:
+                p300_control_logger.warning(
+                    "Failed to perform drip stop after aspiration"
+                )
+
         return solution
 
     def dispense(
@@ -172,22 +308,21 @@ class OT2P300:
         being_infused: Optional[Union[Vial, wp.Well]] = None,
         infused_into: Optional[Union[Vial, wp.Well]] = None,
         rate: Optional[float] = None,
-        blowout_ul: float = 0.0,
     ) -> None:
         """
         Dispense the given volume at the given rate.
+        If a drip stop was performed, it will also dispense the drip stop volume
+        but not add it to the destination vessel.
 
         Args:
             volume_to_dispense (float): Volume to be dispensed in microliters.
-            being_infused (Vial object): The solution being dispensed to get the density
-            infused_into (str or Vial): The destination of the solution (well or vial)
-            rate (float): Pumping rate in µL/second. None defaults to the max p300 rate.
-            blowout_ul (float): The volume to blowout in microliters
+            being_infused (Union[Vial, wp.Well], optional): The solution being dispensed to get the density
+            infused_into (Union[Vial, wp.Well], optional): The destination of the solution (well or vial)
+            rate (float, optional): Pumping rate in µL/second. None defaults to the max p300 rate.
         """
         # Validate inputs
         try:
             volume_to_dispense = float(volume_to_dispense)
-            blowout_ul = float(blowout_ul)
             if rate is not None:
                 rate = float(rate)
             else:
@@ -209,34 +344,43 @@ class OT2P300:
             )
             return None
 
-        # Calculate the total volume dispensed (including blowout)
-        total_volume_dispensed = volume_to_dispense
+        # Calculate total dispense volume including drip stop if present
+        total_volume_to_dispense = volume_to_dispense
+        drip_stop_volume = 0.0
 
-        # Log the dispensing operation with details
+        if self.has_drip_stop:
+            drip_stop_volume = self._drip_stop_volume
+            total_volume_to_dispense += drip_stop_volume
+            p300_control_logger.debug(
+                f"Including drip stop volume of {drip_stop_volume} µL in dispense operation"
+            )
+
+        # Log the operation
         p300_control_logger.info(
-            f"Dispensing {volume_to_dispense} µL"
-            + f" at {rate} µL/s"
+            f"Dispensing {volume_to_dispense} µL at {rate} µL/s"
             + (f" from {being_infused}" if being_infused else "")
             + (f" into {infused_into}" if infused_into else "")
+            + (
+                f" (including {drip_stop_volume} µL drip stop)"
+                if drip_stop_volume > 0
+                else ""
+            )
         )
 
-        # Use the pipette driver to dispense
-        success = self.pipette_driver.dispense(volume_to_dispense, rate)
+        # Use the pipette driver to dispense the total volume
+        success = self.pipette_driver.dispense(total_volume_to_dispense, rate)
         if not success:
-            p300_control_logger.error(f"Failed to dispense {volume_to_dispense} µL")
+            p300_control_logger.error(
+                f"Failed to dispense {total_volume_to_dispense} µL"
+            )
             return None
-
-        # If blowout is requested, perform it
-        if blowout_ul > 0:
-            blowout_success = self.pipette_driver.blowout()
-            if not blowout_success:
-                p300_control_logger.error("Failed to perform blowout")
-            # return to zero position after blowout
-            self.pipette_driver.prime()
 
         # If we have a destination, update its contents based on what was in the pipette
         if infused_into is not None and isinstance(infused_into, (Vial, wp.Well)):
-            # First update the destination vessel
+            # Calculate the sample volume (excluding drip stop)
+            sample_volume_ul = volume_to_dispense  # The actual sample without drip stop
+
+            # First update the destination vessel with just the sample volume
             if sum(self.pipette_tracker.contents.values() or [0]) > 0:
                 # Calculate the ratio of each content in the pipette
                 content_ratio = {
@@ -244,29 +388,33 @@ class OT2P300:
                     for key, value in self.pipette_tracker.contents.items()
                 }
 
-                # Add the proportional contents to the destination
+                # Add the proportional contents to the destination (excluding drip stop)
                 infused_into.add_contents(
                     {
-                        key: ratio * volume_to_dispense
+                        key: ratio * sample_volume_ul
                         for key, ratio in content_ratio.items()
                     },
-                    volume_to_dispense,
+                    sample_volume_ul,
                 )
 
-                # Remove the dispensed contents from the pipette
+                # Remove all dispensed contents from the pipette (including drip stop)
                 for key, ratio in content_ratio.items():
                     self.pipette_tracker.update_contents(
-                        key, -volume_to_dispense * ratio
+                        key, -total_volume_to_dispense * ratio
                     )
             else:
                 # If no contents defined but we have volume, still track the empty transfer
-                # and update the destination vial
-                infused_into.add_contents({}, volume_to_dispense)
-                # Remove the volume (including blowout) from the pipette
-                self.pipette_tracker.volume -= total_volume_dispensed
+                # and update the destination vial with just the sample volume
+                infused_into.add_contents({}, sample_volume_ul)
+                # Remove the total volume from the pipette
+                self.pipette_tracker.volume -= total_volume_to_dispense
         else:
-            # If no destination vessel, just update the pipette volume
-            self.pipette_tracker.volume -= total_volume_dispensed
+            # If no destination vessel, just update the pipette volume with the total dispensed
+            self.pipette_tracker.volume -= total_volume_to_dispense
+
+        # Reset drip stop flag
+        self.has_drip_stop = False
+        self._drip_stop_volume = 0.0
 
         p300_control_logger.debug(
             f"Dispensed: {volume_to_dispense} µL"
@@ -274,6 +422,65 @@ class OT2P300:
         )
 
         return None
+
+    def blowout(self, reprime: bool = True) -> bool:
+        """
+        Perform a blowout operation to expel any remaining liquid.
+        Optionally reprime the pipette afterward.
+
+        Args:
+            reprime (bool): Whether to prime the pipette after blowout
+
+        Returns:
+            bool: True if successful
+        """
+        if not self.is_primed:
+            p300_control_logger.warning(
+                "Cannot perform blowout - pipette is not primed"
+            )
+            return False
+
+        p300_control_logger.info("Performing blowout operation")
+        success = self.pipette_driver.blowout()
+
+        if success:
+            # Log the original volume before resetting
+            original_volume = self.pipette_tracker.volume
+            original_contents = dict(self.pipette_tracker.contents)
+
+            # Reset volume and contents after blowout
+            for key in original_contents:
+                original_contents[key] = 0.0
+            self.pipette_tracker.volume = 0.0
+            self.pipette_tracker.contents = original_contents
+
+            # Reset flags
+            self.is_primed = False
+            self.has_drip_stop = False
+            self._drip_stop_volume = 0.0
+
+            p300_control_logger.debug(
+                f"Performed blowout of {original_volume} µL with contents: {original_contents}"
+            )
+
+            # Return to zero position after blowout
+            if self.pipette_driver.prime():
+                # Reprime if requested
+                if reprime:
+                    prime_success = self.prime()
+                    if not prime_success:
+                        p300_control_logger.warning("Failed to reprime after blowout")
+                        return False
+            else:
+                p300_control_logger.warning(
+                    "Failed to reset pipette position after blowout"
+                )
+                return False
+        else:
+            p300_control_logger.error("Failed to perform blowout")
+            return False
+
+        return success
 
     def mix(
         self, repetitions: int, volume: float, rate: Optional[float] = None
@@ -341,6 +548,8 @@ class OT2P300:
             bool: True if successful
         """
         self.pipette_tracker.reset_contents()
+        self.has_drip_stop = False
+        self._drip_stop_volume = 0.0
         p300_control_logger.debug("Pipette contents reset")
         return True
 
@@ -367,44 +576,17 @@ class OT2P300:
         self.pipette_tracker.volume = 0.0
         self.pipette_tracker.reset_contents()
 
+        # Reset flags
+        self.is_primed = False
+        self.has_drip_stop = False
+        self._drip_stop_volume = 0.0
+
         p300_control_logger.debug("Pipette reset successfully")
+
+        # Re-prime the pipette with air
+        self.prime()
+
         return True
-
-    def blowout(self) -> bool:
-        """
-        Perform a blowout operation to expel any remaining liquid
-
-        Returns:
-            bool: True if successful
-        """
-        p300_control_logger.info("Performing blowout operation")
-        success = self.pipette_driver.blowout()
-
-        if success:
-            # Log the original volume before resetting
-            original_volume = self.pipette_tracker.volume
-            original_contents = dict(self.pipette_tracker.contents)
-
-            # Reset volume and contents after blowout
-            # Note: Different from syringepump implementation which uses reset_contents()
-            # We preserve the content keys but set volumes to 0
-            for key in original_contents:
-                original_contents[key] = 0.0
-            self.pipette_tracker.volume = 0.0
-            self.pipette_tracker.contents = original_contents
-
-            p300_control_logger.debug(
-                f"Performed blowout of {original_volume} µL with contents: {original_contents}"
-            )
-
-            # Return to zero position after blowout
-            prime_success = self.pipette_driver.prime()
-            if not prime_success:
-                p300_control_logger.warning("Failed to prime pipette after blowout")
-        else:
-            p300_control_logger.error("Failed to perform blowout")
-
-        return success
 
     def get_status(self) -> Dict[str, Any]:
         """
@@ -426,6 +608,9 @@ class OT2P300:
             "db_max_volume": self.pipette_tracker.capacity_ul,
             "has_tip": self.pipette_driver.has_tip,
             "contents": self.pipette_tracker.contents,
+            # "is_primed": self.is_primed, # TODO add to schema
+            # "has_drip_stop": self.has_drip_stop,# TODO add to schema
+            # "drip_stop_volume": self._drip_stop_volume,# TODO add to schema
         }
 
         return status
@@ -475,7 +660,12 @@ class OT2P300:
 
 
 class MockOT2P300(OT2P300):
-    """Mock version of OT2P300 for testing"""
+    """
+    Mock version of OT2P300 for testing.
+
+    Simulates the behavior of a real OT2P300 pipette without requiring hardware connection.
+    Maintains accurate volume tracking, state management, and simulated timing.
+    """
 
     def __init__(self, arduino: Optional[ArduinoLink] = None):
         """Initialize the mock OT2P300 interface"""
@@ -487,6 +677,23 @@ class MockOT2P300(OT2P300):
             "P300", "max_pipetting_rate", fallback=50.0
         )  # µL/s for Arduino pipette
 
+        # Liquid handling specific constants
+        self.prime_volume_ul = config.getfloat(
+            "P300", "prime_volume_ul", fallback=10.0
+        )  # µL
+        self.drip_stop_volume_ul = config.getfloat(
+            "P300", "drip_stop_volume_ul", fallback=5.0
+        )  # µL
+
+        # Tracking flags - same as real implementation
+        self.is_primed = False
+        self.has_drip_stop = False
+        self._drip_stop_volume = 0.0
+
+        # Add unit conversion constants for clarity
+        self.UL_TO_ML = 0.001  # Conversion factor from µL to mL
+        self.ML_TO_UL = 1000.0  # Conversion factor from mL to µL
+
         # Use the mock pipette driver
         self.pipette_driver = MockPipette.from_config(
             stepper=self.arduino,
@@ -496,6 +703,12 @@ class MockOT2P300(OT2P300):
 
         # Set up database tracker
         self.pipette_tracker = PipetteDBHandler()
-        self.pipette_tracker.set_capacity(300.0)  # µL
+        self.pipette_tracker.set_capacity(
+            config.getfloat("P300", "pipette_capacity", fallback=300.0)
+        )  # µL
 
         p300_control_logger.info("Mock OT2P300 initialized")
+
+        # Prime automatically if the pipette is empty
+        if self.pipette_tracker.volume == 0:
+            self.prime()
