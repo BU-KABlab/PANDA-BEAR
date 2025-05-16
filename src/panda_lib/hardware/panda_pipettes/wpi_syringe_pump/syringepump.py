@@ -832,7 +832,6 @@ class MockPump(SyringePump):
         syringe_pump.volume_withdrawn_clear()
 
         # Set the address to indicate it's a mock
-        syringe_pump.address = "MOCK-PUMP-01"
         log_msg = f"Mock pump created with address {syringe_pump.address}"
         self.connected = True
         pump_control_logger.info(log_msg)
@@ -901,11 +900,11 @@ class MockPump(SyringePump):
 
         # Set the appropriate volume that was pumped
         if pump_direction == nesp_lib.PumpingDirection.WITHDRAW:
-            self.pump.volume_withdrawn = volume_ml
+            self.pump.run()
             action_volume = self.pump.volume_withdrawn
             action_type = "aspirated"
         else:  # INFUSE
-            self.pump.volume_infused = volume_ml
+            self.pump.run()
             action_volume = self.pump.volume_infused
             action_type = "dispensed"
 
