@@ -6,21 +6,23 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-env_found = load_dotenv()
+# Skip loading .env if DOTENV_LOADED is set (used in testing)
+if os.environ.get("DOTENV_LOADED") != "True":
+    env_found = load_dotenv()
 
-if not env_found:
-    # print("No .env file found. Please create one with the required environment variables.")
-    # make_for_user = input("Create a new .env file? (y/n): ")
-    # if make_for_user.lower() == "y":
-    #     with open(".env", "w") as f:
-    #         f.write("PANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\n")
-    #         f.write("# Temp DB for pytest\nTEMP_DB='0'\n")
+    if not env_found:
+        # print("No .env file found. Please create one with the required environment variables.")
+        # make_for_user = input("Create a new .env file? (y/n): ")
+        # if make_for_user.lower() == "y":
+        #     with open(".env", "w") as f:
+        #         f.write("PANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\n")
+        #         f.write("# Temp DB for pytest\nTEMP_DB='0'\n")
 
-    # else:
-    raise FileNotFoundError(
-        "No .env file found. Please create one with the required environment variables:"
-        "\nPANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\nTEMP_DB='0'"
-    )
+        # else:
+        raise FileNotFoundError(
+            "No .env file found. Please create one with the required environment variables:"
+            "\nPANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\nTEMP_DB='0'"
+        )
 
 
 from .config_tools import is_testing_mode  # noqa: E402
