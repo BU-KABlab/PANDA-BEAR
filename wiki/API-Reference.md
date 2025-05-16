@@ -23,7 +23,6 @@ toolkit = Toolkit()
 | `toolkit.potentiostat`                 | Access to the potentiostat             |
 | `toolkit.camera`                       | Access to the camera                   |
 | `toolkit.pipette`                      | Access to the pipetting system         |
-| `toolkit.get_ml_model()`               | Get access to a ML model               |
 | `toolkit.use_specific_deck_zone(zone)` | Position robot at a specific deck zone |
 | `toolkit.move_pipette_to_well(well)`   | Move pipette to a specific well        |
 | `toolkit.global_logger`                | System logger for recording events     |
