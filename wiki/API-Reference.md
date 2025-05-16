@@ -165,22 +165,7 @@ from panda_lib.utilities import Coordinates, SystemState
 
 ### Machine Learning Integration
 
-```python
-# Get a ML model
-model = toolkit.get_ml_model("my_model_name")
-
-# Use the model
-predictions = model.predict(input_data)
-```
-
-### Custom Hardware Communication
-
-```python
-# Direct serial communication
-serial_device = toolkit.get_serial_device("device_name")
-serial_device.write("command")
-response = serial_device.read()
-```
+Coming soon
 
 ## Exception Handling
 
