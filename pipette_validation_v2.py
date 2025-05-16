@@ -48,12 +48,12 @@ vkwargs = VialKwargs(
             dead_volume=1000,
         )
 vial = StockVial(
-    position="s7", create_new=True, **vkwargs
+    position="s10", create_new=True, **vkwargs
 )
 vial.save()
 
 wellKwargs = WellKwargs(
-    name="A6",
+    name="B1",
     volume=0,
     height=10,
     radius=5,
@@ -69,7 +69,7 @@ wellKwargs = WellKwargs(
     
 )
 well = Well(
-    well_id="A6", plate_id=115,create_new=True, **wellKwargs
+    well_id="B1", plate_id=115,create_new=True, **wellKwargs
 )
 well.save()
 
