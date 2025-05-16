@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.shared_utilities.config.config_interface import (
+from shared_utilities.config.config_interface import (
     ConfigInterface,
     create_test_config,
     get_config,
@@ -169,7 +169,7 @@ def test_is_testing_mode(mock_test_config):
 def test_patched_config():
     """Test using pytest monkeypatch to replace config"""
     with patch(
-        "src.shared_utilities.config.config_interface._config_instance"
+        "shared_utilities.config.config_interface._config_instance"
     ) as mock_config:
         # Set up mock methods
         mock_config.get.return_value = "mocked_value"

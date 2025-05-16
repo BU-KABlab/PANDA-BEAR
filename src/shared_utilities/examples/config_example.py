@@ -4,7 +4,7 @@ Example module demonstrating usage of the new ConfigInterface
 This module shows how to properly use the new configuration interface in your code.
 """
 
-from src.shared_utilities.config.config_interface import get_config
+from shared_utilities.config.config_interface import get_config
 
 
 def get_unit_id() -> int:

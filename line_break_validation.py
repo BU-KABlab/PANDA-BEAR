@@ -7,11 +7,11 @@ from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 from typing import Optional
 
-from src.panda_lib.hardware import arduino_interface
-from src.panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
-from src.panda_lib.hardware.gantry_interface import PandaMill
-from src.panda_lib.sql_tools.panda_models import Base
-from src.shared_utilities.config.config_tools import read_config_value
+from panda_lib.hardware import arduino_interface
+from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
+from panda_lib.hardware.gantry_interface import PandaMill
+from panda_lib.sql_tools.panda_models import Base
+from shared_utilities.config.config_tools import read_config_value
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
