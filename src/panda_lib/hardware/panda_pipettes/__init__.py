@@ -18,9 +18,9 @@ from .state import PipetteState
 pipette_type = str(read_config_value("PIPETTE", "pipette_type")).upper()
 if pipette_type == "WPI":
     if read_testing_config():
-        from .wpi_syringe.syringepump import MockPump as Pipette
+        from .wpi_syringe_pump.syringepump import MockPump as Pipette
     else:
-        from .wpi_syringe.syringepump import SyringePump as Pipette
+        from .wpi_syringe_pump.syringepump import SyringePump as Pipette
 
 elif pipette_type == "OT2":
     if read_testing_config():
