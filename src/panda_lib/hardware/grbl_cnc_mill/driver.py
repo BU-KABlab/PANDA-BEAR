@@ -152,7 +152,7 @@ class Mill:
     def homing_sequence(self):
         """Home the mill, set the feed rate, and clear the buffers"""
         self.home()
-        self.set_feed_rate(2000)  # Set feed rate to 2000
+        self.set_feed_rate(5000)  # Set feed rate to 2000
         self.clear_buffers()
         self.check_max_z_height()
 
@@ -382,6 +382,7 @@ class Mill:
         """Enter the context manager"""
         # Connect to mill with any port specified during object creation
         self.connect_to_mill()
+        self.set_feed_rate(5000)
 
         # Optional auto-homing behavior that can be controlled by a property
         if not self.homed and getattr(self, "auto_home", True):
@@ -574,7 +575,7 @@ class Mill:
                 self.homed = True
                 break
 
-            if "Alarm" in status:
+            if "Alarm" in status or "alarm" in status:
                 # Try homing again
                 self.logger.warning("Homing failed, trying again...")
                 self.execute_command("$H")
@@ -588,6 +589,12 @@ class Mill:
         while "Idle" not in status:
             if "<Run" in status:
                 start_time = time.time()
+            if "error" in status:
+                self.logger.error("Error in status: %s", status)
+                raise StatusReturnError(f"Error in status: {status}")
+            if "alarm" in status:
+                self.logger.error("Alarm in status: %s", status)
+                raise StatusReturnError(f"Alarm in status: {status}")
             if time.time() - start_time > timeout:
                 self.logger.warning("Command execution timed out")
                 return status
@@ -694,6 +701,11 @@ class Mill:
         status = self.read()
         attempts = 0
         while status[0] != "<" and attempts < 3:
+            if "alarm" in status.lower() or "error" in status.lower():
+                self.logger.error("Error in status: %s", status)
+                raise StatusReturnError(f"Error in status: {status}")
+            if "ok" in status.lower():
+                self.logger.debug("OK in status: %s", status)
             status = self.read()
             attempts += 1
         # Get the current mode of the mill
@@ -738,11 +750,6 @@ class Mill:
                     "Error occurred while getting %s coordinates", coord_type
                 )
                 raise LocationNotFound
-        else:
-            self.logger.critical("Failed to obtain coordinates from the mill")
-            self.stop()
-            self.disconnect()
-            raise LocationNotFound
 
         mill_center = Coordinates(x_coord, y_coord, z_coord)
         # So far we have obtain the mill's coordinates
