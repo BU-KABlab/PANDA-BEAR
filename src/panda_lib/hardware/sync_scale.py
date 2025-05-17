@@ -71,7 +71,16 @@ class SyncScale:
         return self._run_coroutine(self.scale.get())
     
     read = get
-    
+
+    def get_info(self):
+        """
+        Get scale model, serial, and software version numbers.
+        
+        Returns:
+            A dictionary with the scale's model, serial number, and software version
+        """
+        return self._run_coroutine(self.scale.get_info())
+       
     def disconnect(self):
         """Disconnect from the scale synchronously."""
         if hasattr(self.scale, 'disconnect'):
