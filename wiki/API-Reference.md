@@ -181,11 +181,17 @@ Experiments are processed based on priority (lower number = higher priority):
 
 ## Action Functions (aliased as Protocol)
 
-### Fluid Handling
+```python
+from panda_lib.actions import ...
+```
+
+Or
 
 ```python
-from panda_lib.actions import transfer, clear_well, flush_pipette, rinse_well, mix, purge_pipette
+from panda_lib.protocol import ...
 ```
+
+### Fluid Handling
 
 | Function                                                                                   | Description                              | Parameters                                                                                                                                                                                                                                                                      |
 | ------------------------------------------------------------------------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -198,10 +204,6 @@ from panda_lib.actions import transfer, clear_well, flush_pipette, rinse_well, m
 | `volume_correction(volume, density=None, viscosity=None)`                                  | Correct volume based on fluid properties | <ul><li>`volume`: Volume to correct in μL</li><li>`density`: Fluid density (default 1.0)</li><li>`viscosity`: Fluid viscosity in cP (default 1.0)</li></ul>                                                                                                                     |
 
 ### Movement
-
-```python
-from panda_lib.actions import move_to_well, move_to_vial, decapping_sequence, capping_sequence
-```
 
 | Function                                                   | Description                     | Parameters                                                                                                                                                                          |
 | ---------------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -216,13 +218,6 @@ from panda_lib.actions import move_to_well, move_to_vial, decapping_sequence, ca
 
 ### Electrochemistry
 
-```python
-from panda_lib.actions import (move_to_and_perform_ca,
-    move_to_and_perform_cv,
-    perform_chronoamperometry,
-    perform_cyclic_voltammetry)
-```
-
 | Function                                                                                                        | Description                    | Parameters                                                                                                                                                                                                                                           |
 | --------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `open_circuit_potential(file_tag, exp=None, testing=False)`                                                     | Measure open circuit potential | <ul><li>`file_tag`: Tag for output files</li><li>`exp`: Experiment object (optional)</li><li>`testing`: Whether in testing mode (optional)</li></ul>                                                                                                 |
@@ -233,20 +228,32 @@ from panda_lib.actions import (move_to_and_perform_ca,
 
 ### Imaging
 
-```python
-from panda_lib.actions import image_well, capture_new_image
-```
-
 | Function                                                                        | Description                     | Parameters                                                                                                                                                                                              |
 | ------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `image_well(toolkit, experiment, image_label, curvature_image)`                 | Take an image of a well         | <ul><li>`toolkit`: System toolkit</li><li>`experiment`: Experiment object</li><li>`image_label`: Label for the image</li><li>`curvature_image`: Use the curvature lights</li></ul>                      |
 | `capture_new_image(save, num_images, filename, logger, camera_type, camera_id)` | Capture a picture from a camera | <ul><li>`toolkit`: System toolkit</li><li>`path`: Save path</li><li>`file_name`: File name</li><li>`well_id`: Well ID</li><li>`project_id`: Project ID</li><li>`experiment_id`: Experiment ID</li></ul> |
 
+### Vessel Handling
+
+Functions for handling vessels, solution selection, and liquid transfers.
+
+| Function                                                                                                | Description                         | Parameters                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `solution_selector(solution_name, volume, db_session=SessionLocal)`                                     | Select solution vial for withdrawal | - `solution_name`: Name of the solution to select<br>- `volume`: Volume to be pipetted in μL<br>- `db_session`: Database session for queries (optional)                                                                                                           |
+| `waste_selector(solution_name, volume, db_session=SessionLocal)`                                        | Select waste vial for deposit       | - `solution_name`: Name of the waste vial to select<br>- `volume`: Volume to be deposited in μL<br>- `db_session`: Database session for queries (optional)                                                                                                        |
+| `_handle_source_vessels(volume, src_vessel, pjct_logger=logger, source_concentration=None, db_session)` | Handle selection of source vessels  | - `volume`: Volume to transfer in μL<br>- `src_vessel`: Source vessel name or object<br>- `pjct_logger`: Logger instance (optional)<br>- `source_concentration`: Target concentration in mM (optional)<br>- `db_session`: Database session for queries (optional) |
+
+#### VesselSelector Class
+
+| Method                                                                                                    | Description                        | Parameters                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VesselSelector.select_solution_vessel(solution_name, volume, db_session=SessionLocal)`                   | Select appropriate solution vessel | - `solution_name`: Name of the required solution<br>- `volume`: Required volume in μL<br>- `db_session`: Database session for queries (optional)                                                                                                              |
+| `VesselSelector.select_waste_vessel(solution_name, volume, db_session=SessionLocal)`                      | Select appropriate waste vessel    | - `solution_name`: Name of the waste solution<br>- `volume`: Volume to be deposited in μL<br>- `db_session`: Database session for queries (optional)                                                                                                          |
+| `VesselSelector.handle_source_vessels(volume, src_vessel, pjct_logger, source_concentration, db_session)` | Handle source vessel selection     | - `volume`: Required volume in μL<br>- `src_vessel`: Source vessel name or object<br>- `pjct_logger`: Project logger (optional)<br>- `source_concentration`: Target concentration in mM (optional)<br>- `db_session`: Database session for queries (optional) |
+
 ### Utility Actions
 
-```python
-from panda_lib.actions import delay
-```
+Utility functions for writing protocols
 
 | Function                     | Description                | Parameters                                                                                                        |
 | ---------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
@@ -367,6 +374,8 @@ from panda_lib.labware import get_xyz
 | `get_xyz(labware)` | Get XYZ coordinates from any labware type | <ul><li>`labware`: Wellplate, Well, Vial, or Coordinates object</li></ul> |
 
 ## Database Functions
+
+The provided database functions are meant to assist in executing custom SQL queries or provide ready made common queries to the system database.
 
 ```python
 from panda_lib import sql_tools

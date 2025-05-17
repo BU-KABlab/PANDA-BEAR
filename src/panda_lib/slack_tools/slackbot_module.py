@@ -31,10 +31,12 @@ from panda_lib.experiments.results import (
 from panda_lib.labware import vials
 from panda_lib.labware.wellplates import Well
 from panda_lib.sql_tools import (
-    sql_queue,
-    sql_system_state,
-    sql_wellplate,
+    count_queue_length,
+    select_current_wellplate_info,
+    select_well_characteristics,
+    select_wellplate_wells,
 )
+from panda_lib.sql_tools.queries import system
 from panda_shared.config.config_tools import read_config, read_testing_config
 from panda_shared.log_tools import setup_default_logger
 
@@ -250,8 +252,8 @@ class SlackBot:
 
             if conversation_history is None:
                 # This means the past 100 messages are from the bot, we should stop
-                sql_system_state.set_system_status(
-                    sql_system_state.SystemState.SHUTDOWN,
+                system.set_system_status(
+                    system.SystemState.SHUTDOWN,
                     "stopping ePANDA",
                     self.testing,
                 )
@@ -449,17 +451,17 @@ class SlackBot:
             return 1
 
         elif text[0:7] == "status":
-            system_status = sql_system_state.select_system_status()
+            system_status = system.select_system_status()
             message = f"The system status is {system_status}."
         elif text[0:5] == "pause":
-            sql_system_state.set_system_status(
-                sql_system_state.SystemState.PAUSE, "pausing ePANDA", self.testing
+            system.set_system_status(
+                system.SystemState.PAUSE, "pausing ePANDA", self.testing
             )
             return 1
 
         elif text[0:6] == "resume":
-            sql_system_state.set_system_status(
-                sql_system_state.SystemState.RESUME, "resuming ePANDA", self.testing
+            system.set_system_status(
+                system.SystemState.RESUME, "resuming ePANDA", self.testing
             )
             return 1
 
@@ -473,14 +475,14 @@ class SlackBot:
             return 1
 
         elif text[0:4] == "shutdown":
-            sql_system_state.set_system_status(
-                sql_system_state.SystemState.SHUTDOWN, "stopping ePANDA", self.testing
+            system.set_system_status(
+                system.SystemState.SHUTDOWN, "stopping ePANDA", self.testing
             )
             return 1
 
         elif text[0:4] == "stop":
-            sql_system_state.set_system_status(
-                sql_system_state.SystemState.STOP, "stopping ePANDA", self.testing
+            system.set_system_status(
+                system.SystemState.STOP, "stopping ePANDA", self.testing
             )
             self.send_message(channel_id, "Stopping the controller loop")
             return 1
@@ -571,7 +573,7 @@ class SlackBot:
 
     def _queue_length(self, channel_id):
         # Get queue length
-        message = f"The queue length is {sql_queue.count_queue_length()}."
+        message = f"The queue length is {count_queue_length()}."
         self.send_message(channel_id, message)
         return 1
 
@@ -743,13 +745,13 @@ def well_status() -> str:
     Create a plot of the well status and return the file path.
     """
     # Check current wellplate type
-    plate_id, type_number, _ = sql_wellplate.select_current_wellplate_info()
-    plate_type = sql_wellplate.select_well_characteristics(type_number)
+    plate_id, type_number, _ = select_current_wellplate_info()
+    plate_type = select_well_characteristics(type_number)
     # Choose the correct wellplate object based on the wellplate type
     rows = plate_type.rows
     columns = plate_type.cols
 
-    result = sql_wellplate.select_wellplate_wells()
+    result = select_wellplate_wells()
     current_wells: List[Well] = []
     for row in result:
         try:

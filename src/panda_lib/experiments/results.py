@@ -7,7 +7,7 @@ from typing import List, Tuple, Union
 from pydantic import ConfigDict, RootModel
 from pydantic.dataclasses import dataclass
 
-from panda_lib.sql_tools.panda_models import (
+from panda_lib.sql_tools import (
     ExperimentResults,
 )
 from panda_shared.db_setup import SessionLocal

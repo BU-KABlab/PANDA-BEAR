@@ -7,7 +7,7 @@ The slack_tickets table is used to store slack messages that are waiting to be p
 
 from dataclasses import dataclass
 
-from panda_lib.sql_tools.panda_models import SlackTickets
+from panda_lib.sql_tools import SlackTickets
 from panda_shared.db_setup import SessionLocal
 
 

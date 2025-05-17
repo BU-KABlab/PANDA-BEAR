@@ -2,11 +2,16 @@ from .config.config_print import print_config_values, resolve_config_paths
 from .config.config_tools import (
     get_env_var,
     get_repo_path,
+    get_unit_id,
     is_testing_mode,
+    read_camera_type,
     read_config,
+    read_config_value,
     read_data_dir,
     read_logging_dir,
     read_testing_config,
+    read_webcam_settings,
+    reload_config,
     test,
     write_testing_config,
 )
@@ -83,4 +88,9 @@ __all__ = [
     "get_port_manufacturers",
     "setup_default_logger",
     "is_testing_mode",
+    "get_unit_id",
+    "read_camera_type",
+    "read_config_value",
+    "read_webcam_settings",
+    "reload_config",
 ]

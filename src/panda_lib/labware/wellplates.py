@@ -16,7 +16,7 @@ from sqlalchemy.orm import sessionmaker
 from panda_lib.errors import OverDraftException, OverFillException
 from panda_lib.hardware.gantry_interface import Coordinates
 from panda_lib.labware.services import WellplateService, WellService, get_unit_id
-from panda_lib.sql_tools.panda_models import (
+from panda_lib.sql_tools import (
     ExperimentParameters,
     ExperimentResults,
     Experiments,

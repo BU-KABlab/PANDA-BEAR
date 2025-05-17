@@ -5,9 +5,9 @@ from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 
 from panda_lib.hardware import arduino_interface
-from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
 from panda_lib.hardware.gantry_interface import PandaMill
-from panda_lib.sql_tools.panda_models import Base
+from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
+from panda_lib.sql_tools import Base
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"

@@ -1,19 +1,158 @@
-"""SQL Functions for the wellplates and well_hx tables."""
+"""
+SQL Tools Wellplate Queries
+
+This module contains functions for querying and manipulating wellplates and wells.
+"""
 
 import json
+import logging
 from dataclasses import asdict
 from datetime import datetime, timezone
-from typing import List, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from sqlalchemy import Integer, cast, func, insert, select, update
+from sqlalchemy.orm import Session
 
-from panda_lib.sql_tools import sql_reports
-from panda_lib.sql_tools.panda_models import PlateTypes, WellModel, Wellplates
-from panda_lib.sql_tools.sql_queue import get_unit_id
-from panda_shared.config.config_tools import read_config_value
+from panda_shared import read_config_value
 from panda_shared.db_setup import SessionLocal
 
-logger = sql_reports.logger
+from ..models.wellplates import PlateTypes, WellModel, Wellplates
+from .queue import get_unit_id
+
+logger = logging.getLogger("sql_tools")
+
+
+def get_wellplate_by_id(plate_id: int) -> Optional[Dict[str, Any]]:
+    """
+    Get a wellplate by its ID.
+
+    Args:
+        plate_id: The ID of the wellplate to retrieve
+
+    Returns:
+        A dictionary with wellplate data if found, None otherwise
+    """
+    with SessionLocal() as session:
+        stmt = select(Wellplates).where(Wellplates.id == plate_id)
+        plate = session.scalars(stmt).first()
+
+        if not plate:
+            return None
+
+        return {
+            "id": plate.id,
+            "plate_type_id": plate.plate_type_id,
+            "plate_type_name": plate.plate_type.name if plate.plate_type else None,
+            "barcode": plate.barcode,
+            "label": plate.label,
+            "created_at": plate.created_at.isoformat() if plate.created_at else None,
+        }
+
+
+def get_all_wellplates() -> List[Dict[str, Any]]:
+    """
+    Get all wellplates in the database.
+
+    Returns:
+        A list of dictionaries with wellplate data
+    """
+    with SessionLocal() as session:
+        stmt = select(Wellplates).order_by(Wellplates.id)
+        plates = session.scalars(stmt).all()
+
+        result = []
+        for plate in plates:
+            result.append(
+                {
+                    "id": plate.id,
+                    "plate_type_id": plate.plate_type_id,
+                    "plate_type_name": plate.plate_type.name
+                    if plate.plate_type
+                    else None,
+                    "barcode": plate.barcode,
+                    "label": plate.label,
+                    "created_at": plate.created_at.isoformat()
+                    if plate.created_at
+                    else None,
+                }
+            )
+
+        return result
+
+
+def add_wellplate(
+    plate_type_id: int, barcode: Optional[str] = None, label: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Add a new wellplate to the database.
+
+    Args:
+        plate_type_id: ID of the plate type
+        barcode: Optional barcode for the plate
+        label: Optional human-readable label
+
+    Returns:
+        A dictionary with the created wellplate data
+    """
+    with SessionLocal() as session:
+        # Check if plate type exists
+        plate_type = session.get(PlateTypes, plate_type_id)
+        if not plate_type:
+            raise ValueError(f"Plate type with id {plate_type_id} not found")
+
+        # Create new wellplate
+        plate = Wellplates(plate_type_id=plate_type_id, barcode=barcode, label=label)
+
+        session.add(plate)
+        session.commit()
+        session.refresh(plate)
+
+        # Create wells for this plate
+        _create_wells_for_plate(session, plate)
+
+        return {
+            "id": plate.id,
+            "plate_type_id": plate.plate_type_id,
+            "plate_type_name": plate.plate_type.name,
+            "barcode": plate.barcode,
+            "label": plate.label,
+            "created_at": plate.created_at.isoformat() if plate.created_at else None,
+        }
+
+
+def get_well_history(well_id: int) -> List[Dict[str, Any]]:
+    """
+    Get the history of experiments for a specific well.
+
+    Args:
+        well_id: The ID of the well to check history for
+
+    Returns:
+        A list of dictionaries with experiment history
+    """
+    # This would typically join wells with experiment history table
+    # Implementation depends on the specific schema
+    return []
+
+
+def _create_wells_for_plate(session: Session, plate: Wellplates) -> None:
+    """
+    Create the well records for a new wellplate.
+
+    Args:
+        session: SQLAlchemy session
+        plate: The wellplate to create wells for
+    """
+    plate_type = plate.plate_type
+
+    wells = []
+    for row in range(plate_type.rows):
+        for col in range(plate_type.columns):
+            well = WellModel(plate_id=plate.id, row=row, column=col, volume_ul=0)
+            wells.append(well)
+
+    session.add_all(wells)
+    session.commit()
 
 
 def check_if_plate_type_exists(type_id: int) -> bool:

@@ -2,7 +2,7 @@ import pandas as pd
 
 from panda_lib.experiments.experiment_types import _select_specific_parameter
 from panda_lib.experiments.results import select_specific_result
-from panda_lib.sql_tools import sql_system_state
+from panda_lib.sql_tools.queries import system
 from panda_shared.config.config_tools import read_testing_config
 
 from .pedot_classes import RequiredData
@@ -66,8 +66,8 @@ df = pd.DataFrame(data)
 
 def populate_required_information(experiment_id: int) -> RequiredData:
     """Populates the required information for the machine learning input."""
-    sql_system_state.set_system_status(
-        sql_system_state.SystemState.BUSY, "analyzing data", read_testing_config()
+    system.set_system_status(
+        system.SystemState.BUSY, "analyzing data", read_testing_config()
     )
     df.loc[df["name"] == "experiment_id", "value"] = experiment_id
 
@@ -93,9 +93,7 @@ def populate_required_information(experiment_id: int) -> RequiredData:
         except Exception as e:
             print(f"Error getting result {row}: {e}")
             df.loc[(df["name"] == name), "value"] = None
-    sql_system_state.set_system_status(
-        sql_system_state.SystemState.IDLE, "ready", read_testing_config()
-    )
+    system.set_system_status(system.SystemState.IDLE, "ready", read_testing_config())
 
     # Convert the df into a MLInput object
     results = RequiredData(

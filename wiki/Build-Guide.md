@@ -10,7 +10,7 @@ The PANDA-SDL is a custom-built robotics system for polymer film deposition and 
 
 1. A 3-axis gantry system for movement
 2. Custom 3D printed components for mounting equipment
-3. Arduino-based control electronics 
+3. Arduino-based control electronics
 4. A specialized wellplate system for electrochemical experiments
 
 ## Gantry Construction
@@ -55,6 +55,7 @@ The PANDA-SDL requires several custom 3D printed parts to mount and integrate eq
 ### Required Files
 
 All STL files for 3D printing can be found in the `documentation/3d-prints/` directory:
+
 - Equipment-Head-Front_v2.stl
 - Equipment-Head-Rear_v2.stl
 - Paw components
@@ -103,6 +104,7 @@ The PANDA-SDL uses Arduino-based control systems for various functions.
 ### Wiring Diagrams
 
 Refer to the documents in the `documentation/documents/` directory:
+
 - Pawduino - LEDs.pdf
 - Pawduino - Neopixels.pdf
 
@@ -141,15 +143,15 @@ Follow the detailed instructions in the [Wellplate and Gasket SOP](../documentat
 
 1. **Prepare Materials**
    - Cut and clean all materials according to specifications
-   
+
 2. **Assemble the Wellplate**
    - Follow the layering order specified in the SOP
    - Ensure proper alignment of all components
-   
+
 3. **Install Electrical Connections**
    - Connect the working electrode material
    - Install reference and counter electrode fixtures
-   
+
 4. **Test Wellplate**
    - Check for leaks
    - Verify electrical connections

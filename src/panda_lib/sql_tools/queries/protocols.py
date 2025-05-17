@@ -11,12 +11,10 @@ import os
 
 # region Protocols
 from panda_lib.errors import ProtocolNotFoundError
-from panda_lib.sql_tools.panda_models import Protocols
-from panda_shared.config.config_tools import read_config
-
-# import sqlite3
-# from panda_lib.config.config import SQL_DB_PATH
+from panda_shared import read_config
 from panda_shared.db_setup import SessionLocal
+
+from ..panda_models import Protocols
 
 
 class ProtocolEntry:
@@ -254,16 +252,6 @@ def select_protocol_name(protocol_id) -> str:
     Returns:
         str: The name of the protocol.
     """
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Get the name of the protocol from the database
-    # cursor.execute("SELECT name FROM protocols WHERE id = ?", (protocol_id,))
-    # protocol_name = cursor.fetchone()[0]
-
-    # conn.close()
-
-    # return protocol_name
 
     with SessionLocal() as session:
         result = session.query(Protocols).filter(Protocols.id == protocol_id).first()

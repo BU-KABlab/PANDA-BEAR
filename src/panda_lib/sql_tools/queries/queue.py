@@ -10,10 +10,6 @@ If the status is 'queued' then the experiment is in the queue.
 Otherwise the experiment is not in the queue.
 
 """
-
-# region Queue Functions
-
-
 # TODO in the future experiments in the experiments table that are not matched to a well
 # in the well_hx table should be added to the queue in some manner but this is not implemented yet.
 
@@ -23,7 +19,7 @@ from typing import Optional
 
 from sqlalchemy import and_, select
 
-from panda_shared.config.config_tools import get_unit_id
+from panda_shared import get_unit_id
 from panda_shared.db_setup import SessionLocal
 
 
@@ -58,7 +54,7 @@ def select_queue(project_id: Optional[int] = None) -> list:
     Returns:
         list: The entries from the queue table.
     """
-    from .panda_models import (
+    from ..models import (
         Experiments,
         WellModel,
         Wellplates,

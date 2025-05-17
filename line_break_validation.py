@@ -10,7 +10,7 @@ from tqdm import tqdm
 from panda_lib.hardware import arduino_interface
 from panda_lib.hardware.gantry_interface import PandaMill
 from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
-from panda_lib.sql_tools.panda_models import Base
+from panda_lib.sql_tools import Base
 from panda_shared.config.config_tools import read_config_value
 
 # Setup an in-memory SQLite database for testing

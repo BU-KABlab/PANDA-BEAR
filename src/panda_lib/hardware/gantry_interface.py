@@ -6,7 +6,7 @@ from pathlib import Path
 from sqlalchemy import select
 
 from panda_lib.labware.vials import read_vial
-from panda_lib.sql_tools.panda_models import VialStatus
+from panda_lib.sql_tools import VialStatus
 from panda_shared.config.config_tools import (
     read_config_value,
     read_logging_dir,

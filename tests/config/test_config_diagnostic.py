@@ -118,7 +118,7 @@ baudrate = 9600
     # Clean up
     try:
         os.unlink(temp_path)
-    except:
+    except OSError:
         pass
 
     # Restore environment

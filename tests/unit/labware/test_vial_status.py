@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from panda_lib.sql_tools.panda_models import Base, Vials, VialStatus
+from panda_lib.sql_tools import Base, Vials, VialStatus
 
 
 @pytest.fixture

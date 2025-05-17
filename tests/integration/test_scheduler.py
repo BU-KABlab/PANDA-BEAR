@@ -2,7 +2,7 @@ from sqlalchemy import select, text
 
 from panda_lib.experiments import ExperimentBase
 from panda_lib.scheduler import schedule_experiments
-from panda_lib.sql_tools.panda_models import (
+from panda_lib.sql_tools import (
     ExperimentParameters,
     Experiments,
 )

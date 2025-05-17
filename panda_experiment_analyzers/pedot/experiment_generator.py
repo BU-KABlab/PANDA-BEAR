@@ -7,7 +7,7 @@ from pedot_analyzer import analyze
 
 from panda_lib import scheduler
 from panda_lib.experiments import ExperimentStatus, experiment_types
-from panda_lib.sql_tools.sql_system_state import get_current_pin
+from panda_lib.sql_tools.queries.system import get_current_pin
 
 from .pedot_classes import PEDOTParams
 

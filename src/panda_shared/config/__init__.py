@@ -3,14 +3,13 @@ Configuration module for PANDA SDL.
 """
 
 import configparser
-import json
 import os
-from pathlib import Path
 
 from .config_print import print_config_values, resolve_config_paths
 from .config_tools import (
     get_env_var,
     get_repo_path,
+    get_unit_id,
     is_testing_mode,
     read_config,
     read_data_dir,
@@ -65,4 +64,5 @@ __all__ = [
     "teardown_test_config",
     "get_original_env",
     "is_testing_mode",
+    "get_unit_id",
 ]

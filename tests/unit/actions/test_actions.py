@@ -24,7 +24,7 @@ from panda_lib.hardware.panda_pipettes import (
 from panda_lib.labware import StockVial, Well
 
 # from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
-# from panda_lib.sql_tools.panda_models import Base, Vials, WellModel
+# from panda_lib.sql_tools import Base, Vials, WellModel
 from panda_lib.toolkit import (
     Toolkit,
 )

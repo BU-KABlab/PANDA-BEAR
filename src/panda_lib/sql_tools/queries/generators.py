@@ -10,22 +10,12 @@ generators from the generators folder and running generators.
 import importlib
 import os
 
-from panda_lib.sql_tools.panda_models import ExperimentGenerators
-
-# import sqlite3
-from panda_shared.config.config_tools import read_config
+from panda_shared import read_config
 from panda_shared.db_setup import SessionLocal
 
-# from sqlalchemy.orm import Session
+from ..models import ExperimentGenerators
 
-# region Generators
 config = read_config()
-# if config.getboolean("OPTIONS", "TESTING"):
-#     sql_db_path = config.get("TESTING", "testing_db_address")
-# else:
-#     sql_db_path = config.get("PRODUCTION", "production_db_address")
-
-# SQL_DB_PATH = sql_db_path
 
 
 class GeneratorEntry:

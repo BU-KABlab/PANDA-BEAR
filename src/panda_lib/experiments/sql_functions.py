@@ -4,7 +4,7 @@ from typing import List, Union, get_type_hints
 
 from sqlalchemy import select
 
-from panda_lib.sql_tools.panda_models import (
+from panda_lib.sql_tools import (
     ExperimentParameters,
     Experiments,
     WellModel,
