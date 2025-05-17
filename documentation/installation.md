@@ -181,7 +181,6 @@ pumping_rate = 0.3
 testing = True
 random_experiment_selection = False
 use_slack = False
-use_obs = False
 precision = 6
 
 [LOGGING]
@@ -208,12 +207,6 @@ production_db_user =
 production_db_password = 
 logging_dir = 
 data_dir = 
-
-[OBS]
-obs_host = localhost
-obs_password = 
-obs_port = 4455
-obs_timeout = 3
 
 [SLACK]
 slack_token = 
@@ -245,7 +238,7 @@ baudrate = 9600
 timeout = 10
 
 [CAMERA]
-camera_type = flir 
+camera_type = webcam 
 webcam_id = 0  
 webcam_resolution_width = 1280
 webcam_resolution_height = 720
@@ -260,39 +253,53 @@ model = emstat
 port = 
 firmware_path =
 
+[PIPETTE]
+pipette_type = WPI
+
+
 [TOOLS]
 offsets = [
     {
         "name": "center",
         "x": 0.0,
-        "y": 0.0,
+        "y": -5.5,
         "z": 0.0
     },
     {
         "name": "pipette",
-        "x": -99.0,
-        "y": 0.0,
-        "z": 130.0
+        "x": -117.13,
+        "y": -11.75,
+        "z": 100.0
     },
     {
         "name": "electrode",
-        "x": 22.0,
-        "y": 51.0,
-        "z": 124.0
+        "x": 48.35,
+        "y": -11.77,
+        "z": 87.0
     },
     {
         "name": "decapper",
-        "x": -73.0,
-        "y": 0.0,
-        "z": 72.0
+        "x": -64.27,
+        "y": -12.5,
+        "z": 62.0
     },
     {
         "name": "lens",
-        "x": 4.0,
-        "y": -1.0,
+        "x": 0.0,
+        "y": -5.5,
+        "z": 0.0
+    },
+    {
+        "name": "mill",
+        "x": 0.0,
+        "y": 0.0,
         "z": 0.0
     }
     ]
+
+[P300]
+max_pipetting_rate = 50.0
+pipette_capacity = 300
 ```
 
 ## Test Your Installation
