@@ -59,6 +59,8 @@ class SyncScale:
         """
         return self._run_coroutine(self.scale.zero())
     
+    tare = zero
+
     def get(self):
         """
         Get a reading from the scale synchronously.
@@ -67,6 +69,8 @@ class SyncScale:
             The current scale reading as a float
         """
         return self._run_coroutine(self.scale.get())
+    
+    read = get
     
     def disconnect(self):
         """Disconnect from the scale synchronously."""
