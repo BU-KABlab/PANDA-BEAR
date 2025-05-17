@@ -1,7 +1,7 @@
 import multiprocessing
 from multiprocessing import Queue
 
-from panda_experiment_analyzers import analysis_worker
+from panda_lib.experiment_analysis_loop import analysis_worker
 
 if __name__ == "__main__":
     status_queue = Queue()
