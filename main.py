@@ -1,3 +1,3 @@
-from panda_lib_cli.menu import main_menu
+from panda_lib_cli import MainMenu
 
-main_menu.main()
+MainMenu()
