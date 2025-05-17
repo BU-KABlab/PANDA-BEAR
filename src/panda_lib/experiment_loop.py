@@ -732,14 +732,13 @@ def _fetch_protocol_function(protocol_id: int) -> callable:
 
 @timing_wrapper
 def _establish_system_state(
-    session_maker: sessionmaker = SessionLocal,
 ) -> tuple[Sequence[StockVial], Sequence[WasteVial], Wellplate]:
     """
     Establish state of system
 
     Args:
     --------
-        session_maker (Optional): The session maker object. Defaults to SessionLocal.
+        None
 
     Returns:
     --------
@@ -748,7 +747,7 @@ def _establish_system_state(
         wellplate (wellplate_module.Wells): wellplate object
     """
     slack = SlackBot()
-    stock_vials, waste_vials = read_vials(session=session_maker)
+    stock_vials, waste_vials = read_vials()
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
     wellplate = Wellplate()
