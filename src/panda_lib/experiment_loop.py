@@ -28,7 +28,6 @@ from panda_shared.db_setup import SessionLocal
 from panda_shared.log_tools import (
     apply_log_filter,
     setup_default_logger,
-    timing_wrapper,
 )
 
 from . import scheduler
@@ -729,7 +728,6 @@ def _fetch_protocol_function(protocol_id: int) -> callable:
     return protocol_function
 
 
-@timing_wrapper
 def _establish_system_state() -> tuple[
     Sequence[StockVial], Sequence[WasteVial], Wellplate
 ]:
@@ -818,7 +816,6 @@ def _establish_system_state() -> tuple[
     return stock_vials_only, waste_vials_only, wellplate
 
 
-@timing_wrapper
 def _check_stock_vials(
     exp_solns: dict, stock_vials: Sequence[Vial]
 ) -> Tuple[bool, dict]:
@@ -916,7 +913,6 @@ def _check_stock_vials(
     return passes, check_table
 
 
-@timing_wrapper
 def _monitor_system_status(
     slack: SlackBot, status_queue: multiprocessing.Queue, process_id: int
 ) -> SystemState:

@@ -17,7 +17,7 @@ from sqlalchemy import select, update
 
 from panda_lib.experiments.sql_functions import update_experiment_status
 from panda_shared.db_setup import SessionLocal
-from panda_shared.log_tools import setup_default_logger, timing_wrapper
+from panda_shared.log_tools import setup_default_logger
 
 from .experiments import (
     EchemExperimentGenerator,
@@ -48,7 +48,6 @@ from .sql_tools.sql_wellplate import (
 logger = setup_default_logger(log_name="scheduler")
 
 
-@timing_wrapper
 def check_well_status(well_to_check: str, plate_id: int = None) -> str:
     """Checks the status of the well in the well_status view in the SQLite database"""
     try:
@@ -59,7 +58,6 @@ def check_well_status(well_to_check: str, plate_id: int = None) -> str:
         raise e
 
 
-@timing_wrapper
 def choose_next_new_well(plate_id: int = None) -> str:
     """Choose the next available well for an experiment"""
     try:
@@ -70,7 +68,6 @@ def choose_next_new_well(plate_id: int = None) -> str:
         raise e
 
 
-@timing_wrapper
 def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> None:
     """Change the status of the well in the well_hx table"""
     logger.debug(
@@ -105,7 +102,6 @@ def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> No
         raise e
 
 
-@timing_wrapper
 def read_next_experiment_from_queue(
     random_pick: bool = True,
     experiment_id: int = None,
@@ -149,7 +145,6 @@ def read_next_experiment_from_queue(
     return experiment, filename
 
 
-@timing_wrapper
 def update_experiment_queue_priority(experiment_id: int, priority: int):
     """Update the priority of experiments in the queue"""
     try:
@@ -167,7 +162,6 @@ def update_experiment_queue_priority(experiment_id: int, priority: int):
         raise e
 
 
-@timing_wrapper
 def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
     """Update the experiment information in the experiments table"""
     try:
@@ -184,7 +178,6 @@ def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
         raise e
 
 
-@timing_wrapper
 def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> None:
     """
     Update the experiment parameters in the experiment_parameters table.
@@ -227,7 +220,6 @@ def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> 
         raise e
 
 
-@timing_wrapper
 def schedule_experiment(
     experiment: ExperimentBase, override_well_available=False
 ) -> int:
@@ -313,7 +305,6 @@ def assign_well_if_unavailable(experiment: ExperimentBase) -> bool:
     return True
 
 
-@timing_wrapper
 def schedule_experiments(
     experiments: list[
         Union[ExperimentBase, ExperimentGenerator, EchemExperimentGenerator]
@@ -441,7 +432,6 @@ def schedule_experiments(
     return len(experiments)
 
 
-@timing_wrapper
 def check_project_id(project_id: int) -> bool:
     """Check if the project_id is in the projects table"""
     try:
@@ -455,7 +445,6 @@ def check_project_id(project_id: int) -> bool:
         raise e
 
 
-@timing_wrapper
 def add_project_id(project_id: int) -> None:
     """Add the project_id to the projects table when an experiment is submitted with an unrecongized project_id"""
     try:
@@ -467,7 +456,6 @@ def add_project_id(project_id: int) -> None:
         raise e
 
 
-@timing_wrapper
 def determine_next_experiment_id() -> int:
     """FIX ME: This is used in many places but should be changed to directly call the sql function"""
     return select_next_experiment_id()

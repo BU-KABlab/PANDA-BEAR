@@ -20,7 +20,6 @@ from panda_shared.config.config_tools import (
     read_config,
     read_testing_config,
 )
-from panda_shared.log_tools import timing_wrapper
 
 
 class ImageFailure(Exception):
@@ -53,7 +52,6 @@ logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
 
 
-@timing_wrapper
 def image_well(
     toolkit: Toolkit,
     experiment: Optional[EchemExperimentBase] = None,
