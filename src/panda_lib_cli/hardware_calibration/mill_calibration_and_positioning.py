@@ -1119,12 +1119,12 @@ def manual_commands(mill: Mill, *args, **kwargs):
                 if coordinates:
                     # Ask which tool to move
                     tool = input_validation(
-                        "Which tool to move? (pipette/electrode/decapper/lens/center): ",
+                        "Which tool to move? (pipette/electrode/decapper/lens/center/mill): ",
                         str,
                         menu_items=valid_tools,
                         default=previous_tool,
                     )
-                    previous_tool = tool
+                    previous_tool = tool                    
 
                     # Confirm the movement
                     print(
