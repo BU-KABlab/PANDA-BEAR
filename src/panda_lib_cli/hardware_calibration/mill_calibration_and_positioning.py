@@ -1060,7 +1060,8 @@ def manual_commands(mill: Mill, *args, **kwargs):
     print("  reload tools - Reload the Mill tools from config file")
     print("  exit - Exit the command interface")
 
-    valid_tools = ["pipette", "electrode", "decapper", "lens", "center"]
+    valid_tools = ["pipette", "electrode", "decapper", "lens", "center", "mill"]
+    previous_tool = "mill"
 
     while True:
         try:
@@ -1113,17 +1114,17 @@ def manual_commands(mill: Mill, *args, **kwargs):
                 # Check if it's a movement command to handle specially
                 # Handle both "G00 X10 Y20" and "G00X10Y20" formats
                 command, coordinates = _parse_gcode(command, mill.current_coordinates())
-                command_upper = command.upper()
 
                 # If we have at least one coordinate, ask about tool selection
                 if coordinates:
                     # Ask which tool to move
                     tool = input_validation(
-                        "Which tool to move? (pipette/electrode/decapper/lens/center): ",
+                        "Which tool to move? (pipette/electrode/decapper/lens/center/mill): ",
                         str,
                         menu_items=valid_tools,
-                        default="pipette",
+                        default=previous_tool,
                     )
+                    previous_tool = tool                    
 
                     # Confirm the movement
                     print(
@@ -1147,7 +1148,7 @@ def manual_commands(mill: Mill, *args, **kwargs):
                     print("No coordinates specified in movement command")
 
             # For non-movement commands, validate and send directly
-            elif validate_command_or_gcode(command_upper):
+            elif validate_command_or_gcode(command.upper()):
                 print(f"Sending command: {command}")
                 try:
                     response = mill.execute_command(command)
@@ -1156,9 +1157,9 @@ def manual_commands(mill: Mill, *args, **kwargs):
                     print(f"Error executing command: {e}")
             else:
                 print(f"Unknown or invalid command: {command}")
-                suggestion = get_command_description(command_upper)
+                suggestion = get_command_description(command.upper())
                 if suggestion != "Unknown command":
-                    print(f"Did you mean: {command_upper} - {suggestion}?")
+                    print(f"Did you mean: {command.upper()} - {suggestion}?")
 
         except Exception as e:
             print(f"Error processing command: {e}")

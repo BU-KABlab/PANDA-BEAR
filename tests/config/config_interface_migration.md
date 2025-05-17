@@ -20,10 +20,10 @@ Replace imports from `config_tools.py` with imports from `config_interface.py`:
 
 ```python
 # Old imports
-from src.shared_utilities.config.config_tools import read_config, read_config_value
+from shared_utilities.config.config_tools import read_config, read_config_value
 
 # New imports
-from src.shared_utilities.config.config_interface import get_config
+from shared_utilities.config.config_interface import get_config
 ```
 
 ### Step 2: Replace Function Calls
@@ -95,7 +95,7 @@ def test_with_config(patch_global_config):
     
 # Alternative new way (using manual config)
 def test_with_custom_config():
-    from src.shared_utilities.config.config_interface import create_test_config
+    from shared_utilities.config.config_interface import create_test_config
     
     # Create test config
     test_config = create_test_config({
@@ -111,7 +111,7 @@ def test_with_custom_config():
 
 ```python
 # Before
-from src.shared_utilities.config.config_tools import read_config, read_config_value
+from shared_utilities.config.config_tools import read_config, read_config_value
 
 def get_mill_port():
     return read_config_value("MILL", "port", "COM1")
@@ -125,7 +125,7 @@ class MillController:
 
 ```python
 # After
-from src.shared_utilities.config.config_interface import get_config
+from shared_utilities.config.config_interface import get_config
 
 def get_mill_port():
     return get_config().get("MILL", "port", "COM1")

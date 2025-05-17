@@ -4,13 +4,13 @@ Example test that demonstrates how to use the test_config_manager
 
 import os
 
-from src.shared_utilities.config.test_config_manager import (
+from shared_utilities.config.test_config_manager import (
     ConfigTestHelper,
     temporary_config,
 )
 
 # Import AFTER the test environment is set up to ensure the right config is used
-# from src.shared_utilities.config.config_tools import read_config
+# from shared_utilities.config.config_tools import read_config
 
 
 def test_config_with_context_manager():
@@ -36,7 +36,7 @@ def test_config_with_context_manager():
 
     with temporary_config(test_config) as config_path:
         # Import inside the context to ensure the right config is used
-        from src.shared_utilities.config.config_tools import read_config
+        from shared_utilities.config.config_tools import read_config
 
         # Now read_config() should return our test config
         config = read_config()
@@ -79,7 +79,7 @@ def test_config_with_helper_class():
         ConfigTestHelper.setup_test_environment(temp_path)
 
         # Import after environment is set up
-        from src.shared_utilities.config.config_tools import read_config
+        from shared_utilities.config.config_tools import read_config
 
         # Read the config
         config = read_config()

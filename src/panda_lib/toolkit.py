@@ -6,11 +6,10 @@ from dataclasses import dataclass
 from logging import Logger
 from typing import Union
 
-from sartorius import Scale
-from sartorius.mock import Scale as MockScale
+from panda_lib.hardware import Scale
 
 from panda_lib.hardware import ArduinoLink
-from panda_lib.hardware.gantry_interface import MockPandaMill, PandaMill
+from panda_lib.hardware import PandaMill
 from panda_lib.hardware.imaging.camera_factory import CameraFactory, CameraType
 from panda_lib.hardware.imaging.interface import CameraInterface
 from panda_lib.hardware.panda_pipettes import (
@@ -61,8 +60,8 @@ class Toolkit:
         self.global_logger = kwargs.get("global_logger", None)
         self.experiment_logger = kwargs.get("experiment_logger", None)
 
-    mill: Union[PandaMill, MockPandaMill, None] = None
-    scale: Union[Scale, MockScale, None] = None
+    mill: Union[PandaMill, None] = None
+    scale: Union[Scale, None] = None
     pipette: Union[Pipette, None] = None
     wellplate: Wellplate = None
     arduino: ArduinoLink = None
@@ -130,8 +129,8 @@ class Hardware:
         self.global_logger = kwargs.get("global_logger", None)
         self.experiment_logger = kwargs.get("experiment_logger", None)
 
-    mill: Union[PandaMill, MockPandaMill, None] = None
-    scale: Union[Scale, MockScale, None] = None
+    mill: Union[PandaMill, None] = None
+    scale: Union[Scale, None] = None
     pipette: Union[Pipette, None] = None
     arduino: ArduinoLink = None
     # include the global logger so that the hardware can log to the same file
@@ -224,9 +223,9 @@ def connect_to_instruments(
 
     if use_mock_instruments:
         logger.info("Using mock instruments")
-        instruments.mill = MockPandaMill()
+        instruments.mill = PandaMill()
         instruments.mill.connect_to_mill()
-        # instruments.scale = MockScale()
+        instruments.scale = Scale()
         instruments.pipette = Pipette()
         # pstat = echem_mock.GamryPotentiostat.connect()
         instruments.arduino = ArduinoLink()
@@ -257,19 +256,25 @@ def connect_to_instruments(
         if not port:
             raise Exception("No scale port specified in the configuration file")
         instruments.scale = Scale(address=port)
-        if instruments.scale.hw.open:
-            info_dict = instruments.scale.get_info()
-            model = info_dict["model"]
-            if not model:
-                instruments.scale.hw.close()
-                raise Exception("Scale connected but no model information returned")
-            logger.debug("Connected to scale: %s", model)
-        else:
-            raise Exception("Failed to open connection to scale")
+        info_dict = instruments.scale.get_info()
+        model = info_dict["model"]
+        if not model:
+            instruments.scale.hw.close()
+            raise Exception("Scale connected but no model information returned")
+        logger.debug("Connected to scale: %s", model)
+      
     except Exception as error:
         logger.error("No scale connected, %s", error)
         instruments.scale = None
         incomplete = True
+    finally:
+        if instruments.scale is not None:
+            try:
+                instruments.scale.disconnect()
+            except Exception as error:
+                logger.error("Error closing scale connection, %s", error)
+                instruments.scale = None
+                incomplete = True
 
     # Initialize the camera
     logger.debug("Connecting to camera")
@@ -369,11 +374,11 @@ def test_instrument_connections(
     if use_mock_instruments:
         logger.info("Using mock instruments")
         print("Using mock instruments")
-        instruments.mill = MockPandaMill()
+        instruments.mill = PandaMill()
         instruments.mill.connect_to_mill()
         instruments.pipette = Pipette()
         instruments.arduino = ArduinoLink()
-
+        instruments.scale = Scale()
         # Initialize the camera (mock)
         instruments.initialize_camera(use_mock=True)
         connected_instruments = ["PandaMill", "Pump", "Arduino", "Camera"]
@@ -406,19 +411,15 @@ def test_instrument_connections(
         if not port:
             raise Exception("No scale port specified in the configuration file")
         logger.debug("Connecting to scale")
-        scale = Scale(address=port)
-        if scale.hw.open:
+        with Scale(address=port) as scale:
             info_dict = scale.get_info()
             model = info_dict["model"]
             if not model:
-                scale.hw.close()
                 raise Exception("Scale connected but no model information returned")
             logger.debug("Connected to scale: %s", model)
             print("Scale connected                        ", flush=True)
             connected_instruments.append("Scale")
-            scale.hw.close()
-        else:
-            raise Exception("Failed to open connection to scale")
+
     except Exception as error:
         logger.error("No scale connected, %s", error)
         print("Scale not found                        ", flush=True)

@@ -42,6 +42,7 @@ def _pipette_action(
     src_vessel: Union[Vial, Well],
     dst_vessel: Union[Well, WasteVial],
     desired_volume: float,
+    blowout: bool = True,
 ) -> None:
     """Perform pipetting action from source to destination vessel.
 
@@ -98,8 +99,6 @@ def _pipette_action(
             tool=Instruments.PIPETTE,
         )
         toolkit.pipette.aspirate(repetition_vol, solution=src_vessel)
-        if isinstance(src_vessel, Well):
-            toolkit.pipette.aspirate(20)
         toolkit.mill.move_to_safe_position()
         toolkit.pipette.drip_stop()
 
@@ -129,7 +128,8 @@ def _pipette_action(
             being_infused=src_vessel,
             infused_into=dst_vessel,
         )
-        toolkit.pipette.blowout()
+        if blowout:
+            toolkit.pipette.blowout()
 
         if isinstance(dst_vessel, WasteVial):
             capping_sequence(

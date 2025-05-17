@@ -68,22 +68,22 @@ def wellplate_scan(mill_arg: Mill = None, capture_images=False):
             mill.rest_electrode()
 
 
-def move_pipette_to_each_corner(mill: Mill, well1, well2, well3, well4, z_top):
+def move_pipette_to_each_corner(mill: Mill, well1, well2, well3, well4, top):
     """Move the pipette to each corner of the wellplate"""
-    mill.safe_move(well1["x"], well1["y"], z_top, instrument=Instruments.PIPETTE)
-    mill.safe_move(well2["x"], well2["y"], z_top, instrument=Instruments.PIPETTE)
-    mill.safe_move(well3["x"], well3["y"], z_top, instrument=Instruments.PIPETTE)
-    mill.safe_move(well4["x"], well4["y"], z_top, instrument=Instruments.PIPETTE)
+    mill.safe_move(well1["x"], well1["y"], top, instrument=Instruments.PIPETTE)
+    mill.safe_move(well2["x"], well2["y"], top, instrument=Instruments.PIPETTE)
+    mill.safe_move(well3["x"], well3["y"], top, instrument=Instruments.PIPETTE)
+    mill.safe_move(well4["x"], well4["y"], top, instrument=Instruments.PIPETTE)
 
 
 def move_electrode_to_each_corner(
-    mill: Mill, well1, well2, well3, well4, z_top, echem_height
+    mill: Mill, well1, well2, well3, well4, top, echem_height
 ):
     """Move the electrode to each corner of the wellplate"""
-    mill.safe_move(well1["x"], well1["y"], z_top, instrument=Instruments.ELECTRODE)
-    mill.safe_move(well2["x"], well2["y"], z_top, instrument=Instruments.ELECTRODE)
-    mill.safe_move(well3["x"], well3["y"], z_top, instrument=Instruments.ELECTRODE)
-    mill.safe_move(well4["x"], well4["y"], z_top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(well1["x"], well1["y"], top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(well2["x"], well2["y"], top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(well3["x"], well3["y"], top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(well4["x"], well4["y"], top, instrument=Instruments.ELECTRODE)
 
     repsonse = input("Move the electrode to the echem height? y/n: ")
     if repsonse.lower() == "y":
@@ -119,7 +119,7 @@ def move_to_vials(mill: Mill, stock_vials, waste_vials):
             mill.safe_move(
                 stock_vial.coordinates["x"],
                 stock_vial.coordinates["y"],
-                stock_vial.z_top,
+                stock_vial.top,
                 instrument=Instruments.PIPETTE,
             )
         mill.move_to_safe_position()
@@ -130,7 +130,7 @@ def move_to_vials(mill: Mill, stock_vials, waste_vials):
             mill.safe_move(
                 waste_vial.coordinates["x"],
                 waste_vial.coordinates["y"],
-                waste_vial.z_top,
+                waste_vial.top,
                 instrument=Instruments.PIPETTE,
             )
         mill.move_to_safe_position()
@@ -162,7 +162,7 @@ def movement_test(mill: Mill):
             waste_vials: Sequence[WasteVial] = read_vials()[1]
 
             # mill.safe_move(
-            # well1["x"], well1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
+            # well1["x"], well1["y"], wellplate.top, instrument=Instruments.PIPETTE
             # )
             input("Begin corner to corner test. Press enter to continue...")
 
@@ -171,7 +171,7 @@ def movement_test(mill: Mill):
                 == "y"
             ):
                 move_pipette_to_each_corner(
-                    mill, well1, well2, well3, well4, wellplate.z_top
+                    mill, well1, well2, well3, well4, wellplate.top
                 )
 
             if (
@@ -186,7 +186,7 @@ def movement_test(mill: Mill):
                     well2,
                     well3,
                     well4,
-                    wellplate.z_top,
+                    wellplate.top,
                     wellplate.echem_height,
                 )
 
@@ -242,21 +242,21 @@ def only_z_move_test(mill: Mill):
 
             mill.safe_move(a1["x"], a1["y"], -40, instrument=Instruments.PIPETTE)
             mill.safe_move(
-                a1["x"], a1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
+                a1["x"], a1["y"], wellplate.top, instrument=Instruments.PIPETTE
             )
 
             mill.safe_move(a12["x"], a12["y"], -40, instrument=Instruments.PIPETTE)
             mill.safe_move(
                 stock_vials[0].coordinates["x"],
                 stock_vials[0].coordinates["y"],
-                stock_vials[0].z_top,
+                stock_vials[0].top,
                 instrument=Instruments.PIPETTE,
             )
 
             mill.safe_move(
                 waste_vials[0].coordinates["x"],
                 waste_vials[0].coordinates["y"],
-                waste_vials[0].z_top,
+                waste_vials[0].top,
                 instrument=Instruments.PIPETTE,
             )
 

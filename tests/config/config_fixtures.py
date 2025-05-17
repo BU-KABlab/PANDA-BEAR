@@ -7,7 +7,7 @@ from typing import Any, Dict
 
 import pytest
 
-from src.shared_utilities.config.config_interface import (
+from shared_utilities.config.config_interface import (
     create_test_config,
     get_config,
     reset_config,
@@ -108,20 +108,20 @@ def patch_global_config(test_config):
         The test ConfigInterface instance
     """
     # Store original instance
-    from src.shared_utilities.config.config_interface import _config_instance
+    from shared_utilities.config.config_interface import _config_instance
 
     original_instance = _config_instance
 
     # Reset and mock the global config
     reset_config()
-    from src.shared_utilities.config.config_interface import _config_instance
+    from shared_utilities.config.config_interface import _config_instance
 
     _config_instance = test_config
 
     yield test_config
 
     # Restore original instance
-    from src.shared_utilities.config.config_interface import _config_instance
+    from shared_utilities.config.config_interface import _config_instance
 
     _config_instance = original_instance
 

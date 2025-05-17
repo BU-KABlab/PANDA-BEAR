@@ -25,8 +25,8 @@ from sqlalchemy.orm import sessionmaker
 from shared_utilities.config.config_tools import read_config, read_testing_config
 
 config = read_config()
-from src.shared_utilities.db_setup import SessionLocal
-from src.shared_utilities.log_tools import (
+from shared_utilities.db_setup import SessionLocal
+from shared_utilities.log_tools import (
     apply_log_filter,
     setup_default_logger,
     timing_wrapper,

@@ -4,8 +4,8 @@ Tests for the configuration example module
 
 from unittest.mock import MagicMock
 
-from src.shared_utilities.config.config_interface import ConfigInterface
-from src.shared_utilities.examples.config_example import (
+from shared_utilities.config.config_interface import ConfigInterface
+from shared_utilities.examples.config_example import (
     MillController,
     get_mill_port,
     get_unit_id,
@@ -27,7 +27,7 @@ def test_using_patched_global_config(patch_global_config):
 # Method 2: Create a custom test configuration directly
 def test_with_manual_patch():
     # Import the module to patch
-    import src.shared_utilities.config.config_interface as config_module
+    import shared_utilities.config.config_interface as config_module
 
     # Store original
     original_config = config_module._config_instance

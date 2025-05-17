@@ -20,7 +20,7 @@ def test_config_load():
     """Test if we can load a custom configuration during tests"""
 
     # Import the configuration tools
-    from src.shared_utilities.config.config_tools import (
+    from shared_utilities.config.config_tools import (
         get_config_path,
         is_testing_mode,
         read_config,
@@ -99,10 +99,10 @@ baudrate = 9600
     print("\n=== IMPORTING FRESH READ_CONFIG ===")
     import importlib
 
-    import src.shared_utilities.config.config_tools as ct
+    import shared_utilities.config.config_tools as ct
 
     importlib.reload(ct)
-    from src.shared_utilities.config.config_tools import (
+    from shared_utilities.config.config_tools import (
         read_config as fresh_read_config,
     )
 

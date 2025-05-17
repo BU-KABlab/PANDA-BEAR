@@ -231,18 +231,26 @@ def read_config_value(
         return default
 
     # Convert to appropriate type
-    if value.lower() in ("true", "1"):
-        return True
-    elif value.lower() in ("false", "0"):
-        return False
-    elif value.isdigit():
-        return int(value)
     try:
-        return float(value)
+        if value.lower() in ("true", "1"):
+            return True
+        elif value.lower() in ("false", "0"):
+            return False
+        elif value.isdigit():
+            return int(value)
+        elif value.isdecimal():
+            return float(value)
+        elif value.isnumeric():
+            return float(value)
     except ValueError:
-        pass
-    return value
+        return value  # If conversion fails, return the string value
+    except TypeError:
+        # Handle cases where value is not a string
+        if isinstance(value, (int, float)):
+            return value
+    
     # If all else fails, return the string value
+    return value
 
 
 def write_config_value(section: str, key: str, value: str) -> None:
