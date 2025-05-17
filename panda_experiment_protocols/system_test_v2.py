@@ -251,8 +251,8 @@ def pedotdeposition(
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
-        instructions=instructions,
-        step_description="AfterDeposition",
+        experiment=instructions,
+        image_label="AfterDeposition",
     )
     instructions.process_type = 2
     instructions.priority = 1
@@ -359,8 +359,8 @@ def pedotbleaching(
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
-        instructions=instructions,
-        step_description="AfterBleaching",
+        experiment=instructions,
+        image_label="AfterBleaching",
     )
 
     instructions.process_type = 3
@@ -471,8 +471,8 @@ def pedotcoloring(
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
-        instructions=instructions,
-        step_description="AfterColoring",
+        experiment=instructions,
+        image_label="AfterColoring",
     )
     instructions.process_type = 4
     instructions.priority = 0
@@ -579,8 +579,8 @@ def pedotcv(
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
-        instructions=instructions,
-        step_description="AfterCharacterizing",
+        experiment=instructions,
+        image_label="AfterCharacterizing",
     )
     toolkit.global_logger.info("8. Rinsing the well 4x with rinse")
     instructions.set_status_and_save(ExperimentStatus.RINSING)
@@ -612,8 +612,8 @@ def pedotcv(
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
-        instructions=instructions,
-        step_description="EndImage",
+        experiment=instructions,
+        image_label="EndImage",
     )
     instructions.process_type = 99
     instructions.priority = 99

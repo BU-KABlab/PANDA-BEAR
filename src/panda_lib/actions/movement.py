@@ -56,7 +56,7 @@ def move_to_well(
     mill : Mill
         The mill controller object
     tool : str
-        The tool identifier to move
+        The tool identifier to move (pipette, decapper, etc.)
     logger : Logger
         Logger for operation tracking
     z_offset : float, optional
@@ -87,7 +87,7 @@ def move_to_vial(
     mill : Mill
         The mill controller object
     tool : str
-        The tool identifier to move
+        The tool identifier to move (pipette, decapper, etc.)
     logger : Logger
         Logger for operation tracking
     z_offset : float, optional

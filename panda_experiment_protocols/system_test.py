@@ -219,8 +219,8 @@ def ca_deposition(
     exp_obj.declare_step("Take after deposition image", ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
-        instructions=exp_obj,
-        step_description="AfterDeposition",
+        experiment=exp_obj,
+        image_label="AfterDeposition",
     )
     toolkit.global_logger.info("Deposition of %scomplete\n\n", soln_name)
 

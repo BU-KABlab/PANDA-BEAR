@@ -43,7 +43,7 @@ from panda_lib.sql_tools import (
     sql_wellplate,
 )
 from panda_lib.sql_tools.remove_testing_experiments import (
-    main as _remove_testing_experiments,
+    remove_testing_experiments as _remove_testing_experiments,
 )
 from shared_utilities.config import (
     print_config_values,
