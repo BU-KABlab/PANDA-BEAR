@@ -3,6 +3,7 @@
 # pylint: disable=line-too-long
 
 import configparser
+import json
 import logging
 import math
 import threading
@@ -742,15 +743,56 @@ def well_status() -> str:
     Create a plot of the well status and return the file path.
     """
     # Check current wellplate type
-    _, type_number, _ = sql_wellplate.select_current_wellplate_info()
+    plate_id, type_number, _ = sql_wellplate.select_current_wellplate_info()
     plate_type = sql_wellplate.select_well_characteristics(type_number)
     # Choose the correct wellplate object based on the wellplate type
     rows = plate_type.rows
     columns = plate_type.cols
 
-    current_wells: List[Well] = sql_wellplate.select_wellplate_wells()
-    # turn tuple of well info into a list of well objects
-    current_wells = [well for well in current_wells]
+    result = sql_wellplate.select_wellplate_wells()
+    current_wells: List[Well] = []
+    for row in result:
+        try:
+            if isinstance(row[5], str):
+                incoming_contents = json.loads(row[5])
+            else:
+                incoming_contents = row[5]
+        except json.JSONDecodeError:
+            incoming_contents = {}
+        except TypeError:
+            incoming_contents = {}
+
+        try:
+            if isinstance(row[9], str):
+                incoming_coordinates = json.loads(row[9])
+            else:
+                incoming_coordinates = row[9]
+        except json.JSONDecodeError:
+            incoming_coordinates = (0, 0)
+
+        well_type_number = int(row[1]) if row[1] else 0
+        volume = int(row[8]) if row[8] else 0
+        capacity = int(row[10]) if row[10] else 0
+        height = int(row[11]) if row[11] else 0
+        experiment_id = int(row[6]) if row[6] else None
+        project_id = int(row[7]) if row[7] else None
+
+        current_wells.append(
+            Well(
+                well_id=str(row[2]),
+                well_type_number=well_type_number,
+                status=str(row[3]),
+                status_date=str(row[4]),
+                contents=incoming_contents,
+                experiment_id=experiment_id,
+                project_id=project_id,
+                volume=volume,
+                coordinates=incoming_coordinates,
+                capacity=capacity,
+                height=height,
+                plate_id=int(plate_id),
+            )
+        )
 
     wells_and_status = {}
     for well in current_wells:
