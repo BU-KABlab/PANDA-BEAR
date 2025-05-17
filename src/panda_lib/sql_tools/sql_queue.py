@@ -23,8 +23,8 @@ from typing import Optional
 
 from sqlalchemy import and_, select
 
-from shared_utilities.config.config_tools import get_unit_id
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.config.config_tools import get_unit_id
+from panda_shared.db_setup import SessionLocal
 
 
 class Queue:

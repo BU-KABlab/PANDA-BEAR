@@ -27,7 +27,7 @@ import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-from shared_utilities.config.config_tools import read_config
+from panda_shared.config.config_tools import read_config
 
 config = read_config()
 # Determine if it's testing or production
@@ -55,11 +55,11 @@ else:
     raise ValueError(f"Unsupported database type: {db_type}")
 
 engine = create_engine(
-        DATABASE_URL,
-        echo=False,
-        pool_size=20,
-        pool_recycle=3600,
-    )
+    DATABASE_URL,
+    echo=False,
+    pool_size=20,
+    pool_recycle=3600,
+)
 
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

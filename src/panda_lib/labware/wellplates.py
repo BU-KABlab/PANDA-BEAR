@@ -24,8 +24,8 @@ from panda_lib.sql_tools.panda_models import (
     Wellplates,
 )
 from panda_lib.types import WellKwargs
-from shared_utilities.config.config_tools import read_config_value
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.config.config_tools import read_config_value
+from panda_shared.db_setup import SessionLocal
 
 from .schemas import (
     PlateTypeModel,

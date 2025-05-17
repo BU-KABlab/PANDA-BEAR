@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from panda_lib.errors import NoAvailableSolution
 from panda_lib.hardware.grbl_cnc_mill import Instruments
-from shared_utilities.config.config_tools import (
+from panda_shared.config.config_tools import (
     ConfigParserError,
     read_config,
     read_testing_config,
@@ -26,7 +26,7 @@ config = read_config()
 
 # Constants
 try:
-    AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
+    blowout_volume = config.getfloat("DEFAULTS", "blowout_volume")
     DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
 except ConfigParserError as e:
     logging.error("Failed to read config file. Error: %s", e)
@@ -352,8 +352,8 @@ def purge_pipette(
     Move the pipette over an available waste vessel and purge its contents
 
     Args:
-        mill (Union[Mill, MockMill]): _description_
-        pump (Union[Pump, MockPump]): _description_
+        mill (Union[Mill]): _description_
+        pump (Union[Pump]): _description_
     """
     liquid_volume = toolkit.pipette.pipette_tracker.liquid_volume()
     total_volume = toolkit.pipette.pipette_tracker.volume

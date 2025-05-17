@@ -10,8 +10,8 @@ from sqlalchemy import Integer, cast, func, insert, select, update
 from panda_lib.sql_tools import sql_reports
 from panda_lib.sql_tools.panda_models import PlateTypes, WellModel, Wellplates
 from panda_lib.sql_tools.sql_queue import get_unit_id
-from shared_utilities.config.config_tools import read_config_value
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.config.config_tools import read_config_value
+from panda_shared.db_setup import SessionLocal
 
 logger = sql_reports.logger
 

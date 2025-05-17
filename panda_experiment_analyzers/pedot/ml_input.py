@@ -3,7 +3,7 @@ import pandas as pd
 from panda_lib.experiments.experiment_types import _select_specific_parameter
 from panda_lib.experiments.results import select_specific_result
 from panda_lib.sql_tools import sql_system_state
-from shared_utilities.config.config_tools import read_testing_config
+from panda_shared.config.config_tools import read_testing_config
 
 from .pedot_classes import RequiredData
 

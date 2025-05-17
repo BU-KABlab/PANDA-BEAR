@@ -24,7 +24,7 @@ import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-from shared_utilities.config.config_tools import read_config
+from panda_shared.config.config_tools import read_config
 
 config = read_config()
 

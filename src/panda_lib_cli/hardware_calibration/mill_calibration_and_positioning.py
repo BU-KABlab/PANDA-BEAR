@@ -19,7 +19,7 @@ import os
 import platform
 import re
 from pathlib import Path
-from typing import Sequence, Optional
+from typing import Optional, Sequence
 
 from panda_lib.hardware.gantry_interface import Coordinates
 from panda_lib.hardware.gantry_interface import MockPandaMill as MockMill
@@ -28,8 +28,9 @@ from panda_lib.hardware.imaging import capture_new_image
 from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well, Wellplate
 from panda_lib.utilities import Instruments, input_validation
-from shared_utilities.config.config_tools import read_config
-from shared_utilities.log_tools import setup_default_logger
+from panda_shared.config.config_tools import read_config
+from panda_shared.log_tools import setup_default_logger
+
 from .decapper_testing import main as decapper_test
 from .line_break_validation import main as line_break_test
 
@@ -1124,7 +1125,7 @@ def manual_commands(mill: Mill, *args, **kwargs):
                         menu_items=valid_tools,
                         default=previous_tool,
                     )
-                    previous_tool = tool                    
+                    previous_tool = tool
 
                     # Confirm the movement
                     print(
@@ -1233,8 +1234,8 @@ menu_options = {
 def calibrate_mill(
     use_mock_mill: bool,
     wellplate: Optional[Wellplate] = None,
-    stock_vials: Optional[Sequence[StockVial]]=None,
-    waste_vials: Optional[Sequence[WasteVial]]=None,
+    stock_vials: Optional[Sequence[StockVial]] = None,
+    waste_vials: Optional[Sequence[WasteVial]] = None,
 ):
     """Calibrate the mill to the wellplate and stock vials"""
     hide_choices = []

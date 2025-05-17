@@ -4,7 +4,7 @@ from logging import Logger
 from pathlib import Path
 from typing import Optional, Tuple
 
-from shared_utilities.config.config_tools import (
+from panda_shared.config.config_tools import (
     ConfigParserError,
     read_config,
     read_testing_config,
@@ -12,7 +12,7 @@ from shared_utilities.config.config_tools import (
 
 config = read_config()
 TESTING = read_testing_config()
-from shared_utilities.log_tools import timing_wrapper
+from panda_shared.log_tools import timing_wrapper
 
 from ..errors import CAFailure, CVFailure, DepositionFailure, OCPError, OCPFailure
 from ..experiments.experiment_types import (

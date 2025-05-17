@@ -6,7 +6,7 @@ This script is used to capture images from the FLIR camera.
 import logging
 from pathlib import Path
 
-from shared_utilities.log_tools import setup_default_logger
+from panda_shared.log_tools import setup_default_logger
 
 logger = setup_default_logger(
     log_file="FLIRCamera.log",
@@ -50,4 +50,3 @@ def image_filepath_generator(
     while filepath.exists():
         filepath = file_enumeration(filepath)
     return filepath
-

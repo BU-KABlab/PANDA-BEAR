@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Union
 
 from panda_lib.errors import OverDraftException, OverFillException
-from shared_utilities.log_tools import setup_default_logger
+from panda_shared.log_tools import setup_default_logger
 
 # Set up the logger
 logger = setup_default_logger(log_name="vessel")

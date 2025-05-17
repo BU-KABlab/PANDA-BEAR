@@ -16,8 +16,8 @@ import sqlalchemy.exc
 from sqlalchemy import select, update
 
 from panda_lib.experiments.sql_functions import update_experiment_status
-from shared_utilities.db_setup import SessionLocal
-from shared_utilities.log_tools import setup_default_logger, timing_wrapper
+from panda_shared.db_setup import SessionLocal
+from panda_shared.log_tools import setup_default_logger, timing_wrapper
 
 from .experiments import (
     EchemExperimentGenerator,

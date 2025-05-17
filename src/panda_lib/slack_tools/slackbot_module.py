@@ -35,8 +35,8 @@ from panda_lib.sql_tools import (
     sql_system_state,
     sql_wellplate,
 )
-from shared_utilities.config.config_tools import read_config, read_testing_config
-from shared_utilities.log_tools import setup_default_logger
+from panda_shared.config.config_tools import read_config, read_testing_config
+from panda_shared.log_tools import setup_default_logger
 
 from .sql_slack_tickets import SlackTicket, insert_slack_ticket, select_slack_ticket
 

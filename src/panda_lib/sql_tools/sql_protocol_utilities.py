@@ -12,11 +12,11 @@ import os
 # region Protocols
 from panda_lib.errors import ProtocolNotFoundError
 from panda_lib.sql_tools.panda_models import Protocols
-from shared_utilities.config.config_tools import read_config
+from panda_shared.config.config_tools import read_config
 
 # import sqlite3
 # from panda_lib.config.config import SQL_DB_PATH
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.db_setup import SessionLocal
 
 
 class ProtocolEntry:

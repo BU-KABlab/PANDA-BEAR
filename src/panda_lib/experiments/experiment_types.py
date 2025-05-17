@@ -18,12 +18,12 @@ from panda_lib.sql_tools.panda_models import (
 # from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
 #                                                 execute_sql_command_no_return)
 from panda_lib.sql_tools.sql_wellplate import get_well_by_id
-from shared_utilities.config.config_tools import read_config
+from panda_shared.config.config_tools import read_config
 
 # from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
 #                                                 execute_sql_command_no_return)
-from shared_utilities.db_setup import SessionLocal
-from shared_utilities.log_tools import setup_default_logger
+from panda_shared.db_setup import SessionLocal
+from panda_shared.log_tools import setup_default_logger
 
 from .experiment_parameters import ExperimentParameterRecord
 from .experiment_status import ExperimentStatus
@@ -250,7 +250,7 @@ class ExperimentBase:
             if self.well_id:
                 result = get_well_by_id(well_id=self.well_id)
                 self.well: Well = Well(
-                    id=result.well_id,
+                    well_id=result.well_id,
                     plate_id=result.plate_id,
                 )
             else:

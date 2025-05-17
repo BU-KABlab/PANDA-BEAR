@@ -5,10 +5,10 @@ from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 
 from panda_lib.hardware import arduino_interface
-from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
 from panda_lib.hardware.gantry_interface import PandaMill
+from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
 from panda_lib.sql_tools.panda_models import Base
-from shared_utilities.config.config_tools import read_config_value
+from panda_shared.config.config_tools import read_config_value
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
@@ -48,7 +48,9 @@ def main():
         print(f"Vial {vial} has been created")
         # Set up the hardware connections
         with PandaMill() as mill:
-            with arduino_interface.ArduinoLink(port_address=read_config_value("ARDUINO", "port")) as arduino:
+            with arduino_interface.ArduinoLink(
+                port_address=read_config_value("ARDUINO", "port")
+            ) as arduino:
                 # Check the tools in the tool manager
                 print("Tools in the tool manager:")
                 for tool in mill.tool_manager.tool_offsets.values():
@@ -100,15 +102,11 @@ def decapping_validation(
     # Pause for 1 hour
     print(f"Pausing for {round(pause / 3600, 0)} hour: 3600 seconds")
     for i in tqdm(range(pause), desc="Pausing for 1 hour"):
-        print(
-            f"Pausing for {round(pause / 3600, 0)} hour: {pause - i} seconds"
-        )
+        print(f"Pausing for {round(pause / 3600, 0)} hour: {pause - i} seconds")
         time.sleep(1)
 
     # Decap, move the pipette to the vial bottom, and cap the vial 100 times with progress bar
-    print(
-        f"Decapping, dipping pipette, and capping the vial {repetitions} times"
-    )
+    print(f"Decapping, dipping pipette, and capping the vial {repetitions} times")
     for i in tqdm(range(repetitions), desc="Decapping, moving pipette, and capping"):
         print(
             f"Decapping, dipping pipette, and capping the vial {repetitions} times: decapping \n{i + 1} of {repetitions}"
@@ -132,9 +130,7 @@ def decapping_validation(
             mill, Coordinates(vial.coordinates.x, vial.coordinates.y, vial.top), arduino
         )
 
-    print(
-        f"Decapping and capping the vial {repetitions} times: Done"
-    )
+    print(f"Decapping and capping the vial {repetitions} times: Done")
     arduino.curvature_lights_off()
 
 

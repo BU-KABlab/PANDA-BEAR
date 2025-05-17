@@ -6,7 +6,7 @@ from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
     Experiments,
 )
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.db_setup import SessionLocal
 
 
 def test_schedule_experiments_no_experiments(temp_test_db):

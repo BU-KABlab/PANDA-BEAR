@@ -8,9 +8,9 @@ from sqlalchemy.orm import sessionmaker
 
 from panda_lib.types import VialKwargs
 from panda_lib.utilities import Coordinates, directory_picker, file_picker
-from shared_utilities.config.config_tools import read_config_value
-from shared_utilities.db_setup import SessionLocal
-from shared_utilities.log_tools import setup_default_logger
+from panda_shared.config.config_tools import read_config_value
+from panda_shared.db_setup import SessionLocal
+from panda_shared.log_tools import setup_default_logger
 
 from .errors import OverDraftException, OverFillException  # Custom exceptions
 from .schemas import VialReadModel, VialWriteModel  # Pydantic models

@@ -5,8 +5,8 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
-from shared_utilities.config.config_tools import get_unit_id
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.config.config_tools import get_unit_id
+from panda_shared.db_setup import SessionLocal
 
 from ..sql_tools.panda_models import PlateTypes as PlateTypeDBModel
 from ..sql_tools.panda_models import Vials  # SQLAlchemy models

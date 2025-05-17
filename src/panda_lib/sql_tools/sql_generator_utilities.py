@@ -13,8 +13,8 @@ import os
 from panda_lib.sql_tools.panda_models import ExperimentGenerators
 
 # import sqlite3
-from shared_utilities.config.config_tools import read_config
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.config.config_tools import read_config
+from panda_shared.db_setup import SessionLocal
 
 # from sqlalchemy.orm import Session
 
@@ -67,7 +67,7 @@ def get_generator_by_id(generator_id) -> GeneratorEntry:
     Returns:
         GeneratorEntry: The generator from the database.
     """
-    
+
     with SessionLocal() as session:
         return (
             session.query(ExperimentGenerators)
@@ -115,7 +115,7 @@ def update_generator(generator_id, new_name):
     Returns:
         None
     """
-    
+
     with SessionLocal() as session:
         generator = (
             session.query(ExperimentGenerators)
@@ -136,7 +136,7 @@ def delete_generator(generator_id):
     Returns:
         None
     """
-   
+
     with SessionLocal() as session:
         generator = (
             session.query(ExperimentGenerators)

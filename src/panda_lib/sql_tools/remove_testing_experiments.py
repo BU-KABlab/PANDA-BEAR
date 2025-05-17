@@ -10,7 +10,7 @@ from panda_lib.sql_tools.panda_models import (
     Experiments,
     WellModel,
 )
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.db_setup import SessionLocal
 
 
 def remove_testing_experiments():

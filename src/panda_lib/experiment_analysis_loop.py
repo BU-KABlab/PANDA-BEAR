@@ -15,7 +15,7 @@ from pathlib import Path
 from sqlalchemy import select
 
 from panda_lib.sql_tools.panda_models import Experiments
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.db_setup import SessionLocal
 
 logger = logging.getLogger("panda")
 

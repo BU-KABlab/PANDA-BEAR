@@ -11,14 +11,6 @@ from typing import Tuple
 
 from PIL import Image
 
-from panda_lib_cli.hardware_calibration import (
-    decapper_testing,
-    line_break_validation,
-)
-from panda_lib_cli.hardware_calibration.mill_calibration_and_positioning import (
-    calibrate_mill,
-)
-from panda_lib_cli.menu.license_text import show_conditions, show_warranty
 from panda_lib import (
     SystemState,
     analysis_worker,
@@ -45,7 +37,15 @@ from panda_lib.sql_tools import (
 from panda_lib.sql_tools.remove_testing_experiments import (
     remove_testing_experiments as _remove_testing_experiments,
 )
-from shared_utilities.config import (
+from panda_lib_cli.hardware_calibration import (
+    decapper_testing,
+    line_break_validation,
+)
+from panda_lib_cli.hardware_calibration.mill_calibration_and_positioning import (
+    calibrate_mill,
+)
+from panda_lib_cli.menu.license_text import show_conditions, show_warranty
+from panda_shared.config import (
     print_config_values,
     read_config,
     read_testing_config,

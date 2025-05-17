@@ -4,12 +4,12 @@ from typing import List, Optional, Tuple, Union
 
 from sqlalchemy.orm import Session
 
-from shared_utilities.config.config_tools import (
+from panda_shared.config.config_tools import (
     read_config,
     read_testing_config,
 )
-from shared_utilities.db_setup import SessionLocal
-from shared_utilities.log_tools import timing_wrapper
+from panda_shared.db_setup import SessionLocal
+from panda_shared.log_tools import timing_wrapper
 
 from ..errors import (
     NoAvailableSolution,

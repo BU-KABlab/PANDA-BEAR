@@ -5,6 +5,17 @@ from pathlib import Path
 
 from sqlalchemy import select
 
+from panda_lib.labware.vials import read_vial
+from panda_lib.sql_tools.panda_models import VialStatus
+from panda_shared.config.config_tools import (
+    read_config_value,
+    read_logging_dir,
+    read_testing_config,
+    reload_config,
+    write_config_value,
+)
+from panda_shared.db_setup import SessionLocal
+
 from .grbl_cnc_mill import (
     Coordinates,
     Mill,
@@ -12,16 +23,6 @@ from .grbl_cnc_mill import (
     MockMill,
     set_up_mill_logger,
 )
-from panda_lib.labware.vials import read_vial
-from panda_lib.sql_tools.panda_models import VialStatus
-from shared_utilities.config.config_tools import (
-    read_config_value,
-    read_logging_dir,
-    read_testing_config,
-    reload_config,
-    write_config_value,
-)
-from shared_utilities.db_setup import SessionLocal
 
 # Set up the mill connection
 TESTING = read_testing_config()

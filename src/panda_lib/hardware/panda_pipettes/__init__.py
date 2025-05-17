@@ -1,6 +1,6 @@
 """This module is used to control the pipette. It is used to get the status of the pipette and to set the status of the pipette."""
 
-from shared_utilities.config.config_tools import read_config_value, read_testing_config
+from panda_shared.config.config_tools import read_config_value, read_testing_config
 
 from .pipette import PipetteDBHandler
 from .sql_pipette import Pipette as PipetteModel

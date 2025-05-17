@@ -9,7 +9,8 @@ import json
 import logging
 import os
 
-from ...arduino_interface import ArduinoLink, MockArduinoLink, PawduinoFunctions as CMD
+from ...arduino_interface import ArduinoLink, MockArduinoLink
+from ...arduino_interface import PawduinoFunctions as CMD
 
 logger = logging.getLogger(__name__)
 
@@ -216,7 +217,7 @@ class Pipette:
         :param s: The speed of the plunger movement in mm/min
         :type s: int
         """
-        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO,self.zero_position,s)
+        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.zero_position, s)
 
         if response.get("success", False):
             self.is_primed = True
@@ -241,7 +242,7 @@ class Pipette:
             self.prime()
 
         # Send the command
-        response = self.stepper.send(CMD.CMD_PIPETTE_ASPIRATE,vol,s)
+        response = self.stepper.send(CMD.CMD_PIPETTE_ASPIRATE, vol, s)
 
         if response.get("success", False):
             # Update position after successful aspiration
@@ -264,7 +265,7 @@ class Pipette:
         :type s: int
         """
         # Send the command
-        response = self.stepper.send(CMD.CMD_PIPETTE_DISPENSE,vol,s)
+        response = self.stepper.send(CMD.CMD_PIPETTE_DISPENSE, vol, s)
 
         if response.get("success", False):
             # Update position after successful dispensing
@@ -285,8 +286,8 @@ class Pipette:
         :type s: int, optional
         """
         # Blowout is essentially just moving to the blowout position
-        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO,self.blowout_position,s)
-        
+        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.blowout_position, s)
+
         if response.get("success", False):
             self.position = self.blowout_position
             logger.info("Performed blowout, position: %s mm", self.position)
@@ -297,7 +298,7 @@ class Pipette:
         return response.get("success", False)
 
     @tip_check
-    def air_gap(self, vol, s: int = 2000):
+    def blowout_volume(self, vol, s: int = 2000):
         """Moves the plunger upwards to aspirate air into the pipette tip
 
         :param vol: The volume of air to aspirate in uL
@@ -322,7 +323,7 @@ class Pipette:
         :type s: int, optional
         """
         # Use the built-in mix command if available
-        response = self.stepper.send(CMD.CMD_PIPETTE_MIX,n,vol,s)
+        response = self.stepper.send(CMD.CMD_PIPETTE_MIX, n, vol, s)
 
         if response.get("success", False):
             logger.info("Mixed %s uL %s times at speed %s", vol, n, s)
@@ -343,7 +344,7 @@ class Pipette:
         :type s: int, optional
         """
         # Move to the drop tip position
-        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO,self.drop_tip_position,s)
+        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.drop_tip_position, s)
 
         if response.get("success", False):
             self.has_tip = False

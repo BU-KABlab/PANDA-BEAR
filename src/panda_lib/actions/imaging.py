@@ -15,12 +15,12 @@ from panda_lib.hardware.imaging import (
     image_filepath_generator,
 )
 from panda_lib.toolkit import Toolkit
-from shared_utilities.config.config_tools import (
+from panda_shared.config.config_tools import (
     ConfigParserError,
     read_config,
     read_testing_config,
 )
-from shared_utilities.log_tools import timing_wrapper
+from panda_shared.log_tools import timing_wrapper
 
 
 class ImageFailure(Exception):
