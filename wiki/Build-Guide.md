@@ -12,6 +12,7 @@ The PANDA-SDL is a custom-built robotics system for polymer film deposition and 
 2. Custom 3D printed components for mounting equipment
 3. Arduino-based control electronics
 4. A specialized wellplate system for electrochemical experiments
+5. Syringe pump or Opentrons Pipette
 
 ## Gantry Construction
 
@@ -19,34 +20,9 @@ The gantry provides the structural framework and motion system for the PANDA-SDL
 
 ### Components Needed
 
-- Linear rails and bearings
-- Stepper motors
-- Belt drive system
-- Aluminum extrusions
-- Mounting brackets
-- Control electronics
+-
 
 ### Assembly Steps
-
-1. **Frame Construction**
-   - Assemble the aluminum extrusion base frame
-   - Mount Y-axis rails to the base frame
-   - Attach X-axis crossbeam to Y-axis carriers
-
-2. **Motion System**
-   - Install stepper motors for each axis
-   - Mount belt drives and tensioners
-   - Install limit switches at axis endpoints
-
-3. **Control Electronics**
-   - Mount the control board
-   - Connect stepper motor drivers
-   - Wire limit switches
-
-4. **Validation**
-   - Test movement on all axes
-   - Calibrate motion system
-   - Verify homing functions
 
 ## 3D Printed Components
 
@@ -54,39 +30,19 @@ The PANDA-SDL requires several custom 3D printed parts to mount and integrate eq
 
 ### Required Files
 
-All STL files for 3D printing can be found in the `documentation/3d-prints/` directory:
-
-- Equipment-Head-Front_v2.stl
-- Equipment-Head-Rear_v2.stl
-- Paw components
-- Pipette Adapter
-- Pipette Arm
-- SharpieHolder
-- Stage Accessories
+All STL files for 3D printing can be found in the `documentation/3d-prints/` directory
+-
 
 ### Printing Specifications
 
-- **Material**: PLA or PETG recommended
+- **Material**: PLA or ABS recommended
 - **Infill**: 20-30% for most parts, 50%+ for structural components
 - **Layer Height**: 0.2mm recommended
 - **Supports**: Required for overhanging features
 
 ### Assembly Instructions
 
-1. **Tool Head Assembly**
-   - Print Equipment-Head-Front_v2.stl and Equipment-Head-Rear_v2.stl
-   - Attach to the Z-axis carriage
-   - Mount the camera and pipette adaptors
-
-2. **Pipette System**
-   - Print the Pipette Adapter components
-   - Assemble with the appropriate pipette
-   - Mount to the tool head
-
-3. **Stage Accessories**
-   - Print the required stage accessories
-   - Mount to the deck surface
-   - Secure vial holders and wellplate fixtures
+1.
 
 ## Arduino Wiring
 
@@ -94,37 +50,16 @@ The PANDA-SDL uses Arduino-based control systems for various functions.
 
 ### Components Needed
 
-- Arduino Mega (or compatible board)
-- Motor drivers
-- Power supply
-- Connection wires
-- LED control circuit
-- Relay modules (if needed)
+-
 
 ### Wiring Diagrams
 
-Refer to the documents in the `documentation/documents/` directory:
-
-- Pawduino - LEDs.pdf
-- Pawduino - Neopixels.pdf
+Refer to the documents in the `documentation/documents/` directory
+-
 
 ### Wiring Steps
 
-1. **Power System**
-   - Connect the power supply to the Arduino and motor drivers
-   - Wire the 5V and 12V distribution
-
-2. **Motor Connections**
-   - Connect stepper motors to their respective drivers
-   - Wire the drivers to the Arduino control pins
-
-3. **Sensor Connections**
-   - Wire limit switches to the Arduino inputs
-   - Connect any additional sensors (temperature, etc.)
-
-4. **LED System**
-   - Follow the Pawduino - Neopixels diagram for LED connections
-   - Test the LED functionality
+1.
 
 ## Wellplate and Gasket
 
@@ -199,11 +134,11 @@ Proper calibration is essential for accurate and reliable operation.
    - Validate using the `pipette_validation_v2.py` script
 
 3. **Camera Calibration**
-   - Position and focus the camera
+   - Calibrate the camera offsets and focus the camera
    - Calibrate image coordinates to physical positions
 
 4. **Electrode Position Calibration**
-   - Calibrate the position of the electrodes relative to wells
+   - Calibrate the position of the electrodes relative to center of PAW
    - Verify electrical connections
 
 ## Maintenance
@@ -214,7 +149,6 @@ Regular maintenance is necessary to keep the PANDA-SDL functioning properly.
 
 1. **Mechanical System**
    - Lubricate linear rails and bearings
-   - Check belt tension
    - Inspect for wear or damage
 
 2. **Fluid System**
@@ -238,7 +172,6 @@ Common hardware issues and their solutions.
 ### Common Issues
 
 1. **Motor Skipping Steps**
-   - Check belt tension
    - Verify motor current settings
    - Reduce acceleration or speed
 
