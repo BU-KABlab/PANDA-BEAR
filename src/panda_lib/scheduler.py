@@ -81,7 +81,11 @@ def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> No
     # If the well is a string, get a well object
     if isinstance(well, str):
         well_id = well
-        well: Well = get_well_by_id(well_id=well_id)
+        result = get_well_by_id(well_id=well_id)
+        well: Well = Well(
+            id=result.well_id,
+            plate_id=result.plate_id,
+        )
         if well is None:
             logger.error("Well %s not found", well_id)
             raise ValueError(f"Well {well_id} not found")
