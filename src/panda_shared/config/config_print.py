@@ -11,7 +11,11 @@ if os.environ.get("DOTENV_LOADED") != "True":
     env_found = load_dotenv()
 
     if not env_found:
-        # print("No .env file found. Please create one with the required environment variables.")
+        print(
+            "No .env file found. Please create one in your root directory with the required environment variables:"
+            "\nPANDA_SDL_CONFIG_PATH=path/to/config.ini\nTEMP_DB='0'"
+        )
+        exit()
         # make_for_user = input("Create a new .env file? (y/n): ")
         # if make_for_user.lower() == "y":
         #     with open(".env", "w") as f:
@@ -19,13 +23,13 @@ if os.environ.get("DOTENV_LOADED") != "True":
         #         f.write("# Temp DB for pytest\nTEMP_DB='0'\n")
 
         # else:
-        raise FileNotFoundError(
-            "No .env file found. Please create one with the required environment variables:"
-            "\nPANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\nTEMP_DB='0'"
-        )
+        # raise FileNotFoundError(
+        #     "No .env file found. Please create one with the required environment variables:"
+        #     "\nPANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\nTEMP_DB='0'"
+        # )
 
 
-from .config_tools import is_testing_mode  # noqa: E402
+from .config_tools import exit_on_error, is_testing_mode  # noqa: E402
 
 
 def load_default_config():
@@ -87,16 +91,9 @@ def resolve_config_paths():
     config = ConfigParser()
     CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
     if not CONFIG_FILE or not Path(CONFIG_FILE).exists():
-        print(
-            "PANDA_SDL_CONFIG_PATH environment variable not set or config file not found."
+        exit_on_error(
+            "Config file not found. Please check the PANDA_SDL_CONFIG_PATH environment variable."
         )
-        print(
-            "Please refer to the documentation for instructions on how to set up both the .env and .ini file."
-        )
-        print(
-            "https://github.com/BU-KABlab/PANDA-BEAR/blob/packaing/documentation/installation.md#env-file"
-        )
-        exit()
 
     try:
         config.read(CONFIG_FILE)

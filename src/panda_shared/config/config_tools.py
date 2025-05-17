@@ -138,10 +138,42 @@ def get_config_path() -> str:
 
     # Check if the config path is valid
     if not os.path.exists(var):
-        raise FileNotFoundError(
-            f"Configuration file not found at {var}. Please check the path."
+        exit_on_error(f"Configuration file not found at {var}. Please check the path.")
+
+    # Check if the config path is a file
+    if not os.path.isfile(var):
+        exit_on_error(
+            f"Configuration path is not a file: {var}. Please check the path."
         )
+    # Check if the config path is readable
+    if not os.access(var, os.R_OK):
+        exit_on_error(
+            f"Configuration file is not readable: {var}. Please check the permissions."
+        )
+
+    # Check if the config path is writable
+    if not os.access(var, os.W_OK):
+        exit_on_error(
+            f"Configuration file is not writable: {var}. Please check the permissions."
+        )
+
+    # Check that the config file is not empty
+    if os.path.getsize(var) == 0:
+        exit_on_error(f"Configuration file is empty: {var}. Please check the file.")
     return str(var)
+
+
+def exit_on_error(message: str) -> None:
+    """Exit the program with an error message."""
+    print("PANDA_SDL_CONFIG_PATH is misconfigued.")
+    print(message)
+    print(
+        "Please refer to the documentation for instructions on how to set up both the .env and .ini file."
+    )
+    print(
+        "https://github.com/BU-KABlab/PANDA-BEAR/blob/packaing/documentation/installation.md#env-file"
+    )
+    exit(1)
 
 
 @lru_cache(maxsize=1)
@@ -248,7 +280,7 @@ def read_config_value(
         # Handle cases where value is not a string
         if isinstance(value, (int, float)):
             return value
-    
+
     # If all else fails, return the string value
     return value
 
