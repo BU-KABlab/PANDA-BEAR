@@ -10,7 +10,7 @@ from panda_lib.utilities import SystemState
 from panda_shared import read_config
 from panda_shared.db_setup import SessionLocal
 
-from ..panda_models import SystemStatus
+from ..models import SystemStatus
 
 config = read_config()
 

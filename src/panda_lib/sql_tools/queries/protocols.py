@@ -14,7 +14,7 @@ from panda_lib.errors import ProtocolNotFoundError
 from panda_shared import read_config
 from panda_shared.db_setup import SessionLocal
 
-from ..panda_models import Protocols
+from ..models import Protocols
 
 
 class ProtocolEntry:

@@ -13,7 +13,7 @@ import logging
 from panda_shared.db_setup import SessionLocal as Session
 from panda_shared.log_tools import setup_default_logger
 
-from ..panda_models import PotentiostatReadout
+from ..models import PotentiostatReadout
 
 logger: logging.Logger = setup_default_logger(log_name="sql_logger")
 
