@@ -1,15 +1,20 @@
-"""Utilities for working with protocols in the database."""
+"""
+This module contains functions for interacting with the protocols table in
+the database.
+
+The functions in this module allow you to get, insert, update, and delete
+protocols in the database. The module also contains functions for reading in
+protocols from the protocols folder and running protocols.
+"""
 
 import os
 
 # region Protocols
 from panda_lib.errors import ProtocolNotFoundError
-from panda_lib.sql_tools.panda_models import Protocols
-from shared_utilities.config.config_tools import read_config
+from panda_shared import read_config
+from panda_shared.db_setup import SessionLocal
 
-# import sqlite3
-# from panda_lib.config.config import SQL_DB_PATH
-from shared_utilities.db_setup import SessionLocal
+from ..models import Protocols
 
 
 class ProtocolEntry:
@@ -35,21 +40,6 @@ def select_protocols() -> list[ProtocolEntry]:
     Returns:
         list: A list of all protocols in the database.
     """
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Get all protocols from the database
-    # cursor.execute("SELECT * FROM protocols")
-    # protocols = cursor.fetchall()
-
-    # conn.close()
-
-    # protocol_entries = []
-    # for protocol in protocols:
-    #     protocol_entry = ProtocolEntry(*protocol)
-    #     protocol_entries.append(protocol_entry)
-
-    # return protocol_entries
 
     with SessionLocal() as session:
         protocols = session.query(Protocols).all()
@@ -115,21 +105,6 @@ def insert_protocol(protocol_id, project, name, filepath):
         None
     """
 
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Clean the name of any file extensions
-    # name = name.split(".")[0]
-
-    # # Insert the protocol into the database
-    # cursor.execute(
-    #     "INSERT INTO protocols (id, project, name, filepath) VALUES (?, ?, ?, ?)",
-    #     (protocol_id, project, name, filepath),
-    # )
-
-    # conn.commit()
-    # conn.close()
-
     with SessionLocal() as session:
         # Clean the name of any file extensions, split on "." and take the first element
         name = name.split(".")[0]
@@ -153,16 +128,6 @@ def update_protocol(protocol_id, new_name):
     Returns:
         None
     """
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Update the name of the protocol in the database
-    # cursor.execute(
-    #     "UPDATE protocols SET name = ? WHERE id = ?", (new_name, protocol_id)
-    # )
-
-    # conn.commit()
-    # conn.close()
 
     with SessionLocal() as session:
         # Update the name of the protocol in the database
@@ -181,14 +146,6 @@ def delete_protocol(protocol_id):
     Returns:
         None
     """
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Delete the protocol from the database
-    # cursor.execute("DELETE FROM protocols WHERE id = ?", (protocol_id,))
-
-    # conn.commit()
-    # conn.close()
 
     with SessionLocal() as session:
         # Delete the protocol from the database
@@ -205,14 +162,6 @@ def read_in_protocols():
     Returns:
         None
     """
-
-    # Get the protocols folder from the environment variables
-    # try:
-    #     protocols = os.environ["PANDA_SDL_PROTOCOLS_DIR"]
-    # except KeyError as e:
-    #     raise ValueError(
-    #         "PANDA_SDL_PROTOCOLS_DIR environment variable not set in .env file."
-    #     ) from e
     config = read_config()
     protocols = config.get("GENERAL", "protocols_dir")
 
@@ -303,16 +252,6 @@ def select_protocol_name(protocol_id) -> str:
     Returns:
         str: The name of the protocol.
     """
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Get the name of the protocol from the database
-    # cursor.execute("SELECT name FROM protocols WHERE id = ?", (protocol_id,))
-    # protocol_name = cursor.fetchone()[0]
-
-    # conn.close()
-
-    # return protocol_name
 
     with SessionLocal() as session:
         result = session.query(Protocols).filter(Protocols.id == protocol_id).first()

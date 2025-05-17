@@ -6,10 +6,7 @@ from dataclasses import dataclass
 from logging import Logger
 from typing import Union
 
-from panda_lib.hardware import Scale
-
-from panda_lib.hardware import ArduinoLink
-from panda_lib.hardware import PandaMill
+from panda_lib.hardware import ArduinoLink, PandaMill, Scale
 from panda_lib.hardware.imaging.camera_factory import CameraFactory, CameraType
 from panda_lib.hardware.imaging.interface import CameraInterface
 from panda_lib.hardware.panda_pipettes import (
@@ -18,7 +15,7 @@ from panda_lib.hardware.panda_pipettes import (
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Wellplate
 from panda_lib.slack_tools.slackbot_module import SlackBot
-from shared_utilities.config.config_tools import (
+from panda_shared.config.config_tools import (
     read_camera_type,
     read_config_value,
     read_webcam_settings,
@@ -111,6 +108,7 @@ class Toolkit:
             self.scale.hw.close()
         if self.pipette:
             self.pipette.close()
+
 
 class Hardware:
     """A class to hold all of the hardware"""
@@ -262,7 +260,7 @@ def connect_to_instruments(
             instruments.scale.hw.close()
             raise Exception("Scale connected but no model information returned")
         logger.debug("Connected to scale: %s", model)
-      
+
     except Exception as error:
         logger.error("No scale connected, %s", error)
         instruments.scale = None

@@ -24,12 +24,12 @@ from nesp_lib.mock import Pump as MockNespLibPump
 
 from panda_lib.labware import Vial
 from panda_lib.labware import wellplates as wp
-from shared_utilities import get_port_manufacturers, get_ports
-from shared_utilities.config.config_tools import read_config
-from shared_utilities.log_tools import (
+from panda_shared import get_port_manufacturers, get_ports
+from panda_shared.config.config_tools import read_config
+from panda_shared.log_tools import (
     default_logger as pump_control_logger,
 )
-from shared_utilities.log_tools import (
+from panda_shared.log_tools import (
     setup_default_logger,
 )
 

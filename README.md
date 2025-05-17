@@ -94,7 +94,7 @@ Polymer analysis and discovery array (PANDA) self-driving lab (SDL): an automate
    TEMP_DB='0'
    ```
    
-   b. Create a config file using the template in `shared_utilities/config/default_config.ini`
+   b. Create a config file using the template in `panda_shared/config/default_config.ini`
 
 
 For detailed information on configuration, usage, and development, see the [documentation](documentation/user_manual.md).

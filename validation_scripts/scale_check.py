@@ -8,10 +8,14 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
-from config.config import PATH_TO_DATA, PATH_TO_LOGS
 from sartorius import Scale
 from sartorius.mock import Scale as MockScale
 from tqdm import tqdm
+
+from panda_shared.config import read_data_dir, read_logging_dir
+
+PATH_TO_DATA = read_data_dir()
+PATH_TO_LOGS = read_logging_dir()
 
 scale_logger = logging.getLogger(__name__)
 scale_logger.setLevel(logging.DEBUG)

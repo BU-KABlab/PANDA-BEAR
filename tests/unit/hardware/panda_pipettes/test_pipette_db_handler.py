@@ -10,7 +10,7 @@ from panda_lib.hardware.panda_pipettes import (
     insert_new_pipette,
     select_current_pipette_id,
 )
-from panda_lib.sql_tools.panda_models import Base
+from panda_lib.sql_tools import Base
 
 # NOTE: The pipette has no check on volume, and may be overfilled
 

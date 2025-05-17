@@ -5,13 +5,13 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
-from shared_utilities.config.config_tools import get_unit_id
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.config.config_tools import get_unit_id
+from panda_shared.db_setup import SessionLocal
 
-from ..sql_tools.panda_models import PlateTypes as PlateTypeDBModel
-from ..sql_tools.panda_models import Vials  # SQLAlchemy models
-from ..sql_tools.panda_models import WellModel as WellDBModel
-from ..sql_tools.panda_models import Wellplates as WellPlateDBModel
+from ..sql_tools import PlateTypes as PlateTypeDBModel
+from ..sql_tools import Vials  # SQLAlchemy models
+from ..sql_tools import WellModel as WellDBModel
+from ..sql_tools import Wellplates as WellPlateDBModel
 from .schemas import (  # PyDanctic models
     PlateTypeModel,
     VialReadModel,

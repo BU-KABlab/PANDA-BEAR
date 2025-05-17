@@ -7,7 +7,7 @@ from typing import Any, Dict
 
 import pytest
 
-from shared_utilities.config.config_interface import (
+from panda_shared.config.config_interface import (
     create_test_config,
     get_config,
     reset_config,
@@ -27,7 +27,7 @@ def test_config():
         {
             "PANDA": {"version": "2.0", "unit_id": "99", "unit_name": "TestUnit"},
             "DEFAULTS": {
-                "air_gap": "40.0",
+                "blowout_volume": "40.0",
                 "drip_stop_volume": "5.0",
                 "pipette_purge_volume": "20.0",
                 "pumping_rate": "0.3",
@@ -108,20 +108,20 @@ def patch_global_config(test_config):
         The test ConfigInterface instance
     """
     # Store original instance
-    from shared_utilities.config.config_interface import _config_instance
+    from panda_shared.config.config_interface import _config_instance
 
     original_instance = _config_instance
 
     # Reset and mock the global config
     reset_config()
-    from shared_utilities.config.config_interface import _config_instance
+    from panda_shared.config.config_interface import _config_instance
 
     _config_instance = test_config
 
     yield test_config
 
     # Restore original instance
-    from shared_utilities.config.config_interface import _config_instance
+    from panda_shared.config.config_interface import _config_instance
 
     _config_instance = original_instance
 

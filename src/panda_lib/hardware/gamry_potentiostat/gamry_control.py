@@ -3,25 +3,23 @@
 import gc
 import logging
 import pathlib
+import sys
 import time
 from decimal import Decimal
-from typing import Tuple
 from pathlib import Path
+from typing import Tuple
+
 import numpy as np
 import pandas as pd
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
-
 from .errors import ErrorCodeLookup, GamryCOMError, check_platform_compatibility
-
-import os
-import sys
 
 if sys.platform == "win32":
     import comtypes
     from comtypes import client
-   
+
 
 # pylint: disable=global-statement, invalid-name, global-variable-undefined
 

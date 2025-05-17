@@ -20,10 +20,10 @@ Replace imports from `config_tools.py` with imports from `config_interface.py`:
 
 ```python
 # Old imports
-from shared_utilities.config.config_tools import read_config, read_config_value
+from panda_shared.config.config_tools import read_config, read_config_value
 
 # New imports
-from shared_utilities.config.config_interface import get_config
+from panda_shared.config.config_interface import get_config
 ```
 
 ### Step 2: Replace Function Calls
@@ -95,7 +95,7 @@ def test_with_config(patch_global_config):
     
 # Alternative new way (using manual config)
 def test_with_custom_config():
-    from shared_utilities.config.config_interface import create_test_config
+    from panda_shared.config.config_interface import create_test_config
     
     # Create test config
     test_config = create_test_config({
@@ -111,7 +111,7 @@ def test_with_custom_config():
 
 ```python
 # Before
-from shared_utilities.config.config_tools import read_config, read_config_value
+from panda_shared.config.config_tools import read_config, read_config_value
 
 def get_mill_port():
     return read_config_value("MILL", "port", "COM1")
@@ -125,7 +125,7 @@ class MillController:
 
 ```python
 # After
-from shared_utilities.config.config_interface import get_config
+from panda_shared.config.config_interface import get_config
 
 def get_mill_port():
     return get_config().get("MILL", "port", "COM1")
@@ -172,7 +172,7 @@ def test_mill_controller():
 ## Need Help?
 
 If you encounter any issues during migration, please refer to the example code in:
-- `src/shared_utilities/examples/config_example.py`
+- `src/panda_shared/examples/config_example.py`
 - `tests/config/test_config_example.py`
 
 These files demonstrate the recommended patterns for using the new configuration interface.

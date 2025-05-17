@@ -24,7 +24,7 @@ config_path, env_path, original_env = setup_test_environment()
 os.environ["DOTENV_LOADED"] = "True"
 
 # Now it's safe to import modules that depend on configuration
-from shared_utilities.config.config_tools import reload_config  # noqa: E402
+from panda_shared.config.config_tools import reload_config  # noqa: E402
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -65,7 +65,7 @@ def temp_test_db():
     )
     from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
     from panda_lib.labware.wellplates import Wellplate
-    from panda_lib.sql_tools.panda_models import (
+    from panda_lib.sql_tools import (
         Base,
         PlateTypes,
         Vials,

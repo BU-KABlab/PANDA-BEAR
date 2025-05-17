@@ -4,7 +4,7 @@ from logging import Logger
 from pathlib import Path
 
 from panda_lib.hardware.gantry_interface import PandaMill as Mill
-from shared_utilities.config.config_tools import (
+from panda_shared.config.config_tools import (
     ConfigParserError,
     read_config,
     read_testing_config,
@@ -56,7 +56,7 @@ def move_to_well(
     mill : Mill
         The mill controller object
     tool : str
-        The tool identifier to move
+        The tool identifier to move (pipette, decapper, etc.)
     logger : Logger
         Logger for operation tracking
     z_offset : float, optional
@@ -87,7 +87,7 @@ def move_to_vial(
     mill : Mill
         The mill controller object
     tool : str
-        The tool identifier to move
+        The tool identifier to move (pipette, decapper, etc.)
     logger : Logger
         Logger for operation tracking
     z_offset : float, optional

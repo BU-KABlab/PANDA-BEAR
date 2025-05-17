@@ -7,19 +7,21 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
+from panda_shared.config.config_tools import read_camera_type, read_webcam_settings
+
 from .camera_factory import CameraFactory, CameraType
 from .interface import CameraInterface
-from shared_utilities.config.config_tools import read_camera_type, read_webcam_settings
 
 # Check if PySpin is available
 try:
     import PySpin
+
     PYSPIN_AVAILABLE = True
 except ImportError:
     PYSPIN_AVAILABLE = False
 
 
-def capture_image_flir(camera: 'PySpin.Camera') -> Optional[np.ndarray]:
+def capture_image_flir(camera: "PySpin.Camera") -> Optional[np.ndarray]:
     """Capture an image from a FLIR camera
 
     Args:
@@ -31,7 +33,7 @@ def capture_image_flir(camera: 'PySpin.Camera') -> Optional[np.ndarray]:
     if not PYSPIN_AVAILABLE:
         logging.getLogger("panda.camera").error("PySpin library not available")
         return None
-        
+
     logger = logging.getLogger("panda.camera")
 
     if camera is None:
@@ -81,7 +83,7 @@ def setup_camera(
     """
     logger = logging.getLogger("panda.camera")
     config_camera_type = read_camera_type().lower()
-    
+
     # Map configuration camera type to CameraType enum
     if config_camera_type == "webcam":
         camera_type_enum = CameraType.OPENCV
@@ -89,25 +91,25 @@ def setup_camera(
         camera_type_enum = CameraType.FLIR
     else:
         # Default to OpenCV
-        logger.warning(f"Unknown camera type '{config_camera_type}', defaulting to OpenCV")
+        logger.warning(
+            f"Unknown camera type '{config_camera_type}', defaulting to OpenCV"
+        )
         camera_type_enum = CameraType.OPENCV
         config_camera_type = "webcam"
-    
+
     # Use the mock camera if requested
     if use_mock:
         camera_type_enum = CameraType.MOCK
-    
+
     # Create camera based on type
     if camera_type_enum == CameraType.OPENCV or camera_type_enum == CameraType.MOCK:
         webcam_id, resolution = read_webcam_settings()
         camera = CameraFactory.create_camera(
-            camera_type=camera_type_enum, 
-            camera_id=webcam_id, 
-            resolution=resolution
+            camera_type=camera_type_enum, camera_id=webcam_id, resolution=resolution
         )
     else:  # FLIR camera
         camera = CameraFactory.create_camera(camera_type=camera_type_enum)
-        
+
         # If FLIR camera creation failed, fallback to OpenCV
         if camera is None:
             logger.warning("Failed to create FLIR camera, falling back to OpenCV")
@@ -115,21 +117,19 @@ def setup_camera(
             camera = CameraFactory.create_camera(
                 camera_type=CameraType.OPENCV,
                 camera_id=webcam_id,
-                resolution=resolution
+                resolution=resolution,
             )
             config_camera_type = "webcam"
-    
+
     # Connect to the camera
     if camera is not None and not camera.connect():
         logger.error("Failed to connect to camera")
         return None, config_camera_type
-    
+
     return camera, config_camera_type
 
 
-def capture_image(
-    camera: CameraInterface, camera_type: str
-) -> Optional[np.ndarray]:
+def capture_image(camera: CameraInterface, camera_type: str) -> Optional[np.ndarray]:
     """Capture an image from either camera type
 
     Args:
@@ -141,7 +141,7 @@ def capture_image(
     """
     if camera is None:
         return None
-    
+
     return camera.capture_image()
 
 
@@ -170,7 +170,7 @@ def save_image(
 
     try:
         path = Path(path) if isinstance(path, str) else path
-        
+
         # If camera object provided, use its save method
         if camera is not None:
             return camera.save_image(image, path)
@@ -178,6 +178,7 @@ def save_image(
         # Otherwise use generic approach
         os.makedirs(path.parent, exist_ok=True)
         import cv2
+
         cv2.imwrite(str(path), image)
         logger.info(f"Image saved to {path}")
         return True
@@ -202,8 +203,8 @@ def capture_and_save(
         Tuple[Path, bool]: The path of the saved image and a boolean indicating success
     """
     path = Path(path) if isinstance(path, str) else path
-    
+
     if camera is None:
         return path, False
-    
+
     return camera.capture_and_save(path)

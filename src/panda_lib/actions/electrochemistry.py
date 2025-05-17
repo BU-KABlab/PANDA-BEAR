@@ -4,7 +4,7 @@ from logging import Logger
 from pathlib import Path
 from typing import Optional, Tuple
 
-from shared_utilities.config.config_tools import (
+from panda_shared.config.config_tools import (
     ConfigParserError,
     read_config,
     read_testing_config,
@@ -12,15 +12,20 @@ from shared_utilities.config.config_tools import (
 
 config = read_config()
 TESTING = read_testing_config()
-from shared_utilities.log_tools import timing_wrapper
 
-from ..errors import CAFailure, CVFailure, DepositionFailure, OCPError, OCPFailure
-from ..experiments.experiment_types import (
+from ..errors import (  # noqa: E402
+    CAFailure,
+    CVFailure,
+    DepositionFailure,
+    OCPError,
+    OCPFailure,
+)
+from ..experiments.experiment_types import (  # noqa: E402
     EchemExperimentBase,
     ExperimentStatus,
 )
-from ..labware.wellplates import Well
-from ..toolkit import Toolkit
+from ..labware.wellplates import Well  # noqa: E402
+from ..toolkit import Toolkit  # noqa: E402
 
 if TESTING or os.name != "nt":
     from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
@@ -202,7 +207,6 @@ def ocp_check(
             break
 
 
-@timing_wrapper
 def perform_chronoamperometry(
     experiment: EchemExperimentBase,
     file_tag: Optional[str] = None,
@@ -474,7 +478,6 @@ def pulsed_chronoamperometry(
     return experiment
 
 
-@timing_wrapper
 def perform_cyclic_voltammetry(
     experiment: EchemExperimentBase,
     file_tag: str = None,

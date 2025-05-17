@@ -8,11 +8,10 @@ from unittest.mock import patch
 
 import pytest
 
-from shared_utilities.config.config_interface import (
+from panda_shared.config.config_interface import (
     ConfigInterface,
     create_test_config,
     get_config,
-    is_testing_mode,
     reset_config,
 )
 
@@ -150,27 +149,9 @@ def mock_test_config():
     reset_config()
 
 
-def test_is_testing_mode(mock_test_config):
-    """Test detection of testing mode"""
-    assert is_testing_mode() is True
-
-    # Change environment variable
-    os.environ["PANDA_TESTING_MODE"] = "0"
-    assert is_testing_mode() is False
-
-    # Set pytest environment variable
-    os.environ["PYTEST_CURRENT_TEST"] = "some_test"
-    assert is_testing_mode() is True
-
-    # Clean up
-    del os.environ["PYTEST_CURRENT_TEST"]
-
-
 def test_patched_config():
     """Test using pytest monkeypatch to replace config"""
-    with patch(
-        "shared_utilities.config.config_interface._config_instance"
-    ) as mock_config:
+    with patch("panda_shared.config.config_interface._config_instance") as mock_config:
         # Set up mock methods
         mock_config.get.return_value = "mocked_value"
         mock_config.get_int.return_value = 999

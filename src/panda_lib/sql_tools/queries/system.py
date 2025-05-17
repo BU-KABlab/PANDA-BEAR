@@ -6,10 +6,11 @@ import datetime
 
 from pytz import utc
 
-from panda_lib.sql_tools.panda_models import SystemStatus
 from panda_lib.utilities import SystemState
-from shared_utilities.config.config_tools import read_config
-from shared_utilities.db_setup import SessionLocal
+from panda_shared import read_config
+from panda_shared.db_setup import SessionLocal
+
+from ..models import SystemStatus
 
 config = read_config()
 

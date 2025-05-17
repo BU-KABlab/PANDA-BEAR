@@ -25,7 +25,7 @@ from panda_lib.hardware.grbl_cnc_mill import (
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well
 from panda_lib.labware.wellplates import Wellplates as Wellplate
-from shared_utilities.config.config_tools import read_config
+from panda_shared.config.config_tools import read_config
 
 logger = set_up_mill_logger(Path("mill_testing.log"))
 config = read_config()

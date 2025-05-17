@@ -1,0 +1,61 @@
+from datetime import datetime as dt
+from datetime import timezone
+
+from sqlalchemy import Column, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.sql.sqltypes import (
+    Float,
+    Integer,
+    String,
+)
+
+from .base import Base, JSONEncodedDict
+
+
+class Pipette(Base):
+    """
+    Pipette table model
+
+    Attributes:
+        id (int): The pipette ID.
+        capacity_ul (float): The pipette capacity in microliters.
+        capacity_ml (float): The pipette capacity in milliliters.
+        volume_ul (float): The pipette volume in microliters.
+        volume_ml (float): The pipette volume in milliliters.
+        contents (str): The contents of the pipette.
+        updated (datetime): The last time the pipette was updated.
+        active (int): The status of the pipette. 0 = inactive, 1 = active.
+        uses (int): The number of times the pipette has been used.
+    """
+
+    __tablename__ = "panda_pipette"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    capacity_ul: Mapped[float] = mapped_column(Float, nullable=False)
+    capacity_ml: Mapped[float] = mapped_column(Float, nullable=False)
+    volume_ul: Mapped[float] = mapped_column(Float, nullable=False)
+    volume_ml: Mapped[float] = mapped_column(Float, nullable=False)
+    contents: Mapped[dict] = mapped_column(JSONEncodedDict())
+    updated: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
+    active: Mapped[int] = mapped_column(Integer)  # 0 = inactive, 1 = active
+    uses: Mapped[int] = mapped_column(Integer, default=0)
+    panda_unit_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("panda_units.id"), nullable=False
+    )
+
+    def __repr__(self):
+        return f"<Pipette(id={self.id}, capacity_ul={self.capacity_ul}, capacity_ml={self.capacity_ml}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, contents={self.contents}, updated={self.updated})>"
+
+
+class PipetteLog(Base):
+    """PipetteLog table model"""
+
+    __tablename__ = "panda_pipette_log"
+    id = Column(Integer, primary_key=True)
+    pipette_id = Column(Integer, ForeignKey("panda_pipette.id"))
+    volume_ul = Column(Float, nullable=False)
+    volume_ml = Column(Float, nullable=False)
+    updated = Column(String, default=dt.now(timezone.utc))
+    panda_unit_id = Column(Integer, ForeignKey("panda_units.id"), nullable=False)
+
+    def __repr__(self):
+        return f"<PipetteLog(id={self.id}, pipette_id={self.pipette_id}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, updated={self.updated})>"

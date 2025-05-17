@@ -15,12 +15,11 @@ from panda_lib.hardware.imaging import (
     image_filepath_generator,
 )
 from panda_lib.toolkit import Toolkit
-from shared_utilities.config.config_tools import (
+from panda_shared.config.config_tools import (
     ConfigParserError,
     read_config,
     read_testing_config,
 )
-from shared_utilities.log_tools import timing_wrapper
 
 
 class ImageFailure(Exception):
@@ -53,14 +52,13 @@ logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
 
 
-@timing_wrapper
 def image_well(
     toolkit: Toolkit,
-    instructions: Optional[EchemExperimentBase] = None,
-    step_description: Optional[str] = None,
+    experiment: Optional[EchemExperimentBase] = None,
+    image_label: Optional[str] = None,
     curvature_image: bool = False,
 ) -> None:
-    """Capture and save an image of a well.
+    """Move to and capture an image of a well.
 
     Parameters
     ----------
@@ -84,23 +82,23 @@ def image_well(
         return
 
     try:
-        instructions.set_status_and_save(ExperimentStatus.IMAGING)
-        logger.info("Imaging well %s", instructions.well_id)
-        exp_id = instructions.experiment_id or "test"
-        well_id = instructions.well_id or "test"
-        pjct_id = instructions.project_id or "test"
-        cmpgn_id = instructions.project_campaign_id or "test"
+        experiment.set_status_and_save(ExperimentStatus.IMAGING)
+        logger.info("Imaging well %s", experiment.well_id)
+        exp_id = experiment.experiment_id or "test"
+        well_id = experiment.well_id or "test"
+        pjct_id = experiment.project_id or "test"
+        cmpgn_id = experiment.project_campaign_id or "test"
         # create file path
         filepath = image_filepath_generator(
-            exp_id, pjct_id, cmpgn_id, well_id, step_description, PATH_TO_DATA
+            exp_id, pjct_id, cmpgn_id, well_id, image_label, PATH_TO_DATA
         )
 
         # position lens above the well
         logger.debug("Moving camera above well %s", well_id)
         if well_id != "test":
             toolkit.mill.safe_move(
-                x_coord=instructions.well.well_data.x,
-                y_coord=instructions.well.well_data.y,
+                x_coord=experiment.well.well_data.x,
+                y_coord=experiment.well.well_data.y,
                 z_coord=toolkit.wellplate.plate_data.image_height,
                 tool=Instruments.LENS,
             )
@@ -114,7 +112,7 @@ def image_well(
                 toolkit.arduino.curvature_lights_on()
             else:
                 toolkit.arduino.white_lights_on()
-            logger.debug("Capturing image of well %s", instructions.well_id)
+            logger.debug("Capturing image of well %s", experiment.well_id)
             filepath, result = capture_new_image(
                 save=True, num_images=1, file_name=filepath, logger=logger
             )
@@ -127,17 +125,17 @@ def image_well(
             dz_filepath = filepath.with_name(dz_filename)
 
             img: Image = add_data_zone(
-                experiment=instructions,
+                experiment=experiment,
                 image=Image.open(filepath),
-                context=step_description,
+                context=image_label,
             )
             img.save(dz_filepath)
-            instructions.results.append_image_file(
-                dz_filepath, context=step_description + "_dz"
+            experiment.results.append_image_file(
+                dz_filepath, context=image_label + "_dz"
             )
-        logger.debug("Image of well %s captured", instructions.well_id)
+        logger.debug("Image of well %s captured", experiment.well_id)
 
-        instructions.results.append_image_file(filepath, context=step_description)
+        experiment.results.append_image_file(filepath, context=image_label)
 
     except ImageFailure as e:
         logger.exception("Failed to image well %s. Error %s occured", well_id, e)
@@ -146,7 +144,7 @@ def image_well(
 
     except Exception as e:
         logger.exception(
-            "Failed to image well %s. Error %s occured", instructions.well_id, e
+            "Failed to image well %s. Error %s occured", experiment.well_id, e
         )
         # raise ImageCaputreFailure(instructions.well_id) from e
         # don't raise anything and continue with the experiment. The image is not critical to the experiment

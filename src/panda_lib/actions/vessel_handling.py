@@ -4,12 +4,11 @@ from typing import List, Optional, Tuple, Union
 
 from sqlalchemy.orm import Session
 
-from shared_utilities.config.config_tools import (
+from panda_shared.config.config_tools import (
     read_config,
     read_testing_config,
 )
-from shared_utilities.db_setup import SessionLocal
-from shared_utilities.log_tools import timing_wrapper
+from panda_shared.db_setup import SessionLocal
 
 from ..errors import (
     NoAvailableSolution,
@@ -125,7 +124,6 @@ def _handle_source_vessels(
     return selected_source_vessels, source_vessel_volumes
 
 
-@timing_wrapper
 def solution_selector(
     solution_name: str,
     volume: float,
@@ -157,7 +155,6 @@ def solution_selector(
     raise NoAvailableSolution(solution_name)
 
 
-@timing_wrapper
 def waste_selector(
     solution_name: str,
     volume: float,

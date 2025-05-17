@@ -20,21 +20,21 @@ from pathlib import Path
 from typing import Optional, Sequence, Tuple
 
 from sqlalchemy import update
-from sqlalchemy.orm import sessionmaker
 
-from shared_utilities.config.config_tools import read_config, read_testing_config
+from panda_shared.config.config_tools import read_config, read_testing_config
+
+from .sql_tools.queries import system
 
 config = read_config()
-from shared_utilities.db_setup import SessionLocal
-from shared_utilities.log_tools import (
+from panda_shared.db_setup import SessionLocal  # noqa: E402
+from panda_shared.log_tools import (  # noqa: E402
     apply_log_filter,
     setup_default_logger,
-    timing_wrapper,
 )
 
-from . import scheduler
-from .actions import purge_pipette
-from .errors import (
+from . import scheduler  # noqa: E402
+from .actions import purge_pipette  # noqa: E402
+from .errors import (  # noqa: E402
     CAFailure,
     CVFailure,
     DepositionFailure,
@@ -47,8 +47,8 @@ from .errors import (
     ProtocolNotFoundError,
     ShutDownCommand,
     WellImportError,
-)
-from .experiments import (
+)  # noqa: E402
+from .experiments import (  # noqa: E402
     EchemExperimentBase,
     ExperimentBase,
     ExperimentResult,
@@ -56,23 +56,24 @@ from .experiments import (
     select_complete_experiment_information,
     select_experiment_status,
 )
-from .labware.vials import StockVial, Vial, WasteVial, read_vials
-from .labware.wellplates import Well, Wellplate
-from .slack_tools.slackbot_module import SlackBot, share_to_slack
-from .sql_tools import (
-    panda_models,
-    sql_protocol_utilities,
-    sql_queue,
-    sql_system_state,
-    sql_wellplate,
-)
-from .toolkit import (
+from .labware.vials import StockVial, Vial, WasteVial, read_vials  # noqa: E402
+from .labware.wellplates import Well, Wellplate  # noqa: E402
+from .slack_tools.slackbot_module import SlackBot, share_to_slack  # noqa: E402
+from .sql_tools import (  # noqa: E402
+    Experiments,
+    get_next_experiment_from_queue,
+    get_number_of_clear_wells,
+    get_number_of_wells,
+    select_protocol,
+    select_queue,
+)  # noqa: E402
+from .toolkit import (  # noqa: E402
     Hardware,
     Labware,
     connect_to_instruments,
     disconnect_from_instruments,
 )
-from .utilities import SystemState
+from .utilities import ProtocolEntry, SystemState  # noqa: E402
 
 logger = setup_default_logger(log_name="panda")
 TESTING = read_testing_config()
@@ -140,7 +141,7 @@ def experiment_loop_worker(
             ## Reset the logger to log to the PANDA_SDL.log file and format
             # obs.place_text_on_screen("")
             apply_log_filter(logger=logger)
-            sql_system_state.set_system_status(SystemState.BUSY)
+            system.set_system_status(SystemState.BUSY)
             stock_vials, _, toolkit.wellplate = _establish_system_state()
 
             while current_experiment is None:
@@ -172,7 +173,7 @@ def experiment_loop_worker(
                     )
                 )
 
-                sql_system_state.set_system_status(
+                system.set_system_status(
                     SystemState.PAUSE, "Waiting for new experiments"
                 )
                 status = _monitor_system_status(
@@ -209,7 +210,7 @@ def experiment_loop_worker(
             logger.info(
                 "Experiment %d selected and validated", current_experiment.experiment_id
             )
-            sql_system_state.set_system_status(SystemState.BUSY)
+            system.set_system_status(SystemState.BUSY)
             # Initialize a results object
             current_experiment.results = ExperimentResult(
                 experiment_id=current_experiment.experiment_id,
@@ -274,8 +275,8 @@ def experiment_loop_worker(
             logger.info("Beginning experiment %d", current_experiment.experiment_id)
 
             # Get the protocol entry using either the name or id
-            protocol_entry: sql_protocol_utilities.ProtocolEntry = (
-                sql_protocol_utilities.select_protocol(current_experiment.protocol_name)
+            protocol_entry: ProtocolEntry = select_protocol(
+                current_experiment.protocol_name
             )
 
             # Convert the file path to a module name
@@ -333,8 +334,8 @@ def experiment_loop_worker(
             if current_experiment.status == ExperimentStatus.COMPLETE:
                 with SessionLocal() as connection:
                     stmt = (
-                        update(panda_models.Experiments)
-                        .where(panda_models.Experiments.experiment_id)
+                        update(Experiments)
+                        .where(Experiments.experiment_id)
                         .values(needs_analysis=True)
                     )
                     connection.execute(stmt)
@@ -383,7 +384,7 @@ def experiment_loop_worker(
     ) as error:
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_system_state.set_system_status(SystemState.ERROR)
+        system.set_system_status(SystemState.ERROR)
 
         logger.error(error)
         controller_slack.echem_error_procedure()
@@ -393,7 +394,7 @@ def experiment_loop_worker(
     except ProtocolNotFoundError as error:
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_system_state.set_system_status(SystemState.ERROR)
+        system.set_system_status(SystemState.ERROR)
         logger.error(error)
         controller_slack.send_message(
             "alert", f"PANDA_SDL encountered an error: {error}"
@@ -403,13 +404,13 @@ def experiment_loop_worker(
     except ShutDownCommand:
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_system_state.set_system_status(SystemState.OFF)
+        system.set_system_status(SystemState.OFF)
         logger.info("User commanded shutting down of PANDA_SDL")
 
     except KeyboardInterrupt as exc:
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_system_state.set_system_status(SystemState.ERROR)
+        system.set_system_status(SystemState.ERROR)
         logger.info("Keyboard interrupt detected")
         controller_slack.send_message("alert", "PANDA_SDL was interrupted by the user")
         raise KeyboardInterrupt from exc  # raise error to go to finally. This was triggered by the user to indicate they want to stop the program
@@ -417,7 +418,7 @@ def experiment_loop_worker(
     except Exception as error:
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_system_state.set_system_status(SystemState.ERROR)
+        system.set_system_status(SystemState.ERROR)
         logger.error(error)
         logger.exception(error)
         controller_slack.send_message(
@@ -435,7 +436,7 @@ def experiment_loop_worker(
             disconnect_from_instruments(toolkit)
         # obs.place_text_on_screen("")
         # obs.stop_recording()
-        sql_system_state.set_system_status(SystemState.IDLE)
+        system.set_system_status(SystemState.IDLE)
 
         controller_slack.send_message("alert", "PANDA_SDL is shutting down...goodbye")
         status_queue.put((process_id, "idle"))
@@ -473,7 +474,7 @@ def sila_experiment_loop_worker(
 
     def set_worker_state(state: SystemState):
         """Set the worker state"""
-        sql_system_state.set_system_status(state)
+        system.set_system_status(state)
         status_queue.put((process_id, f"{specific_experiment_id}: {state.value}"))
 
     for specific_experiment_id in experiment_ids:
@@ -567,8 +568,8 @@ def sila_experiment_loop_worker(
                     if status == ExperimentStatus.COMPLETE:
                         with SessionLocal() as connection:
                             stmt = (
-                                update(panda_models.Experiments)
-                                .where(panda_models.Experiments.experiment_id)
+                                update(Experiments)
+                                .where(Experiments.experiment_id)
                                 .values(needs_analysis=True)
                             )
                             connection.execute(stmt)
@@ -623,9 +624,7 @@ def _initialize_experiment(
 
     # TODO: this is silly but we need to reference the queue to get the well_id because the experiment object isn't updated with the correct target well_id
     # TODO: make a function that just gets the well_id from the queue and returns it
-    _, _, _, well_id = sql_queue.get_next_experiment_from_queue(
-        specific_experiment_id=exp_id
-    )
+    _, _, _, well_id = get_next_experiment_from_queue(specific_experiment_id=exp_id)
     # TODO: Replace with checking for available well, unless given one.
     exp_obj.well_id = well_id
 
@@ -703,9 +702,7 @@ def _fetch_protocol_function(protocol_id: int) -> callable:
         callable: The protocol function.
     """
 
-    protocol_entry: sql_protocol_utilities.ProtocolEntry = (
-        sql_protocol_utilities.select_protocol(protocol_id)
-    )
+    protocol_entry: ProtocolEntry = select_protocol(protocol_id)
 
     # Convert the file path to a module name
     module_name = Path(
@@ -730,16 +727,15 @@ def _fetch_protocol_function(protocol_id: int) -> callable:
     return protocol_function
 
 
-@timing_wrapper
-def _establish_system_state(
-    session_maker: sessionmaker = SessionLocal,
-) -> tuple[Sequence[StockVial], Sequence[WasteVial], Wellplate]:
+def _establish_system_state() -> tuple[
+    Sequence[StockVial], Sequence[WasteVial], Wellplate
+]:
     """
     Establish state of system
 
     Args:
     --------
-        session_maker (Optional): The session maker object. Defaults to SessionLocal.
+        None
 
     Returns:
     --------
@@ -748,7 +744,7 @@ def _establish_system_state(
         wellplate (wellplate_module.Wells): wellplate object
     """
     slack = SlackBot()
-    stock_vials, waste_vials = read_vials(session=session_maker)
+    stock_vials, waste_vials = read_vials()
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
     wellplate = Wellplate()
@@ -797,10 +793,8 @@ def _establish_system_state(
     number_of_wells = 0
 
     # Query the number of clear wells in well_status
-    number_of_clear_wells = sql_wellplate.get_number_of_clear_wells(
-        plate_id=wellplate.id
-    )
-    number_of_wells = sql_wellplate.get_number_of_wells(plate_id=wellplate.id)
+    number_of_clear_wells = get_number_of_clear_wells(plate_id=wellplate.id)
+    number_of_wells = get_number_of_wells(plate_id=wellplate.id)
     # check that wellplate has the appropriate number of wells
     if number_of_wells != len(wellplate.wells):
         logger.error(
@@ -819,7 +813,6 @@ def _establish_system_state(
     return stock_vials_only, waste_vials_only, wellplate
 
 
-@timing_wrapper
 def _check_stock_vials(
     exp_solns: dict, stock_vials: Sequence[Vial]
 ) -> Tuple[bool, dict]:
@@ -917,7 +910,6 @@ def _check_stock_vials(
     return passes, check_table
 
 
-@timing_wrapper
 def _monitor_system_status(
     slack: SlackBot, status_queue: multiprocessing.Queue, process_id: int
 ) -> SystemState:
@@ -939,7 +931,7 @@ def _monitor_system_status(
     while True:
         slack.check_slack_messages("alert")
         # Check the system status
-        system_status = sql_system_state.select_system_status(1)
+        system_status = system.select_system_status(1)
         if SystemState.SHUTDOWN in system_status:
             raise ShutDownCommand
 
@@ -948,11 +940,11 @@ def _monitor_system_status(
 
         if SystemState.RESUME in system_status:
             slack.send_message("alert", "PANDA_SDL is resuming")
-            sql_system_state.set_system_status(SystemState.BUSY)
+            system.set_system_status(SystemState.BUSY)
             break
-        if len(sql_queue.select_queue()) > 0:
+        if len(select_queue()) > 0:
             slack.send_message("alert", "PANDA_SDL is resuming")
-            sql_system_state.set_system_status(SystemState.BUSY)
+            system.set_system_status(SystemState.BUSY)
             break
         if SystemState.PAUSE in system_status:
             if first_pause:

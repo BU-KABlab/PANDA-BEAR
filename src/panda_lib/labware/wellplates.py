@@ -16,7 +16,7 @@ from sqlalchemy.orm import sessionmaker
 from panda_lib.errors import OverDraftException, OverFillException
 from panda_lib.hardware.gantry_interface import Coordinates
 from panda_lib.labware.services import WellplateService, WellService, get_unit_id
-from panda_lib.sql_tools.panda_models import (
+from panda_lib.sql_tools import (
     ExperimentParameters,
     ExperimentResults,
     Experiments,
@@ -24,8 +24,8 @@ from panda_lib.sql_tools.panda_models import (
     Wellplates,
 )
 from panda_lib.types import WellKwargs
-from shared_utilities.config.config_tools import read_config_value
-from shared_utilities.db_setup import SessionLocal
+from panda_shared.config.config_tools import read_config_value
+from panda_shared.db_setup import SessionLocal
 
 from .schemas import (
     PlateTypeModel,

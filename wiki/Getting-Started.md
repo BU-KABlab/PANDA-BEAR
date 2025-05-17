@@ -100,7 +100,7 @@ PANDA_SDL_CONFIG_PATH = /path/to/your/config.ini
 TEMP_DB='0'
 ```
 
-b. Create a config file using the template in `shared_utilities/config/default_config.ini`
+b. Create a config file using the template in `panda_shared/config/default_config.ini`
 
 ## Running Your First Experiment
 

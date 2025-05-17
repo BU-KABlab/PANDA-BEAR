@@ -30,8 +30,8 @@ from panda_lib.experiments.results import (
     select_specific_result,
 )
 from panda_lib.slack_tools.slackbot_module import SlackBot
-from panda_lib.sql_tools.sql_system_state import get_current_pin
-from shared_utilities.config.config_tools import read_testing_config
+from panda_lib.sql_tools.queries.system import get_current_pin
+from panda_shared.config.config_tools import read_testing_config
 
 CURRENT_PIN = get_current_pin()
 ANALYSIS_ID = 3

@@ -76,7 +76,7 @@ def setup_test_environment() -> Tuple[str, str, Dict[str, str]]:
     default_config_path = (
         Path(__file__).parent.parent.parent
         / "src"
-        / "shared_utilities"
+        / "panda_shared"
         / "config"
         / "default_config.ini"
     )
@@ -160,7 +160,7 @@ def cleanup_test_environment(
 
     # Clear config cache
     try:
-        from shared_utilities.config.config_tools import reload_config
+        from panda_shared.config.config_tools import reload_config
 
         reload_config()
     except (ImportError, AttributeError) as e:

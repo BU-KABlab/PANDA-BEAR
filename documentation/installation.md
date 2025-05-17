@@ -172,7 +172,7 @@ unit_id = 0
 unit_name = ""
 
 [DEFAULTS]
-air_gap = 40.0
+blowout_volume = 40.0
 drip_stop_volume = 5.0
 pipette_purge_volume = 20.0
 pumping_rate = 0.3

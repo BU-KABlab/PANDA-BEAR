@@ -1,5 +1,5 @@
 def test_grbl_controller():
-    import hardware.grbl_cnc_mill as grbl
+    import panda_lib.hardware.grbl_cnc_mill as grbl
 
     # Set up the mill connection
     mill = grbl.MockMill()

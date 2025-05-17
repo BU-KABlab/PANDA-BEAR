@@ -24,7 +24,7 @@ from panda_lib.hardware.panda_pipettes import (
 from panda_lib.labware import StockVial, Well
 
 # from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
-# from panda_lib.sql_tools.panda_models import Base, Vials, WellModel
+# from panda_lib.sql_tools import Base, Vials, WellModel
 from panda_lib.toolkit import (
     Toolkit,
 )
@@ -38,7 +38,7 @@ logger = MagicMock(
 def toolkit():
     from panda_lib.hardware.arduino_interface import MockArduinoLink as ArduinoLink
     from panda_lib.toolkit import (
-        MockPandaMill as Mill,
+        PandaMill as Mill,
     )
     from panda_lib.toolkit import Pipette
 

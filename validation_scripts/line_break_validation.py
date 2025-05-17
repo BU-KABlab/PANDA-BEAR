@@ -1,17 +1,17 @@
 import csv
 import time
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
-from typing import Optional
 
 from panda_lib.hardware import arduino_interface
-from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
 from panda_lib.hardware.gantry_interface import PandaMill
-from panda_lib.sql_tools.panda_models import Base
-from shared_utilities.config.config_tools import read_config_value
+from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
+from panda_lib.sql_tools import Base
+from panda_shared.config.config_tools import read_config_value
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
@@ -19,6 +19,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
 CAP_NUM = 5  # TODO replace with the actual cap number
+
 
 def main():
     try:
@@ -56,7 +57,7 @@ def main():
         # Set up the hardware connections
         with PandaMill() as mill:
             with arduino_interface.ArduinoLink(
-                port_address = read_config_value("ARDUINO", "port")
+                port_address=read_config_value("ARDUINO", "port")
             ) as arduino:
                 # Check the tools in the tool manager
                 print("Tools in the tool manager:")
@@ -81,7 +82,7 @@ def main():
                 print("Please remove the vial from position s3")
 
                 mill.home()
-                arduino.ALL_CAP() #decativate the decapper
+                arduino.ALL_CAP()  # decativate the decapper
     except Exception as e:
         print(e)
     finally:
@@ -256,7 +257,7 @@ def capping_sequence(
         rx = ard_link.ALL_CAP()
         print(f"Decapper deactivated: {rx == 106}")
         time.sleep(0.5)
-        
+
         # Move the decapper to 0 z
         mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
 

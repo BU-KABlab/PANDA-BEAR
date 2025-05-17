@@ -72,7 +72,7 @@ class ConfigTestHelper:
         # Ensure the config cache is cleared
         try:
             # Import here to avoid import cycles
-            from shared_utilities.config.config_tools import reload_config
+            from panda_shared.config.config_tools import reload_config
 
             # Use reload_config which internally clears any cached config
             reload_config()
@@ -115,7 +115,7 @@ class ConfigTestHelper:
 
         # Clear config cache again
         try:
-            from shared_utilities.config.config_tools import reload_config
+            from panda_shared.config.config_tools import reload_config
 
             # Use reload_config to clear the cache and reload
             reload_config()
@@ -173,7 +173,7 @@ def test_some_feature():
     
     with temporary_config(test_config) as config_path:
         # Now all calls to read_config() will use this temporary config
-        from shared_utilities.config.config_tools import read_config
+        from panda_shared.config.config_tools import read_config
         config = read_config()
         assert config["PANDA"]["unit_id"] == "99"
 """

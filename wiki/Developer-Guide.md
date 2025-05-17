@@ -133,7 +133,7 @@ To add support for new hardware:
 
 1. Create a new module in `panda_lib/hardware/`
 2. Implement the appropriate interface for the hardware type
-3. Add configuration options in `shared_utilities/config/default_config.ini`
+3. Add configuration options in `panda_shared/config/default_config.ini`
 4. Update the hardware initialization in `panda_lib/toolkit.py`
 
 ### Creating New Actions

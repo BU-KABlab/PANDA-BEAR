@@ -11,14 +11,6 @@ from typing import Tuple
 
 from PIL import Image
 
-from panda_lib_cli.hardware_calibration import (
-    decapper_testing,
-    line_break_validation,
-)
-from panda_lib_cli.hardware_calibration.mill_calibration_and_positioning import (
-    calibrate_mill,
-)
-from panda_lib_cli.menu.license_text import show_conditions, show_warranty
 from panda_lib import (
     SystemState,
     analysis_worker,
@@ -36,16 +28,24 @@ from panda_lib.hardware.panda_pipettes import (
 from panda_lib.labware import vials, wellplates
 from panda_lib.labware.services import WellplateService
 from panda_lib.sql_tools import (
-    sql_generator_utilities,
-    sql_protocol_utilities,
+    generators,
+    protocols,
     sql_queue,
-    sql_system_state,
     sql_wellplate,
 )
+from panda_lib.sql_tools.queries import system
 from panda_lib.sql_tools.remove_testing_experiments import (
-    main as _remove_testing_experiments,
+    remove_testing_experiments as _remove_testing_experiments,
 )
-from shared_utilities.config import (
+from panda_lib_cli.hardware_calibration import (
+    decapper_testing,
+    line_break_validation,
+)
+from panda_lib_cli.hardware_calibration.mill_calibration_and_positioning import (
+    calibrate_mill,
+)
+from panda_lib_cli.menu.license_text import show_conditions, show_warranty
+from panda_shared.config import (
     print_config_values,
     read_config,
     read_testing_config,
@@ -351,8 +351,8 @@ def add_new_wellplate():
 def run_experiment_generator():
     """Runs the edot voltage sweep experiment."""
 
-    sql_generator_utilities.read_in_generators()
-    available_generators = sql_generator_utilities.get_generators()
+    generators.read_in_generators()
+    available_generators = generators.get_generators()
     # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
     print()
     if not available_generators:
@@ -376,10 +376,10 @@ def run_experiment_generator():
     if generator_id == "q":
         return
     generator_id = int(generator_id)
-    sql_protocol_utilities.read_in_protocols()
-    generator = sql_generator_utilities.get_generator_name(generator_id)
+    protocols.read_in_protocols()
+    generator = generators.get_generator_name(generator_id)
     if generator:
-        sql_generator_utilities.run_generator(generator_id)
+        generators.run_generator(generator_id)
 
     input("Press Enter to continue...")
 
@@ -493,7 +493,7 @@ def change_pipette_tip():
 
 def instrument_check():
     """Runs the instrument check."""
-    sql_system_state.set_system_status(SystemState.BUSY, "running instrument check")
+    system.set_system_status(SystemState.BUSY, "running instrument check")
     try:
         all_found = toolkit.test_instrument_connections(False)
         if all_found:
@@ -507,7 +507,7 @@ def instrument_check():
 
 def import_vial_data():
     """Imports vial data from a csv file."""
-    sql_system_state.set_system_status(SystemState.BUSY, "importing vial data")
+    system.set_system_status(SystemState.BUSY, "importing vial data")
     vials.import_vial_csv_file()
 
 
@@ -527,7 +527,7 @@ def run_control_loop(uchoice: callable) -> Process:
 def start_analysis_loop():
     """Starts the analysis loop."""
     global analysis_prcss
-    sql_system_state.set_system_status(SystemState.BUSY, "starting analysis loop")
+    system.set_system_status(SystemState.BUSY, "starting analysis loop")
     process = Process(target=analysis_worker, args=(status_queue, ProcessIDs.ANALYSIS))
     process.start()
     return process
@@ -845,7 +845,7 @@ def main():
     # slackThread_running.set()
     print_disclaimer()
     time.sleep(2)
-    sql_protocol_utilities.read_in_protocols()
+    protocols.read_in_protocols()
     banner()
 
     try:

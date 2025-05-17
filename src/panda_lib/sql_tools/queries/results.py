@@ -1,16 +1,19 @@
 """
-SQL Utilities for the PANDA_SDL project
+SQL Results Module
 
-This module contains utility functions for executing SQL commands on the database.
-
+This module contains functions for querying the database for potentiostat readouts.
+It provides a function to query the database for potentiostat readouts
+for a given experiment ID and instrument name. The results are returned as a list
+of dictionaries containing the readout values.
 """
 
 import json
 import logging
 
-from panda_lib.sql_tools.panda_models import PotentiostatReadout
-from shared_utilities.db_setup import SessionLocal as Session
-from shared_utilities.log_tools import setup_default_logger
+from panda_shared.db_setup import SessionLocal as Session
+from panda_shared.log_tools import setup_default_logger
+
+from ..models import PotentiostatReadout
 
 logger: logging.Logger = setup_default_logger(log_name="sql_logger")
 

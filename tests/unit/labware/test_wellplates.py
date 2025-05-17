@@ -12,7 +12,7 @@ from panda_lib.labware.wellplates import (
     load_configuration,
     save_configuration,
 )
-from panda_lib.sql_tools.panda_models import Base, PlateTypes, WellModel, Wellplates
+from panda_lib.sql_tools import Base, PlateTypes, WellModel, Wellplates
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
