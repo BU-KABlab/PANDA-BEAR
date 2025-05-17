@@ -3,11 +3,10 @@
 import json
 from dataclasses import asdict
 from datetime import datetime, timezone
-from typing import List, Tuple, Union
+from typing import List, Sequence, Tuple, Union
 
 from sqlalchemy import Integer, cast, func, insert, select, update
 
-from panda_lib.labware import wellplates as wellplate_module
 from panda_lib.sql_tools import sql_reports
 from panda_lib.sql_tools.panda_models import PlateTypes, WellModel, Wellplates
 from panda_lib.sql_tools.sql_queue import get_unit_id
@@ -204,7 +203,7 @@ def select_well_ids(plate_id: Union[int, None] = None) -> List[str]:
         return [row[0] for row in result]
 
 
-def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
+def select_wellplate_wells(plate_id: Union[int, None] = None) -> Sequence:
     """Select all wells from the well_hx table for a specific wellplate.
 
     Parameters
@@ -214,9 +213,7 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
 
     Returns
     -------
-    List[object]
-        List of well objects containing well information.
-        Returns None if no wells are found.
+    Sequence
     """
     with SessionLocal() as session:
         if plate_id is None:
@@ -247,50 +244,7 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
         if result == []:
             return None
 
-        wells = []
-        for row in result:
-            try:
-                if isinstance(row[5], str):
-                    incoming_contents = json.loads(row[5])
-                else:
-                    incoming_contents = row[5]
-            except json.JSONDecodeError:
-                incoming_contents = {}
-            except TypeError:
-                incoming_contents = {}
-
-            try:
-                if isinstance(row[9], str):
-                    incoming_coordinates = json.loads(row[9])
-                else:
-                    incoming_coordinates = row[9]
-            except json.JSONDecodeError:
-                incoming_coordinates = (0, 0)
-
-            well_type_number = int(row[1]) if row[1] else 0
-            volume = int(row[8]) if row[8] else 0
-            capacity = int(row[10]) if row[10] else 0
-            height = int(row[11]) if row[11] else 0
-            experiment_id = int(row[6]) if row[6] else None
-            project_id = int(row[7]) if row[7] else None
-
-            wells.append(
-                wellplate_module.Well(
-                    well_id=str(row[2]),
-                    well_type_number=well_type_number,
-                    status=str(row[3]),
-                    status_date=str(row[4]),
-                    contents=incoming_contents,
-                    experiment_id=experiment_id,
-                    project_id=project_id,
-                    volume=volume,
-                    coordinates=incoming_coordinates,
-                    capacity=capacity,
-                    height=height,
-                    plate_id=int(plate_id),
-                )
-            )
-        return wells
+        return result
 
 
 def select_well_status(well_id: str, plate_id: Union[int, None] = None) -> str:
@@ -524,7 +478,7 @@ def update_well(well_to_update: object) -> None:
 def get_well_by_id(
     well_id: str,
     plate_id: Union[int, None] = None,
-) -> wellplate_module.Well:
+) -> WellModel:
     """Get a well from the well_hx table.
 
     Parameters
@@ -536,8 +490,7 @@ def get_well_by_id(
 
     Returns
     -------
-    wellplate_module.Well
-        The well.
+    WellModel
     """
     with SessionLocal() as session:
         if plate_id is None:
@@ -553,11 +506,7 @@ def get_well_by_id(
         if result is None:
             return None
 
-        well = wellplate_module.Well(
-            well_id=result.well_id,
-            plate_id=plate_id,
-        )
-        return well
+        return result
 
 
 def get_well_by_experiment_id(experiment_id: str) -> Tuple:

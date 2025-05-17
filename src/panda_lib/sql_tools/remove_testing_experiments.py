@@ -13,7 +13,7 @@ from panda_lib.sql_tools.panda_models import (
 from shared_utilities.db_setup import SessionLocal
 
 
-def main():
+def remove_testing_experiments():
     """
     For this script we will do the following:
     Go to the experiments table and find experiment_ids with project_id = 999
@@ -66,4 +66,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    remove_testing_experiments()

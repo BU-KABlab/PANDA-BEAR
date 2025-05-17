@@ -53,22 +53,6 @@ def get_generators() -> list:
         list: A list of all generators in the database.
     """
 
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Get all generators from the database
-    # cursor.execute("SELECT * FROM generators")
-    # generators = cursor.fetchall()
-
-    # conn.close()
-
-    # generator_entries = []
-    # for generator in generators:
-    #     generator_entry = GeneratorEntry(*generator)
-    #     generator_entries.append(generator_entry)
-
-    # return generator_entries
-
     with SessionLocal() as session:
         return session.query(ExperimentGenerators).all()
 
@@ -83,18 +67,7 @@ def get_generator_by_id(generator_id) -> GeneratorEntry:
     Returns:
         GeneratorEntry: The generator from the database.
     """
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Get the generator from the database
-    # cursor.execute("SELECT * FROM generators WHERE id = ?", (generator_id,))
-    # generator = cursor.fetchone()
-
-    # conn.close()
-
-    # generator_entry = GeneratorEntry(*generator)
-    # return generator_entry
-
+    
     with SessionLocal() as session:
         return (
             session.query(ExperimentGenerators)
@@ -117,27 +90,6 @@ def insert_generator(generator_id, project_id, protocol_id, name, filepath):
     Returns:
         None
     """
-
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Insert the generator into the database
-    # cursor.execute(
-    #     """
-    #     INSERT INTO generators (
-    #         id,
-    #         project_id,
-    #         protocol_id,
-    #         name,
-    #         filepath
-    #         )
-    #     VALUES (?, ?, ?, ?, ?)
-    #     """,
-    #     (generator_id, project_id, protocol_id, name, filepath),
-    # )
-
-    # conn.commit()
-    # conn.close()
 
     with SessionLocal() as session:
         session.add(
@@ -163,17 +115,7 @@ def update_generator(generator_id, new_name):
     Returns:
         None
     """
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Update the name of the generator in the database
-    # cursor.execute(
-    #     "UPDATE generators SET name = ? WHERE id = ?", (new_name, generator_id)
-    # )
-
-    # conn.commit()
-    # conn.close()
-
+    
     with SessionLocal() as session:
         generator = (
             session.query(ExperimentGenerators)
@@ -194,15 +136,7 @@ def delete_generator(generator_id):
     Returns:
         None
     """
-    # conn = sqlite3.connect(SQL_DB_PATH)
-    # cursor = conn.cursor()
-
-    # # Delete the generator from the database
-    # cursor.execute("DELETE FROM generators WHERE id = ?", (generator_id,))
-
-    # conn.commit()
-    # conn.close()
-
+   
     with SessionLocal() as session:
         generator = (
             session.query(ExperimentGenerators)

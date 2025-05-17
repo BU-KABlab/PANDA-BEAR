@@ -1,8 +1,10 @@
 """
-SQL Utilities for the PANDA_SDL project
+SQL Reports Module
 
-This module contains utility functions for executing SQL commands on the database.
-
+This module contains functions for querying the database for potentiostat readouts.
+It provides a function to query the database for potentiostat readouts
+for a given experiment ID and instrument name. The results are returned as a list
+of dictionaries containing the readout values.
 """
 
 import json

@@ -54,24 +54,15 @@ elif db_type == "mysql":
 else:
     raise ValueError(f"Unsupported database type: {db_type}")
 
-if db_type == "sqlite":
-    engine = create_engine(
+engine = create_engine(
         DATABASE_URL,
         echo=False,
         pool_size=20,
         pool_recycle=3600,
     )
-else:
-    engine = create_engine(
-        DATABASE_URL,
-        echo=False,
-        pool_size=20,
-        pool_recycle=3600,
-    )
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Test connection from config file
 
 
 def test_connection():

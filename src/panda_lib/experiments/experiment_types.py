@@ -6,6 +6,7 @@ from typing import Callable, List, Optional, Union, get_type_hints
 from pydantic import ConfigDict, Field, RootModel, field_validator
 from pydantic.dataclasses import dataclass
 
+from panda_lib.labware.wellplates import Well
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
     Experiments,
@@ -247,7 +248,11 @@ class ExperimentBase:
         if not self.well or not isinstance(self.well, object):
             experiment_logger.warning("Well object not set. Checking for Well ID")
             if self.well_id:
-                self.well = get_well_by_id(self.well_id)
+                result = get_well_by_id(well_id=self.well_id)
+                self.well: Well = Well(
+                    id=result.well_id,
+                    plate_id=result.plate_id,
+                )
             else:
                 experiment_logger.error("Well ID not set, cannot save status")
                 return
