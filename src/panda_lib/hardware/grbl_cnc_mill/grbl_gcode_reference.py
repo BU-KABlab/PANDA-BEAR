@@ -51,7 +51,6 @@ grbl_gcode_commands = {
 # Dictionary of GRBL non-G-code commands with their descriptions
 grbl_non_gcode_commands = {
     "$$": "Display Grbl Settings",
-    "$x=val": "Change Grbl Setting x to val",
     "$#": "View GCode Parameters",
     "$G": "View GCode parser state",
     "$C": "Toggle Check Gcode Mode",
@@ -60,7 +59,7 @@ grbl_non_gcode_commands = {
     "$X": "Kill Alarm Lock state",
     "$I": "View Build Info",
     "$N": "View saved start up code",
-    "$Nx=line": "Save Start-up GCode line (x=0 or 1). These are executed on a reset",
+    "$Nx": "Nx=line Save Start-up GCode line (x=0 or 1). These are executed on a reset",
     "$RST=$": "Restores the Grbl settings to defaults",
     "$RST=#": "Erases G54-G59 WCS offsets and G28/30 positions stored in EEPROM",
     "$RST=*": "Clear and Load all data from EEPROM",
@@ -69,6 +68,7 @@ grbl_non_gcode_commands = {
     "?": "Status report query",
     "~": "Cycle Start/Resume from Feed Hold, Door or Program pause",
     "!": "Feed Hold – Stop all motion",
+    
 }
 
 # Dictionary of GRBL error codes with their descriptions
@@ -104,6 +104,47 @@ grbl_alarm_codes = {
     9: "Homing fail. Could not find limit switch",
 }
 
+grbl_settings = {
+    0: "Step pulse, microseconds",
+    1: "Step idle delay, milliseconds",
+    2: "Step port invert, XYZmask*",
+    3: "Direction port invert, XYZmask*",
+    4: "Step enable invert, (0=Disable, 1=Invert)",
+    5: "Limit pins invert, (0=N-Open. 1=N-Close)",
+    6: "Probe pin invert, (0=N-Open. 1=N-Close)",
+    10: "Status report, '?' status. 0=WCS, 1=Machine, 2=plan/buffer + WCS, 3=plan/buffer + Machine.",
+    11: "Junction deviation, mm",
+    12: "Arc tolerance, mm",
+    13: "Report in inches, (0=mm. 1=Inches)**",
+    20: "Soft limits, (0=Disable. 1=Enable, Hard limits and homing Required.",
+    21: "Hard limits, (0=Disable. 1=Enable)",
+    22: "Homing cycle, (0=Disable. 1=Enable)",
+    23: "Homing direction invert, XYZmask* Sets home Pos",
+    24: "Homing feed, mm/min",
+    25: "Homing seek, mm/min",
+    26: "Homing debounce, milliseconds",
+    27: "Homing pull-off, mm",
+    30: "Max spindle speed, RPM",
+    31: "Min spindle speed, RPM",
+    32: "Laser mode, (0=Off, 1=On)",
+    100: "Number of X steps to move 1mm",
+    101: "Number of Y steps to move 1mm",
+    102: "Number of Z steps to move 1mm",
+    103: "Number of A steps to move 1°",
+    110: "X Max rate, mm/min",
+    111: "Y Max rate, mm/min",
+    112: "Z Max rate, mm/min",
+    113: "A Max rate, °/min",
+    120: "X Acceleration, mm/sec^2",
+    121: "Y Acceleration, mm/sec^2",
+    122: "Z Acceleration, mm/sec^2",
+    123: "A Acceleration, °/sec^2",
+    130: "X Max travel, mm Only for Homing and Soft Limits.",
+    131: "Y Max travel, mm Only for Homing and Soft Limits.",
+    132: "Z Max travel, mm Only for Homing and Soft Limits.",
+    133: "A Max travel, ° Only for Homing and Soft Limits.",
+    }
+
 
 def get_command_description(command):
     """
@@ -117,9 +158,25 @@ def get_command_description(command):
     """
     command = command.upper()
     if command in grbl_gcode_commands:
-        return grbl_gcode_commands[command]
+        return command
     elif command in grbl_non_gcode_commands:
-        return grbl_non_gcode_commands[command]
+        return command
+    elif "=" in command:
+        # Handle commands with parameters (e.g., $x=val)
+        # Extract the command key (e.g., $x) and value (e.g., val)
+        # Split the command by '=' and get the first part as the command key
+        # and the second part as the value
+        
+        command_key, value = command.split("=")
+        command_key = command_key.strip()
+        value = value.strip()
+        if command_key in grbl_settings:
+            return f"{command_key}={value}"
+        elif command_key in grbl_non_gcode_commands:
+            return f"{command_key}={value}"
+        else:
+            return "Unknown command"
+
     else:
         return "Unknown command"
 

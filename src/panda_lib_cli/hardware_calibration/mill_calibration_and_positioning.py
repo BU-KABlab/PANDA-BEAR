@@ -1256,6 +1256,7 @@ def calibrate_mill(
 
     # Connect to the mill
     with mill() as cncmill:
+        cncmill.interactive_mode = True
         while True:
             print("\n=====================================")
             print("Welcome to the mill calibration and positioning menu:")

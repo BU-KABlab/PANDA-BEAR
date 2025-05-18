@@ -124,6 +124,7 @@ class Mill:
         self.safe_z_height = -10.0  # TODO: In the PANDA wrapper, set the safe floor height to the max height of any active object on the mill + the pipette length
         self.max_z_height = 0.0
         self.command_logger = set_up_command_logger(self.logger_location)
+        self.interactive_mode = False
 
     def read_working_volume(self):
         """Checks the mill config for soft limits to be enabled, and then if so check the x, y, and z max travel limits"""
@@ -622,9 +623,15 @@ class Mill:
             status = [item.decode().rstrip() for item in status]
             if not status:
                 self.logger.error("Failed to get status from the mill")
+                if self.interactive_mode:
+                    print("Failed to get status from the mill")
+                    return ""
                 raise StatusReturnError("Failed to get status from the mill")
             if any(re.search(r"\b(error|alarm)\b", item.lower()) for item in status):
                 self.logger.error("Error in status: %s", status)
+                if self.interactive_mode:
+                    print("Error in status: %s", status)
+                    return ""
                 raise StatusReturnError(f"Error in status: {status}")
         # Check for busy
         # while status == "ok":
