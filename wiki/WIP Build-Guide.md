@@ -20,9 +20,7 @@ The gantry provides the structural framework and motion system for the PANDA-SDL
 
 ### Components Needed
 
--
-
-### Assembly Steps
+- Genmitsu Prover 4030 XL V2 (without the drill bit)
 
 ## 3D Printed Components
 
