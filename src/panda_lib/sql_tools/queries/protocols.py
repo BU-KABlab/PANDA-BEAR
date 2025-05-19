@@ -10,7 +10,7 @@ protocols from the protocols folder and running protocols.
 import os
 
 # region Protocols
-from panda_lib.errors import ProtocolNotFoundError
+from panda_lib.exceptions import ProtocolNotFoundError
 from panda_shared import read_config
 from panda_shared.db_setup import SessionLocal
 

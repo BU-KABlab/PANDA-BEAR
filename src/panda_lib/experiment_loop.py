@@ -34,7 +34,7 @@ from panda_shared.log_tools import (  # noqa: E402
 
 from . import scheduler  # noqa: E402
 from .actions import purge_pipette  # noqa: E402
-from .errors import (  # noqa: E402
+from .exceptions import (  # noqa: E402
     CAFailure,
     CVFailure,
     DepositionFailure,

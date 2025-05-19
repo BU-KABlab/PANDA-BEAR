@@ -13,7 +13,7 @@ from panda_shared.config.config_tools import (
 config = read_config()
 TESTING = read_testing_config()
 
-from ..errors import (  # noqa: E402
+from ..exceptions import (  # noqa: E402
     CAFailure,
     CVFailure,
     DepositionFailure,
