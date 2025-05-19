@@ -12,8 +12,8 @@ logger = logging.getLogger("panda")
 insert_new_pipette(capacity=300)
 tools = Toolkit(
     mill=PandaMill(), # NOTE: The mill needs to be connected and homed before use
-    arduino=ArduinoLink("/dev/ttyACM0"),
-    scale=Scale("/dev/ttyACM2"),
+    arduino=ArduinoLink("/dev/ttyACM1"),
+    scale=Scale("/dev/ttyACM0"),
     global_logger=logger,
 )
 tools.pipette = Pipette(arduino=tools.arduino)
@@ -35,9 +35,9 @@ vkwargs_src = VialKwargs(
             capacity=20000,
             contamination=0,
             coordinates={
-                "x": -167.0,
-                "y": -291.0,
-                "z": -195.0,
+                "x": -93.0,
+                "y": -225.0,
+                "z": -197.0,
             },  # TODO replace with vial coordinates
             base_thickness=1,
             dead_volume=1000,
@@ -60,9 +60,9 @@ vial_kwargs_dest = VialKwargs(
     capacity=20000,
     contamination=0,
     coordinates={
-        "x": -393.0,
-        "y": -247.0,
-        "z": -195.0,
+        "x": -268.0,
+        "y": -284.0,
+        "z": -195.0, # NOTE this is higher since its in the new vial holder
     },  # TODO replace with vial coordinates
     base_thickness=1,
     dead_volume=1000,
