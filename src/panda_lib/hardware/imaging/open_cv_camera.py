@@ -64,7 +64,7 @@ class OpenCVCamera(CameraInterface):
         if not self.connect():
             raise RuntimeError("Failed to connect to webcam")
         return self
-    
+
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         """Exit the context manager"""
         self.close()

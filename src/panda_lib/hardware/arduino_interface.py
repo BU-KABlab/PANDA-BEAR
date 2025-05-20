@@ -311,14 +311,16 @@ class ArduinoLink:
                 f"IO error connecting to Arduino on {chosen_port}: {e}"
             ) from e
 
-    def _process_response(self, response_str: str, command_to_send: str) -> Dict[str, Any]:
+    def _process_response(
+        self, response_str: str, command_to_send: str
+    ) -> Dict[str, Any]:
         """
         Process the response string from the Arduino and return a standardized result dictionary.
-        
+
         Args:
             response_str: The response string from the Arduino
             command_to_send: The command that was sent
-            
+
         Returns:
             A dictionary with the processed response data
 
@@ -440,7 +442,7 @@ class ArduinoLink:
         start_time = time.time()
         max_total_time = 60.0  # 1 minute total timeout
         response_str = None
-        
+
         while time.time() - start_time < max_total_time:
             try:
                 self.ser.flushInput()
@@ -449,7 +451,7 @@ class ArduinoLink:
 
                 attempt_start_time = time.time()
                 attempts_remaining = True
-                
+
                 # Keep reading until we get a properly formatted response or timeout
                 while attempts_remaining and time.time() - start_time < max_total_time:
                     # Blocking read until a line ending is received
@@ -463,23 +465,25 @@ class ArduinoLink:
                             max_total_time,
                             command_to_send.strip(),
                         )
-                        
+
                         # # If we've been waiting too long for this attempt, reset and try again
                         # if elapsed >= max_total_time * 2:
                         #     attempts_remaining = False
-                            
+
                         time.sleep(1)
                         continue
 
                     response_str = raw_response_bytes.decode().strip()
                     self.logger.debug(
-                        "Raw response: %s (elapsed: %.2fs)", 
+                        "Raw response: %s (elapsed: %.2fs)",
                         response_str,
-                        time.time() - start_time
+                        time.time() - start_time,
                     )
 
                     # Only accept responses that start with OK: or ERR:
-                    if response_str.startswith("OK:") or response_str.startswith("ERR:"):
+                    if response_str.startswith("OK:") or response_str.startswith(
+                        "ERR:"
+                    ):
                         return self._process_response(response_str, command_to_send)
                     else:
                         self.logger.warning(
@@ -514,16 +518,16 @@ class ArduinoLink:
                     exc_info=True,
                 )
                 time.sleep(1)
-                
+
             # Small delay before retrying
             time.sleep(0.2)
-            
+
         # If we get here, we've reached the 1-minute timeout without a properly formatted response
         elapsed = time.time() - start_time
         self.logger.error(
             "Total timeout exceeded (%.2f seconds) waiting for response to: %s",
             elapsed,
-            command_to_send.strip()
+            command_to_send.strip(),
         )
         raise ArduinoTimeoutError(
             f"Timeout after {elapsed:.1f} seconds waiting for properly formatted response for: {command_to_send.strip()}"
@@ -558,7 +562,7 @@ class ArduinoLink:
         max_total_time = 60.0  # 1 minute total timeout
         loop = asyncio.get_event_loop()
         response_str = None
-        
+
         while time.time() - start_time < max_total_time:
             try:
                 try:
@@ -573,10 +577,12 @@ class ArduinoLink:
 
                 attempt_start_time = time.time()
                 attempts_remaining = True
-                
+
                 # Keep reading until we get a properly formatted response or timeout
                 while attempts_remaining and time.time() - start_time < max_total_time:
-                    raw_response_bytes = await loop.run_in_executor(None, self.ser.readline)
+                    raw_response_bytes = await loop.run_in_executor(
+                        None, self.ser.readline
+                    )
 
                     if not raw_response_bytes:
                         elapsed = time.time() - attempt_start_time
@@ -586,23 +592,25 @@ class ArduinoLink:
                             self.read_timeout,
                             command_to_send.strip(),
                         )
-                        
+
                         # If we've been waiting too long for this attempt, reset and try again
                         if elapsed > self.read_timeout * 2:
                             attempts_remaining = False
-                            
+
                         await asyncio.sleep(0.1)
                         continue
 
                     response_str = raw_response_bytes.decode().strip()
                     self.logger.debug(
-                        "Async Raw response: %s (elapsed: %.2fs)", 
+                        "Async Raw response: %s (elapsed: %.2fs)",
                         response_str,
-                        time.time() - start_time
+                        time.time() - start_time,
                     )
 
                     # Only accept responses that start with OK: or ERR:
-                    if response_str.startswith("OK:") or response_str.startswith("ERR:"):
+                    if response_str.startswith("OK:") or response_str.startswith(
+                        "ERR:"
+                    ):
                         return self._process_response(response_str, command_to_send)
                     else:
                         self.logger.warning(
@@ -646,16 +654,16 @@ class ArduinoLink:
                     exc_info=True,
                 )
                 await asyncio.sleep(1)
-                
+
             # Small delay before retrying
             await asyncio.sleep(0.2)
-            
+
         # If we get here, we've reached the 1-minute timeout without a properly formatted response
         elapsed = time.time() - start_time
         self.logger.error(
             "Async: Total timeout exceeded (%.2f seconds) waiting for response to: %s",
             elapsed,
-            command_to_send.strip()
+            command_to_send.strip(),
         )
         raise ArduinoTimeoutError(
             f"Async: Timeout after {elapsed:.1f} seconds waiting for properly formatted response for: {command_to_send.strip()}"
@@ -948,14 +956,16 @@ class ArduinoLink:
             except ValueError:
                 return value_str
 
-    def _process_response(self, response_str: str, command_to_send: str) -> Dict[str, Any]:
+    def _process_response(
+        self, response_str: str, command_to_send: str
+    ) -> Dict[str, Any]:
         """
         Process the response string from the Arduino and return a standardized result dictionary.
-        
+
         Args:
             response_str: The response string from the Arduino
             command_to_send: The command that was sent
-            
+
         Returns:
             A dictionary with the processed response data
         """
