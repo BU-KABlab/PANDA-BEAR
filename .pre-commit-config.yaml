@@ -4,8 +4,8 @@ repos:
     rev: 0.7.6
     hooks:
       - id: uv-lock
-      - id: uv-export
-        args: ["--without-hashes", "--output", "requirements.txt"]
+      - id: pip-compile
+        args: [requirements.in, -o, requirements.txt]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
     rev: v0.11.10
