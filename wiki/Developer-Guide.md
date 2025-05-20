@@ -41,12 +41,32 @@ The PANDA-SDL system is organized into several key components:
 ### Setting Up for Development
 
 1. **Clone the repository**:
-   ```powershell
+
+   ```bash
    git clone https://github.com/BU-KABlab/PANDA-SDL.git
    cd PANDA-SDL
    ```
 
 2. **Create a development environment**:
+
+   Linux/MacOS Systems
+
+   ```bash
+   # Using UV (recommended)
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   uv venv panda_sdl_dev --python 3.10
+   . venv/bin/activate
+   uv sync --reinstall
+
+   # Using Pip
+   python -m venv panda_sdl_dev
+   panda_sdl_dev\Scripts\activate
+   pip install -r requirements.txt
+   pip install -e .  # Install in development mode
+   ```
+
+   Windows Powershell
+
    ```powershell
    # Using UV (recommended)
    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
@@ -63,10 +83,12 @@ The PANDA-SDL system is organized into several key components:
 
 3. **Configure for development**:
    - Create a `.env` file with development settings:
+
      ```
      PANDA_SDL_CONFIG_PATH = path/to/dev_config.ini
      TEMP_DB='1'  # Use a separate test database
      ```
+
    - Create a development config file based on the template
 
 ### Development Tools
@@ -78,6 +100,7 @@ The project uses several development tools:
 - **UV**: For dependency management
 
 To install development tools:
+
 ```powershell
 uv pip install ruff pytest pytest-cov
 ```
@@ -97,6 +120,7 @@ The PANDA-SDL project follows these coding standards:
 ### Development Workflow
 
 1. **Create a feature branch**:
+
    ```powershell
    git checkout -b feature/your-feature-name
    ```
@@ -111,11 +135,13 @@ The PANDA-SDL project follows these coding standards:
    - Update documentation as needed
 
 4. **Run tests**:
+
    ```powershell
    pytest tests/
    ```
 
 5. **Check code quality**:
+
    ```powershell
    ruff check .
    ```
@@ -148,6 +174,7 @@ To create new actions:
    - Returns appropriate results
 
 Example:
+
 ```python
 def my_custom_action(toolkit, param1, param2=None):
     """
@@ -225,16 +252,19 @@ def test_integration_scenario(toolkit):
 ### Running Tests
 
 To run all tests:
+
 ```powershell
 pytest
 ```
 
 To run specific tests:
+
 ```powershell
 pytest tests/unit/test_my_feature.py
 ```
 
 To run tests with coverage:
+
 ```powershell
 pytest --cov=panda_lib
 ```
