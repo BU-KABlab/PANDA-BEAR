@@ -3,6 +3,8 @@ Configuration interface for PANDA-BEAR
 
 This module provides a unified interface for accessing configuration settings
 across the application, with built-in support for testing environments.
+
+PENDING IMPLEMENTATION
 """
 
 import logging
