@@ -54,8 +54,6 @@ The PANDA-SDL system is organized into several key components:
    ```bash
    # Using UV (recommended)
    curl -LsSf https://astral.sh/uv/install.sh | sh
-   uv venv panda_sdl_dev --python 3.10
-   . venv/bin/activate
    uv sync --reinstall
 
    # Using Pip
@@ -70,8 +68,6 @@ The PANDA-SDL system is organized into several key components:
    ```powershell
    # Using UV (recommended)
    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-   uv venv panda_sdl_dev --python 3.10
-   .venv\Scripts\activate
    uv sync --reinstall
    
    # Or using pip
@@ -84,12 +80,13 @@ The PANDA-SDL system is organized into several key components:
 3. **Configure for development**:
    - Create a `.env` file with development settings:
 
-     ```
+     ```env
      PANDA_SDL_CONFIG_PATH = path/to/dev_config.ini
      TEMP_DB='1'  # Use a separate test database
      ```
 
    - Create a development config file based on the template
+   - Install any third party SDKs such as the FLIR SDK if applicable
 
 ### Development Tools
 

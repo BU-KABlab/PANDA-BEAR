@@ -170,9 +170,6 @@ def exit_on_error(message: str) -> None:
     print(
         "Please refer to the documentation for instructions on how to set up both the .env and .ini file."
     )
-    print(
-        "https://github.com/BU-KABlab/PANDA-BEAR/blob/packaing/documentation/installation.md#env-file"
-    )
     exit(1)
 
 

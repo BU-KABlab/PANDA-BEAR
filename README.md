@@ -35,6 +35,12 @@ Polymer analysis and discovery array (PANDA) - self-driving lab (SDL): an automa
    - Install the system SDK
    - Install the Python SDK (for Python 3.10) into your environment. See the README included with the SDK.
 
+3. **Install any device drivers for devices or cables you are using in your set up.**
+
+   These may include:
+      - Potentiostat driver
+      - usb-serial adapter
+
 ## Instruments
 
 - [Genmitsu PROVerXL 4030 CNC Router](https://www.sainsmart.com/products/genmitsu-proverxl-4030-cnc-router-with-carveco-maker-subscription)
