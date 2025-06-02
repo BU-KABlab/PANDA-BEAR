@@ -20,7 +20,7 @@ tools = Toolkit(
 tools.pipette = Pipette(arduino=tools.arduino)
 
 # Number of iterations to run
-n = 5  # Set a default value, update as needed
+n = 20  # Set a default value, update as needed
 
 readings = pd.DataFrame(columns=["Timestamp", "Reading"])
 vkwargs_src = VialKwargs(
@@ -36,10 +36,10 @@ vkwargs_src = VialKwargs(
     capacity=20000,
     contamination=0,
     coordinates={
-        "x": -93.0,
-        "y": -225.0,
-        "z": -197.0,
-    },  # TODO replace with vial coordinates
+        "x": -23.0,
+        "y": -73.0,
+        "z": -195.0,
+    },  # TODO verify vial coordinates
     base_thickness=1,
     dead_volume=1000,
 )
@@ -55,14 +55,14 @@ vial_kwargs_dest = VialKwargs(
     density=1,
     height=66,
     radius=14,
-    volume=20000,
+    volume=0,
     capacity=20000,
     contamination=0,
     coordinates={
-        "x": -268.0,
-        "y": -284.0,
-        "z": -195.0,  # NOTE this is higher since its in the new vial holder
-    },  # TODO replace with vial coordinates
+        "x": -249.0,
+        "y": -62.0,
+        "z": -195.0,  
+    },  # TODO verify scale coordinates (especially the z height)
     base_thickness=1,
     dead_volume=1000,
 )
@@ -82,18 +82,16 @@ try:
     tools.mill.homing_sequence()
     tools.mill.set_feed_rate(2000)  # TODO set back to 5000 for real test
 
-    # Now lets iterate over the number of times we want to transfer
-    # the vial contents and read the scale
-    for i in range(n):
+        for i in range(n):
         panda_lib.actions.transfer(
             100,
             vial_src,
             vial_dest,
             toolkit=tools,
         )
-        # TODO Transfer the vial to the scale
+    
         readings.loc[i + 1] = [pd.Timestamp.now(), tools.scale.get()]
-        # TODO Transfer the vial back to the holder
+    
 
 finally:
     tools.disconnect()
