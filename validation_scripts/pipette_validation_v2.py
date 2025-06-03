@@ -1,6 +1,5 @@
 import panda_lib
-from panda_lib.hardware import ArduinoLink, PandaMill
-from panda_lib.hardware import Scale
+from panda_lib.hardware import ArduinoLink, PandaMill, Scale
 from panda_lib.hardware.panda_pipettes import Pipette, insert_new_pipette
 from panda_lib.toolkit import Toolkit
 from panda_lib.types import VialKwargs
@@ -83,14 +82,14 @@ try:
     tools.mill.set_feed_rate(2000)  # TODO set back to 5000 for real test
 
         for i in range(n):
-        panda_lib.actions.transfer(
-            100,
-            vial_src,
-            vial_dest,
-            toolkit=tools,
-        )
+            panda_lib.actions.transfer(
+                100,
+                vial_src,
+                vial_dest,
+                toolkit=tools,
+            )
     
-        readings.loc[i + 1] = [pd.Timestamp.now(), tools.scale.get()]
+            readings.loc[i + 1] = [pd.Timestamp.now(), tools.scale.get()]
     
 
 finally:
