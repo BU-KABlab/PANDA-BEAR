@@ -90,7 +90,6 @@ def _pipette_action(
                 toolkit.arduino,
             )
 
-        # Use standard interface for aspirate
         toolkit.pipette.prime()
         toolkit.mill.safe_move(
             src_vessel.x,
