@@ -1,11 +1,13 @@
+import logging
+
+import pandas as pd
+
 import panda_lib
 from panda_lib.hardware import ArduinoLink, PandaMill, Scale
 from panda_lib.hardware.panda_pipettes import Pipette, insert_new_pipette
+from panda_lib.labware.vials import StockVial, WasteVial
 from panda_lib.toolkit import Toolkit
 from panda_lib.types import VialKwargs
-from panda_lib.labware.vials import StockVial, WasteVial
-import logging
-import pandas as pd
 
 logger = logging.getLogger("panda")
 
@@ -60,7 +62,7 @@ vial_kwargs_dest = VialKwargs(
     coordinates={
         "x": -249.0,
         "y": -62.0,
-        "z": -195.0,  
+        "z": -195.0,
     },  # TODO verify scale coordinates (especially the z height)
     base_thickness=1,
     dead_volume=1000,
@@ -81,16 +83,16 @@ try:
     tools.mill.homing_sequence()
     tools.mill.set_feed_rate(2000)  # TODO set back to 5000 for real test
 
-        for i in range(n):
-            panda_lib.actions.transfer(
-                100,
-                vial_src,
-                vial_dest,
-                toolkit=tools,
-            )
-    
-            readings.loc[i + 1] = [pd.Timestamp.now(), tools.scale.get()]
-    
+    for i in range(n):
+        panda_lib.actions.transfer(
+            100,
+            vial_src,
+            vial_dest,
+            toolkit=tools,
+        )
+
+        readings.loc[i + 1] = [pd.Timestamp.now(), tools.scale.get()]
+
 
 finally:
     tools.disconnect()
