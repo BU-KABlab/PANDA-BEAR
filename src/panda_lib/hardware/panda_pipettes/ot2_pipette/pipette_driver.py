@@ -241,8 +241,7 @@ class Pipette:
         if not self.is_primed:
             self.prime()
 
-        # Send the command
-        response = self.stepper.send(CMD.CMD_PIPETTE_ASPIRATE, vol, s)
+        response = self.stepper.aspirate(vol, s)
 
         if response.get("success", False):
             # Update position after successful aspiration
@@ -265,7 +264,7 @@ class Pipette:
         :type s: int
         """
         # Send the command
-        response = self.stepper.send(CMD.CMD_PIPETTE_DISPENSE, vol, s)
+        response = self.stepper.dispense(vol, s)
 
         if response.get("success", False):
             # Update position after successful dispensing
@@ -286,7 +285,7 @@ class Pipette:
         :type s: int, optional
         """
         # Blowout is essentially just moving to the blowout position
-        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.blowout_position, s)
+        response = self.stepper.move_to(self.blowout_position, s)
 
         if response.get("success", False):
             self.position = self.blowout_position
@@ -323,7 +322,7 @@ class Pipette:
         :type s: int, optional
         """
         # Use the built-in mix command if available
-        response = self.stepper.send(CMD.CMD_PIPETTE_MIX, n, vol, s)
+        response = self.stepper.mix(n, vol, s)
 
         if response.get("success", False):
             logger.info("Mixed %s uL %s times at speed %s", vol, n, s)
@@ -344,7 +343,7 @@ class Pipette:
         :type s: int, optional
         """
         # Move to the drop tip position
-        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.drop_tip_position, s)
+        response = self.stepper.move_to(self.drop_tip_position, s)
 
         if response.get("success", False):
             self.has_tip = False
@@ -362,7 +361,7 @@ class Pipette:
         :return: The current status of the pipette
         :rtype: dict
         """
-        response = self.stepper.send(CMD.CMD_PIPETTE_STATUS)
+        response = self.stepper.get_status()
 
         if response.get("success", False):
             # Extract key status information

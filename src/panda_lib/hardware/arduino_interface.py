@@ -967,7 +967,7 @@ class ArduinoLink:
             command_to_send: The command that was sent
 
         Returns:
-            A dictionary with the processed response data
+            Dict: A dictionary with the processed response data
         """
         self.logger.debug("Processing response: '%s'", response_str)
 
@@ -1040,6 +1040,7 @@ class ArduinoLink:
         Get the current status of the pipette (homed, position, max_volume).
 
         Returns:
+            Dict:
             A dictionary with status info, e.g.,
             {'success': True, 'homed': True, 'position': 10.5, 'max_volume': 200.0}
             Returns {'success': False} on error.
@@ -1086,7 +1087,7 @@ class ArduinoLink:
 
         return status_data
 
-    def move_to(self, position: float, speed: Optional[int] = None) -> bool:
+    def move_to(self, position: float, speed: Optional[int] = None) -> Dict[str, Any]:
         """
         Move to a specific position in mm.
 
@@ -1095,15 +1096,17 @@ class ArduinoLink:
             speed: Movement speed (steps/second) (optional)
 
         Returns:
-            bool: True if movement was successful
+            Dict: Response dictionary containing success status.
         """
         if speed is not None:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_MOVE_TO, position, speed)
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_MOVE_TO, position)
-        return response.get("success", False)
+        return response
 
-    def move_relative(self, direction: int, steps: int, velocity: int) -> bool:
+    def move_relative(
+        self, direction: int, steps: int, velocity: int
+    ) -> Dict[str, Any]:
         """
         Move the pipette by a relative number of steps.
         Args:
@@ -1111,14 +1114,14 @@ class ArduinoLink:
             steps: number of steps
             velocity: steps per second
         Returns:
-            bool: True if successful
+            Dict: Response dictionary containing success status.
         """
         response = self.send(
             PawduinoFunctions.CMD_MOVE_RELATIVE, direction, steps, velocity
         )
-        return response.get("success", False)
+        return response
 
-    def aspirate(self, volume: float, rate: Optional[float] = None) -> bool:
+    def aspirate(self, volume: float, rate: Optional[float] = None) -> Dict[str, Any]:
         """
         Aspirate a specific volume in µL.
 
@@ -1127,15 +1130,15 @@ class ArduinoLink:
             rate: Aspiration rate in µL/s (optional)
 
         Returns:
-            bool: True if aspiration was successful
+            Dict[str, Any]: Response dictionary containing success status and any additional data.
         """
         if rate is not None:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_ASPIRATE, volume, rate)
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_ASPIRATE, volume)
-        return response.get("success", False)
+        return response
 
-    def dispense(self, volume: float, rate: Optional[float] = None) -> bool:
+    def dispense(self, volume: float, rate: Optional[float] = None) -> Dict[str, Any]:
         """
         Dispense a specific volume in µL.
 
@@ -1144,17 +1147,17 @@ class ArduinoLink:
             rate: Dispensing rate in µL/s (optional)
 
         Returns:
-            bool: True if dispensing was successful
+            Dict: Response dictionary containing success status and any additional data.
         """
         if rate is not None:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE, volume, rate)
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE, volume)
-        return response.get("success", False)
+        return response
 
     def mix(
         self, repetitions: int, volume: float, rate: Optional[float] = None
-    ) -> bool:
+    ) -> Dict[str, Any]:
         """
         Mix by performing multiple aspirate/dispense cycles.
 
@@ -1164,7 +1167,7 @@ class ArduinoLink:
             rate: Mixing rate in µL/s (optional)
 
         Returns:
-            bool: True if mixing was successful
+            Dict: Response dictionary containing success status and any additional data.
         """
         if rate is not None:
             response = self.send(
@@ -1172,7 +1175,7 @@ class ArduinoLink:
             )
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_MIX, repetitions, volume)
-        return response.get("success", False)
+        return response
 
     def hello(self) -> bool:
         """Send a hello message to the Arduino and check response"""
