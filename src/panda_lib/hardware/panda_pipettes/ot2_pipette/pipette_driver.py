@@ -214,7 +214,7 @@ class Pipette:
         """Moves the plunger to the low-point on the pipette motor axis to prepare for further commands
         Note::This position should not engage the pipette tip plunger
 
-        :param s: The speed of the plunger movement in mm/min
+        :param s: The speed of the plunger movement in steps/sec, defaults to 2500
         :type s: int
         """
         response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.zero_position, s)
@@ -230,19 +230,24 @@ class Pipette:
         return response.get("success", False)
 
     @tip_check
-    def aspirate(self, vol: float, s: int = 2000):
+    def aspirate(self, vol: float, s: int = 1.6):
         """Moves the plunger upwards to aspirate liquid into the pipette tip
 
         :param vol: The volume of liquid to aspirate in uL
         :type vol: float
-        :param s: The speed of the plunger movement in mm/min
+        :param s: The rate of aspiration in uL/s
         :type s: int
         """
-        if not self.is_primed:
-            self.prime()
+    # Always move to ZERO_POSITION (0 mm) before aspirating
+    logger.debug("Resetting plunger to zero before aspirating...")
+    reset_response = self.stepper.move_to(30.0, 2500)  # 2500 steps/sec
 
-        # Send the command
-        response = self.stepper.send(CMD.CMD_PIPETTE_ASPIRATE, vol, s)
+    if not reset_response.get("success", False):
+        logger.error("Failed to reset to zero before aspiration: %s",
+                     reset_response.get("message", "Unknown error"))
+        return False
+
+        response = self.stepper.aspirate(vol, s)
 
         if response.get("success", False):
             # Update position after successful aspiration
@@ -256,16 +261,16 @@ class Pipette:
         return response.get("success", False)
 
     @tip_check
-    def dispense(self, vol: float, s: int = 2000):
+    def dispense(self, vol: float, s: int = 1.6):
         """Moves the plunger downwards to dispense liquid out of the pipette tip
 
         :param vol: The volume of liquid to dispense in uL
         :type vol: float
-        :param s: The speed of the plunger movement in mm/min
+        :param s: The rate of dispensing in uL/s
         :type s: int
         """
         # Send the command
-        response = self.stepper.send(CMD.CMD_PIPETTE_DISPENSE, vol, s)
+        response = self.stepper.dispense(vol, s)
 
         if response.get("success", False):
             # Update position after successful dispensing
@@ -279,14 +284,14 @@ class Pipette:
         return response.get("success", False)
 
     @tip_check
-    def blowout(self, s: int = 6000):
+    def blowout(self, s: int = 2500):
         """Blows out any remaining liquid in the pipette tip
 
-        :param s: The speed of the plunger movement in mm/min, defaults to 6000
+        :param s: The speed of the plunger movement in steps/sec, defaults to 2500
         :type s: int, optional
         """
         # Blowout is essentially just moving to the blowout position
-        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.blowout_position, s)
+        response = self.stepper.move_to(self.blowout_position, s)
 
         if response.get("success", False):
             self.position = self.blowout_position
@@ -298,12 +303,12 @@ class Pipette:
         return response.get("success", False)
 
     @tip_check
-    def blowout_volume(self, vol, s: int = 2000):
+    def blowout_volume(self, vol, s: int = 1.6):
         """Moves the plunger upwards to aspirate air into the pipette tip
 
         :param vol: The volume of air to aspirate in uL
         :type vol: float
-        :param s: The speed of the plunger movement in mm/min
+        :param s: The rate of aspiration in uL/s
         :type s: int, optional
         """
         # Air gap is functionally the same as aspirate, but we might want to differentiate
@@ -312,18 +317,18 @@ class Pipette:
         return self.aspirate(vol, s)
 
     @tip_check
-    def mix(self, vol: float, n: int, s: int = 5500):
+    def mix(self, vol: float, n: int, s: int = 1.6):
         """Mixes liquid by alternating aspirate and dispense steps for the specified number of times
 
         :param vol: The volume of liquid to mix in uL
         :type vol: float
         :param n: The number of times to mix
         :type n: int
-        :param s: The speed of the plunger movement in mm/min, defaults to 5500
+        :param s: The rate of aspiration/dispensing in uL/s
         :type s: int, optional
         """
         # Use the built-in mix command if available
-        response = self.stepper.send(CMD.CMD_PIPETTE_MIX, n, vol, s)
+        response = self.stepper.mix(n, vol, s)
 
         if response.get("success", False):
             logger.info("Mixed %s uL %s times at speed %s", vol, n, s)
@@ -337,14 +342,14 @@ class Pipette:
             return True
 
     @tip_check
-    def drop_tip(self, s: int = 5000):
+    def drop_tip(self, s: int = 2000):
         """Moves the plunger to eject the pipette tip
 
-        :param s: The speed of the plunger movement in mm/min, defaults to 5000
+        :param s: The speed of the plunger movement in mm/min, defaults to 2000
         :type s: int, optional
         """
         # Move to the drop tip position
-        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.drop_tip_position, s)
+        response = self.stepper.move_to(self.drop_tip_position, s)
 
         if response.get("success", False):
             self.has_tip = False
@@ -362,7 +367,7 @@ class Pipette:
         :return: The current status of the pipette
         :rtype: dict
         """
-        response = self.stepper.send(CMD.CMD_PIPETTE_STATUS)
+        response = self.stepper.get_status()
 
         if response.get("success", False):
             # Extract key status information

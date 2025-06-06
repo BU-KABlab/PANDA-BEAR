@@ -311,14 +311,16 @@ class ArduinoLink:
                 f"IO error connecting to Arduino on {chosen_port}: {e}"
             ) from e
 
-    def _process_response(self, response_str: str, command_to_send: str) -> Dict[str, Any]:
+    def _process_response(
+        self, response_str: str, command_to_send: str
+    ) -> Dict[str, Any]:
         """
         Process the response string from the Arduino and return a standardized result dictionary.
-        
+
         Args:
             response_str: The response string from the Arduino
             command_to_send: The command that was sent
-            
+
         Returns:
             A dictionary with the processed response data
 
@@ -440,7 +442,7 @@ class ArduinoLink:
         start_time = time.time()
         max_total_time = 60.0  # 1 minute total timeout
         response_str = None
-        
+
         while time.time() - start_time < max_total_time:
             try:
                 self.ser.flushInput()
@@ -449,7 +451,7 @@ class ArduinoLink:
 
                 attempt_start_time = time.time()
                 attempts_remaining = True
-                
+
                 # Keep reading until we get a properly formatted response or timeout
                 while attempts_remaining and time.time() - start_time < max_total_time:
                     # Blocking read until a line ending is received
@@ -463,23 +465,25 @@ class ArduinoLink:
                             max_total_time,
                             command_to_send.strip(),
                         )
-                        
+
                         # # If we've been waiting too long for this attempt, reset and try again
                         # if elapsed >= max_total_time * 2:
                         #     attempts_remaining = False
-                            
+
                         time.sleep(1)
                         continue
 
                     response_str = raw_response_bytes.decode().strip()
                     self.logger.debug(
-                        "Raw response: %s (elapsed: %.2fs)", 
+                        "Raw response: %s (elapsed: %.2fs)",
                         response_str,
-                        time.time() - start_time
+                        time.time() - start_time,
                     )
 
                     # Only accept responses that start with OK: or ERR:
-                    if response_str.startswith("OK:") or response_str.startswith("ERR:"):
+                    if response_str.startswith("OK:") or response_str.startswith(
+                        "ERR:"
+                    ):
                         return self._process_response(response_str, command_to_send)
                     else:
                         self.logger.warning(
@@ -514,16 +518,16 @@ class ArduinoLink:
                     exc_info=True,
                 )
                 time.sleep(1)
-                
+
             # Small delay before retrying
             time.sleep(0.2)
-            
+
         # If we get here, we've reached the 1-minute timeout without a properly formatted response
         elapsed = time.time() - start_time
         self.logger.error(
             "Total timeout exceeded (%.2f seconds) waiting for response to: %s",
             elapsed,
-            command_to_send.strip()
+            command_to_send.strip(),
         )
         raise ArduinoTimeoutError(
             f"Timeout after {elapsed:.1f} seconds waiting for properly formatted response for: {command_to_send.strip()}"
@@ -558,7 +562,7 @@ class ArduinoLink:
         max_total_time = 60.0  # 1 minute total timeout
         loop = asyncio.get_event_loop()
         response_str = None
-        
+
         while time.time() - start_time < max_total_time:
             try:
                 try:
@@ -573,10 +577,12 @@ class ArduinoLink:
 
                 attempt_start_time = time.time()
                 attempts_remaining = True
-                
+
                 # Keep reading until we get a properly formatted response or timeout
                 while attempts_remaining and time.time() - start_time < max_total_time:
-                    raw_response_bytes = await loop.run_in_executor(None, self.ser.readline)
+                    raw_response_bytes = await loop.run_in_executor(
+                        None, self.ser.readline
+                    )
 
                     if not raw_response_bytes:
                         elapsed = time.time() - attempt_start_time
@@ -586,23 +592,25 @@ class ArduinoLink:
                             self.read_timeout,
                             command_to_send.strip(),
                         )
-                        
+
                         # If we've been waiting too long for this attempt, reset and try again
                         if elapsed > self.read_timeout * 2:
                             attempts_remaining = False
-                            
+
                         await asyncio.sleep(0.1)
                         continue
 
                     response_str = raw_response_bytes.decode().strip()
                     self.logger.debug(
-                        "Async Raw response: %s (elapsed: %.2fs)", 
+                        "Async Raw response: %s (elapsed: %.2fs)",
                         response_str,
-                        time.time() - start_time
+                        time.time() - start_time,
                     )
 
                     # Only accept responses that start with OK: or ERR:
-                    if response_str.startswith("OK:") or response_str.startswith("ERR:"):
+                    if response_str.startswith("OK:") or response_str.startswith(
+                        "ERR:"
+                    ):
                         return self._process_response(response_str, command_to_send)
                     else:
                         self.logger.warning(
@@ -646,16 +654,16 @@ class ArduinoLink:
                     exc_info=True,
                 )
                 await asyncio.sleep(1)
-                
+
             # Small delay before retrying
             await asyncio.sleep(0.2)
-            
+
         # If we get here, we've reached the 1-minute timeout without a properly formatted response
         elapsed = time.time() - start_time
         self.logger.error(
             "Async: Total timeout exceeded (%.2f seconds) waiting for response to: %s",
             elapsed,
-            command_to_send.strip()
+            command_to_send.strip(),
         )
         raise ArduinoTimeoutError(
             f"Async: Timeout after {elapsed:.1f} seconds waiting for properly formatted response for: {command_to_send.strip()}"
@@ -948,16 +956,18 @@ class ArduinoLink:
             except ValueError:
                 return value_str
 
-    def _process_response(self, response_str: str, command_to_send: str) -> Dict[str, Any]:
+    def _process_response(
+        self, response_str: str, command_to_send: str
+    ) -> Dict[str, Any]:
         """
         Process the response string from the Arduino and return a standardized result dictionary.
-        
+
         Args:
             response_str: The response string from the Arduino
             command_to_send: The command that was sent
-            
+
         Returns:
-            A dictionary with the processed response data
+            Dict: A dictionary with the processed response data
         """
         self.logger.debug("Processing response: '%s'", response_str)
 
@@ -1030,6 +1040,7 @@ class ArduinoLink:
         Get the current status of the pipette (homed, position, max_volume).
 
         Returns:
+            Dict:
             A dictionary with status info, e.g.,
             {'success': True, 'homed': True, 'position': 10.5, 'max_volume': 200.0}
             Returns {'success': False} on error.
@@ -1076,7 +1087,7 @@ class ArduinoLink:
 
         return status_data
 
-    def move_to(self, position: float, speed: Optional[int] = None) -> bool:
+    def move_to(self, position: float, speed: Optional[int] = None) -> Dict[str, Any]:
         """
         Move to a specific position in mm.
 
@@ -1085,15 +1096,17 @@ class ArduinoLink:
             speed: Movement speed (steps/second) (optional)
 
         Returns:
-            bool: True if movement was successful
+            Dict: Response dictionary containing success status.
         """
         if speed is not None:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_MOVE_TO, position, speed)
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_MOVE_TO, position)
-        return response.get("success", False)
+        return response
 
-    def move_relative(self, direction: int, steps: int, velocity: int) -> bool:
+    def move_relative(
+        self, direction: int, steps: int, velocity: int
+    ) -> Dict[str, Any]:
         """
         Move the pipette by a relative number of steps.
         Args:
@@ -1101,14 +1114,14 @@ class ArduinoLink:
             steps: number of steps
             velocity: steps per second
         Returns:
-            bool: True if successful
+            Dict: Response dictionary containing success status.
         """
         response = self.send(
             PawduinoFunctions.CMD_MOVE_RELATIVE, direction, steps, velocity
         )
-        return response.get("success", False)
+        return response
 
-    def aspirate(self, volume: float, rate: Optional[float] = None) -> bool:
+    def aspirate(self, volume: float, rate: Optional[float] = None) -> Dict[str, Any]:
         """
         Aspirate a specific volume in µL.
 
@@ -1117,15 +1130,15 @@ class ArduinoLink:
             rate: Aspiration rate in µL/s (optional)
 
         Returns:
-            bool: True if aspiration was successful
+            Dict[str, Any]: Response dictionary containing success status and any additional data.
         """
         if rate is not None:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_ASPIRATE, volume, rate)
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_ASPIRATE, volume)
-        return response.get("success", False)
+        return response
 
-    def dispense(self, volume: float, rate: Optional[float] = None) -> bool:
+    def dispense(self, volume: float, rate: Optional[float] = None) -> Dict[str, Any]:
         """
         Dispense a specific volume in µL.
 
@@ -1134,17 +1147,17 @@ class ArduinoLink:
             rate: Dispensing rate in µL/s (optional)
 
         Returns:
-            bool: True if dispensing was successful
+            Dict: Response dictionary containing success status and any additional data.
         """
         if rate is not None:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE, volume, rate)
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE, volume)
-        return response.get("success", False)
+        return response
 
     def mix(
         self, repetitions: int, volume: float, rate: Optional[float] = None
-    ) -> bool:
+    ) -> Dict[str, Any]:
         """
         Mix by performing multiple aspirate/dispense cycles.
 
@@ -1154,7 +1167,7 @@ class ArduinoLink:
             rate: Mixing rate in µL/s (optional)
 
         Returns:
-            bool: True if mixing was successful
+            Dict: Response dictionary containing success status and any additional data.
         """
         if rate is not None:
             response = self.send(
@@ -1162,7 +1175,7 @@ class ArduinoLink:
             )
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_MIX, repetitions, volume)
-        return response.get("success", False)
+        return response
 
     def hello(self) -> bool:
         """Send a hello message to the Arduino and check response"""

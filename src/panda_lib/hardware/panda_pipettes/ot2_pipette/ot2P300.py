@@ -47,7 +47,7 @@ class OT2P300:
         aspirate(volume, rate): Aspirate the given volume at the given rate.
         drip_stop(): Aspirate a small volume of air to prevent dripping.
         dispense(volume, rate): Dispense the given volume at the given rate.
-        blowout(reprime): Blow out any remaining volume and optionally reprime.
+        blowout(reprime): Blow out any remaining volume and optionally reprime.#TODO remove this. Blowout is not necessary. Dispensing will go to the blowout position.
         mix(repetitions, volume, rate): Mix the solution by aspirating and dispensing.
     """
 
@@ -348,12 +348,6 @@ class OT2P300:
         total_volume_to_dispense = volume_to_dispense
         drip_stop_volume = 0.0
 
-        if self.has_drip_stop:
-            drip_stop_volume = self._drip_stop_volume
-            total_volume_to_dispense += drip_stop_volume
-            p300_control_logger.debug(
-                f"Including drip stop volume of {drip_stop_volume} µL in dispense operation"
-            )
 
         # Log the operation
         p300_control_logger.info(
@@ -422,7 +416,7 @@ class OT2P300:
         )
 
         return None
-
+'''
     def blowout(self, reprime: bool = True) -> bool:
         """
         Perform a blowout operation to expel any remaining liquid.
@@ -481,7 +475,7 @@ class OT2P300:
             return False
 
         return success
-
+'''
     def mix(
         self, repetitions: int, volume: float, rate: Optional[float] = None
     ) -> bool:

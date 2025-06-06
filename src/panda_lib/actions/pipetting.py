@@ -91,7 +91,6 @@ def _pipette_action(
             )
 
         # Use standard interface for aspirate
-        toolkit.pipette.prime()
         toolkit.mill.safe_move(
             src_vessel.x,
             src_vessel.y,
@@ -128,9 +127,7 @@ def _pipette_action(
             being_infused=src_vessel,
             infused_into=dst_vessel,
         )
-        if blowout:
-            toolkit.pipette.blowout()
-
+        
         if isinstance(dst_vessel, WasteVial):
             capping_sequence(
                 toolkit.mill,
