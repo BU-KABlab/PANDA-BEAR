@@ -1,7 +1,7 @@
 import logging
 import math
 from typing import Optional, Union
-
+import time
 from panda_lib.errors import NoAvailableSolution
 from panda_lib.hardware.grbl_cnc_mill import Instruments
 from panda_shared.config.config_tools import (
@@ -98,8 +98,9 @@ def _pipette_action(
             tool=Instruments.PIPETTE,
         )
         toolkit.pipette.aspirate(repetition_vol, solution=src_vessel)
+        time.sleep(3)  # Allow time for aspirate to complete
         toolkit.mill.move_to_safe_position()
-        toolkit.pipette.drip_stop()
+        #toolkit.pipette.drip_stop()
 
         if isinstance(src_vessel, StockVial):
             capping_sequence(

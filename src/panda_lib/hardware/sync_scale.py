@@ -2,33 +2,40 @@
 Synchronous wrapper for the Scale class.
 Provides easy-to-use synchronous methods that wrap the async Scale class.
 """
-#import asyncio
-#from sartorius import Scale as AsyncScale
-#from sartorius.mock import Scale as MockScale
-#import logging
-
-
-#logger = logging.getLogger('sartorius')
-
+import asyncio
+from sartorius.driver import Scale
+from sartorius.mock import Scale as MockScale
 class SyncScale:
-    """Synchronous wrapper for the Sartorius scale."""
+    """
+    A synchronous wrapper for the Scale class.
     
-    def __init__(self, address=None, **kwargs):
-        """Initialize with the same parameters as the async Scale."""
-        self.address = address
+    This class provides synchronous methods that internally handle the
+    asynchronous calls to the Scale class, making it easier to use
+    in synchronous contexts.
+    """
+    
+    def __init__(self, port=None, **kwargs):
+        """
+        Initialize a new SyncScale instance.
         
-        # Override the baudrate to 19200 for your scale
-        kwargs['baudrate'] = 19200
-        
-        self.kwargs = kwargs
-        self.scale = AsyncScale(address=address, **kwargs)
+        Args:
+            port: The port where the scale is connected
+            **kwargs: Additional keyword arguments to pass to the Scale constructor
+        """
+        self.scale = Scale(port, **kwargs)
         self._loop = None
-        
-        
+    
+    def __getattr__(self, name):
+        """Forward attribute access to the wrapped scale."""
+        if name == 'hw' and hasattr(self.scale, 'hw'):
+            return self.scale.hw
+        raise AttributeError(f"'SyncScale' object has no attribute '{name}'")
+    
     def _get_event_loop(self):
         """Get or create an event loop."""
         try:
             loop = asyncio.get_event_loop()
+            # Check if the loop is closed
             if loop.is_closed():
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
@@ -49,25 +56,37 @@ class SyncScale:
         else:
             return loop.run_until_complete(coroutine)
     
-    def get(self):
-        """Get scale reading synchronously."""
-        try:
-            result = self._run_coroutine(self.scale.get())
-            if 'mass' in result:
-                return result['mass']
-            return 0.0
-        except Exception as e:
-            logger.error(f"Error getting scale reading: {e}")
-            raise OSError(f"Unable to get reading from scale: {e}")
-    
-    def tare(self):
-        """Zero the scale synchronously."""
+    def zero(self):
+        """
+        Zero (tare) the scale synchronously.
+        
+        Returns:
+            The result from scale.zero()
+        """
         return self._run_coroutine(self.scale.zero())
     
+    tare = zero
+
+    def get(self):
+        """
+        Get a reading from the scale synchronously.
+        
+        Returns:
+            The current scale reading as a float
+        """
+        return self._run_coroutine(self.scale.get())
+    
+    read = get
+
     def get_info(self):
-        """Get scale info synchronously."""
+        """
+        Get scale model, serial, and software version numbers.
+        
+        Returns:
+            A dictionary with the scale's model, serial number, and software version
+        """
         return self._run_coroutine(self.scale.get_info())
-       
+
     def disconnect(self):
         """Disconnect from the scale synchronously."""
         if hasattr(self.scale, 'disconnect'):
@@ -110,4 +129,6 @@ class MockSyncScale(SyncScale):
         self.scale.get = lambda: {"stable": True, "units": "kg", "mass": 0.0}
         self.scale.zero = lambda: None
         self.scale.get_info = lambda: self.scale.info
+        self.scale._parse = lambda response: {"mass": 0.0, "units": "g", "stable": True}
+
     

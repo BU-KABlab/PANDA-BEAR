@@ -256,7 +256,6 @@ class ArduinoLink:
                 raise ArduinoConnectionError(
                     f"Failed to open serial port {chosen_port}"
                 )
-
             self.port_address = chosen_port
             self.connected = True
             self.logger.info(

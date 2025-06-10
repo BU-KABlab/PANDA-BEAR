@@ -53,6 +53,7 @@ class Pipette:
         drop_tip_position,
         mm_to_ul,
         stepper: ArduinoLink,
+        prime_position=None,
     ):
         """Initialize the pipette object
 
@@ -82,6 +83,7 @@ class Pipette:
         self.min_volume = min_volume
         self.zero_position = zero_position
         self.blowout_position = blowout_position
+        self.prime_position = prime_position
         self.drop_tip_position = drop_tip_position
         self.mm_per_ul = mm_to_ul
         self.has_tip = False
@@ -217,7 +219,7 @@ class Pipette:
         :param s: The speed of the plunger movement in steps/sec, defaults to 2500
         :type s: int
         """
-        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.zero_position, s)
+        response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.prime_position, s)
 
         if response.get("success", False):
             self.is_primed = True
@@ -230,27 +232,26 @@ class Pipette:
         return response.get("success", False)
 
     @tip_check
-    def aspirate(self, vol: float, s: int = 1.6):
+    def aspirate(self, vol: float, s: int = 2500):
         """Moves the plunger upwards to aspirate liquid into the pipette tip
 
         :param vol: The volume of liquid to aspirate in uL
         :type vol: float
-        :param s: The rate of aspiration in uL/s
+        :param s: The speed of the plunger movement in steps/sec
         :type s: int
         """
-    # Always move to ZERO_POSITION (0 mm) before aspirating
-    logger.debug("Resetting plunger to zero before aspirating...")
-    reset_response = self.stepper.move_to(30.0, 2500)  # 2500 steps/sec
+        # Always move to ZERO_POSITION (0 mm) before aspirating
+        logger.debug("Resetting plunger to zero before aspirating...")
+        reset_response = self.stepper.move_to(40.0, 2500)  # 2500 steps/sec
 
-    if not reset_response.get("success", False):
-        logger.error("Failed to reset to zero before aspiration: %s",
-                     reset_response.get("message", "Unknown error"))
-        return False
+        if not reset_response.get("success", False):
+            logger.error("Failed to reset to zero before aspiration: %s",
+                        reset_response.get("message", "Unknown error"))
+            return False
 
         response = self.stepper.aspirate(vol, s)
 
         if response.get("success", False):
-            # Update position after successful aspiration
             if "value2" in response:
                 self.position = response["value2"]
             logger.info("Aspirated %s uL, new position: %s mm", vol, self.position)
@@ -260,16 +261,17 @@ class Pipette:
 
         return response.get("success", False)
 
+
     @tip_check
-    def dispense(self, vol: float, s: int = 1.6):
+    def dispense(self, vol: float, s: int = 3000):
         """Moves the plunger downwards to dispense liquid out of the pipette tip
 
         :param vol: The volume of liquid to dispense in uL
         :type vol: float
-        :param s: The rate of dispensing in uL/s
+        :param s: The speed of the plunger movement in steps/sec
         :type s: int
         """
-        # Send the command
+        # Send the dispense command
         response = self.stepper.dispense(vol, s)
 
         if response.get("success", False):
@@ -277,12 +279,24 @@ class Pipette:
             if "value2" in response:
                 self.position = response["value2"]
             logger.info("Dispensed %s uL, new position: %s mm", vol, self.position)
+            
+            # Auto-prime after dispensing to reset position for next operation
+            logger.info("Automatically priming after dispense...")
+            prime_response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.prime_position, s)
+            
+            if prime_response.get("success", False):
+                self.position = self.prime_position
+                self.is_primed = True
+                logger.info("Pipette auto-primed to position %s mm", self.position)
+            else:
+                logger.warning("Auto-prime after dispense failed: %s", 
+                            prime_response.get("message", "Unknown error"))
         else:
             error_msg = response.get("message", "Unknown error")
             logger.error("Failed to dispense %s uL: %s", vol, error_msg)
 
         return response.get("success", False)
-
+    
     @tip_check
     def blowout(self, s: int = 2500):
         """Blows out any remaining liquid in the pipette tip
@@ -303,12 +317,12 @@ class Pipette:
         return response.get("success", False)
 
     @tip_check
-    def blowout_volume(self, vol, s: int = 1.6):
+    def blowout_volume(self, vol, s: int = 2500):
         """Moves the plunger upwards to aspirate air into the pipette tip
 
         :param vol: The volume of air to aspirate in uL
         :type vol: float
-        :param s: The rate of aspiration in uL/s
+        :param s: The speed of the plunger movement in steps/sec
         :type s: int, optional
         """
         # Air gap is functionally the same as aspirate, but we might want to differentiate
@@ -317,14 +331,14 @@ class Pipette:
         return self.aspirate(vol, s)
 
     @tip_check
-    def mix(self, vol: float, n: int, s: int = 1.6):
+    def mix(self, vol: float, n: int, s: int = 2500):
         """Mixes liquid by alternating aspirate and dispense steps for the specified number of times
 
         :param vol: The volume of liquid to mix in uL
         :type vol: float
         :param n: The number of times to mix
         :type n: int
-        :param s: The rate of aspiration/dispensing in uL/s
+        :param s: The speed of the plunger movement in steps/sec
         :type s: int, optional
         """
         # Use the built-in mix command if available
@@ -405,6 +419,7 @@ class MockPipette:
         min_volume=10,
         zero_position=0.0,
         blowout_position=0.0,
+        prime_position=None,
         drop_tip_position=0.0,
         mm_to_ul=1.0,
         stepper: MockArduinoLink = None,
@@ -417,6 +432,7 @@ class MockPipette:
         self.min_volume = 10
         self.zero_position = 0.0
         self.blowout_position = 0.0
+        self.prime_position = prime_position
         self.drop_tip_position = 0.0
         self.stepper: MockArduinoLink = None
         self.has_tip = False

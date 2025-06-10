@@ -51,14 +51,15 @@ class OT2P300:
         mix(repetitions, volume, rate): Mix the solution by aspirating and dispensing.
     """
 
-    def __init__(self, arduino: Optional[ArduinoLink] = None):
+    def __init__(self, arduino: Optional[ArduinoLink] = None, prime_position: Optional[float] = None):
         """Initialize the OT2P300 Pipette interface."""
         # Set up Arduino connection
         self.arduino = ArduinoLink() if arduino is None else arduino
-
         # Configuration constants
+        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=40.0)
+      
         self.max_p300_rate = config.getfloat(
-            "P300", "max_pipetting_rate", fallback=50.0
+            "P300", "max_pipetting_rate", fallback=3000
         )  # µL/s for Arduino pipette
 
         # Liquid handling specific constants
@@ -416,7 +417,7 @@ class OT2P300:
         )
 
         return None
-'''
+    '''
     def blowout(self, reprime: bool = True) -> bool:
         """
         Perform a blowout operation to expel any remaining liquid.
@@ -475,7 +476,7 @@ class OT2P300:
             return False
 
         return success
-'''
+    '''
     def mix(
         self, repetitions: int, volume: float, rate: Optional[float] = None
     ) -> bool:
@@ -661,12 +662,15 @@ class MockOT2P300(OT2P300):
     Maintains accurate volume tracking, state management, and simulated timing.
     """
 
-    def __init__(self, arduino: Optional[ArduinoLink] = None):
+    def __init__(self, arduino: Optional[ArduinoLink] = None, prime_position: Optional[float] = None):
+
         """Initialize the mock OT2P300 interface"""
         # Use the mock Arduino interface
         self.arduino = MockArduinoLink() if arduino is None else arduino
 
         # Configuration constants
+        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=40.0)
+
         self.max_p300_rate = config.getfloat(
             "P300", "max_pipetting_rate", fallback=50.0
         )  # µL/s for Arduino pipette
