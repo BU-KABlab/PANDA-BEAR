@@ -73,9 +73,16 @@ try:
         print(f"Error initializing pipette: {e}")
         print("Continuing without pipette functionality")
 
+    
+    tools.pipette = Pipette(arduino=tools.arduino)
+    print("Successfully initialized pipette")
+
     # Number of iterations to run
     reps_per_volume = 10
+    #volumes_to_test = [100,150]
+    #volumes_to_test = [2, 3, 4, 5, 7, 9, 11, 15, 19, 25, 32, 42, 54, 70, 90, 100]
     volumes_to_test = [2, 3, 4, 5, 7, 9, 11, 15, 19, 25, 32, 42, 54, 70, 90, 116, 149, 192, 200]
+    
     
     readings = pd.DataFrame(columns=["Timestamp","Reading"])
     vkwargs_src = VialKwargs(

@@ -8,6 +8,7 @@
 import json
 import logging
 import os
+import time
 
 from ...arduino_interface import ArduinoLink, MockArduinoLink
 from ...arduino_interface import PawduinoFunctions as CMD
@@ -71,6 +72,8 @@ class Pipette:
         :type zero_position: float
         :param blowout_position: The position of the plunger for running a :method:`blowout` step
         :type blowout_position: float
+        :param prime_position: The position of the plunger for priming the pipette
+        :type prime_position: float
         :param drop_tip_position: The position of the plunger for running a :method:`drop_tip` step
         :type drop_tip_position: float
         :param mm_to_ul: The conversion factor for converting motor microsteps in mm to uL
@@ -242,7 +245,7 @@ class Pipette:
         """
         # Always move to ZERO_POSITION (0 mm) before aspirating
         logger.debug("Resetting plunger to zero before aspirating...")
-        reset_response = self.stepper.move_to(40.0, 2500)  # 2500 steps/sec
+        reset_response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.prime_position, s)
 
         if not reset_response.get("success", False):
             logger.error("Failed to reset to zero before aspiration: %s",
@@ -279,7 +282,7 @@ class Pipette:
             if "value2" in response:
                 self.position = response["value2"]
             logger.info("Dispensed %s uL, new position: %s mm", vol, self.position)
-            
+            time.sleep(2)
             # Auto-prime after dispensing to reset position for next operation
             logger.info("Automatically priming after dispense...")
             prime_response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.prime_position, s)

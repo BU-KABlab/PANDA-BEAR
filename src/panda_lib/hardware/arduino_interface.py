@@ -152,7 +152,7 @@ class ArduinoLink:
         self,
         port_address: str = "COM4",
         baud_rate: int = 115200,
-        read_timeout: float = 2.0,
+        read_timeout: float = 10.0,
         max_retries: int = 3,
     ):
         self.ser: Serial = None

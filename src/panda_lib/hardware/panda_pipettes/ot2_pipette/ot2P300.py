@@ -56,7 +56,7 @@ class OT2P300:
         # Set up Arduino connection
         self.arduino = ArduinoLink() if arduino is None else arduino
         # Configuration constants
-        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=40.0)
+        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=36.0)
       
         self.max_p300_rate = config.getfloat(
             "P300", "max_pipetting_rate", fallback=3000
@@ -64,7 +64,7 @@ class OT2P300:
 
         # Liquid handling specific constants
         self.prime_volume_ul = config.getfloat(
-            "P300", "prime_volume_ul", fallback=10.0
+            "P300", "prime_volume_ul", fallback=0.0
         )  # µL
         self.drip_stop_volume_ul = config.getfloat(
             "P300", "drip_stop_volume_ul", fallback=5.0
@@ -669,15 +669,15 @@ class MockOT2P300(OT2P300):
         self.arduino = MockArduinoLink() if arduino is None else arduino
 
         # Configuration constants
-        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=40.0)
+        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=36)
 
         self.max_p300_rate = config.getfloat(
-            "P300", "max_pipetting_rate", fallback=50.0
+            "P300", "max_pipetting_rate", fallback=2500.0
         )  # µL/s for Arduino pipette
 
         # Liquid handling specific constants
         self.prime_volume_ul = config.getfloat(
-            "P300", "prime_volume_ul", fallback=10.0
+            "P300", "prime_volume_ul", fallback=0.0
         )  # µL
         self.drip_stop_volume_ul = config.getfloat(
             "P300", "drip_stop_volume_ul", fallback=5.0
