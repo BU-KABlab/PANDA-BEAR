@@ -1,0 +1,7 @@
+Timestamp,Reading
+2025-06-09 14:13:34.600401,"{'mass': 0.0, 'units': 'g', 'stable': True, 'measurement': 'gross'}"
+2025-06-09 14:15:16.015706,"{'mass': 0.102, 'units': 'g', 'stable': True, 'measurement': 'gross'}"
+2025-06-09 14:16:08.500876,"{'mass': 0.235, 'units': 'g', 'stable': False, 'measurement': 'gross'}"
+2025-06-09 14:17:01.091631,"{'mass': 0.365, 'units': 'g', 'stable': False, 'measurement': 'gross'}"
+2025-06-09 14:17:53.696540,"{'mass': 0.505, 'units': 'g', 'stable': False, 'measurement': 'gross'}"
+2025-06-09 14:18:46.244616,"{'mass': 0.63, 'units': 'g', 'stable': False, 'measurement': 'gross'}"
