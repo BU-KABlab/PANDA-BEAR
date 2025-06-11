@@ -139,7 +139,7 @@ class Pipette:
         ),
     ) -> "Pipette":
         """Initialize the pipette object from a config file
-
+#TODO fix this whole thing because it DOES NOT WORK.
         Use by calling the class method `from_config` with the appropriate parameters.
         example:
         .. code-block:: python
@@ -282,7 +282,8 @@ class Pipette:
             if "value2" in response:
                 self.position = response["value2"]
             logger.info("Dispensed %s uL, new position: %s mm", vol, self.position)
-            time.sleep(2)
+            time.sleep(2) #delay before priming, important for more viscous solutions, adjust as needed
+            
             # Auto-prime after dispensing to reset position for next operation
             logger.info("Automatically priming after dispense...")
             prime_response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.prime_position, s)
@@ -301,7 +302,7 @@ class Pipette:
         return response.get("success", False)
     
     @tip_check
-    def blowout(self, s: int = 2500):
+    def blowout(self, s: int = 2500): #TODO remove this function and fix all references to it
         """Blows out any remaining liquid in the pipette tip
 
         :param s: The speed of the plunger movement in steps/sec, defaults to 2500
@@ -320,7 +321,7 @@ class Pipette:
         return response.get("success", False)
 
     @tip_check
-    def blowout_volume(self, vol, s: int = 2500):
+    def blowout_volume(self, vol, s: int = 2500): #TODO remove this function and all references to it
         """Moves the plunger upwards to aspirate air into the pipette tip
 
         :param vol: The volume of air to aspirate in uL
@@ -334,7 +335,7 @@ class Pipette:
         return self.aspirate(vol, s)
 
     @tip_check
-    def mix(self, vol: float, n: int, s: int = 2500):
+    def mix(self, vol: float, n: int, s: int = 2500): #TODO make function for this specifically, don't just use aspirate and dispense
         """Mixes liquid by alternating aspirate and dispense steps for the specified number of times
 
         :param vol: The volume of liquid to mix in uL
