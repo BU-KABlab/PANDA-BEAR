@@ -1,0 +1,351 @@
+"""
+Contact Angle Validation Script
+This script performs a contact angle validation test by dispensing droplets 
+on a glass slide, capturing images, and then aspirating the droplets.
+"""
+
+import os
+import sys
+import logging
+import pandas as pd
+import time
+from datetime import datetime
+from pathlib import Path
+import cv2
+
+# Set up logging
+logger = logging.getLogger("panda")
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Create file handler
+file_handler = logging.FileHandler("contactangle_validation.log")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+# Create console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+
+# Import PANDA libraries
+from panda_lib.hardware import ArduinoLink, PandaMill
+from panda_lib.hardware.panda_pipettes import Pipette
+from panda_lib.toolkit import Toolkit
+from panda_lib.types import VialKwargs
+from panda_lib.labware.vials import StockVial, WasteVial
+from panda_lib.labware.plates import PlatePosition, WellPlate
+
+# Disable decapping/capping operations
+from panda_lib.actions import movement
+import panda_lib.actions.pipetting
+
+# Create replacement functions for skipping capping/decapping
+def no_op_decap(*args, **kwargs):
+    logger.info("SKIPPED: Decapping operation (disabled by monkey patch)")
+    return None
+
+def no_op_cap(*args, **kwargs):
+    logger.info("SKIPPED: Capping operation (disabled by monkey patch)")
+    return None
+
+# Apply patches to both modules
+movement.decapping_sequence = no_op_decap
+movement.capping_sequence = no_op_cap
+logger.info("Successfully applied monkey patch to disable decapping/capping")
+
+try:
+    # Create timestamp for file naming
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+    
+    # Create directory for this experiment's images
+    experiment_dir = f"contact_angle_experiment_{timestamp}"
+    os.makedirs(experiment_dir, exist_ok=True)
+    logger.info(f"Created experiment directory: {experiment_dir}")
+    
+    # Set up the hardware
+    logger.info("Initializing hardware components...")
+    tools = Toolkit(
+        mill=PandaMill(),
+        arduino=ArduinoLink("/dev/ttyACM1", timeout=5.0),  # Increased timeout
+        camera=cv2.VideoCapture(0),  # Using OpenCV for camera
+        global_logger=logger,
+    )
+    
+    # Check if camera opened successfully
+    if not tools.camera.isOpened():
+        raise RuntimeError("Error: Could not open camera")
+    
+    print("Successfully initialized toolkit")
+    
+    # Initialize pipette
+    tools.pipette = Pipette(arduino=tools.arduino)
+    print("Successfully initialized pipette")
+    
+    # Create a fixed test volume
+    test_volume = 10  # 10 µL for contact angle testing
+    
+    # Define slide positions (4 positions on a glass slide)
+    slide_positions = [
+        {"x": -100, "y": -100, "z": -40},  # Position 1
+        {"x": -100, "y": -50, "z": -40},   # Position 2
+        {"x": -50, "y": -100, "z": -40},   # Position 3
+        {"x": -50, "y": -50, "z": -40}     # Position 4
+    ]
+    
+    # Set up source vial (stock solution)
+    vkwargs_src = VialKwargs(
+        category=0,
+        name="H20",
+        contents={"H20": 20000},
+        viscosity_cp=1,
+        concentration=0.01,
+        density=1,
+        height=66,
+        radius=14,
+        volume=20000,
+        capacity=20000,
+        contamination=0,
+        coordinates={
+            "x": -22.0,
+            "y": -71.0,
+            "z": -195.0,
+        },
+        base_thickness=1,
+        dead_volume=1000,
+    )
+    vial_src = StockVial(
+        position="s1", create_new=True, **vkwargs_src
+    )
+    vial_src.save()
+    
+    # Set up waste vial
+    vial_kwargs_dest = VialKwargs(
+        category=1,
+        name="waste",
+        contents={"H20": 0},
+        viscosity_cp=1,
+        concentration=0.01,
+        density=1,
+        height=66,
+        radius=14,
+        volume=0,
+        capacity=20000,
+        contamination=0,
+        coordinates={
+            "x": -252.0,
+            "y": -66.0,
+            "z": -195.0,
+        },
+        base_thickness=1,
+        dead_volume=1000,
+    )
+    vial_dest = WasteVial(
+        position="w1", create_new=True, **vial_kwargs_dest
+    )
+    vial_dest.save()
+    
+    # Create a "plate" object to represent the glass slide
+    glass_slide = WellPlate(
+        name="glass_slide",
+        position="p1",
+        rows=2,
+        columns=2,
+        well_volume=50,  # More than enough for our 10µL droplet
+        well_depth=10,
+        coordinates={"x": -100, "y": -100, "z": -50}  # Base position of the slide
+    )
+    
+    # Home the mill
+    logger.info("Connecting to mill and homing...")
+    tools.mill.connect_to_mill()
+    tools.mill.homing_sequence()
+    tools.mill.set_feed_rate(5000)
+    
+    # Create a results dataframe
+    results = pd.DataFrame(columns=["Timestamp", "Slide_Number", "Position", "Image_Path"])
+    row_index = 0
+    
+    # Function to capture an image of the droplet
+    def capture_droplet_image(slide_num, position_idx):
+        """Capture an image of the droplet on the slide."""
+        image_path = f"{experiment_dir}/slide{slide_num}_pos{position_idx+1}.jpg"
+        
+        # Position camera above the droplet
+        # You may need to adjust these offsets based on your camera position
+        camera_x = slide_positions[position_idx]["x"] 
+        camera_y = slide_positions[position_idx]["y"]
+        camera_z = -10  # Higher Z for camera positioning
+        
+        # Move to camera position
+        logger.info(f"Moving to position for imaging: ({camera_x}, {camera_y}, {camera_z})")
+        tools.mill.move_to_position(x=camera_x, y=camera_y, z=camera_z)
+        time.sleep(1)  # Ensure the mill has moved
+        
+        # Capture image
+        ret, frame = tools.camera.read()
+        if not ret:
+            logger.error("Failed to capture image")
+            return None
+        
+        # Save the image
+        cv2.imwrite(image_path, frame)
+        logger.info(f"Saved image to {image_path}")
+        
+        return image_path
+    
+    # Function to prompt user for slide replacement
+    def prompt_for_slide_replacement():
+        """Ask user if they want to replace the slide or end the experiment."""
+        while True:
+            response = input("\nDo you want to:\n"
+                            "1. Replace the slide and continue\n"
+                            "2. End the experiment\n"
+                            "Enter 1 or 2: ")
+            if response == "1":
+                input("Replace the slide, then press Enter to continue...")
+                return True
+            elif response == "2":
+                return False
+            else:
+                print("Invalid response. Please enter 1 or 2.")
+    
+    # Main experiment loop
+    slide_number = 1
+    continue_experiment = True
+    
+    while continue_experiment:
+        print(f"\n===== Testing Slide #{slide_number} =====")
+        logger.info(f"Starting tests on slide #{slide_number}")
+        
+        # For each position on the slide
+        for pos_idx, position in enumerate(slide_positions):
+            position_name = f"Position {pos_idx+1}"
+            print(f"\n--- Testing {position_name} ---")
+            logger.info(f"Testing slide {slide_number}, {position_name}")
+            
+            try:
+                # Create a well position object for this location
+                well_pos = PlatePosition(
+                    x=position["x"],
+                    y=position["y"],
+                    z=position["z"],
+                    volume=0,
+                    contents={},
+                    plate=glass_slide
+                )
+                
+                # Step 1: Dispense 10 µL droplet onto the slide
+                print(f"Dispensing {test_volume} µL onto slide...")
+                logger.info(f"Dispensing {test_volume} µL at {position_name}")
+                panda_lib.actions.transfer(
+                    test_volume,
+                    vial_src,
+                    well_pos,
+                    toolkit=tools,
+                )
+                
+                # Print the plunger position for diagnostic purposes
+                if hasattr(tools.pipette, 'pipette_driver'):
+                    print("\n📏 PLUNGER POSITION DETAILS:")
+                    driver = tools.pipette.pipette_driver
+                    if hasattr(driver, 'prime_position'):
+                        print(f"  Prime position: {driver.prime_position:.2f} mm")
+                    if hasattr(driver, 'blowout_position'):
+                        print(f"  Blowout position: {driver.blowout_position:.2f} mm")
+                
+                # Let the droplet settle
+                print("Waiting for droplet to settle...")
+                time.sleep(2)
+                
+                # Step 2: Capture image of the droplet
+                print("Capturing image of the droplet...")
+                image_path = capture_droplet_image(slide_number, pos_idx)
+                
+                # Log the result
+                if image_path:
+                    results.loc[row_index] = [
+                        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        slide_number,
+                        pos_idx + 1,
+                        image_path
+                    ]
+                    row_index += 1
+                
+                # Step 3: Aspirate the droplet and move it to waste
+                print("Aspirating droplet to waste...")
+                logger.info(f"Removing droplet from {position_name}")
+                panda_lib.actions.transfer(
+                    test_volume,
+                    well_pos,
+                    vial_dest,
+                    toolkit=tools,
+                )
+                
+                print(f"Completed test on slide {slide_number}, {position_name}")
+                
+            except Exception as e:
+                print(f"Error during contact angle test at {position_name}: {e}")
+                logger.error(f"Error at {position_name}: {e}", exc_info=True)
+                # Continue with next position
+        
+        # After all positions on this slide are complete
+        print(f"\nCompleted all positions on slide #{slide_number}")
+        logger.info(f"Completed all tests on slide #{slide_number}")
+        
+        # Periodically save results
+        temp_results_file = f"{experiment_dir}/contact_angle_results_partial.csv"
+        results.to_csv(temp_results_file, index=False)
+        logger.info(f"Saved partial results to {temp_results_file}")
+        
+        # Step 5: Prompt user for slide replacement or experiment end
+        continue_experiment = prompt_for_slide_replacement()
+        if continue_experiment:
+            slide_number += 1
+    
+    # Save final results to CSV
+    results_file = f"{experiment_dir}/contact_angle_results.csv"
+    results.to_csv(results_file, index=False)
+    print(f"\nResults saved to {results_file}")
+    logger.info(f"Final results saved to {results_file}")
+    
+    # Create summary report
+    summary_file = f"{experiment_dir}/experiment_summary.txt"
+    with open(summary_file, 'w') as f:
+        f.write("Contact Angle Validation Summary\n")
+        f.write("==============================\n")
+        f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"Total slides tested: {slide_number}\n")
+        f.write(f"Positions per slide: {len(slide_positions)}\n")
+        f.write(f"Droplet volume: {test_volume} µL\n\n")
+        f.write(f"Images captured: {len(results)}\n")
+        f.write("Images are stored in the experiment directory for further analysis.\n")
+    
+    print(f"Experiment summary saved to {summary_file}")
+    logger.info("Experiment completed successfully")
+
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
+    logger.error(f"Experiment failed: {e}", exc_info=True)
+
+finally:
+    # Cleanup
+    try:
+        # Release camera
+        if 'tools' in locals() and hasattr(tools, 'camera') and tools.camera.isOpened():
+            tools.camera.release()
+            logger.info("Camera released")
+        
+        # Disconnect from hardware
+        if 'tools' in locals() and hasattr(tools, 'mill'):
+            tools.mill.disconnect()
+            logger.info("Mill disconnected")
+        
+        print("Hardware disconnected. Script completed.")
+        logger.info("Cleanup completed")
+        
+    except Exception as cleanup_error:
+        print(f"Error during cleanup: {cleanup_error}")
+        logger.error(f"Cleanup error: {cleanup_error}", exc_info=True)
