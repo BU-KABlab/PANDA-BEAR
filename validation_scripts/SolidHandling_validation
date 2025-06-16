@@ -1,0 +1,292 @@
+"""
+Solid Handling Demonstration Protocol
+
+This script demonstrates solid handling capabilities including:
+- Multiple Arduino connections (light ring, electromagnet, linebreak sensor)
+- Decapping and capping operations
+- Precise mill movement (rectangular pattern)
+- Imaging with light control
+- Interaction with gel surfaces
+"""
+
+import time
+import logging
+from pathlib import Path
+from datetime import datetime
+
+# PANDA system imports
+from panda_lib.hardware import ArduinoLink, PandaMill
+from panda_lib.hardware.arduino_interface import PawduinoFunctions
+from panda_lib.toolkit import Toolkit
+from panda_lib.types import VialKwargs, Coordinates, WellKwargs
+from panda_lib.labware.vials import StockVial
+from panda_lib.labware.wellplates import WellplateKwargs, PlatePosition
+from panda_lib.actions.movement import decapping_sequence, capping_sequence
+
+# Set up logging
+logger = logging.getLogger("solid_handling_demo")
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Create output directory
+timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+output_dir = Path(f"solid_handling_demo_{timestamp}")
+output_dir.mkdir(exist_ok=True)
+
+# Create file handler
+file_handler = logging.FileHandler(output_dir / "solid_handling_demo.log")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+# Create console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+
+try:
+    # ===== HARDWARE SETUP =====
+    logger.info("Initializing hardware components...")
+    
+    # Initialize the mill
+    mill = PandaMill()
+    
+    
+    # Main Arduino 
+    arduino = ArduinoLink("/dev/ttyACM1", timeout=5.0)
+    
+    # Initialize camera
+    import cv2
+    camera = cv2.VideoCapture(0)
+    if not camera.isOpened():
+        raise RuntimeError("Error: Could not open camera")
+    
+    # Create toolkit
+    tools = Toolkit(
+        mill=mill,
+        arduino=arduino,
+        camera=camera,
+        global_logger=logger,
+    )
+    
+    logger.info("Successfully initialized hardware")
+    
+    # ===== LABWARE SETUP =====
+    
+    # Set up stock vial 1
+    vkwargs_stock = VialKwargs(
+        category=0,
+        name="Solid_Sample",
+        contents={"solid_particles": 5000},
+        viscosity_cp=None,  # Not applicable for solids
+        concentration=0.01,
+        density=1.2,
+        height=66,
+        radius=14,
+        volume=5000,
+        capacity=20000,
+        contamination=0,
+        coordinates={
+            "x": -22.0,
+            "y": -71.0,
+            "z": -195.0,
+        },
+        base_thickness=1,
+        dead_volume=0,
+    )
+    
+    stock_vial = StockVial(
+        position="s1", create_new=True, **vkwargs_stock
+    )
+    stock_vial.save()
+    
+    # Set up wellplate with gel
+    vkwargs_wellplate = WellplateKwargs(
+        name="gel_plate",
+        type_id="", #TODO: Find reference to wellplate types
+        position="p1",
+        a1_x= 0.0,
+        a1_y = 0.0,
+        orientation = 0,
+        rows= "ABCD",
+        cols= 3,
+        echem_height = 0.0,
+        image_height = 0.0,
+        coordinates= {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
+    
+    # Define well position for gel
+    well_pos = PlatePosition(
+        x=-100,  # Adjust as needed
+        y=-100,  # Adjust as needed
+        z=-40,   # Adjust as needed - gel surface
+        volume=0,
+        contents={},
+        plate=wellplate
+    )
+    
+    # ===== RECTANGULAR MOVEMENT PATTERN =====
+    # Define rectangular movement pattern (adjust as needed)
+    rect_pattern = [
+        {"x": 0, "y": 0},      # Starting point (relative to vial center)
+        {"x": 2, "y": 0},      # Right
+        {"x": 2, "y": 2},      # Up
+        {"x": 0, "y": 2},      # Left
+        {"x": 0, "y": 0}       # Back to start
+    ]
+    
+    # ===== EXECUTE PROTOCOL =====
+    logger.info("Beginning solid handling protocol")
+    
+    # Home the mill
+    logger.info("Homing mill...")
+    mill.connect_to_mill()
+    mill.homing_sequence()
+    mill.set_feed_rate(3000)  # Slower for solid handling
+    
+    # 1. Decap stock vial 1
+    logger.info("Decapping stock vial 1...")
+    decapping_sequence(
+        mill, 
+        Coordinates(stock_vial.coordinates.x, stock_vial.coordinates.y, stock_vial.top), 
+        arduino
+    )
+    
+    # 2. Move pipette to stock vial 1
+    logger.info("Moving pipette to stock vial 1...")
+    mill.move_to_position(
+        stock_vial.coordinates.x,
+        stock_vial.coordinates.y,
+        stock_vial.top,  # Position above vial # TODO: Adjust based on actual vial height
+        tool="pipette"
+    )
+    
+    # 3. Lower pipette into stock vial
+    logger.info("Lowering pipette into stock vial...")
+    mill.move_to_position(
+        stock_vial.coordinates.x,
+        stock_vial.coordinates.y,
+        stock_vial.bottom + 5,  # Slightly above bottom to avoid damage # TODO: Adjust based on actual vial height
+        tool="pipette"
+    )
+    
+    # 4. Move in rectangular pattern
+    logger.info("Executing rectangular movement pattern...")
+    base_x = stock_vial.coordinates.x
+    base_y = stock_vial.coordinates.y
+    base_z = stock_vial.bottom + 5 # TODO: Adjust based on actual vial height
+    
+    for point in rect_pattern:
+        target_x = base_x + point["x"]
+        target_y = base_y + point["y"]
+        logger.info(f"Moving to relative position: ({point['x']}, {point['y']})")
+        mill.move_to_position(target_x, target_y, base_z, tool="pipette")
+    
+    # 5. Raise pipette up
+    logger.info("Raising pipette...")
+    mill.move_to_position(
+        stock_vial.coordinates.x,
+        stock_vial.coordinates.y,
+        stock_vial.top - 10, #TODO: adjust based on vial height
+        tool="pipette"
+    )
+    
+    # 6. Cap the stock vial
+    logger.info("Capping stock vial 1...")
+    capping_sequence(
+        mill, 
+        Coordinates(stock_vial.coordinates.x, stock_vial.coordinates.y, stock_vial.top), 
+        arduino
+    )
+    
+    # 7. Move pipette to wellplate #TODO: Manually update coordinates
+    logger.info("Moving to wellplate position...")
+    mill.move_to_position(
+        well_pos.x,
+        well_pos.y,
+        well_pos.z + 20,  # Position above well
+        tool="pipette"
+    )
+    
+    # 8. Lower pipette to touch gel surface
+    logger.info("Lowering pipette to gel surface...")
+    mill.move_to_position(
+        well_pos.x,
+        well_pos.y,
+        well_pos.z,  # Gel surface level
+        tool="pipette"
+    )
+    
+    # Move pipette to safe position above gel
+    mill.move_to_safe_position()
+
+    # Move camera into position to take picture
+    mill.move_to_position(
+        well_pos.x,
+        well_pos.y,
+        well_pos.z + 50, #TODO: Adjust based on camera height
+        tool="camera"
+    )
+    
+    # 9. Turn on light ring
+    logger.info("Turning on light ring...")
+    try:
+        arduino.send(PawduinoFunctions.CMD_WHITE_ON)
+    except Exception as e:
+        logger.warning(f"Could not control light ring: {e}")
+        
+    # 10. Take picture
+    logger.info("Capturing image...")
+    image_path = output_dir / f"gel_well_image_{timestamp}.jpg"
+    
+    # Alternative: Capture sequence of images
+    fps = 1  # Frames per second
+    recording_duration = 5  # seconds
+
+    frame_sequence_dir = output_dir / "frame_sequence"
+    frame_sequence_dir.mkdir(exist_ok=True)
+
+    for i in range(fps * recording_duration):
+        ret, frame = camera.read()
+        if ret:
+            cv2.imwrite(str(frame_sequence_dir / f"frame_{i:04d}.jpg"), frame)
+        time.sleep(1/fps)  # Wait appropriate time between frames
+    
+    # 11. Turn off light ring
+    logger.info("Turning off light ring...")
+    try:
+        arduino.send(PawduinoFunctions.CMD_WHITE_OFF) 
+    except Exception as e:
+        logger.warning(f"Could not control light ring: {e}")
+        
+    # 12. Raise pipette to safe position
+    logger.info("Moving to safe position...")
+    mill.move_to_safe_position()
+    
+    # Protocol complete
+    logger.info("Solid handling protocol completed successfully")
+
+except Exception as e:
+    logger.error(f"Protocol failed: {e}", exc_info=True)
+    print(f"An error occurred: {e}")
+
+finally:
+    # Cleanup
+    try:
+        # Release camera
+        if 'camera' in locals() and camera.isOpened():
+            camera.release()
+            logger.info("Camera released")
+        
+        # Disconnect from hardware
+        if 'mill' in locals():
+            mill.disconnect()
+            logger.info("Mill disconnected")
+        
+        print("Hardware disconnected. Protocol completed.")
+        logger.info("Cleanup completed")
+        
+    except Exception as cleanup_error:
+        print(f"Error during cleanup: {cleanup_error}")
+        logger.error(f"Cleanup error: {cleanup_error}", exc_info=True)
