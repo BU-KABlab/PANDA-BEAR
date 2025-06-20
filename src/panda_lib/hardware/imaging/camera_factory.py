@@ -48,11 +48,11 @@ class CameraFactory:
         
         elif camera_type == CameraType.FLIR:
             # Import FlirCamera here to avoid circular imports
-            from .flir_camera import FlirCamera, PYSPIN_AVAILABLE
-            
-            if not PYSPIN_AVAILABLE:
-                logger.warning("PySpin not available, falling back to OpenCV camera")
-                return OpenCVCamera(**kwargs)
+            from .flir_camera import FlirCamera
+            #from .flir_camera import FlirCamera, PYSPIN_AVAILABLE
+            #if not PYSPIN_AVAILABLE:
+            #    logger.warning("PySpin not available, falling back to OpenCV camera")
+            #    return OpenCVCamera(**kwargs)
             
             logger.info("Creating FLIR camera")
             return FlirCamera(**kwargs)

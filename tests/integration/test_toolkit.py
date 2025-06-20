@@ -203,7 +203,7 @@ def test_delete_tool_empty_file(tmp_path):
         tool_manager.delete_tool("test_tool")
 
 
-def test_defualt_tool_offset(test_empty_json_file):
+def test_default_tool_offset(test_empty_json_file):
     tool_offset = ToolManager(test_empty_json_file)
     assert "center" in tool_offset.tool_offsets
     tool = tool_offset.tool_offsets["center"]

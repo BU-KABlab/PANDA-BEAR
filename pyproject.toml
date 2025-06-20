@@ -54,6 +54,7 @@ dependencies = [
     "pydantic_core==2.23.3",
     "pyparsing==3.1.4",
     "pyserial==3.5",
+    "pyserial-asyncio==0.6.0",
     "pytest>=8.3.4",
     "python-dateutil==2.9.0.post0",
     "python-dotenv==1.0.1",
@@ -80,6 +81,7 @@ dependencies = [
     "typing_extensions==4.12.2",
     "tzdata==2024.1",
     "uv>=0.6.4",
+    "simple-pyspin==0.1.1",
     "websocket-client==1.8.0",
 ]
 
@@ -87,7 +89,7 @@ dependencies = [
 "Homepage" = "https://github.com/BU-KABlab/PANDA-BEAR"
 "Bug Tracker" = "https://github.com/BU-KABlab/PANDA-BEAR/issues"
 [project.optional-dependencies]
-flir = []                                                              # Empty because PySpin is installed manually
+flir = ["simple-pyspin==0.1.1"]                           
 syringe_pump = ["nesp_lib>=0.2.0"]
 dev = ["pytest>=8.3.4", "ruff>=0.8.3", "mypy>=1.8.0", "black>=24.3.0"]
 
