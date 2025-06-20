@@ -100,7 +100,7 @@ def _pipette_action(
         toolkit.pipette.aspirate(repetition_vol, solution=src_vessel)
         time.sleep(3)  # Allow time for aspirate to complete
         toolkit.mill.move_to_safe_position()
-        #toolkit.pipette.drip_stop()
+        #toolkit.pipette.drip_stop() #TODO: add this as a separation function to the pipette.cpp that does not use the aspirate function
 
         if isinstance(src_vessel, StockVial):
             capping_sequence(
