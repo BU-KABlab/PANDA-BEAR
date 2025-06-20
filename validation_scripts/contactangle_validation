@@ -57,6 +57,26 @@ panda_lib.actions.pipetting.decapping_sequence = no_op_decap
 panda_lib.actions.pipetting.capping_sequence = no_op_cap
 logger.info("Successfully applied monkey patch to disable decapping/capping")
 
+class SlidePosition:
+    def __init__(self, name: str, x: float, y: float, z: float):
+        self.name = name
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def to_well_dict(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+            "volume": 0,
+            "contents": {},
+        }
+
+    def __repr__(self):
+        return f"SlidePosition(name={self.name}, x={self.x}, y={self.y}, z={self.z})"
+
+
 try:
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
     
@@ -75,16 +95,16 @@ try:
     )
     
     # Test if we can capture an image to verify FLIR camera functionality
-    test_img_path, success = capture_new_image(
-        save=True,
-        file_name="camera_test.tiff",
-        camera_type=CameraType.FLIR
-    )
-    if not success:
-        logger.error("Could not initialize FLIR camera. This experiment requires a FLIR camera.")
-        raise RuntimeError("Error: Could not open FLIR camera. This experiment requires a FLIR camera.")
-    else:
-        logger.info("Successfully initialized FLIR camera")
+    test_img_path = Path(experiment_dir) / "camera_test.tiff"
+    try:
+        image = tools.camera.capture_image()
+        tools.camera.save_image(image, test_img_path)
+        logger.info(f"Successfully saved camera test image to {test_img_path}")
+        success = True
+    except Exception as e:
+        logger.error(f"Error capturing image with FLIR camera: {e}")
+        success = False
+
     
     print("Successfully initialized toolkit")
     
@@ -96,11 +116,12 @@ try:
     
     # Define slide positions using mill coordinates
     slide_positions = [
-        {"name": "A", "x": -186.87, "y": -88.25, "z": -193.5},
-        {"name": "B", "x": -196.87, "y": -88.25, "z": -193.5},
-        {"name": "C", "x": -196.87, "y": -78.25, "z": -193.5},
-        {"name": "D", "x": -186.87, "y": -78.25, "z": -193.5}
+        SlidePosition("A", -186.87, -88.25, -193.5),
+        SlidePosition("B", -196.87, -88.25, -193.5),
+        SlidePosition("C", -196.87, -78.25, -193.5),
+        SlidePosition("D", -186.87, -78.25, -193.5),
     ]
+
     
     # Set up source vial (stock solution)
     vkwargs_src = VialKwargs(
@@ -157,6 +178,8 @@ try:
     # Home the mill
     logger.info("Connecting to mill and homing...")
     tools.mill.connect_to_mill()
+    if not tools.mill.ser_mill:
+        raise RuntimeError("Failed to connect to the mill.")
     tools.mill.homing_sequence()
     tools.mill.set_feed_rate(5000)
     
@@ -168,8 +191,8 @@ try:
     def capture_droplet_image(slide_num, position_idx):
         """Capture an image of the droplet on the slide using FLIR camera."""
         position = slide_positions[position_idx]
-        position_name = position["name"]
-        file_name = f"slide{slide_num}_pos{position_name}"
+        position.name = position["name"]
+        file_name = f"slide{slide_num}_pos{position.name}"
         image_path = Path(experiment_dir) / f"{file_name}.tiff"
         # Position camera above the droplet
         camera_x = position["x"] 
@@ -186,7 +209,7 @@ try:
         # Capture with FLIR camera
         logger.info("Capturing image with FLIR camera")
         try:
-            image_path, success = capture_new_image(
+            actual_path, success = capture_new_image(
                 save=True,
                 file_name=image_path,
                 camera_type=CameraType.FLIR
@@ -236,27 +259,17 @@ try:
         
         # For each position on the slide
         for pos_idx, position in enumerate(slide_positions):
-            position_name = position["name"]
-            print(f"\n--- Testing Position {position_name} ---")
-            logger.info(f"Testing slide {slide_number}, Position {position_name}")
+            print(f"\n--- Testing Position {position.name} ---")
+            logger.info(f"Testing slide {slide_number}, Position {position.name}")
             
             try:
-                # Create a position object for this location
-                well_pos = {
-                    "x": position["x"],
-                    "y": position["y"],
-                    "z": position["z"],
-                    "volume": 0,
-                    "contents": {}
-                }
-                
-                # Step 1: Dispense 10 µL droplet onto the slide
-                print(f"Dispensing {test_volume} µL onto slide position {position_name}...")
-                logger.info(f"Dispensing {test_volume} µL at Position {position_name}")
+                # Step 1: Dispense droplet
+                print(f"Dispensing {test_volume} µL onto slide position {position.name}...")
+                logger.info(f"Dispensing {test_volume} µL at Position {position.name}")
                 panda_lib.actions.transfer(
                     test_volume,
                     vial_src,
-                    well_pos,
+                    position.to_well_dict(),
                     toolkit=tools,
                 )
                 
@@ -273,34 +286,34 @@ try:
                     results.loc[row_index] = [
                         datetime.now().strftime("%Y-%m-%d_%H%M%S"),
                         slide_number,
-                        position_name,
+                        position.name,
                         str(image_path)
                     ]
                     row_index += 1
                 
                     # Add pause with prompt after image is captured and lights are off
-                    user_input = input(f"\nImage captured for slide {slide_number}, position {position_name}. Press Enter to aspirate the droplet and continue, or type 'skip' to leave the droplet: ")
+                    user_input = input(f"\nImage captured for slide {slide_number}, position {position.name}. Press Enter to aspirate the droplet and continue, or type 'skip' to leave the droplet: ")
                     
                     if user_input.lower() == 'skip':
-                        logger.info(f"User chose to skip aspiration for slide {slide_number}, position {position_name}")
-                        print(f"Skipping aspiration for position {position_name}")
+                        logger.info(f"User chose to skip aspiration for slide {slide_number}, position {position.name}")
+                        print(f"Skipping aspiration for position {position.name}")
                         continue
 
                 # Step 3: Aspirate the droplet and move it to waste
                 print("Aspirating droplet to waste...")
-                logger.info(f"Removing droplet from Position {position_name}")
+                logger.info(f"Removing droplet from Position {position.name}")
                 panda_lib.actions.transfer(
                     test_volume,
-                    well_pos,
+                    position.to_well_dict(),
                     vial_dest,
                     toolkit=tools,
                 )
                 
-                print(f"Completed test on slide {slide_number}, Position {position_name}")
+                print(f"Completed test on slide {slide_number}, Position {position.name}")
                 
             except Exception as e:
-                print(f"Error during contact angle test at Position {position_name}: {e}")
-                logger.error(f"Error at Position {position_name}: {e}", exc_info=True)
+                print(f"Error during contact angle test at Position {position.name}: {e}")
+                logger.error(f"Error at Position {position.name}: {e}", exc_info=True)
                 # Continue with next position
         
         # After all positions on this slide are complete
@@ -319,7 +332,8 @@ try:
     
     # Save final results to CSV
     results_file = f"{experiment_dir}/contact_angle_results.csv"
-    results.to_csv(results_file, index=False)
+    if not results.empty:
+        results.to_csv(results_file, index=False)
     print(f"\nResults saved to {results_file}")
     logger.info(f"Final results saved to {results_file}")
     
@@ -355,9 +369,12 @@ finally:
                 except Exception as e:
                     logger.warning(f"Error while turning off lights during cleanup: {e}")
             # Disconnect mill
-            if hasattr(tools, 'mill'):
-                tools.mill.disconnect()
-                logger.info("Mill disconnected")
+            try:
+                if tools.mill:
+                    tools.mill.disconnect()
+            except Exception as e:
+                logger.error(f"Cleanup error: {e}")
+
             # Close Arduino connection LAST (after using it to turn off lights)
             if hasattr(tools, 'arduino'):
                 tools.arduino.close()
