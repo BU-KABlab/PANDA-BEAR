@@ -1,5 +1,5 @@
 """
-Requires the PySpin library to be installed and run in a python <=3.10 environment.
+Requires the simple_pyspin library to be installed and run in a python <=3.10 environment.
 This script is used to capture images from the FLIR camera.
 """
 

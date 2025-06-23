@@ -2,25 +2,22 @@
 """
 FLIR camera implementation using PySpin.
 This module provides a wrapper around the PySpin library for FLIR cameras.
-Due to Python versioning issues, it uses `simple_pyspin` as a drop-in replacement for PySpin.
 """
 
-import simple_pyspin as PySpin
 import logging
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
 from .interface import CameraInterface
-from .flir_camera_tools import file_enumeration
-#from .flir_camera_tools import file_enumeration, run_single_camera
+from .flir_camera_tools import file_enumeration, run_single_camera
 
 # Try to import PySpin, but make it optional
-#try:
-    # import PySpin # PySpin only works with Python <=3.10
-#    import simple_pyspin as PySpin
-#    PYSPIN_AVAILABLE = True
-#except ImportError:
-#    PYSPIN_AVAILABLE = False
+try:
+    import PySpin # PySpin only works with Python <=3.10
+    
+    PYSPIN_AVAILABLE = True
+except ImportError:
+    PYSPIN_AVAILABLE = False
 
 
 class FlirCamera(CameraInterface):
@@ -47,11 +44,13 @@ class FlirCamera(CameraInterface):
             ImportError: If PySpin is not available
         """
         if not PYSPIN_AVAILABLE:
-            raise ImportError("simple-pyspin is required for FLIR camera support")
+            raise ImportError("PySpin library is required for FLIR camera support")
         
         self.camera_id = camera_id
         self.logger = logging.getLogger("panda.flir_camera")
-        self.cam = None
+        self.system = None
+        self.camera_list = None
+        self.camera = None
         self.connected = False
     
     def connect(self) -> bool:
@@ -61,30 +60,32 @@ class FlirCamera(CameraInterface):
             bool: True if connection successful, False otherwise
         """
         if not PYSPIN_AVAILABLE:
-            self.logger.error("simple-pyspin not available")
+            self.logger.error("PySpin library not available")
             return False
         
         try:
-            cam_list = PySpin.list_cameras()
+            # Initialize PySpin system
+            self.system = PySpin.System.GetInstance()
+            self.camera_list = self.system.GetCameras()
             
-            if len(cam_list) == 0:
+            if self.camera_list.GetSize() == 0:
                 self.logger.error("No FLIR cameras found")
                 return False
             
             # Get the specified camera (or first one if index out of range)
-            if self.camera_id < len(cam_list):
-                self.cam = cam_list[self.camera_id]
+            if self.camera_id < self.camera_list.GetSize():
+                self.camera = self.camera_list[self.camera_id]
             else:
                 self.logger.warning(f"Camera ID {self.camera_id} out of range, using first camera")
-                self.cam = cam_list[0]
+                self.camera = self.camera_list[0]
             
             # Initialize the camera
-            self.cam.init()
+            self.camera.Init()
             self.connected = True
             self.logger.info(f"Connected to FLIR camera ID {self.camera_id}")
             return True
             
-        except Exception as ex:
+        except PySpin.SpinnakerException as ex:
             self.logger.error(f"Error connecting to FLIR camera: {ex}")
             return False
     
@@ -94,14 +95,22 @@ class FlirCamera(CameraInterface):
             return
         
         try:
-            if self.cam is not None:
-                self.cam.close()
-                self.cam = None
+            if self.camera is not None:
+                self.camera.DeInit()
+                self.camera = None
+            
+            if self.camera_list is not None:
+                self.camera_list.Clear()
+                self.camera_list = None
+            
+            if self.system is not None:
+                self.system.ReleaseInstance()
+                self.system = None
             
             self.connected = False
             self.logger.info("Disconnected from FLIR camera")
             
-        except Exception as ex:
+        except PySpin.SpinnakerException as ex:
             self.logger.error(f"Error disconnecting from FLIR camera: {ex}")
     
     def is_connected(self) -> bool:
@@ -110,9 +119,9 @@ class FlirCamera(CameraInterface):
         Returns:
             bool: True if connected, False otherwise
         """
-        return self.connected and self.cam is not None
+        return self.connected and self.camera is not None
     
-    def capture_image(self) -> Optional['PySpin.Image']:
+    def capture_image(self) -> Optional[PySpin.ImagePtr]:
         """Capture a single image from the FLIR camera
         
         Returns:
@@ -124,21 +133,29 @@ class FlirCamera(CameraInterface):
         
         try:
             # Begin acquisition
-            self.cam.start()
+            self.camera.BeginAcquisition()
             
             # Get the image
-            image = self.cam.get_image()
+            image_result = self.camera.GetNextImage(1000)
+            
+            # Check if the image is complete
+            if image_result.IsIncomplete():
+                self.logger.error(f"Image incomplete with status {image_result.GetImageStatus()}")
+                image_result.Release()
+                self.camera.EndAcquisition()
+                return None
             
             # End acquisition
-            self.cam.stop()
+            self.camera.EndAcquisition()
             
-            return image
+            return image_result
             
-        except Exception as ex:
+        except PySpin.SpinnakerException as ex:
             self.logger.error(f"Error capturing image from FLIR camera: {ex}")
+            self.camera.EndAcquisition()
             return None
     
-    def save_image(self, image: 'PySpin.Image', path: Union[str, Path]) -> bool:
+    def save_image(self, image: PySpin.ImagePtr, path: Union[str, Path]) -> bool:
         """Save an image to disk
         
         Args:
@@ -149,7 +166,7 @@ class FlirCamera(CameraInterface):
             bool: True if successful, False otherwise
         """
         if not PYSPIN_AVAILABLE:
-            self.logger.error("simple-pyspin not available")
+            self.logger.error("PySpin library not available")
             return False
         
         try:
@@ -158,16 +175,20 @@ class FlirCamera(CameraInterface):
             # Make sure the directory exists
             path.parent.mkdir(parents=True, exist_ok=True)
             
+            # Convert the image to RGB8
+            processor = PySpin.ImageProcessor()
+            image_converted = processor.Convert(image, PySpin.PixelFormat_RGB8)
+            
             # Save the image
-            image.save(str(path))
+            image_converted.Save(str(path))
             
             # Release the image
-            image.release()
+            image.Release()
             
             self.logger.info(f"Image saved to {path}")
             return True
             
-        except Exception as ex:
+        except PySpin.SpinnakerException as ex:
             self.logger.error(f"Error saving image from FLIR camera: {ex}")
             return False
     
@@ -181,7 +202,7 @@ class FlirCamera(CameraInterface):
             Tuple[Path, bool]: The path of the saved image and a boolean indicating success
         """
         if not PYSPIN_AVAILABLE:
-            self.logger.error("simple-pyspin not available")
+            self.logger.error("PySpin library not available")
             return Path(path), False
         
         path = Path(path) if isinstance(path, str) else path
@@ -189,13 +210,14 @@ class FlirCamera(CameraInterface):
         # Check the file name and enumerate if it already exists
         path = file_enumeration(path)
         
-        if not self.is_connected():
-            self.logger.error("Cannot capture image: Camera not connected")
-            return path, False
-        
-        image = self.capture_image()
-        if image is not None:
-            success = self.save_image(image, path)
-            return path, success
-        else:
+        try:
+            # Instead of using our own implementation, use the existing run_single_camera function
+            if self.is_connected():
+                result = run_single_camera(self.camera, image_path=path, num_images=1)
+                return path, result
+            else:
+                self.logger.error("Cannot capture image: Camera not connected")
+                return path, False
+        except Exception as e:
+            self.logger.error(f"Error in capture_and_save: {e}")
             return path, False
