@@ -45,7 +45,7 @@ if TESTING:
             cv_parameters,
             potentiostat_ocp_parameters,
         )
-    
+
     else:
         raise ValueError(
             f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
@@ -57,7 +57,7 @@ else:
                 "Gamry potentiostat is not supported on non-Windows systems.\n Reverting to mock implementation."
             )
             from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
-            GamryPotentiostat as echem,
+                GamryPotentiostat as echem,
             )
             from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
                 chrono_parameters,
@@ -147,9 +147,7 @@ def open_circuit_potential(
                 "test",
             )
         pstat.OCP(
-            potentiostat_ocp_parameters.OCPvi,
-            potentiostat_ocp_parameters.OCPti,
-            potentiostat_ocp_parameters.OCPrate,
+            potentiostat_ocp_parameters
         )  # OCP
         pstat.activecheck()
         ocp_pass, ocp_final_voltage = pstat.check_vf_range(base_filename)
@@ -293,9 +291,7 @@ def perform_chronoamperometry(
         )
         ca_results = experiment.results
         pstat.OCP(
-            potentiostat_ocp_parameters.OCPvi,
-            potentiostat_ocp_parameters.OCPti,
-            potentiostat_ocp_parameters.OCPrate,
+            potentiostat_ocp_parameters,
         )  # OCP
         pstat.activecheck()
         ocp_dep_pass, ocp_char_final_voltage = pstat.check_vf_range(base_filename)
@@ -424,11 +420,7 @@ def pulsed_chronoamperometry(
             experiment.well_id,
         )
         ca_results = experiment.results
-        pstat.OCP(
-            potentiostat_ocp_parameters.OCPvi,
-            potentiostat_ocp_parameters.OCPti,
-            potentiostat_ocp_parameters.OCPrate,
-        )  # OCP
+        pstat.OCP(potentiostat_ocp_parameters)  # OCP
         pstat.activecheck()
         ocp_dep_pass, ocp_char_final_voltage = pstat.check_vf_range(base_filename)
         ca_results.set_ocp_ca_file(
@@ -479,11 +471,10 @@ def pulsed_chronoamperometry(
                 ca_results.set_ca_data_file(deposition_data_file, context=file_tag)
 
                 # OCV
-                pstat.OCP(
-                    potentiostat_ocp_parameters.OCPvi,
-                    pause_time,
-                    potentiostat_ocp_parameters.OCPrate,
-                )
+                ocp_params = potentiostat_ocp_parameters
+                ocp_params.ttot = pause_time
+
+                pstat.OCP(ocp_params)
                 pstat.activecheck()
                 ca_results.set_ocp_ca_file(base_filename, True, 0.0, file_tag)
 
@@ -563,9 +554,7 @@ def perform_cyclic_voltammetry(
 
         try:
             pstat.OCP(
-                OCPvi=potentiostat_ocp_parameters.OCPvi,
-                OCPti=potentiostat_ocp_parameters.OCPti,
-                OCPrate=potentiostat_ocp_parameters.OCPrate,
+                potentiostat_ocp_parameters,
             )  # OCP
             pstat.activecheck()
 
