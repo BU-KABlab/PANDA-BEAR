@@ -49,6 +49,7 @@ dependencies = [
     "pandas==2.2.2",
     "pillow==10.4.0",
     "pip>=24.3.1",
+    "pre-commit>=4.2.0",
     "PuLP==2.9.0",
     "pydantic==2.9.1",
     "pydantic_core==2.23.3",

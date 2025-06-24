@@ -5,7 +5,7 @@ import pytest
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from panda_lib.errors import OverDraftException, OverFillException
+from panda_lib.exceptions import OverDraftException, OverFillException
 from panda_lib.labware.wellplates import (
     Well,
     Wellplate,

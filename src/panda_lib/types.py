@@ -35,7 +35,7 @@ class WellKwargs(TypedDict, total=False):
         dead_volume (float): Dead volume in the well
         contents (Dict[str, float]): Chemical contents in the well
         coordinates (Dict[str, float]): Coordinates of the well
-    
+
     """
 
     name: str

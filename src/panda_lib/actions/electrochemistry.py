@@ -12,8 +12,9 @@ from panda_shared.config.config_tools import (
 
 config = read_config()
 TESTING = read_testing_config()
+PSTAT = config.get("POTENTIOSTAT", "model", fallback="gamry")
 
-from ..errors import (  # noqa: E402
+from ..exceptions import (  # noqa: E402
     CAFailure,
     CVFailure,
     DepositionFailure,
@@ -27,22 +28,56 @@ from ..experiments.experiment_types import (  # noqa: E402
 from ..labware.wellplates import Well  # noqa: E402
 from ..toolkit import Toolkit  # noqa: E402
 
-if TESTING or os.name != "nt":
-    from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
-        GamryPotentiostat as echem,
-    )
-    from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
-        chrono_parameters,
-        cv_parameters,
-        potentiostat_ocp_parameters,
-    )
+if TESTING:
+    if PSTAT == "gamry":
+        from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+            GamryPotentiostat as echem,
+        )
+        from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+            chrono_parameters,
+            cv_parameters,
+            potentiostat_ocp_parameters,
+        )
+    elif PSTAT == "emstat":
+        from panda_lib.hardware.emstat_potentiostat.emstat_control_mock import (
+            echem,
+            chrono_parameters,
+            cv_parameters,
+            potentiostat_ocp_parameters,
+        )
+    
+    else:
+        raise ValueError(
+            f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+        )
 else:
-    import panda_lib.hardware.gamry_potentiostat.gamry_control as echem
-    from panda_lib.hardware.gamry_potentiostat.gamry_control import (
-        chrono_parameters,
-        cv_parameters,
-        potentiostat_ocp_parameters,
-    )
+    if PSTAT == "gamry":
+        if os.name != "nt":
+            print(
+                "Gamry potentiostat is not supported on non-Windows systems.\n Reverting to mock implementation."
+            )
+            from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+            GamryPotentiostat as echem,
+            )
+            from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+                chrono_parameters,
+                cv_parameters,
+                potentiostat_ocp_parameters,
+            )
+        else:
+            import panda_lib.hardware.gamry_potentiostat.gamry_control as echem
+            from panda_lib.hardware.gamry_potentiostat.gamry_control import (
+                chrono_parameters,
+                cv_parameters,
+                potentiostat_ocp_parameters,
+            )
+    elif PSTAT == "emstat":
+        import panda_lib.hardware.emstat_potentiostat.emstat_control as echem
+        from panda_lib.hardware.emstat_potentiostat.emstat_control import (
+            chrono_parameters,
+            cv_parameters,
+            potentiostat_ocp_parameters,
+        )
 
 
 # Constants

@@ -10,7 +10,7 @@ from panda_shared.config.config_tools import (
 )
 from panda_shared.db_setup import SessionLocal
 
-from ..errors import (
+from ..exceptions import (
     NoAvailableSolution,
 )
 from ..labware import StockVial, Vial, WasteVial, Well, read_vials

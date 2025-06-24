@@ -69,7 +69,7 @@ baudrate = 9600
 timeout = 10
 
 [CAMERA]
-camera_type = FLIR 
+camera_type = webcam 
 webcam_id = 0  
 webcam_resolution_width = 1280
 webcam_resolution_height = 720
@@ -85,7 +85,7 @@ port =
 firmware_path =
 
 [PIPETTE]
-pipette_type = WPI
+pipette_type = OT2
 
 
 [TOOLS]

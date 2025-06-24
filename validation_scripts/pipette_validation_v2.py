@@ -46,69 +46,11 @@ movement.capping_sequence(None, None, None)    # Should print the "SKIPPED" mess
 # Continue with your imports
 from panda_lib.hardware import ArduinoLink, PandaMill
 from panda_lib.hardware.panda_pipettes import Pipette, insert_new_pipette
+from panda_lib.labware.vials import StockVial, WasteVial
 from panda_lib.toolkit import Toolkit
 from panda_lib.hardware import Scale
 from panda_lib.types import VialKwargs
-from panda_lib.labware.vials import StockVial, WasteVial
 
-
-try:
-    print(f"Initializing Arduino on {'/dev/ttyACM1'}")
-    print(f"Initializing Scale on {'/dev/ttyACM0'}")
-    
-    insert_new_pipette(capacity=300)
-    tools = Toolkit(
-        mill=PandaMill(),
-        arduino=ArduinoLink("/dev/ttyACM1"),
-        scale=Scale("/dev/ttyACM0"),
-        global_logger=logger,
-    )
-    
-    print("Successfully initialized toolkit")
-    
-    try:
-        tools.pipette = Pipette(arduino=tools.arduino)
-        print("Successfully initialized pipette")
-    except Exception as e:
-        print(f"Error initializing pipette: {e}")
-        print("Continuing without pipette functionality")
-
-    
-    tools.pipette = Pipette(arduino=tools.arduino)
-    print("Successfully initialized pipette")
-
-    # Number of iterations to run
-    reps_per_volume = 10
-    #volumes_to_test = [100,150]
-    #volumes_to_test = [2, 3, 4, 5, 7, 9, 11, 15, 19, 25, 32, 42, 54, 70, 90, 100]
-    volumes_to_test = [2, 3, 4, 5, 7, 9, 11, 15, 19, 25, 32, 42, 54, 70, 90, 116, 149, 192, 200]
-    
-    
-    readings = pd.DataFrame(columns=["Timestamp","Reading"])
-    vkwargs_src = VialKwargs(
-            category=0,
-            name="H20",
-            contents={"H20": 20000},
-            viscosity_cp=1,
-            concentration=0.01,
-            density=1,
-            height=66,
-            radius=14,
-            volume=20000,
-            capacity=20000,
-            contamination=0,
-            coordinates={
-                "x": -22.0,
-                "y": -71.0,
-                "z": -195.0,
-            },  # TODO verify vial coordinates
-            base_thickness=1,
-            dead_volume=1000,
-        )
-    vial_src = StockVial(
-        position="s1", create_new=True, **vkwargs_src
-    )
-    vial_src.save()
 
     vial_kwargs_dest = VialKwargs(
         category=1,
@@ -130,7 +72,6 @@ try:
         base_thickness=1,
         dead_volume=1000,
     )
-
     vial_dest = WasteVial(
         position="w1", create_new=True, **vial_kwargs_dest
     )

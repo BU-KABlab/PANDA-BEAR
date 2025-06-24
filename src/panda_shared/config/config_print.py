@@ -16,17 +16,6 @@ if os.environ.get("DOTENV_LOADED") != "True":
             "\nPANDA_SDL_CONFIG_PATH=path/to/config.ini\nTEMP_DB='0'"
         )
         exit()
-        # make_for_user = input("Create a new .env file? (y/n): ")
-        # if make_for_user.lower() == "y":
-        #     with open(".env", "w") as f:
-        #         f.write("PANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\n")
-        #         f.write("# Temp DB for pytest\nTEMP_DB='0'\n")
-
-        # else:
-        # raise FileNotFoundError(
-        #     "No .env file found. Please create one with the required environment variables:"
-        #     "\nPANDA_SDL_CONFIG_PATH=./panda_lib/config/config.ini\nTEMP_DB='0'"
-        # )
 
 
 from .config_tools import exit_on_error, is_testing_mode  # noqa: E402

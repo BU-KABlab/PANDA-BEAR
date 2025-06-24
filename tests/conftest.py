@@ -71,19 +71,35 @@ def temp_test_db():
         Vials,
         WellModel,
     )
-    # Toggle using the temp db in the config
 
-    # Create an in-memory SQLite database
+    # Set temp db flag in environment
+    os.environ["TEMP_DB"] = "1"
+
+    # Delete any existing temp.db file before starting
+    if os.path.exists("temp.db"):
+        try:
+            os.remove("temp.db")
+            print("Removed existing temp.db file")
+        except (PermissionError, OSError) as e:
+            print(f"Warning: Could not remove existing temp.db file: {e}")
+
+    # Create an SQLite database (file-based instead of in-memory for debugging)
     engine = create_engine("sqlite:///temp.db", echo=False)
     TestingSessionLocal = sessionmaker(bind=engine)
+
+    # Make sure we're starting with a clean slate
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
-    # Patch the SessionLocal globally
-    global SessionLocal
-    SessionLocal = TestingSessionLocal
+    # Store original SessionLocal to restore later
+    original_SessionLocal = globals().get("SessionLocal", None)
 
-    # Verify we are using the in-memory database
+    # Patch the SessionLocal globally
+    globals()["SessionLocal"] = TestingSessionLocal
+
+    print(f"Created temp database at {os.path.abspath('temp.db')}")
+
+    # Verify we are using the temp database
     if engine.url.database != "temp.db":
         raise Exception("Not using temp database")
 
@@ -233,7 +249,7 @@ def temp_test_db():
             ),
         ]
 
-        with SessionLocal() as session:
+        with TestingSessionLocal() as session:
             session.execute(text("DELETE FROM panda_wellplate_types"))
             session.commit()
             for plate_type in plate_types_data:
@@ -339,7 +355,7 @@ def temp_test_db():
             ),
         ]
 
-        with SessionLocal() as sesh:
+        with TestingSessionLocal() as sesh:
             for pipette in pipette_data:
                 sesh.add(
                     PipetteModel(
@@ -359,7 +375,7 @@ def temp_test_db():
 
         # Add a wellplate of type 1, type 1, to the database
         plate = Wellplate(
-            session_maker=SessionLocal,
+            session_maker=TestingSessionLocal,
             plate_id=1,
             create_new=True,
             name="Test Plate",
@@ -373,7 +389,7 @@ def temp_test_db():
         )
         plate.activate_plate()
 
-        with SessionLocal() as sesh:
+        with TestingSessionLocal() as sesh:
             vials = [
                 VialWriteModel(
                     position="s2",
@@ -472,15 +488,28 @@ def temp_test_db():
             sesh.add(WellModel(**well.model_dump()))
             sesh.commit()
 
-        yield  # Allow tests to run
+        globals()["SessionLocal"] = TestingSessionLocal
+        # Ensure database is ready before yielding
+        with TestingSessionLocal() as session:
+            # Simple query to test database is ready
+            count = session.execute(
+                text("SELECT COUNT(*) FROM panda_wellplate_types")
+            ).scalar()
+            print(f"Database initialized with {count} plate types")
+            if count == 0:
+                raise Exception("Database not initialized correctly")
+
+        yield TestingSessionLocal  # Allow tests to run
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error setting up temp database: {e}")
         raise e
 
     finally:
-        # Drop all tables and views
-        if engine.url.database == "temp.db":
+        print("Cleaning up temp database...")
+
+        # Drop all tables and views first
+        try:
             Base.metadata.drop_all(bind=engine)
             with engine.connect() as connection:
                 views = [
@@ -491,26 +520,50 @@ def temp_test_db():
                 ]
                 for view in views:
                     connection.execute(text(f"DROP VIEW IF EXISTS {view};"))
-        else:
-            raise Exception("Not using in-memory database")
+                connection.commit()
+        except Exception as e:
+            print(f"Warning: Error dropping tables/views: {e}")
 
-        # Toggle using the temp db in the config
+        # Reset the original Session
+        if original_SessionLocal is not None:
+            globals()["SessionLocal"] = original_SessionLocal
+        else:
+            globals().pop("SessionLocal", None)
+
+        # Close all connections and dispose engine properly
+        try:
+            close_all_sessions()
+            engine.dispose()
+            print("All database sessions closed and engine disposed")
+        except Exception as e:
+            print(f"Warning: Error closing sessions: {e}")
+
+        # Unset temp db flag
         os.environ["TEMP_DB"] = "0"
 
-        close_all_sessions()
-        engine.dispose()
-        SessionLocal = None
-        del SessionLocal
-
         # Ensure all connections are closed before deleting the file
+        import gc
         import time
 
+        # Run garbage collection to help release file handles
+        gc.collect()
+
         # Wait a moment for connections to close
-        time.sleep(5)
-        try:
-            os.remove("temp.db")
-        except PermissionError:
-            print("Failed to delete temp.db, file is in use.")
+        time.sleep(1)
+
+        # Delete the database file
+        for _ in range(3):  # Try multiple times
+            try:
+                if os.path.exists("temp.db"):
+                    os.remove("temp.db")
+                    print("Successfully deleted temp.db")
+                break
+            except (PermissionError, OSError) as e:
+                print(f"Attempt to delete temp.db failed: {e}")
+                time.sleep(2)  # Wait longer and try again
+                gc.collect()
+        else:
+            print("Warning: Failed to delete temp.db after multiple attempts")
 
 
 @pytest.fixture

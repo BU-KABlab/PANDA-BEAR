@@ -2,7 +2,7 @@
 
 from typing import Tuple
 
-from panda_lib.errors import (
+from panda_lib.exceptions import (
     CAFailure,
     CVFailure,
     DepositionFailure,

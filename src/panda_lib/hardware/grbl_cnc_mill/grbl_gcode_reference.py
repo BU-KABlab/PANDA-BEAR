@@ -68,7 +68,6 @@ grbl_non_gcode_commands = {
     "?": "Status report query",
     "~": "Cycle Start/Resume from Feed Hold, Door or Program pause",
     "!": "Feed Hold – Stop all motion",
-    
 }
 
 # Dictionary of GRBL error codes with their descriptions
@@ -143,7 +142,7 @@ grbl_settings = {
     131: "Y Max travel, mm Only for Homing and Soft Limits.",
     132: "Z Max travel, mm Only for Homing and Soft Limits.",
     133: "A Max travel, ° Only for Homing and Soft Limits.",
-    }
+}
 
 
 def get_command_description(command):
@@ -166,7 +165,7 @@ def get_command_description(command):
         # Extract the command key (e.g., $x) and value (e.g., val)
         # Split the command by '=' and get the first part as the command key
         # and the second part as the value
-        
+
         command_key, value = command.split("=")
         command_key = command_key.strip()
         value = value.strip()

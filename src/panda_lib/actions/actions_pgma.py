@@ -8,7 +8,7 @@ from panda_lib.actions.electrochemistry import (
     logger,
     perform_cyclic_voltammetry,
 )
-from panda_lib.errors import (
+from panda_lib.exceptions import (
     CVFailure,
     OCPError,
 )
