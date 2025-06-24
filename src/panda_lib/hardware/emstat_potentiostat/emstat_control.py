@@ -18,7 +18,17 @@ logger = logging.getLogger("panda")
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class OCPParameters:
+class potentiostat_ocp_parameters:
+    """Parameters for Open Circuit Potential (OCP) experiment.
+    This class defines the parameters needed to run an OCP experiment
+    on the EmStat Pico potentiostat.
+
+    Attributes:
+        ttot (float): Total time for the experiment in seconds.
+        dt (float): Time increment in seconds.
+        fileName (str): Base file name for data file.
+        header (str): Header for data file."""
+
     ttot: float = 1  # s, total time
     dt: float = 0.01  # s, time increment
     fileName: str = "OCP"  # base file name for data file
@@ -26,7 +36,25 @@ class OCPParameters:
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class CVParameters:
+class cv_parameters:
+    """Parameters for Cyclic Voltammetry experiment.
+    This class defines the parameters needed to run a cyclic voltammetry experiment
+    on the EmStat Pico potentiostat.
+
+    Attributes:
+        Eini (float): Initial potential in volts.
+        Ev1 (float): First vertex potential in volts.
+        Ev2 (float): Second vertex potential in volts.
+        Efin (float): Final potential in volts.
+        sr (float): Scan rate in V/s.
+        dE (float): Potential increment in volts.
+        nSweeps (int): Number of sweeps.
+        sens (float): Current sensitivity in A/V.
+        E2 (float): Potential of the second working electrode in volts.
+        sens2 (float): Current sensitivity of the second working electrode in A/V.
+        fileName (str): Base file name for data file.
+        header (str): Header for data file."""
+
     Eini: float = -0.5  # V, initial potential
     Ev1: float = 0.5  # V, first vertex potential
     Ev2: float = -0.5  # V, second vertex potential
@@ -42,7 +70,22 @@ class CVParameters:
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class CAParameters:
+class chrono_parameters:
+    """Parameters for Chronoamperometry experiment.
+
+    This class defines the parameters needed to run a chronoamperometry experiment
+    on the EmStat Pico potentiostat.
+
+    Attributes:
+        Estep (float): Step potential in volts.
+        dt (float): Time increment in seconds.
+        ttot (float): Total time for the experiment in seconds.
+        sens (float): Current sensitivity in A/V.
+        E2 (float): Potential of the second working electrode in volts.
+        sens2 (float): Current sensitivity of the second working electrode in A/V.
+        fileName (str): Base file name for the data file.
+        header (str): Header for the data file."""
+
     Estep: float = 0.5  # V, step potential
     dt: float = 0.01  # s, time increment
     ttot: float = 1  # s, total time
@@ -74,7 +117,7 @@ def validate_file_name(file_name: str) -> str:
 # =====================
 
 
-def OCP(params: OCPParameters):
+def OCP(params: potentiostat_ocp_parameters):
     """Run OCP experiment on EmStat Pico."""
     model = "emstatpico"
     folder = read_data_dir()
@@ -87,7 +130,7 @@ def OCP(params: OCPParameters):
     save_in_gamry_format(data, COMPLETE_FILE_NAME, params.header)
 
 
-def cyclic(params: CVParameters):
+def cyclic(params: cv_parameters):
     """Run CV experiment on EmStat Pico."""
     model = "emstatpico"
     folder = read_data_dir()
@@ -113,7 +156,7 @@ def cyclic(params: CVParameters):
     save_in_gamry_format(data, COMPLETE_FILE_NAME, params.header)
 
 
-def chrono(params: CAParameters):
+def chrono(params: chrono_parameters):
     """Run CA experiment on EmStat Pico."""
     model = "emstatpico"
     folder = read_data_dir()
