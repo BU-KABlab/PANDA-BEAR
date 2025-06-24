@@ -25,9 +25,7 @@ class CameraFactory:
     """Factory for creating camera instances"""
 
     @staticmethod
-    def create_camera(
-        camera_type: Union[str, CameraType] = CameraType.OPENCV, **kwargs
-    ) -> Optional[CameraInterface]:
+    def create_camera(camera_type: Union[str, CameraType] = CameraType.FLIR, **kwargs) -> Optional[CameraInterface]:
         """Create a camera instance based on camera type
 
         Args:
@@ -56,6 +54,7 @@ class CameraFactory:
             if not PYSPIN_AVAILABLE:
                 logger.warning("PySpin not available, falling back to OpenCV camera")
                 return OpenCVCamera(**kwargs)
+
 
             logger.info("Creating FLIR camera")
             return FlirCamera(**kwargs)

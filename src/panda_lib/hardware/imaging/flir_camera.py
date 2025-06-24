@@ -14,7 +14,6 @@ from .flir_camera_tools import file_enumeration, run_single_camera
 # Try to import PySpin, but make it optional
 try:
     import PySpin
-
     PYSPIN_AVAILABLE = True
 except ImportError:
     PYSPIN_AVAILABLE = False

@@ -1,0 +1,21 @@
+command,x,y,z,tool,feed_rate,notes
+homing,0,0,0,None,None,Homing sequence
+set_feed_rate,None,None,None,None,3000,Set feed rate
+safe_move,-18.5,-45.5,-128.0,decapper,None,None
+move_to_position,-18.5,-45.5,0,decapper,None,None
+safe_move,-18.5,-45.5,None,pipette,None,None
+safe_move,-18.5,-45.5,-179.0,pipette,None,None
+move_to_position,-18.5,-45.5,-179.0,pipette,None,None
+move_to_position,-16.5,-45.5,-179.0,pipette,None,None
+move_to_position,-16.5,-43.5,-179.0,pipette,None,None
+move_to_position,-18.5,-43.5,-179.0,pipette,None,None
+move_to_position,-18.5,-45.5,-179.0,pipette,None,None
+move_to_position,-18.5,-45.5,0,pipette,None,None
+capping,-18.5,-45.5,-128.0,decapper,None,Start capping sequence
+safe_move,-18.5,-45.5,-128.0,decapper,None,None
+move_to_position,-18.5,-45.5,0,decapper,None,None
+move_to_position,-167,-50,0,pipette,None,None
+move_to_position,None,None,-91,None,None,None
+move_to_safe_position,0,0,0,None,None,Moving to safe position
+move_to_position,-167,-50,None,camera,None,None
+move_to_safe_position,0,0,0,None,None,Moving to safe position

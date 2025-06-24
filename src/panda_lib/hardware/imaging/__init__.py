@@ -34,7 +34,7 @@ def capture_new_image(
     num_images=1,
     file_name: Union[str, Path] = Path("images/test.tiff"),
     logger: Optional[Logger] = default_logger,
-    camera_type: Union[str, CameraType] = CameraType.OPENCV,
+    camera_type: Union[str, CameraType] = CameraType.FLIR,
     camera_id: int = 0,
 ) -> Tuple[Path, bool]:
     """Capture a new image from a camera

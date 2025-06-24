@@ -14,7 +14,7 @@ from .interface import CameraInterface
 
 # Check if PySpin is available
 try:
-    import PySpin
+    import PySpin 
 
     PYSPIN_AVAILABLE = True
 except ImportError:

@@ -1,8 +1,8 @@
 import logging
 import math
 from typing import Optional, Union
-
-from panda_lib.exceptions import NoAvailableSolution
+import time
+from panda_lib.errors import NoAvailableSolution
 from panda_lib.hardware.grbl_cnc_mill import Instruments
 from panda_shared.config.config_tools import (
     ConfigParserError,
@@ -91,6 +91,7 @@ def _pipette_action(
             )
 
         toolkit.pipette.prime()
+        # Use standard interface for aspirate
         toolkit.mill.safe_move(
             src_vessel.x,
             src_vessel.y,
@@ -98,8 +99,9 @@ def _pipette_action(
             tool=Instruments.PIPETTE,
         )
         toolkit.pipette.aspirate(repetition_vol, solution=src_vessel)
+        time.sleep(3)  # Allow time for aspirate to complete
         toolkit.mill.move_to_safe_position()
-        toolkit.pipette.drip_stop()
+        #toolkit.pipette.drip_stop() #TODO: add this as a separation function to the pipette.cpp that does not use the aspirate function
 
         if isinstance(src_vessel, StockVial):
             capping_sequence(
@@ -127,9 +129,7 @@ def _pipette_action(
             being_infused=src_vessel,
             infused_into=dst_vessel,
         )
-        if blowout:
-            toolkit.pipette.blowout()
-
+        
         if isinstance(dst_vessel, WasteVial):
             capping_sequence(
                 toolkit.mill,

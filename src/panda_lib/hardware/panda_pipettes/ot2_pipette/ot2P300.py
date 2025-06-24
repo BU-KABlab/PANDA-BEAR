@@ -47,23 +47,24 @@ class OT2P300:
         aspirate(volume, rate): Aspirate the given volume at the given rate.
         drip_stop(): Aspirate a small volume of air to prevent dripping.
         dispense(volume, rate): Dispense the given volume at the given rate.
-        blowout(reprime): Blow out any remaining volume and optionally reprime.
+        blowout(reprime): Blow out any remaining volume and optionally reprime.#TODO remove this. Blowout is not necessary. Dispensing will go to the blowout position.
         mix(repetitions, volume, rate): Mix the solution by aspirating and dispensing.
     """
 
-    def __init__(self, arduino: Optional[ArduinoLink] = None):
+    def __init__(self, arduino: Optional[ArduinoLink] = None, prime_position: Optional[float] = None):
         """Initialize the OT2P300 Pipette interface."""
         # Set up Arduino connection
         self.arduino = ArduinoLink() if arduino is None else arduino
-
         # Configuration constants
+        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=36.0)
+      
         self.max_p300_rate = config.getfloat(
-            "P300", "max_pipetting_rate", fallback=50.0
+            "P300", "max_pipetting_rate", fallback=3000
         )  # µL/s for Arduino pipette
 
         # Liquid handling specific constants
         self.prime_volume_ul = config.getfloat(
-            "P300", "prime_volume_ul", fallback=10.0
+            "P300", "prime_volume_ul", fallback=0.0
         )  # µL
         self.drip_stop_volume_ul = config.getfloat(
             "P300", "drip_stop_volume_ul", fallback=5.0
@@ -183,7 +184,9 @@ class OT2P300:
                 return False
 
             # Use the pipette driver to aspirate air
-            success = self.pipette_driver.aspirate(
+            #TODO fix the drip_stop function, because right now it uses aspirate as a function which starts at the prime position
+            # as is, the drip_stop function will push out the volume it already aspirated, then aspirate the drip_stop volume.
+            success = self.pipette_driver.aspirate( #TODO change this to an actual drip_stop function, not aspirate.
                 vol=drip_volume, s=self.max_p300_rate
             )
 
@@ -253,7 +256,7 @@ class OT2P300:
 
         # Log the operation
         p300_control_logger.info(
-            f"Aspirating {volume_to_aspirate} µL at {rate} µL/s"
+            f"Aspirating {volume_to_aspirate} µL at {rate} steps/s"
             + (f" from {solution}" if solution else " of air")
         )
 
@@ -281,13 +284,13 @@ class OT2P300:
                 self.pipette_tracker.update_contents(soln, vol)
 
             p300_control_logger.debug(
-                f"Aspirated: {volume_to_aspirate} µL at {rate} µL/s from {solution}. Pipette vol: {self.pipette_tracker.volume} µL"
+                f"Aspirated: {volume_to_aspirate} µL at {rate} steps/s from {solution}. Pipette vol: {self.pipette_tracker.volume} µL"
             )
         else:
             # If no solution is provided, just update the pipette volume
             self.pipette_tracker.volume += volume_to_aspirate
             p300_control_logger.debug(
-                f"Aspirated: {volume_to_aspirate} µL of air at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
+                f"Aspirated: {volume_to_aspirate} µL of air at {rate} steps/s. Pipette vol: {self.pipette_tracker.volume} µL"
             )
 
         # If a drip stop is requested, perform it
@@ -348,16 +351,10 @@ class OT2P300:
         total_volume_to_dispense = volume_to_dispense
         drip_stop_volume = 0.0
 
-        if self.has_drip_stop:
-            drip_stop_volume = self._drip_stop_volume
-            total_volume_to_dispense += drip_stop_volume
-            p300_control_logger.debug(
-                f"Including drip stop volume of {drip_stop_volume} µL in dispense operation"
-            )
 
         # Log the operation
         p300_control_logger.info(
-            f"Dispensing {volume_to_dispense} µL at {rate} µL/s"
+            f"Dispensing {volume_to_dispense} µL at {rate} steps/s"
             + (f" from {being_infused}" if being_infused else "")
             + (f" into {infused_into}" if infused_into else "")
             + (
@@ -418,11 +415,12 @@ class OT2P300:
 
         p300_control_logger.debug(
             f"Dispensed: {volume_to_dispense} µL"
-            f" at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
+            f" at {rate} steps/s. Pipette vol: {self.pipette_tracker.volume} µL"
         )
 
         return None
-
+    #TODO remove this blowout function, but verify that nothing references it.
+    ''' 
     def blowout(self, reprime: bool = True) -> bool:
         """
         Perform a blowout operation to expel any remaining liquid.
@@ -481,7 +479,7 @@ class OT2P300:
             return False
 
         return success
-
+    '''
     def mix(
         self, repetitions: int, volume: float, rate: Optional[float] = None
     ) -> bool:
@@ -491,7 +489,7 @@ class OT2P300:
         Args:
             repetitions (int): Number of mixing cycles
             volume (float): Volume to mix in µL
-            rate (float): Mixing rate in µL/second
+            rate (float): Mixing rate in steps/sec
 
         Returns:
             bool: True if mixing was successful
@@ -523,7 +521,7 @@ class OT2P300:
 
         # Use the pipette driver's mix command
         p300_control_logger.info(
-            f"Mixing {repetitions} times with {volume} µL at {rate} µL/s"
+            f"Mixing {repetitions} times with {volume} µL at {rate} steps/s"
         )
         success = self.pipette_driver.mix(volume, repetitions, rate)
 
@@ -535,7 +533,7 @@ class OT2P300:
 
         # Volume shouldn't change after mixing
         p300_control_logger.debug(
-            f"Mixed {repetitions} times with {volume} µL at {rate} µL/s. Pipette vol: {self.pipette_tracker.volume} µL"
+            f"Mixed {repetitions} times with {volume} µL at {rate} steps/s. Pipette vol: {self.pipette_tracker.volume} µL"
         )
 
         return True
@@ -667,19 +665,22 @@ class MockOT2P300(OT2P300):
     Maintains accurate volume tracking, state management, and simulated timing.
     """
 
-    def __init__(self, arduino: Optional[ArduinoLink] = None):
+    def __init__(self, arduino: Optional[ArduinoLink] = None, prime_position: Optional[float] = None):
+
         """Initialize the mock OT2P300 interface"""
         # Use the mock Arduino interface
         self.arduino = MockArduinoLink() if arduino is None else arduino
 
         # Configuration constants
+        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=36)
+
         self.max_p300_rate = config.getfloat(
-            "P300", "max_pipetting_rate", fallback=50.0
+            "P300", "max_pipetting_rate", fallback=2500.0
         )  # µL/s for Arduino pipette
 
         # Liquid handling specific constants
         self.prime_volume_ul = config.getfloat(
-            "P300", "prime_volume_ul", fallback=10.0
+            "P300", "prime_volume_ul", fallback=0.0
         )  # µL
         self.drip_stop_volume_ul = config.getfloat(
             "P300", "drip_stop_volume_ul", fallback=5.0

@@ -152,28 +152,28 @@ class PandaMill(Mill):
 
         self.safe_move(coordinates=coords, tool="electrode")
         return 0
-
+    
     def disconnect(self):
-        """Close the serial connection to the mill"""
+        """Close the serial connection to the mill safely."""
         mill_control_logger.info("Disconnecting from the mill")
 
-        # if self.homed:
-        #     mill_control_logger.debug("Mill was homed, resting electrode")
-        #     self.rest_electrode()
+        if self.ser_mill is None:
+            mill_control_logger.warning("Serial connection to mill is already None.")
+            return
 
-        self.ser_mill.close()
-        time.sleep(2)
-        mill_control_logger.info("Mill connected: %s", self.ser_mill.is_open)
-        if self.ser_mill.is_open:
-            mill_control_logger.error(
-                "Failed to close the serial connection to the mill"
-            )
-            raise MillConnectionError("Error closing serial connection to mill")
-        else:
-            mill_control_logger.info("Serial connection to mill closed successfully")
+        try:
+            self.ser_mill.close()
+            time.sleep(2)
+            if self.ser_mill.is_open:
+                mill_control_logger.error("Failed to close the serial connection to the mill")
+                raise MillConnectionError("Error closing serial connection to mill")
+            else:
+                mill_control_logger.info("Serial connection to mill closed successfully")
+        except Exception as e:
+            mill_control_logger.error(f"Exception while closing serial connection: {e}")
+        finally:
             self.active_connection = False
             self.ser_mill = None
-        return
 
 
 class MockPandaMill(MockMill):

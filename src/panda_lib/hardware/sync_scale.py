@@ -4,7 +4,7 @@ Provides easy-to-use synchronous methods that wrap the async Scale class.
 """
 
 import asyncio
-from sartorius import Scale
+from sartorius.driver import Scale
 from sartorius.mock import Scale as MockScale
 
 
@@ -28,6 +28,12 @@ class SyncScale:
         self.scale = Scale(port, **kwargs)
         self._loop = None
 
+    def __getattr__(self, name):
+        """Forward attribute access to the wrapped scale."""
+        if name == 'hw' and hasattr(self.scale, 'hw'):
+            return self.scale.hw
+        raise AttributeError(f"'SyncScale' object has no attribute '{name}'")
+    
     def _get_event_loop(self):
         """Get or create an event loop."""
         try:
@@ -127,3 +133,5 @@ class MockSyncScale(SyncScale):
         self.scale.get = lambda: {"stable": True, "units": "kg", "mass": 0.0}
         self.scale.zero = lambda: None
         self.scale.get_info = lambda: self.scale.info
+
+        self.scale._parse = lambda response: {"mass": 0.0, "units": "g", "stable": True}

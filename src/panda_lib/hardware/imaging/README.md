@@ -1,6 +1,6 @@
 # Using the FLIR SDKs
 
-## Where to find the SDK files and exmaples
+## Where to find the SDK files and examples
 Spinnaker is proprietary software made by Teledyne FLIR and as such cannot be included in the repository. To use the flir_camera module you must have installed both the Spinnaker SDK and the Python wrapper in your chosen environment.
 
 Downloading is free but you will need to make an account: https://www.flir.com/products/spinnaker-sdk/

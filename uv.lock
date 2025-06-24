@@ -661,6 +661,7 @@ dependencies = [
     { name = "pydantic-core" },
     { name = "pyparsing" },
     { name = "pyserial" },
+    { name = "pyserial-asyncio" },
     { name = "pytest" },
     { name = "python-dateutil" },
     { name = "python-dotenv" },
@@ -671,6 +672,7 @@ dependencies = [
     { name = "scikit-image" },
     { name = "scikit-learn" },
     { name = "scipy" },
+    { name = "simple-pyspin" },
     { name = "six" },
     { name = "slack-sdk" },
     { name = "smmap" },
@@ -696,6 +698,9 @@ dev = [
     { name = "mypy" },
     { name = "pytest" },
     { name = "ruff" },
+]
+flir = [
+    { name = "simple-pyspin" },
 ]
 syringe-pump = [
     { name = "nesp-lib" },
@@ -747,6 +752,7 @@ requires-dist = [
     { name = "pydantic-core", specifier = "==2.23.3" },
     { name = "pyparsing", specifier = "==3.1.4" },
     { name = "pyserial", specifier = "==3.5" },
+    { name = "pyserial-asyncio", specifier = "==0.6.0" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.4" },
     { name = "python-dateutil", specifier = "==2.9.0.post0" },
@@ -759,6 +765,8 @@ requires-dist = [
     { name = "scikit-image", specifier = "==0.24.0" },
     { name = "scikit-learn", specifier = "==1.5.1" },
     { name = "scipy", specifier = ">=1.14.1" },
+    { name = "simple-pyspin", specifier = "==0.1.1" },
+    { name = "simple-pyspin", marker = "extra == 'flir'", specifier = "==0.1.1" },
     { name = "six", specifier = "==1.16.0" },
     { name = "slack-sdk", specifier = ">=3.4.0" },
     { name = "smmap", specifier = "==5.0.1" },
@@ -954,6 +962,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pyserial-asyncio"
+version = "0.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyserial" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4a/9a/8477699dcbc1882ea51dcff4d3c25aa3f2063ed8f7d7a849fd8f610506b6/pyserial-asyncio-0.6.tar.gz", hash = "sha256:b6032923e05e9d75ec17a5af9a98429c46d2839adfaf80604d52e0faacd7a32f", size = 31322, upload-time = "2021-09-30T22:29:02.174Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/27/24/c820cf15f87f7b164e83710c1852d4f900d9793961579e5ef64189bc0c10/pyserial_asyncio-0.6-py3-none-any.whl", hash = "sha256:de9337922619421b62b9b1a84048634b3ac520e1d690a674ed246a2af7ce1fc5", size = 7594, upload-time = "2021-09-30T22:29:00.12Z" },
+]
+
+[[package]]
 name = "pytest"
 version = "8.3.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1138,6 +1158,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/3d/74/c2d8a24d18acdeae69ed02e132b9bc1bb67b7bee90feee1afe05a68f9d67/scipy-1.15.2-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:888307125ea0c4466287191e5606a2c910963405ce9671448ff9c81c53f85f58", size = 37230048, upload-time = "2025-02-17T00:29:56.646Z" },
     { url = "https://files.pythonhosted.org/packages/42/19/0aa4ce80eca82d487987eff0bc754f014dec10d20de2f66754fa4ea70204/scipy-1.15.2-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:9412f5e408b397ff5641080ed1e798623dbe1ec0d78e72c9eca8992976fa65aa", size = 40010322, upload-time = "2025-02-17T00:30:07.422Z" },
     { url = "https://files.pythonhosted.org/packages/d0/d2/f0683b7e992be44d1475cc144d1f1eeae63c73a14f862974b4db64af635e/scipy-1.15.2-cp310-cp310-win_amd64.whl", hash = "sha256:b5e025e903b4f166ea03b109bb241355b9c42c279ea694d8864d033727205e65", size = 41233385, upload-time = "2025-02-17T00:30:20.268Z" },
+]
+
+[[package]]
+name = "simple-pyspin"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/b4/487a3c037e4b11550e39a2bcb90ec4dbc7e849e0d632753627308503b4e3/simple_pyspin-0.1.1.tar.gz", hash = "sha256:31e27d8bede23a07d0c38ffe107827c9cacdf78af24e05295d057d47dc23617f", size = 8504, upload-time = "2019-12-27T22:53:04.738Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/82/9b/1693519389c89178842717987c76a3aa6d7738dc0da488bac4f0a8483c2f/simple_pyspin-0.1.1-py3-none-any.whl", hash = "sha256:53c365eb2f1fc97514d162720e3b9eb4ce2fc6eba648345ba8e3768b993af25c", size = 12445, upload-time = "2019-12-27T22:53:01.833Z" },
 ]
 
 [[package]]
