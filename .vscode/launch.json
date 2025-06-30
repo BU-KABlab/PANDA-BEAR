@@ -1,22 +1,31 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Python: Current File",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "console": "integratedTerminal",
-      "justMyCode": true
-    },
-    {
-      "name": "Python: Pytest",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": ["-v"],
-      "console": "integratedTerminal",
-      "justMyCode": true
-    }
-  ]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Contact Angle Validation",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/validation_scripts/contactangle_validation.py",
+            "console": "integratedTerminal",
+            "python": "/home/panda/github/PANDA-BEAR/.venv/bin/python",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src"
+            },
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Current File (Virtual Env)",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "python": "/home/panda/github/PANDA-BEAR/.venv/bin/python",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src"
+            },
+            "justMyCode": false
+        }
+    ]
 }
