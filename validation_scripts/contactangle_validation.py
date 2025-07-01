@@ -6,7 +6,8 @@ on a glass slide, capturing images, and then aspirating the droplets.
 import sys
 import os
 from pathlib import Path
-
+import cv2
+import numpy as np
 from panda_lib.hardware.imaging import capture_new_image, CameraType
 from datetime import datetime
 import logging
@@ -116,10 +117,10 @@ try:
     
     # Define slide positions using mill coordinates
     slide_positions = [
-        SlidePosition("A", -186.87, -88.25, -193.5),
-        SlidePosition("B", -196.87, -88.25, -193.5),
-        SlidePosition("C", -196.87, -78.25, -193.5),
-        SlidePosition("D", -186.87, -78.25, -193.5),
+        SlidePosition("A", -192.8, -90.3, -191.5),
+        SlidePosition("B", -202.8, -90.3, -191.5),
+        SlidePosition("C", -202.8, -80.3, -191.5),
+        SlidePosition("D", -192.8, -80.3, -191.5),
     ]
 
     
@@ -137,8 +138,8 @@ try:
         capacity=20000,
         contamination=0,
         coordinates={
-            "x": -16.5,
-            "y": -40,
+            "x": -21.8,
+            "y": -43.3,
             "z": -197.0,
         },
         base_thickness=1,
@@ -163,8 +164,8 @@ try:
         capacity=20000,
         contamination=0,
         coordinates={
-            "x": -16.5,
-            "y": -73,
+            "x": -21.8,
+            "y": -76.3,
             "z": -197.0,
         },
         base_thickness=1,
@@ -187,50 +188,76 @@ try:
     results = pd.DataFrame(columns=["Timestamp", "Slide_Number", "Position", "Image_Path"])
     row_index = 0
     
+    def rank_images_by_sharpness(image_paths):
+        """
+        Rank a list of image paths based on Laplacian sharpness.
+        
+        Args:
+            image_paths (list of str or Path): Paths to images to compare.
+            
+        Returns:
+            List of tuples: [(image_path, sharpness_score), ...] sorted by score descending
+        """
+        ranked = []
+
+        for path in image_paths:
+            try:
+                img = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
+                if img is None:
+                    logger.warning(f"Could not load image: {path}")
+                    continue
+                laplacian = cv2.Laplacian(img, cv2.CV_64F)
+                variance = laplacian.var()
+                ranked.append((path, variance))
+                logger.info(f"Sharpness score for {path}: {variance:.2f}")
+            except Exception as e:
+                logger.error(f"Error analyzing image {path}: {e}", exc_info=True)
+
+        ranked.sort(key=lambda x: x[1], reverse=True)  # Descending sharpness
+        return ranked
+
     # Function to capture an image of the droplet
     def capture_droplet_image(slide_num, position_idx):
-        """Capture an image of the droplet on the slide using FLIR camera."""
+        """Capture images of the droplet at different Z heights using FLIR camera."""
         position = slide_positions[position_idx]
-        file_name = f"slide{slide_num}_pos{position.name}"
-        image_path = Path(experiment_dir) / f"{file_name}.tiff"
-        # Position camera above the droplet
+        base_file_name = f"slide{slide_num}_pos{position.name}"
         camera_x = position.x
         camera_y = position.y
-        camera_z = 0  # Z position for camera
-        # Move to camera position
-        logger.info(f"Moving to position for imaging: ({camera_x}, {camera_y}, {camera_z})")
-        tools.mill.safe_move(camera_x, camera_y, camera_z, tool="lens")
-        time.sleep(1)  # Ensure the mill has moved
-        # Turn on contact angle lights for better imaging
+        # Turn on lights
         logger.info("Turning on contact angle lights")
         tools.arduino.curvature_lights_on()
-        time.sleep(0.5)  # Allow lights to stabilize
-        # Capture with FLIR camera
-        logger.info("Capturing image with FLIR camera")
-        try:
-            actual_path, success = capture_new_image(
-                save=True,
-                file_name=image_path,
-                camera_type=CameraType.FLIR
-            )
-            if success:
-                logger.info(f"Successfully captured image to {image_path}")
-                # Turn off contact angle lights after successful capture
-                logger.info("Turning off contact angle lights")
-                tools.arduino.curvature_lights_off()
-                return image_path
-            else:
-                logger.error("Failed to capture image with FLIR camera")
-                # Turn off lights even if capture failed
-                logger.info("Turning off contact angle lights")
-                tools.arduino.curvature_lights_off()
-                return None
-        except Exception as e:
-            logger.error(f"Error capturing with FLIR camera: {e}")
-            # Turn off contact angle lights even if there was an error
-            logger.info("Turning off contact angle lights after error")
-            tools.arduino.curvature_lights_off()
-            return None
+        time.sleep(1)  # Let lighting stabilize
+        # Try these Z heights
+        z_heights = [-38.0, -38.2, -38.5, -38.7, -39.0, -39.2,-39.5, -39.7, -40.0, -40.2, -40.5, -40.7, -41.0, -41.2, -41.5]
+        captured_paths = []
+
+        for z in z_heights:
+            image_path = Path(experiment_dir) / f"{base_file_name}_z{z:.1f}.tiff"
+            logger.info(f"Moving to position for imaging: ({camera_x}, {camera_y}, {z})")
+            tools.mill.safe_move(camera_x, camera_y, z, tool="lens")
+            time.sleep(1)  # Let vibration settle
+
+            # Capture image
+            logger.info(f"Capturing image with FLIR camera at Z={z}")
+            try:
+                actual_path, success = capture_new_image(
+                    save=True,
+                    file_name=image_path,
+                    camera_type=CameraType.FLIR
+                )
+                if success:
+                    logger.info(f"Captured image to {image_path}")
+                    captured_paths.append(str(image_path))
+                else:
+                    logger.error(f"Failed to capture image at Z={z}")
+            except Exception as e:
+                logger.error(f"Error capturing at Z={z}: {e}", exc_info=True)
+
+
+        logger.info("Turning off contact angle lights")
+        tools.arduino.curvature_lights_off()       
+        return captured_paths  # Return all image paths for review
+        
     
     # Function to prompt user for slide replacement
     def prompt_for_slide_replacement():
@@ -271,25 +298,28 @@ try:
                     position,
                     toolkit=tools,
                 )
-                
-                # Let the droplet settle
-                print("Waiting for droplet to settle...")
-                time.sleep(2)
-                
+                position.contents = {"H2O": test_volume}
+               
                 # Step 2: Capture image of the droplet
                 print("Capturing image of the droplet...")
-                image_path = capture_droplet_image(slide_number, pos_idx)
-                
-                # Log the result
-                if image_path:
+                image_paths = capture_droplet_image(slide_number, pos_idx)
+                ranked = rank_images_by_sharpness(image_paths)
+
+                # Log the sharpest image
+                if ranked:
+                    best_image_path = ranked[0][0]
                     results.loc[row_index] = [
                         datetime.now().strftime("%Y-%m-%d_%H%M%S"),
                         slide_number,
                         position.name,
-                        str(image_path)
+                        str(best_image_path)
                     ]
                     row_index += 1
-                
+
+                    print("\nTop sharpest image:")
+                    print(f"{best_image_path} (Score: {ranked[0][1]:.2f})")
+
+
                 # Add pause with prompt after image is captured and lights are off
                 user_input = input(f"\nImage captured for slide {slide_number}, position {position.name}. Press Enter to aspirate the droplet and continue, or type 'skip' to leave the droplet: ")
                 

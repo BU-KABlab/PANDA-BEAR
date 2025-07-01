@@ -1,0 +1,9 @@
+Contact Angle Validation Summary
+==============================
+Date: 2025-07-01_164310
+Total slides tested: 7
+Positions per slide: 4
+Droplet volume: 10 µL
+
+Images captured: 28
+Images are stored in the experiment directory for further analysis.
