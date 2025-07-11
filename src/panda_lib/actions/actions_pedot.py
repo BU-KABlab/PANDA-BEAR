@@ -2,7 +2,7 @@
 
 from typing import Tuple
 
-from panda_lib.errors import (
+from panda_lib.exceptions import (
     CAFailure,
     CVFailure,
     DepositionFailure,
@@ -12,9 +12,9 @@ from panda_lib.experiments.experiment_types import EchemExperimentBase
 
 from .electrochemistry import (
     ExperimentStatus,
-    chrono_parameters,
-    cv_parameters,
     logger,
+    PSTAT,
+    TESTING,
 )
 from .electrochemistry import (
     perform_chronoamperometry as chrono_amp,
@@ -22,6 +22,37 @@ from .electrochemistry import (
 from .electrochemistry import (
     perform_cyclic_voltammetry as cyclic_volt,
 )
+
+# Import the correct parameter classes based on potentiostat type
+if TESTING:
+    if PSTAT == "gamry":
+        from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+            chrono_parameters,
+            cv_parameters,
+        )
+    elif PSTAT == "emstat":
+        from panda_lib.hardware.emstat_potentiostat.emstat_control_mock import (
+            chrono_parameters,
+            cv_parameters,
+        )
+else:
+    if PSTAT == "gamry":
+        try:
+            from panda_lib.hardware.gamry_potentiostat.gamry_control import (
+                chrono_parameters,
+                cv_parameters,
+            )
+        except ImportError:
+            # Fall back to mock if real Gamry not available
+            from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+                chrono_parameters,
+                cv_parameters,
+            )
+    elif PSTAT == "emstat":
+        from panda_lib.hardware.emstat_potentiostat.emstat_control import (
+            chrono_parameters,
+            cv_parameters,
+        )
 
 
 def chrono_amp_edot_bleaching(

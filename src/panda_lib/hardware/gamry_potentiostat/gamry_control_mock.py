@@ -28,7 +28,7 @@ class GamryPotentiostat:
     def pstatdisconnect(self):
         self.OPEN_CONNECTION = False
 
-    def OCP(self, OCPvi, OCPti, OCPrate):
+    def OCP(self, ocp_params):
         self.OPEN_CONNECTION = True
         pass
 

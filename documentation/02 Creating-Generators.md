@@ -1,10 +1,10 @@
 # Creating Generators
 
-Experiment generators allow you to easily set up batches of experiments with varying parameters. Generators are Python scripts that define experiment variables and add the resulting experiments to the PANDA-SDL scheduler.
+Experiment generators allow you to easily set up batches of experiments with varying parameters. They also enable closed loop experiment creation. Generators are Python scripts that define experiment variables and add the resulting experiments to the PANDA-SDL scheduler.
 
 ## Generator Basics
 
-A generator is a Python script that defines the parameters for a series of experiments. Each generator must contain at least one function named `main` that creates and schedules the experiments.
+Each generator must contain at least one function named `main` that creates and schedules the experiments. You are welcome to make other functions to help organize the script, but `main` is what is the entry point.
 
 Generators are typically stored in the generators directory as specified in your `config.ini` file.
 
@@ -80,7 +80,7 @@ def main():
             experiments.append(
                 # Define the experiment
                 EchemExperimentBase(
-                    experiment_id=experiment_id,
+                    experiment_id=experiment_id, # Can be left blank, and be automatically assigned
                     protocol_id="polymer_deposition_protocol.py",  # Name of your protocol file
                     well_id="A1",  # Will be automatically reassigned if unavailable
                     plate_type_number=7,  # 10 mm diameter wells on gold
@@ -89,6 +89,7 @@ def main():
                     project_campaign_id=campaign_id + i,
                     
                     # Solution definitions
+                    # IMPORTANT: these names must match the solutions that are loaded and marked active
                     solutions={
                         "polymer_solution": {
                             "volume": 320,
@@ -151,6 +152,7 @@ def main():
 When creating `EchemExperimentBase` objects, you need to specify various parameters:
 
 ### Basic Information
+
 - `experiment_id`: Unique identifier for the experiment
 - `protocol_id`: Name of the protocol file to use
 - `well_id`: Well to use (can be reassigned automatically)
@@ -160,10 +162,12 @@ When creating `EchemExperimentBase` objects, you need to specify various paramet
 - `project_campaign_id`: Campaign ID for experiment series
 
 ### Solutions
+
 Defined as a dictionary of solution configurations:
+
 ```python
 solutions={
-    "solution_name": {
+    "solution_name": {         # Name of the vial, must be an exact match
         "volume": 320,         # Volume in μL
         "concentration": 1.0,  # Concentration value
         "repeated": 1,         # Number of times used
@@ -173,7 +177,9 @@ solutions={
 ```
 
 ### Electrochemistry Parameters
+
 Many parameters are available for configuring electrochemical experiments, such as:
+
 - Chronoamperometry parameters (`ca_*`)
 - Cyclic voltammetry parameters (`cv_*`)
 - Open circuit potential parameters (`ocp_*`)
@@ -206,16 +212,11 @@ To run your generator:
 
 ### Dynamic Well Assignment
 
-If you want to dynamically assign wells based on availability:
-
-```python
-# The well_id will be automatically reassigned if unavailable
-well_id="A1"
-```
+If you want to dynamically assign wells based on availability, then leave the `well_id` field empty.
 
 ### Dependent Parameters
 
-For parameters that depend on other variables:
+For parameters that depend on other variables, you can use loops and other logic to insert the desired values:
 
 ```python
 # Example of dependent parameters

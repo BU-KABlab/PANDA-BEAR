@@ -69,7 +69,7 @@ baudrate = 9600
 timeout = 10
 
 [CAMERA]
-camera_type = FLIR 
+camera_type = webcam 
 webcam_id = 0  
 webcam_resolution_width = 1280
 webcam_resolution_height = 720
@@ -85,7 +85,7 @@ port =
 firmware_path =
 
 [PIPETTE]
-pipette_type = WPI
+pipette_type = OT2
 
 
 [TOOLS]
@@ -93,31 +93,31 @@ offsets = [
     {
         "name": "center",
         "x": 0.0,
-        "y": 0.0,
+        "y": -5.5,
         "z": 0.0
     },
     {
         "name": "pipette",
-        "x": -112.2,
-        "y": -9.7,
+        "x": -117.13,
+        "y": -11.75,
         "z": 100.0
     },
     {
         "name": "electrode",
         "x": 48.35,
-        "y": -9.7,
+        "y": -11.77,
         "z": 87.0
     },
     {
         "name": "decapper",
-        "x": -60.2,
-        "y": -9.7,
+        "x": -64.27,
+        "y": -12.5,
         "z": 62.0
     },
     {
         "name": "lens",
         "x": 0.0,
-        "y": 0.0,
+        "y": -5.5,
         "z": 0.0
     },
     {

@@ -23,7 +23,7 @@ from panda_lib.actions.electrochemistry import (
 from panda_lib.actions.electrochemistry import (
     perform_chronoamperometry as chrono_amp,
 )
-from panda_lib.errors import (
+from panda_lib.exceptions import (
     CAFailure,
     CVFailure,
     DepositionFailure,

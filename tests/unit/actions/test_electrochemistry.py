@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from panda_lib.errors import CAFailure, CVFailure, OCPError, OCPFailure
+from panda_lib.exceptions import CAFailure, CVFailure, OCPError, OCPFailure
 from panda_lib.experiments.experiment_types import ExperimentStatus
 
 

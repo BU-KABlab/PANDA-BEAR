@@ -2,7 +2,7 @@ import logging
 import math
 from typing import Optional, Union
 import time
-from panda_lib.errors import NoAvailableSolution
+from panda_lib.exceptions import NoAvailableSolution
 from panda_lib.hardware.grbl_cnc_mill import Instruments
 from panda_shared.config.config_tools import (
     ConfigParserError,
@@ -90,6 +90,7 @@ def _pipette_action(
                 toolkit.arduino,
             )
 
+        toolkit.pipette.prime()
         # Use standard interface for aspirate
         toolkit.mill.safe_move(
             src_vessel.x,

@@ -2,6 +2,59 @@
 
 This document provides a comprehensive reference of the PANDA-SDL API, covering the main components and functions available for writing protocols, generators, and analyzers.
 
+- [API Reference](#api-reference)
+  - [Core Components](#core-components)
+    - [Toolkit](#toolkit)
+      - [Key Properties and Methods](#key-properties-and-methods)
+    - [Experiments](#experiments)
+      - [Experiment Types](#experiment-types)
+      - [Key Experiment Properties](#key-experiment-properties)
+        - [Base Experiment Properties](#base-experiment-properties)
+        - [Electrochemistry Experiment Properties](#electrochemistry-experiment-properties)
+    - [Scheduler](#scheduler)
+      - [Key Scheduler Functions](#key-scheduler-functions)
+      - [Scheduler Workflow](#scheduler-workflow)
+      - [Experiment Priorities](#experiment-priorities)
+  - [Action Functions (aliased as Protocol)](#action-functions-aliased-as-protocol)
+    - [Fluid Handling](#fluid-handling)
+    - [Movement](#movement)
+    - [Electrochemistry](#electrochemistry)
+    - [Imaging](#imaging)
+    - [Vessel Handling](#vessel-handling)
+      - [VesselSelector Class](#vesselselector-class)
+    - [Utility Actions](#utility-actions)
+  - [Labware](#labware)
+    - [Wellplates](#wellplates)
+      - [Wellplate Class](#wellplate-class)
+      - [Well Class](#well-class)
+    - [Vials](#vials)
+      - [Vial Classes](#vial-classes)
+      - [Vial Methods/Properties](#vial-methodsproperties)
+      - [Vial Helper Functions](#vial-helper-functions)
+    - [Labware Utilities](#labware-utilities)
+  - [Database Functions](#database-functions)
+    - [Core Database Functions](#core-database-functions)
+    - [Wellplate Functions](#wellplate-functions)
+    - [Well Functions](#well-functions)
+    - [Protocol Functions](#protocol-functions)
+    - [Generator Functions](#generator-functions)
+    - [Queue Functions](#queue-functions)
+    - [System Functions](#system-functions)
+    - [Results Functions](#results-functions)
+  - [Utilities](#utilities)
+  - [Advanced Features](#advanced-features)
+    - [Machine Learning Integration](#machine-learning-integration)
+  - [Exception Handling](#exception-handling)
+    - [Experiment Related Exceptions](#experiment-related-exceptions)
+    - [Labware Related Exceptions](#labware-related-exceptions)
+    - [Hardware Related Exceptions](#hardware-related-exceptions)
+    - [System Control Exceptions](#system-control-exceptions)
+  - [Example Usage Patterns](#example-usage-patterns)
+    - [Protocol Example](#protocol-example)
+    - [Generator Example](#generator-example)
+    - [Analyzer Example](#analyzer-example)
+  - [Additional Resources](#additional-resources)
+
 ## Core Components
 
 ### Toolkit
@@ -375,11 +428,13 @@ from panda_lib.labware import get_xyz
 
 ## Database Functions
 
-The provided database functions are meant to assist in executing custom SQL queries or provide ready made common queries to the system database.
+The provided database functions are meant to assist in executing custom SQL queries or provide ready-made common queries to the system database. These functions are organized into several categories for different database operations.
 
 ```python
 from panda_lib import sql_tools
 ```
+
+### Core Database Functions
 
 | Function                                                           | Description            | Parameters                                                                                                                 |
 | ------------------------------------------------------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -387,10 +442,92 @@ from panda_lib import sql_tools
 | `sql_tools.get_experiment(experiment_id)`                          | Get experiment by ID   | <ul><li>`experiment_id`: ID of the experiment</li></ul>                                                                    |
 | `sql_tools.get_results(experiment_id, result_type)`                | Get experiment results | <ul><li>`experiment_id`: ID of the experiment</li><li>`result_type`: Type of results</li></ul>                             |
 
+### Wellplate Functions
+
+| Function                                                 | Description                             | Parameters                                                                                                                      |
+| -------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `sql_tools.get_wellplate_by_id(plate_id)`                | Get wellplate by ID                     | <ul><li>`plate_id`: ID of the wellplate</li></ul>                                                                               |
+| `sql_tools.get_all_wellplates()`                         | Get all wellplates                      |                                                                                                                                 |
+| `sql_tools.add_wellplate(plate_type_id, barcode, label)` | Add a new wellplate                     | <ul><li>`plate_type_id`: Type ID of wellplate</li><li>`barcode`: Barcode (optional)</li><li>`label`: Label (optional)</li></ul> |
+| `sql_tools.select_current_wellplate_id()`                | Get ID of current active wellplate      |                                                                                                                                 |
+| `sql_tools.select_current_wellplate_info()`              | Get info about current active wellplate |                                                                                                                                 |
+| `sql_tools.check_if_current_wellplate_is_new()`          | Check if current wellplate is new       |                                                                                                                                 |
+| `sql_tools.check_if_plate_type_exists(type_id)`          | Check if plate type exists              | <ul><li>`type_id`: Type ID to check</li></ul>                                                                                   |
+| `sql_tools.select_well_characteristics(type_id)`         | Get characteristics of a well type      | <ul><li>`type_id`: Type ID of the wellplate</li></ul>                                                                           |
+
+### Well Functions
+
+| Function                                                            | Description                   | Parameters                                                                                                                        |
+| ------------------------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `sql_tools.get_well_by_id(well_id, plate_id)`                       | Get well by ID                | <ul><li>`well_id`: ID of the well</li><li>`plate_id`: ID of the plate (optional)</li></ul>                                        |
+| `sql_tools.get_well_by_experiment_id(experiment_id)`                | Get well by experiment ID     | <ul><li>`experiment_id`: ID of the experiment</li></ul>                                                                           |
+| `sql_tools.get_well_history(well_id)`                               | Get history of a well         | <ul><li>`well_id`: ID of the well</li></ul>                                                                                       |
+| `sql_tools.select_well_ids(plate_id)`                               | Get IDs of wells in a plate   | <ul><li>`plate_id`: ID of the plate (optional)</li></ul>                                                                          |
+| `sql_tools.select_well_status(well_id, plate_id)`                   | Get status of a well          | <ul><li>`well_id`: ID of the well</li><li>`plate_id`: ID of the plate (optional)</li></ul>                                        |
+| `sql_tools.select_wellplate_wells(plate_id)`                        | Get all wells in a plate      | <ul><li>`plate_id`: ID of the plate (optional)</li></ul>                                                                          |
+| `sql_tools.select_next_available_well(plate_id)`                    | Find next available well      | <ul><li>`plate_id`: ID of the plate (optional)</li></ul>                                                                          |
+| `sql_tools.count_wells_with_new_status(plate_id)`                   | Count wells with 'new' status | <ul><li>`plate_id`: ID of the plate (optional)</li></ul>                                                                          |
+| `sql_tools.get_number_of_wells(plate_id)`                           | Get total number of wells     | <ul><li>`plate_id`: ID of the plate (optional)</li></ul>                                                                          |
+| `sql_tools.get_number_of_clear_wells(plate_id)`                     | Get number of empty wells     | <ul><li>`plate_id`: ID of the plate (optional)</li></ul>                                                                          |
+| `sql_tools.save_well_to_db(well_to_save)`                           | Save a well to database       | <ul><li>`well_to_save`: Well object to save</li></ul>                                                                             |
+| `sql_tools.save_wells_to_db(wells_to_save)`                         | Save multiple wells           | <ul><li>`wells_to_save`: List of well objects</li></ul>                                                                           |
+| `sql_tools.insert_well(well_to_insert)`                             | Insert a new well             | <ul><li>`well_to_insert`: Well object to insert</li></ul>                                                                         |
+| `sql_tools.update_well(well_to_update)`                             | Update a well                 | <ul><li>`well_to_update`: Well object with updates</li></ul>                                                                      |
+| `sql_tools.update_well_status(well_id, status, plate_id)`           | Update well status            | <ul><li>`well_id`: ID of the well</li><li>`status`: New status</li><li>`plate_id`: ID of the plate (optional)</li></ul>           |
+| `sql_tools.update_well_coordinates(well_id, coordinates, plate_id)` | Update well coordinates       | <ul><li>`well_id`: ID of the well</li><li>`coordinates`: New coordinates</li><li>`plate_id`: ID of the plate (optional)</li></ul> |
+
+### Protocol Functions
+
+| Function                                                          | Description                      | Parameters                                                                                                                                       |
+| ----------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `sql_tools.select_protocols()`                                    | Get all protocols                |                                                                                                                                                  |
+| `sql_tools.select_protocol(protocol_id)`                          | Get protocol by ID               | <ul><li>`protocol_id`: ID of the protocol</li></ul>                                                                                              |
+| `sql_tools.select_protocol_id(protocol_name)`                     | Get protocol ID by name          | <ul><li>`protocol_name`: Name of the protocol</li></ul>                                                                                          |
+| `sql_tools.select_protocol_name(protocol_id)`                     | Get protocol name by ID          | <ul><li>`protocol_id`: ID of the protocol</li></ul>                                                                                              |
+| `sql_tools.insert_protocol(protocol_id, project, name, filepath)` | Insert a protocol                | <ul><li>`protocol_id`: ID for the protocol</li><li>`project`: Project name</li><li>`name`: Protocol name</li><li>`filepath`: File path</li></ul> |
+| `sql_tools.update_protocol(protocol_id, new_name)`                | Update a protocol                | <ul><li>`protocol_id`: ID of the protocol</li><li>`new_name`: New name for the protocol</li></ul>                                                |
+| `sql_tools.delete_protocol(protocol_id)`                          | Delete a protocol                | <ul><li>`protocol_id`: ID of the protocol to delete</li></ul>                                                                                    |
+| `sql_tools.read_in_protocols()`                                   | Import protocols from filesystem |                                                                                                                                                  |
+
+### Generator Functions
+
+| Function                                                                            | Description                       | Parameters                                                                                                                                                                              |
+| ----------------------------------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sql_tools.get_generators()`                                                        | Get all generators                |                                                                                                                                                                                         |
+| `sql_tools.get_generator_by_id(generator_id)`                                       | Get generator by ID               | <ul><li>`generator_id`: ID of the generator</li></ul>                                                                                                                                   |
+| `sql_tools.get_generator_id(generator_name)`                                        | Get generator ID by name          | <ul><li>`generator_name`: Name of the generator</li></ul>                                                                                                                               |
+| `sql_tools.get_generator_name(generator_id)`                                        | Get generator name by ID          | <ul><li>`generator_id`: ID of the generator</li></ul>                                                                                                                                   |
+| `sql_tools.insert_generator(generator_id, project_id, protocol_id, name, filepath)` | Insert a generator                | <ul><li>`generator_id`: ID for the generator</li><li>`project_id`: Project ID</li><li>`protocol_id`: Protocol ID</li><li>`name`: Generator name</li><li>`filepath`: File path</li></ul> |
+| `sql_tools.update_generator(generator_id, new_name)`                                | Update a generator                | <ul><li>`generator_id`: ID of the generator</li><li>`new_name`: New name for the generator</li></ul>                                                                                    |
+| `sql_tools.delete_generator(generator_id)`                                          | Delete a generator                | <ul><li>`generator_id`: ID of the generator to delete</li></ul>                                                                                                                         |
+| `sql_tools.read_in_generators()`                                                    | Import generators from filesystem |                                                                                                                                                                                         |
+| `sql_tools.run_generator(generator_id)`                                             | Run a generator                   | <ul><li>`generator_id`: ID of the generator to run</li></ul>                                                                                                                            |
+
+### Queue Functions
+
+| Function                                                | Description                    | Parameters                                                           |
+| ------------------------------------------------------- | ------------------------------ | -------------------------------------------------------------------- |
+| `sql_tools.select_queue(project_id)`                    | Get experiments in the queue   | <ul><li>`project_id`: Filter by project ID (optional)</li></ul>      |
+| `sql_tools.get_next_experiment_from_queue(random_pick)` | Get next experiment from queue | <ul><li>`random_pick`: Whether to pick randomly (optional)</li></ul> |
+| `sql_tools.count_queue_length()`                        | Count experiments in queue     |                                                                      |
+
+### System Functions
+
+| Function                                                         | Description       | Parameters                                                                                                                                   |
+| ---------------------------------------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sql_tools.select_system_status(look_back)`                      | Get system status | <ul><li>`look_back`: Number of status entries to look back (optional)</li></ul>                                                              |
+| `sql_tools.set_system_status(system_status, comment, test_mode)` | Set system status | <ul><li>`system_status`: Status object</li><li>`comment`: Comment (optional)</li><li>`test_mode`: Boolean for test mode (optional)</li></ul> |
+
+### Results Functions
+
+| Function                                                                | Description           | Parameters                                                                                                       |
+| ----------------------------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `sql_tools.query_potentiostat_readouts(experiment_id, instrument_name)` | Get potentiostat data | <ul><li>`experiment_id`: ID of the experiment</li><li>`instrument_name`: Name of instrument (optional)</li></ul> |
+
 ## Utilities
 
 ```python
-from panda_lib.utilities import Coordinates, SystemState
+from panda_lib.utilities import ...
 ```
 
 | Class/Function                                                                       | Description                           |
@@ -410,14 +547,47 @@ Coming soon
 The PANDA-SDL system defines several exception types for handling errors:
 
 ```python
-from panda_lib.exceptions import PandaError, HardwareError, ExperimentError
+from panda_lib.exceptions import ...
 ```
 
-| Exception         | Description                                   |
-| ----------------- | --------------------------------------------- |
-| `PandaError`      | Base exception class for all PANDA-SDL errors |
-| `HardwareError`   | Exception for hardware-related errors         |
-| `ExperimentError` | Exception for experiment-related errors       |
+### Experiment Related Exceptions
+
+| Exception                 | Description                                             |
+| ------------------------- | ------------------------------------------------------- |
+| `ExperimentError`         | Base exception for experiment failures                  |
+| `ExperimentNotFoundError` | Raised when an experiment is not found                  |
+| `ProtocolNotFoundError`   | Raised when a protocol is not found in the database     |
+| `NoExperimentFromModel`   | Raised when the ML model doesn't generate an experiment |
+| `DepositionFailure`       | Raised when deposition process fails                    |
+| `CAFailure`               | Raised when chronoamperometry (CA) fails                |
+| `CVFailure`               | Raised when cyclic voltammetry (CV) fails               |
+| `OCPError`                | Raised when open circuit potential measurement fails    |
+| `OCPFailure`              | Raised when OCP fails for a specific experiment/well    |
+
+### Labware Related Exceptions
+
+| Exception                    | Description                                              |
+| ---------------------------- | -------------------------------------------------------- |
+| `WellImportError`            | Raised when wellplate file has incorrect number of wells |
+| `MismatchWellplateTypeError` | Raised when wellplate type doesn't match experiment      |
+| `OverFillException`          | Raised when a vessel is over filled                      |
+| `OverDraftException`         | Raised when more volume is removed than available        |
+| `NoAvailableSolution`        | Raised when no available solution is found               |
+| `InsufficientVolumeError`    | Raised when vessel doesn't have enough volume            |
+
+### Hardware Related Exceptions
+
+| Exception                   | Description                                |
+| --------------------------- | ------------------------------------------ |
+| `ImageCaptureError`         | Raised when image capture fails for a well |
+| `InstrumentConnectionError` | Raised when instrument connection fails    |
+
+### System Control Exceptions
+
+| Exception         | Description                                  |
+| ----------------- | -------------------------------------------- |
+| `ShutDownCommand` | Raised when system is commanded to shut down |
+| `StopCommand`     | Raised when a stop command is issued         |
 
 ## Example Usage Patterns
 

@@ -76,7 +76,9 @@ class FlirCamera(CameraInterface):
             if self.camera_id < self.camera_list.GetSize():
                 self.camera = self.camera_list[self.camera_id]
             else:
-                self.logger.warning(f"Camera ID {self.camera_id} out of range, using first camera")
+                self.logger.warning(
+                    f"Camera ID {self.camera_id} out of range, using first camera"
+                )
                 self.camera = self.camera_list[0]
 
             self.camera.Init()
@@ -126,6 +128,7 @@ class FlirCamera(CameraInterface):
             self.logger.error("Cannot capture image: Camera not connected")
             return None
 
+
         try:
             nodemap = self.camera.GetNodeMap()
             pixel_format = PySpin.CEnumerationPtr(nodemap.GetNode("PixelFormat"))
@@ -139,7 +142,9 @@ class FlirCamera(CameraInterface):
             image_result = self.camera.GetNextImage(1000)
 
             if image_result.IsIncomplete():
-                self.logger.error(f"Image incomplete with status {image_result.GetImageStatus()}")
+                self.logger.error(
+                    f"Image incomplete with status {image_result.GetImageStatus()}"
+                )
                 image_result.Release()
                 self.camera.EndAcquisition()
                 return None
@@ -161,9 +166,11 @@ class FlirCamera(CameraInterface):
     def save_image(self, image: np.ndarray, path: Union[str, Path]) -> bool:
         """Save an image to disk
 
+
         Args:
             image: The image to save
             path: The path to save the image to
+
 
         Returns:
             bool: True if successful, False otherwise
@@ -171,6 +178,7 @@ class FlirCamera(CameraInterface):
         if not PYSPIN_AVAILABLE:
             self.logger.error("PySpin library not available")
             return False
+
 
         try:
             path = Path(path) if isinstance(path, str) else path
@@ -185,11 +193,14 @@ class FlirCamera(CameraInterface):
             self.logger.error(f"Error saving image from FLIR camera: {ex}")
             return False
 
+
     def capture_and_save(self, path: Union[str, Path]) -> Tuple[Path, bool]:
         """Capture an image and save it to disk
 
+
         Args:
             path: The path to save the image to
+
 
         Returns:
             Tuple[Path, bool]: The path of the saved image and a boolean indicating success
@@ -197,6 +208,7 @@ class FlirCamera(CameraInterface):
         if not PYSPIN_AVAILABLE:
             self.logger.error("PySpin library not available")
             return Path(path), False
+
 
         path = Path(path) if isinstance(path, str) else path
         path = file_enumeration(path)

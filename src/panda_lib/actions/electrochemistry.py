@@ -12,8 +12,9 @@ from panda_shared.config.config_tools import (
 
 config = read_config()
 TESTING = read_testing_config()
+PSTAT = config.get("POTENTIOSTAT", "model", fallback="gamry")
 
-from ..errors import (  # noqa: E402
+from ..exceptions import (  # noqa: E402
     CAFailure,
     CVFailure,
     DepositionFailure,
@@ -27,22 +28,56 @@ from ..experiments.experiment_types import (  # noqa: E402
 from ..labware.wellplates import Well  # noqa: E402
 from ..toolkit import Toolkit  # noqa: E402
 
-if TESTING or os.name != "nt":
-    from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
-        GamryPotentiostat as echem,
-    )
-    from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
-        chrono_parameters,
-        cv_parameters,
-        potentiostat_ocp_parameters,
-    )
+if TESTING:
+    if PSTAT == "gamry":
+        from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+            GamryPotentiostat as echem,
+        )
+        from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+            chrono_parameters as gamry_chrono_parameters,
+            cv_parameters as gamry_cv_parameters,
+            potentiostat_ocp_parameters as gamry_potentiostat_ocp_parameters,
+        )
+    elif PSTAT == "emstat":
+        import panda_lib.hardware.emstat_potentiostat.emstat_control_mock as echem
+        from panda_lib.hardware.emstat_potentiostat.emstat_control_mock import (
+            chrono_parameters as emstat_chrono_parameters,
+            cv_parameters as emstat_cv_parameters,
+            potentiostat_ocp_parameters as emstat_potentiostat_ocp_parameters,
+        )
+
+    else:
+        raise ValueError(
+            f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+        )
 else:
-    import panda_lib.hardware.gamry_potentiostat.gamry_control as echem
-    from panda_lib.hardware.gamry_potentiostat.gamry_control import (
-        chrono_parameters,
-        cv_parameters,
-        potentiostat_ocp_parameters,
-    )
+    if PSTAT == "gamry":
+        if os.name != "nt":
+            print(
+                "Gamry potentiostat is not supported on non-Windows systems.\n Reverting to mock implementation."
+            )
+            from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+                GamryPotentiostat as echem,
+            )
+            from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+                chrono_parameters as gamry_chrono_parameters,
+                cv_parameters as gamry_cv_parameters,
+                potentiostat_ocp_parameters as gamry_potentiostat_ocp_parameters,
+            )
+        else:
+            import panda_lib.hardware.gamry_potentiostat.gamry_control as echem
+            from panda_lib.hardware.gamry_potentiostat.gamry_control import (
+                chrono_parameters as gamry_chrono_parameters,
+                cv_parameters as gamry_cv_parameters,
+                potentiostat_ocp_parameters as gamry_potentiostat_ocp_parameters,
+            )
+    elif PSTAT == "emstat":
+        import panda_lib.hardware.emstat_potentiostat.emstat_control as echem
+        from panda_lib.hardware.emstat_potentiostat.emstat_control import (
+            chrono_parameters as emstat_chrono_parameters,
+            cv_parameters as emstat_cv_parameters,
+            potentiostat_ocp_parameters as emstat_potentiostat_ocp_parameters,
+        )
 
 
 # Constants
@@ -111,10 +146,22 @@ def open_circuit_potential(
                 "test",
                 "test",
             )
+
+        # Fill in the correct parameters based on the potentiostat type
+        if PSTAT == "gamry":
+            params: gamry_potentiostat_ocp_parameters
+            params = gamry_potentiostat_ocp_parameters
+        elif PSTAT == "emstat":
+            params: emstat_potentiostat_ocp_parameters
+            params = emstat_potentiostat_ocp_parameters
+        else:
+            raise ValueError(
+                f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+            )
+        
+
         pstat.OCP(
-            potentiostat_ocp_parameters.OCPvi,
-            potentiostat_ocp_parameters.OCPti,
-            potentiostat_ocp_parameters.OCPrate,
+            params
         )  # OCP
         pstat.activecheck()
         ocp_pass, ocp_final_voltage = pstat.check_vf_range(base_filename)
@@ -210,7 +257,7 @@ def ocp_check(
 def perform_chronoamperometry(
     experiment: EchemExperimentBase,
     file_tag: Optional[str] = None,
-    custom_parameters: Optional[chrono_parameters] = None,
+    custom_parameters = None,  # Remove type hint
 ) -> EchemExperimentBase:
     """Perform chronoamperometry measurement sequence.
 
@@ -257,10 +304,21 @@ def perform_chronoamperometry(
             experiment.well_id,
         )
         ca_results = experiment.results
+        # Fill in the correct parameters based on the potentiostat type
+        if PSTAT == "gamry":
+            params: gamry_potentiostat_ocp_parameters
+            params = gamry_potentiostat_ocp_parameters
+        elif PSTAT == "emstat":
+            params: emstat_potentiostat_ocp_parameters
+            params = emstat_potentiostat_ocp_parameters
+        else:
+            raise ValueError(
+                f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+            )
+        
+
         pstat.OCP(
-            potentiostat_ocp_parameters.OCPvi,
-            potentiostat_ocp_parameters.OCPti,
-            potentiostat_ocp_parameters.OCPrate,
+            params
         )  # OCP
         pstat.activecheck()
         ocp_dep_pass, ocp_char_final_voltage = pstat.check_vf_range(base_filename)
@@ -295,15 +353,24 @@ def perform_chronoamperometry(
             if custom_parameters:  # if not none then use the custom parameters
                 chrono_params = custom_parameters
             else:
-                chrono_params = chrono_parameters(
-                    CAvi=experiment.ca_prestep_voltage,
-                    CAti=experiment.ca_prestep_time_delay,
-                    CAv1=experiment.ca_step_1_voltage,
-                    CAt1=experiment.ca_step_1_time,
-                    CAv2=experiment.ca_step_2_voltage,
-                    CAt2=experiment.ca_step_2_time,
-                    CAsamplerate=experiment.ca_sample_period,
-                )  # CA
+                
+                if PSTAT == "gamry":
+                    chrono_params = gamry_chrono_parameters(
+                        CAvi=experiment.ca_prestep_voltage,
+                        CAti=experiment.ca_prestep_time_delay,
+                        CAv1=experiment.ca_step_1_voltage,
+                        CAt1=experiment.ca_step_1_time,
+                        CAv2=experiment.ca_step_2_voltage,
+                        CAt2=experiment.ca_step_2_time,
+                        CAsamplerate=experiment.ca_sample_period,
+                    )  # CA
+                elif PSTAT == "emstat":
+                    chrono_params = emstat_chrono_parameters(
+                        Estep=experiment.ca_step_1_voltage,
+                        dt=experiment.ca_sample_period,
+                        ttot=experiment.ca_step_1_time,
+                        E2=experiment.ca_step_2_voltage, # TODO: I dont think this is right, we need to see how the emstat expects CA
+                    )
             pstat.chrono(chrono_params)
             pstat.activecheck()
             ca_results.set_ca_data_file(deposition_data_file, context=file_tag)
@@ -341,7 +408,7 @@ def pulsed_chronoamperometry(
     pulse_count: int,
     pause_time: float,
     file_tag: Optional[str] = None,
-    custom_parameters: Optional[chrono_parameters] = None,
+    custom_parameters = None,  # Remove type hint
 ) -> EchemExperimentBase:
     """Perform pulsed chronoamperometry measurement sequence.
 
@@ -389,11 +456,18 @@ def pulsed_chronoamperometry(
             experiment.well_id,
         )
         ca_results = experiment.results
-        pstat.OCP(
-            potentiostat_ocp_parameters.OCPvi,
-            potentiostat_ocp_parameters.OCPti,
-            potentiostat_ocp_parameters.OCPrate,
-        )  # OCP
+        # Fill in the correct parameters based on the potentiostat type
+        if PSTAT == "gamry":
+            params: gamry_potentiostat_ocp_parameters
+            params = gamry_potentiostat_ocp_parameters
+        elif PSTAT == "emstat":
+            params: emstat_potentiostat_ocp_parameters
+            params = emstat_potentiostat_ocp_parameters
+        else:
+            raise ValueError(
+                f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+            )
+        pstat.OCP(params)  # OCP
         pstat.activecheck()
         ocp_dep_pass, ocp_char_final_voltage = pstat.check_vf_range(base_filename)
         ca_results.set_ocp_ca_file(
@@ -427,15 +501,23 @@ def pulsed_chronoamperometry(
             if custom_parameters:  # if not none then use the custom parameters
                 chrono_params = custom_parameters
             else:
-                chrono_params = chrono_parameters(
-                    CAvi=experiment.ca_prestep_voltage,
-                    CAti=experiment.ca_prestep_time_delay,
-                    CAv1=experiment.ca_step_1_voltage,
-                    CAt1=experiment.ca_step_1_time,
-                    CAv2=experiment.ca_step_2_voltage,
-                    CAt2=experiment.ca_step_2_time,
-                    CAsamplerate=experiment.ca_sample_period,
-                )  # CA
+                if PSTAT == "gamry":
+                    chrono_params = gamry_chrono_parameters(
+                        CAvi=experiment.ca_prestep_voltage,
+                        CAti=experiment.ca_prestep_time_delay,
+                        CAv1=experiment.ca_step_1_voltage,
+                        CAt1=experiment.ca_step_1_time,
+                        CAv2=experiment.ca_step_2_voltage,
+                        CAt2=experiment.ca_step_2_time,
+                        CAsamplerate=experiment.ca_sample_period,
+                    )  # CA
+                elif PSTAT == "emstat":
+                    chrono_params = emstat_chrono_parameters(
+                        Estep=experiment.ca_step_1_voltage,
+                        dt=experiment.ca_sample_period,
+                        ttot=experiment.ca_step_1_time,
+                        E2=experiment.ca_step_2_voltage,  # TODO: I dont think this is right, we need to see how the emstat expects CA
+                    )
 
             for pulse in pulse_count:
                 # Perform the pulse
@@ -444,11 +526,10 @@ def pulsed_chronoamperometry(
                 ca_results.set_ca_data_file(deposition_data_file, context=file_tag)
 
                 # OCV
-                pstat.OCP(
-                    potentiostat_ocp_parameters.OCPvi,
-                    pause_time,
-                    potentiostat_ocp_parameters.OCPrate,
-                )
+                ocp_params = params.copy()
+                ocp_params.ttot = pause_time
+
+                pstat.OCP(ocp_params)
                 pstat.activecheck()
                 ca_results.set_ocp_ca_file(base_filename, True, 0.0, file_tag)
 
@@ -482,7 +563,7 @@ def perform_cyclic_voltammetry(
     experiment: EchemExperimentBase,
     file_tag: str = None,
     overwrite_inital_voltage: bool = True,
-    custom_parameters: cv_parameters = None,
+    custom_parameters = None,  # Remove type hint
 ) -> Tuple[EchemExperimentBase]:
     """
     Cyclicvoltamety in a well. This includes the OCP and CV steps.
@@ -527,10 +608,19 @@ def perform_cyclic_voltammetry(
         )
 
         try:
+            # Fill in the correct parameters based on the potentiostat type
+            if PSTAT == "gamry":
+                params: gamry_potentiostat_ocp_parameters
+                params = gamry_potentiostat_ocp_parameters
+            elif PSTAT == "emstat":
+                params: emstat_potentiostat_ocp_parameters
+                params = emstat_potentiostat_ocp_parameters
+            else:
+                raise ValueError(
+                    f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+                )
             pstat.OCP(
-                OCPvi=potentiostat_ocp_parameters.OCPvi,
-                OCPti=potentiostat_ocp_parameters.OCPti,
-                OCPrate=potentiostat_ocp_parameters.OCPrate,
+                params,
             )  # OCP
             pstat.activecheck()
 
@@ -583,16 +673,42 @@ def perform_cyclic_voltammetry(
             cv_params = custom_parameters
             cv_params.CVvi = ocp_final_voltage  # still need to set the initial voltage, not overwriting the original
         else:
-            cv_params = cv_parameters(
-                CVvi=experiment.cv_initial_voltage,
-                CVap1=experiment.cv_first_anodic_peak,
-                CVap2=experiment.cv_second_anodic_peak,
-                CVvf=experiment.cv_final_voltage,
-                CVsr1=experiment.cv_scan_rate_cycle_1,
-                CVsr2=experiment.cv_scan_rate_cycle_2,
-                CVsr3=experiment.cv_scan_rate_cycle_3,
-                CVcycle=experiment.cv_cycle_count,
-            )
+            if PSTAT == "gamry":
+                cv_params = gamry_cv_parameters(
+                    CVvi=experiment.cv_initial_voltage,
+                    CVap1=experiment.cv_first_anodic_peak,
+                    CVap2=experiment.cv_second_anodic_peak,
+                    CVvf=experiment.cv_final_voltage,
+                    CVsr1=experiment.cv_scan_rate_cycle_1,
+                    CVsr2=experiment.cv_scan_rate_cycle_2,
+                    CVsr3=experiment.cv_scan_rate_cycle_3,
+                    CVcycle=experiment.cv_cycle_count,
+                )
+            elif PSTAT == "emstat":
+                # Emstat CV parameters are different, so we need to set them accordingly
+                if experiment.cv_cycle_count == 1:
+                    cv_params = emstat_cv_parameters(
+                        Eini=experiment.cv_initial_voltage,
+                        Ev1=experiment.cv_first_anodic_peak,
+                        Ev2=experiment.cv_second_anodic_peak,
+                        Efin=experiment.cv_final_voltage,
+                        sr=experiment.cv_scan_rate_cycle_1,
+                        dE=experiment.cv_step_size,
+                        nSweeps=1,  # Emstat does not support multiple sweeps in the same way
+                    )
+                else:
+                    # For multiple sweeps, we can set the second sweep parameters
+                    cv_params = emstat_cv_parameters(
+                        Eini=experiment.cv_initial_voltage,
+                        Ev1=experiment.cv_first_anodic_peak,
+                        Ev2=experiment.cv_second_anodic_peak,
+                        Efin=experiment.cv_final_voltage,
+                        sr=experiment.cv_scan_rate_cycle_1,
+                        dE=experiment.cv_step_size,
+                        nSweeps= experiment.cv_cycle_count,
+                        E2=experiment.cv_second_sweep_voltage,
+                        sens2=experiment.cv_second_sweep_sensitivity,
+                    )
 
         try:
             pstat.cyclic(cv_params)

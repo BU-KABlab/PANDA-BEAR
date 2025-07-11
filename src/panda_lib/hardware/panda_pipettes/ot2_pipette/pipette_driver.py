@@ -274,7 +274,7 @@ class Pipette:
         :param s: The speed of the plunger movement in steps/sec
         :type s: int
         """
-        # Send the dispense command
+
         response = self.stepper.dispense(vol, s)
 
         if response.get("success", False):
