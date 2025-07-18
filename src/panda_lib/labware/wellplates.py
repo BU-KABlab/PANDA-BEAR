@@ -608,6 +608,10 @@ class Wellplate:
     def bottom(self):
         """The z-coordinate of the wellplate bottom"""
         return self.plate_data.bottom
+    @property
+    def ca_dispense_height(self):
+        """The height of the wellplate for CA dispense"""
+        return self.plate_data.ca_dispense_height + self.plate_data.bottom
 
     @property
     def echem_height(self):

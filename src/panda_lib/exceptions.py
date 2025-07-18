@@ -178,3 +178,9 @@ class ExperimentError(Exception):
     def __init__(self, message="Experiment failed"):
         self.message = message
         super().__init__(self.message)
+
+class ContactAngleFailure(Exception):
+    def __init__(self, experiment_id, well_id, message="Contact angle measurement failed"):
+        self.experiment_id = experiment_id
+        self.well_id = well_id
+        super().__init__(f"{message} (Experiment {experiment_id}, Well {well_id})")

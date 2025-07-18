@@ -162,6 +162,7 @@ class WellplateReadModel(DeckObjectModel):
     rows: str
     cols: int
     echem_height: float  # height of echem cell placement in mm
+    ca_dispense_height: float  # height of CA dispense in mm
     image_height: float  # height of the image in mm
     panda_unit_id: int
     # TODO Add substrate and well count...probably inherit the PlateTypeModel instead or in addition to the DeckObjectModel

@@ -2,7 +2,7 @@ import logging
 import math
 from typing import Optional, Union
 import time
-from panda_lib.errors import NoAvailableSolution
+from panda_lib.exceptions import NoAvailableSolution
 from panda_lib.hardware.grbl_cnc_mill import Instruments
 from panda_shared.config.config_tools import (
     ConfigParserError,
@@ -43,6 +43,7 @@ def _pipette_action(
     dst_vessel: Union[Well, WasteVial],
     desired_volume: float,
     blowout: bool = True,
+    ca_dispense_height: Optional[float] = None,  # <-- Accept custom height
 ) -> None:
     """Perform pipetting action from source to destination vessel.
 
@@ -118,10 +119,11 @@ def _pipette_action(
             )
 
         # Use standard interface for dispense
+        dispense_z = ca_dispense_height if ca_dispense_height is not None else dst_vessel.top
         toolkit.mill.safe_move(
             dst_vessel.x,
             dst_vessel.y,
-            dst_vessel.top,
+            dispense_z,
             tool=Instruments.PIPETTE,
         )
         toolkit.pipette.dispense(
@@ -145,6 +147,7 @@ def _forward_pipette_v3(
     toolkit: Union[Toolkit, Hardware],
     source_concentration: float = None,
     labware: Optional[Labware] = None,
+    dst_vessel_z_dispense_height: float = None
 ) -> int:
     try:
         if volume <= 0.0:
@@ -188,7 +191,7 @@ def _forward_pipette_v3(
         for vessel, desired_volume in source_vessel_volumes:
             if desired_volume <= 0.0:
                 continue
-            _pipette_action(toolkit, vessel, dst_vessel, desired_volume)
+            _pipette_action(toolkit, vessel, dst_vessel, desired_volume, dst_vessel_z_dispense_height)
 
     except Exception as e:
         toolkit.global_logger.error("Exception occurred during pipetting: %s", e)
@@ -232,6 +235,41 @@ def transfer(
         volume, src_vessel, dst_vessel, toolkit, source_concentration
     )
 
+def contact_angle_transfer(
+    volume: float,
+    src_vessel: Union[str, Well, StockVial],
+    dst_vessel: Union[str, Well, WasteVial],
+    toolkit: Toolkit,
+    ca_dispense_height: float,
+    source_concentration: float = None,
+) -> int:
+    """Transfer liquid between vessels.
+
+    Parameters
+    ----------
+    volume : float
+        Volume to transfer in microliters
+    src_vessel : Union[str, Well, StockVial]
+        Source vessel identifier or object
+    dst_vessel : Union[Well, WasteVial]
+        Destination vessel object
+    toolkit : Toolkit
+        Toolkit object for hardware control
+    source_concentration : float, optional
+        Target concentration in mM, by default None
+
+    Returns
+    -------
+    int
+        0 on success
+
+    Notes
+    -----
+    This is a wrapper around _forward_pipette_v3 for more convenient usage
+    """
+    return _forward_pipette_v3(
+        volume, src_vessel, dst_vessel, toolkit, source_concentration, ca_dispense_height
+    )
 
 def rinse_well(
     instructions: EchemExperimentBase,
@@ -299,7 +337,7 @@ def rinse_well(
 def flush_pipette(
     flush_with: str,
     toolkit: Toolkit,
-    flush_volume: float = 120.0,
+    flush_volume: float = 200.0,
     flush_count: int = 1,
     instructions: Optional[ExperimentBase] = None,
 ):
