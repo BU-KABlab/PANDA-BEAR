@@ -32,3 +32,4 @@ class ExperimentStatus(str, Enum):
     ANALYZING = "analyzing"
     MOVING = "moving"
     PIPETTING = "pipetting"
+    MEASURING_CA = "measuring contact angle"

@@ -151,6 +151,10 @@ def solve_vials_ilp(
 ) -> tuple[dict[float, float], float, dict[str, float]]:
     """
     Solve the concentration mixing problem using integer linear programming.
+    This function calculates the volumes of each vial needed to achieve a target concentration
+    given the concentrations of the vials and the total volume required.
+
+    It is unit agnostic, as long as the concentrations and volumes are consistent.
 
     Parameters
     ----------
