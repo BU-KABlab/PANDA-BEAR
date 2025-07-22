@@ -612,7 +612,11 @@ class Wellplate:
     def ca_dispense_height(self):
         """The height of the wellplate for CA dispense"""
         return self.plate_data.ca_dispense_height + self.plate_data.bottom
-
+    @property
+    def mixing_height(self):
+        """The height of the wellplate for mixing"""
+        return self.plate_data.bottom + 1
+    
     @property
     def echem_height(self):
         return self.plate_data.echem_height + self.plate_data.bottom
