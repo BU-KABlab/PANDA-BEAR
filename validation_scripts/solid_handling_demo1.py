@@ -16,13 +16,13 @@ from pathlib import Path
 from datetime import datetime
 
 # PANDA system imports
-from src.panda_lib.hardware import ArduinoLink, PandaMill
+from panda_lib.hardware import ArduinoLink, PandaMill
 # from panda_lib.hardware.panda_pipettes import Pipette, insert_newz h_pipette
-from src.panda_lib.hardware.arduino_interface import PawduinoFunctions
-from src.panda_lib.toolkit import Toolkit
-from src.panda_lib.types import VialKwargs
-from src.panda_lib.labware.vials import StockVial
-from src.panda_lib.actions.movement import decapping_sequence, capping_sequence
+from panda_lib.hardware.arduino_interface import PawduinoFunctions
+from panda_lib.toolkit import Toolkit
+from panda_lib.types import VialKwargs
+from panda_lib.labware.vials import StockVial
+from panda_lib.actions.movement import decapping_sequence, capping_sequence
 
 # Set up logging
 logger = logging.getLogger("solid_handling_demo")
@@ -54,8 +54,8 @@ well_a1_z_touch = -164.36  # Z coordinate for wellplate A1 (base level) TODO upd
 safe_z = 0
 well_x_init = -139.5  # X coordinate for wellplate A1 TODO update this before running
 well_y_init = -80.2  # Y coordinate for wellplate A1 TODO update this before running
-x_offset = 20.5  # X offset between wells
-y_offset = 20.5  # Y offset between wells
+x_offset = -20.5  # X offset between wells
+y_offset = -20.5  # Y offset between wells
 wells = []
 cols = "ABCDEF"
 rows = [str(i) for i in range(1, 5)]
@@ -267,49 +267,7 @@ try:
     #     arduino
     # )
 
-    # 2. Move pipette to stock vial 1
-    logger.info("Moving pipette to stock vial 1...")
-    mill.safe_move(
-        stock_vial.coordinates.x,
-        stock_vial.coordinates.y,
-        stock_vial.bottom + 80,  # Position above vial
-        tool="pipette"
-    )
-
-    # 3. Lower pipette into stock vial
-    logger.info("Lowering pipette into stock vial...")
-    mill.safe_move(
-        stock_vial.coordinates.x,
-        stock_vial.coordinates.y,
-        vial_z_touch,  # TODO upddate this before running
-        tool="pipette"
-    )
-
-    # 4. Move in rectangular pattern
-    logger.info("Executing rectangular movement pattern...")
-    base_x = stock_vial.coordinates.x
-    base_y = stock_vial.coordinates.y
-    base_z = vial_z_touch  # TODO update this before running
-
-    for point in rect_pattern:
-        target_x = base_x + point["x"]
-        target_y = base_y + point["y"]
-        logger.info(f"Moving to relative position: ({point['x']}, {point['y']})")
-        mill.move_to_position(target_x, target_y, base_z, tool="pipette")
-
-    # 5. Raise pipette up
-    logger.info("Raising pipette...")
-    mill.safe_move(
-        stock_vial.coordinates.x,
-        stock_vial.coordinates.y,
-        stock_vial.bottom + 80,
-        tool="pipette"
-    )
-
-    # 6. Cap the stock vial
-
-
-    # 7. Move pipette to wellplate
+    
     while True:
         wells_input = input("Input the well position (like A1 B2 C3) or measure the whole plate (all), Enter: ")
         
@@ -342,6 +300,52 @@ try:
 
 # TODO: fix this to make sure back to the stock each time
     for well in wells:
+        # 2. Move pipette to stock vial 1
+        logger.info("Moving pipette back to the stock")
+        mill.safe_move(
+            stock_vial.coordinates.x,
+            stock_vial.coordinates.y,
+            stock_vial.bottom + 80,  # Position above vial
+            tool="pipette"
+        )
+
+        # 3. Lower pipette into stock vial
+        logger.info("Lowering pipette into stock vial...")
+        mill.safe_move(
+            stock_vial.coordinates.x,
+            stock_vial.coordinates.y,
+            vial_z_touch,  # TODO upddate this before running
+            tool="pipette"
+        )
+
+
+
+        # # 4. Move in rectangular pattern
+        # logger.info("Executing rectangular movement pattern...")
+        # base_x = stock_vial.coordinates.x
+        # base_y = stock_vial.coordinates.y
+        # base_z = vial_z_touch  # TODO update this before running
+
+        # for point in rect_pattern:
+        #     target_x = base_x + point["x"]
+        #     target_y = base_y + point["y"]
+        #     logger.info(f"Moving to relative position: ({point['x']}, {point['y']})")
+        #     mill.move_to_position(target_x, target_y, base_z, tool="pipette")
+
+
+
+        # 5. Raise pipette up
+        logger.info("Raising pipette...")
+        mill.safe_move(
+            stock_vial.coordinates.x,
+            stock_vial.coordinates.y,
+            stock_vial.bottom + 80,
+            tool="pipette"
+        )
+        
+        # 6. Cap the stock vial
+
+        # 7. Move pipette to wellplate
         well_a1_x, well_a1_y = get_well_coordinates(well)
         logger.info(f"Moving to wellplate position: {well}")
         mill.safe_move(
@@ -360,9 +364,12 @@ try:
         tool="pipette",
         )
 
-    # 10. Raise pipette to safe position
-    logger.info("Moving to safe position...")
-    mill.move_to_safe_position()
+        # 10. Raise pipette to safe position
+        logger.info("Moving to safe position...")
+        mill.move_to_safe_position()
+
+        input("Please Enter to continue if cleaning is done:")
+
 
     # Protocol complete
     logger.info("Solid handling protocol completed successfully")
