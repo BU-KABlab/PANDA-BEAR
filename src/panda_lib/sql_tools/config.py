@@ -32,10 +32,13 @@ def get_database_url() -> str:
         db_user = config.get("TESTING", "testing_db_user", fallback="")
         db_password = config.get("TESTING", "testing_db_password", fallback="")
     else:
+        # Use the full production_db_url if present
+        db_url = config.get("PRODUCTION", "production_db_url", fallback="")
+        if db_url:
+            return db_url.strip('"')
+        # fallback to manual construction if needed
         db_type = config.get("PRODUCTION", "production_db_type", fallback="sqlite")
-        db_address = config.get(
-            "PRODUCTION", "production_db_address", fallback="panda.db"
-        )
+        db_address = config.get("PRODUCTION", "production_db_address", fallback="panda.db")
         db_user = config.get("PRODUCTION", "production_db_user", fallback="")
         db_password = config.get("PRODUCTION", "production_db_password", fallback="")
 
@@ -44,6 +47,9 @@ def get_database_url() -> str:
         return f"sqlite:///{db_address}"
     elif db_type == "postgresql":
         return f"postgresql://{db_user}:{db_password}@{db_address}"
+    elif db_type == "mysql":
+        # fallback construction if production_db_url is not set
+        return f"mysql+pymysql://{db_user}:{db_password}@{db_address}"
     else:
         raise ValueError(f"Unsupported database type: {db_type}")
 

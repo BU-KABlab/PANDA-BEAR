@@ -11,7 +11,7 @@ import os
 
 # region Protocols
 from panda_lib.exceptions import ProtocolNotFoundError
-from panda_shared import read_config
+from panda_shared.config.config_tools import read_config
 from panda_shared.db_setup import SessionLocal
 
 from ..models import Protocols

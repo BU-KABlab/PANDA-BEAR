@@ -27,7 +27,7 @@ from panda_lib.types import WellKwargs
 from panda_shared.config.config_tools import read_config_value
 from panda_shared.db_setup import SessionLocal
 
-from .schemas import (
+from panda_lib.labware.schemas import (
     PlateTypeModel,
     WellplateReadModel,
     WellplateWriteModel,
@@ -608,14 +608,6 @@ class Wellplate:
     def bottom(self):
         """The z-coordinate of the wellplate bottom"""
         return self.plate_data.bottom
-    @property
-    def ca_dispense_height(self):
-        """The height of the wellplate for CA dispense"""
-        return self.plate_data.ca_dispense_height + self.plate_data.bottom
-    @property
-    def mixing_height(self):
-        """The height of the wellplate for mixing"""
-        return self.plate_data.bottom + 1
     
     @property
     def echem_height(self):
@@ -731,7 +723,7 @@ def _remove_experiment_from_db(
         return False, f"Error occurred while deleting the experiment: {e}"
 
 
-def load_configuration(filename: str = "hardware/grbl_cnc_mill/_configuration.json"):
+def load_configuration(filename: str = "src/panda_lib/hardware/grbl_cnc_mill/_configuration.json"):
     """Load the configuration from the JSON file"""
 
     filename: Path = Path(filename)
@@ -746,7 +738,7 @@ def load_configuration(filename: str = "hardware/grbl_cnc_mill/_configuration.js
 
 
 def save_configuration(
-    config, filename: str = "hardware/grbl_cnc_mill/_configuration.json"
+    config, filename: str = "src/panda_lib/hardware/grbl_cnc_mill/_configuration.json"
 ):
     """Save the configuration to the JSON file"""
 
@@ -932,5 +924,6 @@ def read_current_wellplate_info(
 
 
 if __name__ == "__main__":
+    change_wellplate_location()
     # Lets add a wellplate to the database
     pass

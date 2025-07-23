@@ -7,15 +7,18 @@ from panda_lib.experiments.experiment_types import EchemExperimentBase
 from panda_lib.actions.electrochemistry import (
     ExperimentStatus,
 )
-from panda_lib.actions import (
-    image_well,
+from panda_lib.actions.imaging import (
+    image_well
+)
+from panda_lib.actions.vessel_handling import (
     solution_selector,
-    transfer,
-    contact_angle_transfer,
     waste_selector,
 )
+from panda_lib.actions.pipetting import (
+    transfer,
+    contact_angle_transfer,
+)
 from panda_lib.toolkit import Toolkit
-import panda_lib.actions
 
 
 
@@ -50,14 +53,14 @@ def measure_contact_angle(
             src_vessel=toolkit.wellplate.wells[instructions.well_id],
             dst_vessel=waste_selector("waste", 10),
             toolkit=toolkit,
-            ca_dispense_height=toolkit.wellplate.ca_dispense_height - 3.0,  # TODO: verify dispense height for wellplate
+            ca_dispense_height=toolkit.wellplate.bottom + 3, 
         )
 
         toolkit.global_logger.info("3. Rinsing the well 3x with IPA")
         instructions.set_status_and_save(ExperimentStatus.RINSING)
         for i in range(3):
             toolkit.global_logger.info("Rinse %d of 3", i + 1)
-            panda_lib.actions.transfer(
+            transfer(
                 volume=200,
                 src_vessel=solution_selector("ipa", 200),
                 dst_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -70,7 +73,7 @@ def measure_contact_angle(
                 z_coord=toolkit.wellplate.z_top,
                 instrument="pipette",
             )
-            panda_lib.actions.transfer(
+            transfer(
                 volume=200,
                 src_vessel=toolkit.wellplate.wells[instructions.well_id],
                 dst_vessel=waste_selector("waste", 200),

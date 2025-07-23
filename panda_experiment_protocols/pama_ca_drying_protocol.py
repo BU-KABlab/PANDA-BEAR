@@ -27,7 +27,7 @@ from panda_lib.toolkit import Toolkit
 from panda_lib.utilities import Instruments, solve_vials_ilp
 
 
-PROTOCOL_ID = 999 # TODO: Update with actual protocol ID
+PROTOCOL_ID = 30 
 
 
 def main(
@@ -220,7 +220,7 @@ def pama_deposition(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
+            z_coord=toolkit.wellplate.top,
             instrument=Instruments.PIPETTE,
         )
         transfer(
@@ -330,78 +330,3 @@ def pama_ipa_contact_angle(
         )
 
     toolkit.global_logger.info("Contact angle measurement complete\n\n")
-
-''''
-def measure_contact_angle(
-    instructions: EchemExperimentBase,
-    toolkit: Toolkit,
-):
-    """
-    0. Dispense 10µL droplet of water into well
-    1. Measure contact angle by capturing images
-    2. Clear well contents into waste
-    3. Rinse the well 3x with IPA
-
-
-    Args:
-        instructions (EchemExperimentBase): _description_
-        toolkit (Toolkit): _description_
-    """
-    
-    toolkit.global_logger.info("0. Dispensing 10µL droplet of water into well")
-    instructions.set_status_and_save(ExperimentStatus.DEPOSITING)
-    transfer(
-        volume=10,
-        src_vessel=solution_selector("water", 10),
-        dst_vessel=toolkit.wellplate.wells[instructions.well_id],
-        toolkit=toolkit,
-    )
-
-    toolkit.global_logger.info("1. Imaging the well")
-    instructions.set_status_and_save(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "ContactAngle", curvature_image=True, add_datazone=False)
-    
-    
-    toolkit.global_logger.info("2. Clearing well contents into waste")
-    instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    transfer(
-        volume=10,
-        src_vessel=toolkit.wellplate.wells[instructions.well_id],
-        dst_vessel=waste_selector(
-            "waste",
-            10,
-        ),
-        toolkit=toolkit,
-    )
-
-    toolkit.global_logger.info("7. Rinsing the well 3x with IPA")
-    instructions.set_status_and_save(ExperimentStatus.RINSING)
-    for i in range(3):
-        # Pipette the rinse solution into the well
-        toolkit.global_logger.info("Rinse %d of 3", i + 1)
-        panda_lib.actions.transfer(
-            volume=200,
-            src_vessel=solution_selector("ipa", 200),
-            dst_vessel=toolkit.wellplate.wells[instructions.well_id],
-            toolkit=toolkit,
-        )
-
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.PIPETTE,
-        )
-        # Clear the well
-        panda_lib.actions.transfer(
-            volume=200,
-            src_vessel=toolkit.wellplate.wells[instructions.well_id],
-            dst_vessel=waste_selector(
-                "waste",
-                200,
-            ),
-            toolkit=toolkit,
-        )
-
-    toolkit.global_logger.info("Contact Angle Measurement Complete\n\n")
-'''
