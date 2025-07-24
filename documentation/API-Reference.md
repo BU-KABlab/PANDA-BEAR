@@ -73,7 +73,6 @@ toolkit = Toolkit()
 | Property/Method               | Description                        |
 | ----------------------------- | ---------------------------------- |
 | `toolkit.mill`                | Access to the gantry               |
-| `toolkit.scale`               | Access to the sartorius scale      |
 | `toolkit.pipette`             | Access to the OT2 or WPI Pipette   |
 | `toolkit.arduino`             | Access to the PAW arduino          |
 | `toolkit.camera`              | Access to the camera               |

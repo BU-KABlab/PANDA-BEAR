@@ -118,8 +118,8 @@ def validate_file_name(file_name: str) -> str:
 
 
 def OCP(params: potentiostat_ocp_parameters):
-    """Run OCP experiment on EmStat Pico."""
-    model = "emstatpico"
+    """Run OCP experiment on EmStat 4S."""
+    model = "emstat4s"
     folder = read_data_dir()
     global COMPLETE_FILE_NAME
     hp.potentiostat.Setup(model, None, folder, verbose=0)
