@@ -372,7 +372,8 @@ def perform_chronoamperometry(
                         Estep=experiment.ca_step_1_voltage,
                         dt=experiment.ca_sample_period,
                         ttot=experiment.ca_step_1_time,
-                        E2=experiment.ca_step_2_voltage, # TODO: I dont think this is right, we need to see how the emstat expects CA
+                        E2=experiment.ca_step_2_voltage, # TODO: I dont think this is right, we need to see how the emstat expects CA 
+                        # TODO: E2 is the voltage for a second working electrode, not a second step
                     )
             pstat.chrono(chrono_params)
             pstat.activecheck()
