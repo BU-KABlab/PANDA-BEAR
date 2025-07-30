@@ -27,7 +27,7 @@ from panda_lib.toolkit import Toolkit
 from panda_lib.utilities import Instruments, solve_vials_ilp
 from panda_lib.hardware.panda_pipettes import insert_new_pipette
 
-PROTOCOL_ID = 30 
+PROTOCOL_ID = 31 
 
 
 def main(
@@ -58,12 +58,12 @@ def pama_ca_drying(
     3. pama_contact_angle
     
     
-
+    
     pama_deposition(
         experiment=experiment,
         toolkit=toolkit,
     )
-   """
+    """
     pama_ipa_contact_angle(
         experiment=experiment,
         toolkit=toolkit,
@@ -282,6 +282,11 @@ def pama_ipa_contact_angle(
     toolkit.global_logger.info(
         "Running experiment %s part 2", experiment.experiment_id
     )
+    image_well(
+        toolkit=toolkit,
+        experiment=experiment,
+        image_label="BeforeIPARinsing", curvature_image=False, add_datazone=False
+    )
     toolkit.global_logger.info("0. Rinse with IPA")
     experiment.set_status_and_save(ExperimentStatus.RINSING)
     for i in range(3):
@@ -310,14 +315,14 @@ def pama_ipa_contact_angle(
             ),
             toolkit=toolkit,
         )
+        toolkit.global_logger.info("1. Image well")
+        experiment.set_status_and_save(ExperimentStatus.IMAGING)
+        image_well(
+            toolkit=toolkit,
+            experiment=experiment,
+            image_label=f"AfterRinsing_{i}x",
+        )
 
-    toolkit.global_logger.info("1. Image well")
-    experiment.set_status_and_save(ExperimentStatus.IMAGING)
-    image_well(
-        toolkit=toolkit,
-        experiment=experiment,
-        image_label="AfterRinsing",
-    )
     # create a loop for drying times combined with measuring contact angle at each time interval
     toolkit.global_logger.info("2. Drying the well and measuring contact angle")
     drying_times = [0,1,2,3,5,8,13,22,36,60]  # in minutes

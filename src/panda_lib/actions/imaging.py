@@ -96,6 +96,7 @@ def image_well(
 
         if TESTING:
             Path(filepath).touch()
+        
         else:
             if curvature_image:
                 logger.debug("Moving camera above well %s", well_id)
@@ -105,31 +106,51 @@ def image_well(
                     z_start = toolkit.wellplate.plate_data.image_height
                     num_steps = int(2.0 / 0.2) + 1  # 11 steps: 0, -0.2, ..., -2.0
 
+                    # Define brightness levels and associated functions
+                    brightness_levels = [
+                        ("05", toolkit.arduino.ca_lights_on_5),
+                        ("10", toolkit.arduino.ca_lights_on_10),
+                        ("20", toolkit.arduino.ca_lights_on_20),
+                        ("30", toolkit.arduino.ca_lights_on_30),
+                        ("50", toolkit.arduino.ca_lights_on_50),
+                    ]
+
                     for i in range(num_steps):
-                        z = z_start - i * 0.2
+                        z = z_start + i * 0.2
                         toolkit.mill.safe_move(
                             x_coord=x,
                             y_coord=y,
                             z_coord=z,
                             tool=Instruments.LENS,
                         )
-                        toolkit.arduino.curvature_lights_on()
-                        z_label = f"{image_label}_z{z:.2f}mm" if image_label else f"z{z:.2f}mm"
-                        filepath_z = image_filepath_generator(
-                            exp_id, pjct_id, cmpgn_id, well_id, z_label, PATH_TO_DATA
-                        )
-                        logger.debug("Capturing image of well %s at Z=%.2f", experiment.well_id, z)
-                        filepath_result, result = capture_new_image(
-                            save=True, num_images=1, file_name=filepath_z, logger=logger,
-                        )
-                        toolkit.arduino.lights_off()
 
-                        if not result:
-                            logger.error("Failed to capture image at Z=%.2f", z)
-                            continue  # Skip to next height
-                        experiment.results.append_image_file(filepath_result, context=z_label)
+                        for brightness_label, brightness_func in brightness_levels:
+                            success = brightness_func()
+                            if not success:
+                                logger.warning("Failed to set curvature lights to %s%% brightness", brightness_label)
+                                continue
+
+                            base_label = str(image_label) if image_label else ""
+                            z_label = f"{base_label}_z{z:.2f}mm_b{brightness_label}"
+
+                            filepath_z = image_filepath_generator(
+                                exp_id, pjct_id, cmpgn_id, well_id, z_label, PATH_TO_DATA
+                            )
+                            logger.debug("Capturing image of well %s at Z=%.2f, brightness=%s%%",
+                                        experiment.well_id, z, brightness_label)
+                            filepath_result, result = capture_new_image(
+                                save=True, num_images=1, file_name=filepath_z, logger=logger,
+                            )
+                            toolkit.arduino.lights_off()
+
+                            if not result:
+                                logger.error("Failed to capture image at Z=%.2f, brightness=%s%%", z, brightness_label)
+                                continue
+                            experiment.results.append_image_file(filepath_result, context=z_label)
                 else:
                     pass
+
+        
             else:
                 logger.debug("Moving camera above well %s", well_id)
                 if well_id != "test":
@@ -142,7 +163,7 @@ def image_well(
                 else:
                     pass
                 
-                toolkit.arduino.white_lights_on()
+                toolkit.arduino.white_lights_on5()
                 logger.debug("Capturing image of well %s", experiment.well_id)
                 filepath, result = capture_new_image(
                     save=True, num_images=1, file_name=filepath, logger=logger,

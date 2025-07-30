@@ -79,7 +79,7 @@ def cyclic_volt_pgma_fc(
             # Do not change the instructions initial voltage during custom CV
             # We only change this for the deposition step which is the only step that
             # The instruction parameters apply to.
-            overwrite_inital_voltage=False,
+            overwrite_initial_voltage=False,
             custom_parameters=characterizing_cyclic_volt_params,
         )
 
@@ -138,7 +138,7 @@ def cyclic_volt_pgma_pama(
             # Do not change the instructions initial voltage during custom CV
             # We only change this for the deposition step which is the only step that
             # The instruction parameters apply to.
-            overwrite_inital_voltage=False,
+            overwrite_initial_voltage=False,
             custom_parameters=characterizing_cyclic_volt_params,
         )
 

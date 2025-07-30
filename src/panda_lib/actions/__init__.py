@@ -7,7 +7,7 @@ from .actions_pgma import (
     cyclic_volt_pgma_fc,
     cyclic_volt_pgma_pama,
 )
-from .actions_pama import measure_contact_angle
+from .actions_pama import (measure_contact_angle, measure_contact_angle_norinse)
 
 from .electrochemistry import (
     move_to_and_perform_ca,
@@ -40,6 +40,7 @@ __all__ = [
     "cyclic_volt_pgma_pama",
     # From .actions_pama
     "measure_contact_angle",
+    "measure_contact_angle_norinse",
     # From .electrochemistry
     "move_to_and_perform_ca",
     "move_to_and_perform_cv",

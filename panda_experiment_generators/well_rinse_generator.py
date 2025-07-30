@@ -7,7 +7,7 @@ from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
 PROJECT_ID = 300 
-EXPERIMENT_NAME = "pama_CA_drying"
+EXPERIMENT_NAME = "well_rinse_drying_times"
 CAMPAIGN_ID = 2 
 PLATE_TYPE = 8 
 
@@ -15,7 +15,6 @@ PLATE_TYPE = 8
 def main():
     """Runs the pama contact angle drying experiment generator."""
 
-    # controller.load_new_wellplate(new_wellplate_type_number=6)
     starting_experiment_id = scheduler.determine_next_experiment_id()
     experiment_id = starting_experiment_id
     experiments: list[experiment_types.EchemExperimentBase] = []
@@ -26,7 +25,7 @@ def main():
             experiments.append(
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
-                    protocol_name="pama_ca_drying_protocol",
+                    protocol_name="well_rinse_protocol",
                     analysis_id=999, # TODO: Update with actual analysis ID
                     well_id="B7",
                     wellplate_type_id=PLATE_TYPE,
@@ -39,7 +38,7 @@ def main():
                         "ipa": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "dmf": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "acn": {"volume": 0, "concentration": 0.0, "repeated": 1},
-                        "water": {"volume": 10, "concentration": 0.0, "repeated": 1},
+                        "water": {"volume": 0, "concentration": 0.0, "repeated": 1},
                     },
                     rinse_sol_name="dmf",
                     rinse_vol=200,

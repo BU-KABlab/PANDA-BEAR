@@ -32,7 +32,18 @@ class PawduinoFunctions(enum.Enum):
     CMD_PIPETTE_STATUS = "14"  # Get pipette status (homed, position, max_volume)
     CMD_PIPETTE_MIX = "15"  # Expected: 15,repetitions,volume,rate_opt
     CMD_MOVE_RELATIVE = "16"  # Expected: 16,direction,steps,velocity
-
+    CMD_WHITE_ON_100 = "17"  # Turn on white lights with 100 brightness out of 250
+    CMD_WHITE_ON_50 = "18"
+    CMD_WHITE_ON_25 = "19"
+    CMD_WHITE_ON_15 = "20"
+    CMD_WHITE_ON_10 = "21"
+    CMD_WHITE_ON_5 = "22"
+    CMD_CONTACT_ON_50 = "23"
+    CMD_CONTACT_ON_30 = "24"
+    CMD_CONTACT_ON_20 = "25"
+    CMD_CONTACT_ON_10 = "26"
+    CMD_CONTACT_ON_5 = "27"
+    
 
 class PawduinoReturnCodes(enum.Enum):
     """Enum for Arduino return codes (used in mock and for validation)"""
@@ -53,7 +64,12 @@ class PawduinoReturnCodes(enum.Enum):
     RESP_PIPETTE_MIXED = "OK:Pipette mixed"
     # Example: "OK:{homed:1,pos:10.5,max_vol:200}"
     RESP_PIPETTE_STATUS = "OK:{homed:1,pos:0.0,max_vol:200.0}"
-
+    RESP_WHITE_ON_5 = "OK:White lights on 5%"
+    RESP_CONTACT_ON_50 = "OK:Contact angle lights on 50%"
+    RESP_CONTACT_ON_30 = "OK:Contact angle lights on 30%"
+    RESP_CONTACT_ON_20 = "OK:Contact angle lights on 20%"
+    RESP_CONTACT_ON_10 = "OK:Contact angle lights on 10%"
+    RESP_CONTACT_ON_5 = "OK:Contact angle lights on 5%"
 
 class ArduinoException(Exception):
     """Base class for Arduino communication errors."""
@@ -725,6 +741,36 @@ class ArduinoLink:
         response = self.send(PawduinoFunctions.CMD_WHITE_ON)
         return response.get("success", False)
 
+    def white_lights_on5(self):
+        """Turn on the white lights"""
+        response = self.send(PawduinoFunctions.CMD_WHITE_ON_5)
+        return response.get("success", False)
+    
+    def white_lights_on10(self):
+        """Turn on the white lights"""
+        response = self.send(PawduinoFunctions.CMD_WHITE_ON_10)
+        return response.get("success", False)
+    
+    def white_lights_on15(self):
+        """Turn on the white lights"""
+        response = self.send(PawduinoFunctions.CMD_WHITE_ON_15)
+        return response.get("success", False)
+    
+    def white_lights_on25(self):
+        """Turn on the white lights"""
+        response = self.send(PawduinoFunctions.CMD_WHITE_ON_25)
+        return response.get("success", False)
+    
+    def white_lights_on50(self):
+        """Turn on the white lights"""
+        response = self.send(PawduinoFunctions.CMD_WHITE_ON_50)
+        return response.get("success", False)
+    
+    def white_lights_on100(self):
+        """Turn on the white lights"""
+        response = self.send(PawduinoFunctions.CMD_WHITE_ON_100)
+        return response.get("success", False)
+    
     def white_lights_off(self):
         """Turn off the white lights"""
         response = self.send(PawduinoFunctions.CMD_WHITE_OFF)
@@ -738,6 +784,31 @@ class ArduinoLink:
     def curvature_lights_on(self):
         """Turn on the rb lights"""
         response = self.send(PawduinoFunctions.CMD_CONTACT_ON)
+        return response.get("success", False)
+
+    def ca_lights_on_50(self):
+        """Turn on the rb lights"""
+        response = self.send(PawduinoFunctions.CMD_CONTACT_ON_50)
+        return response.get("success", False)
+    
+    def ca_lights_on_30(self):
+        """Turn on the rb lights"""
+        response = self.send(PawduinoFunctions.CMD_CONTACT_ON_30)
+        return response.get("success", False)
+    
+    def ca_lights_on_20(self):
+        """Turn on the rb lights"""
+        response = self.send(PawduinoFunctions.CMD_CONTACT_ON_20)
+        return response.get("success", False)
+    
+    def ca_lights_on_10(self):
+        """Turn on the rb lights"""
+        response = self.send(PawduinoFunctions.CMD_CONTACT_ON_10)
+        return response.get("success", False)
+    
+    def ca_lights_on_5(self):
+        """Turn on the rb lights"""
+        response = self.send(PawduinoFunctions.CMD_CONTACT_ON_5)
         return response.get("success", False)
 
     async def async_curvature_lights_on(self):

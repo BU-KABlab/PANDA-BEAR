@@ -6,10 +6,10 @@ from pydantic import ValidationError
 from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
-PROJECT_ID = 999 # TODO: Update with actual project ID
+PROJECT_ID = 300 
 EXPERIMENT_NAME = "pama_CA_LHStraining"
-CAMPAIGN_ID = 999 # TODO: Update with actual campaign ID
-PLATE_TYPE = 4 # TODO: Update with actual plate type
+CAMPAIGN_ID = 2
+PLATE_TYPE = 8 
 
 params_df = pd.read_csv(
     r".\panda_experiment_generators\pama_ca_trainingdata_params.csv"
@@ -31,24 +31,25 @@ def main():
             experiments.append(
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
-                    protocol_name="pama_ca_drying_protocol",
-                    analysis_id=999, # TODO: Update with actual analysis ID
+                    protocol_name="pama_ca_trainingdata_protocol",
+                    analysis_id=999, 
                     well_id="A1",
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
                     project_id=PROJECT_ID,
                     project_campaign_id=CAMPAIGN_ID,
                     solutions={
-                        "pama_200": {"volume": 300, "concentration": 200, "repeated": 1},
-                        "electrolyte": {"volume": 300, "concentration": 0.0, "repeated": 1},
-                        "ipa": {"volume": 200, "concentration": 0.0, "repeated": 1},
-                        "dmf": {"volume": 200, "concentration": 0.0, "repeated": 1},
-                        "acn": {"volume": 200, "concentration": 0.0, "repeated": 1},
+                        "pama_200": {"volume": 0, "concentration": 200, "repeated": 1},
+                        "electrolyte": {"volume": 0, "concentration": 0.0, "repeated": 1},
+                        "ipa": {"volume": 0, "concentration": 0.0, "repeated": 1},
+                        "dmf": {"volume": 0, "concentration": 0.0, "repeated": 1},
+                        "acn": {"volume": 0, "concentration": 0.0, "repeated": 1},
+                        "water": {"volume": 0, "concentration": 0.0, "repeated": 1},
                     },
                     rinse_sol_name="dmf",
                     rinse_vol=200,
                     rinse_count=3,
-                    flush_sol_name="electrolyte_flush",
+                    flush_sol_name="dmf",
                     flush_sol_vol=200,
                     flush_count=3,
                     pama_concentration=pama_conc,

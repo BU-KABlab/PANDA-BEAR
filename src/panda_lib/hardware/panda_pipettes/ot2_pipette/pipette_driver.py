@@ -266,7 +266,7 @@ class Pipette:
 
 
     @tip_check
-    def dispense(self, vol: float, s: int = 3000):
+    def dispense(self, vol: float, s: int = 2000):
         """Moves the plunger downwards to dispense liquid out of the pipette tip
 
         :param vol: The volume of liquid to dispense in uL
@@ -283,7 +283,7 @@ class Pipette:
                 self.position = response["value2"]
             logger.info("Dispensed %s uL, new position: %s mm", vol, self.position)
             time.sleep(2) #delay before priming, important for more viscous solutions, adjust as needed
-            
+            '''
             # Auto-prime after dispensing to reset position for next operation
             logger.info("Automatically priming after dispense...")
             prime_response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.prime_position, s)
@@ -295,6 +295,7 @@ class Pipette:
             else:
                 logger.warning("Auto-prime after dispense failed: %s", 
                             prime_response.get("message", "Unknown error"))
+            '''
         else:
             error_msg = response.get("message", "Unknown error")
             logger.error("Failed to dispense %s uL: %s", vol, error_msg)

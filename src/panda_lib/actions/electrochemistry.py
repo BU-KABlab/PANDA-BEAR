@@ -3,6 +3,7 @@ import os
 from logging import Logger
 from pathlib import Path
 from typing import Optional, Tuple
+import copy
 
 from panda_shared.config.config_tools import (
     ConfigParserError,
@@ -321,10 +322,12 @@ def perform_chronoamperometry(
             params
         )  # OCP
         pstat.activecheck()
+        '''
         ocp_dep_pass, ocp_char_final_voltage = pstat.check_vf_range(base_filename)
         ca_results.set_ocp_ca_file(
             base_filename, ocp_dep_pass, ocp_char_final_voltage, file_tag
         )
+        
         logger.info(
             "OCP of well %s passed: %s",
             experiment.well_id,
@@ -335,7 +338,7 @@ def perform_chronoamperometry(
         if not ocp_dep_pass:
             experiment.set_status_and_save(ExperimentStatus.ERROR)
             raise OCPError("CA")
-
+        '''
         try:
             experiment.set_status_and_save(ExperimentStatus.EDEPOSITING)
             logger.info("Beginning eChem deposition of well: %s", experiment.well_id)
@@ -519,7 +522,7 @@ def pulsed_chronoamperometry(
                         E2=experiment.ca_step_2_voltage,  # TODO: I dont think this is right, we need to see how the emstat expects CA
                     )
 
-            for pulse in pulse_count:
+            for _ in range(pulse_count):
                 # Perform the pulse
                 pstat.chrono(chrono_params)
                 pstat.activecheck()
@@ -562,7 +565,7 @@ def pulsed_chronoamperometry(
 def perform_cyclic_voltammetry(
     experiment: EchemExperimentBase,
     file_tag: str = None,
-    overwrite_inital_voltage: bool = True,
+    overwrite_initial_voltage: bool = True,
     custom_parameters = None,  # Remove type hint
 ) -> Tuple[EchemExperimentBase]:
     """
@@ -666,7 +669,7 @@ def perform_cyclic_voltammetry(
         )
         # FEATURE have cyclic return the max and min values for the characterization
         # and save them to the results
-        if overwrite_inital_voltage:
+        if overwrite_initial_voltage:
             experiment.cv_initial_voltage = ocp_final_voltage
 
         if custom_parameters:  # if not none then use the custom parameters

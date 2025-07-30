@@ -222,7 +222,7 @@ def solve_vials_ilp(
     # volumes for each vial (integer), binary variables, and deviation (continuous)
     v_vars = {
         f"C{concentration}": pulp.LpVariable(
-            f"C{concentration}", lowBound=0, upBound=200, cat="Continuous"
+            f"C{concentration}", lowBound=0, upBound=300, cat="Continuous"
         )
         for concentration in vial_concentrations
     }
@@ -273,11 +273,11 @@ def solve_vials_ilp(
     # Additional constraints to enforce volume values
     for i, concentration in enumerate(vial_concentrations):
         prob += (
-            v_vars[f"C{concentration}"] >= 20 * b_vars[i],
+            v_vars[f"C{concentration}"] >= 10 * b_vars[i],
             f"LowerBoundConstraint{i}",
         )
         prob += (
-            v_vars[f"C{concentration}"] <= 120 * b_vars[i],
+            v_vars[f"C{concentration}"] <= 300 * b_vars[i],
             f"UpperBoundConstraint{i}",
         )
 

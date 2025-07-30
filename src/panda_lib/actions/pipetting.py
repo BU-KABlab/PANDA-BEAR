@@ -42,7 +42,6 @@ def _pipette_action(
     src_vessel: Union[Vial, Well],
     dst_vessel: Union[Well, WasteVial],
     desired_volume: float,
-    blowout: bool = True,
     ca_dispense_height: Optional[float] = None,  # <-- Accept custom height
 ) -> None:
     """Perform pipetting action from source to destination vessel.
@@ -416,7 +415,6 @@ def purge_pipette(
         volume_to_dispense=liquid_volume,
         being_infused=None,
         infused_into=purge_vial,
-        blowout_ul=total_volume - liquid_volume,
     )
 
     # Cap the waste vial
@@ -511,7 +509,6 @@ def mix(
             being_infused=None,
             infused_into=well,
             rate=toolkit.pipette.max_pump_rate,
-            blowout_ul=0,
         )
 
     toolkit.pipette.dispense(40)

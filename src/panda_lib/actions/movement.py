@@ -2,6 +2,7 @@ import asyncio
 import logging
 from logging import Logger
 from pathlib import Path
+import time
 
 from panda_lib.hardware.gantry_interface import PandaMill as Mill
 from panda_shared.config.config_tools import (
@@ -295,52 +296,110 @@ def move_electrode_to_vial_bottom(
 def decapping_sequence(
     mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink
 ) -> None:
-    """Execute vial decapping sequence.
+    """Execute vial decapping sequence with retry and manual fallback."""
 
-    Parameters
-    ----------
-    mill : Mill
-        The mill controller object
-    target_coords : Coordinates
-        Target coordinates for decapping operation
-    ard_link : ArduinoLink
-        Arduino interface for cap control
+    def check_line_break() -> bool:
+        unit_version = config.getfloat("PANDA", "version")
+        if unit_version > 1.0:
+            return asyncio.run(ard_link.async_line_break())
+        else:
+            return True  # Assume success for legacy units
 
-    Notes
-    -----
-    Sequence steps:
-    1. Move to target coordinates
-    2. Activate decapper
-    3. Move decapper up to 0mm Z position
-    4. Check that a cap is present by checking the line break sensor
-       (should be true - broken line and cap present)
-    """
-    # Move to the target coordinates
+    
     mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+    time.sleep(0.5)  # Short pause to settle after move
 
-    # Activate the decapper
+    
     ard_link.no_cap()
+    time.sleep(1.0)  # Wait for decapper to engage 
 
-    # Move the decapper up to 0
+   
     mill.move_to_position(
         target_coords.x,
         target_coords.y,
         0,
         tool="decapper",
     )
+    time.sleep(1.0)  # Wait for motion to complete before checking sensor
 
-    unit_version = config.getfloat("PANDA", "version")
-    # Check that a cap is present by checking the line break sensor (should be true - broken line and cap present)
-    if unit_version > 1.0:
-        line_break_result = asyncio.run(ard_link.async_line_break())
-        if not line_break_result:
-            raise ValueError("Cap is not present on decapper after decapping operation")
-    else:
-        # For unit versions <= 1.0, we assume the cap is present
-        # as the line break sensor is not available
-        pass
+    
+    for attempt in range(3):
+        if check_line_break():
+            return  # Success
+        elif attempt == 0:
+            # Retry once
+            print("⚠️ Cap not detected. Retrying decapping...")
+            time.sleep(1.0)
+            mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+            time.sleep(0.5)
+            ard_link.no_cap()
+            time.sleep(1.0)
+            mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
+            time.sleep(1.0)
+        else:
+            # Final failure
 
+            mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+            time.sleep(0.5)
+            ard_link.no_cap()
+            time.sleep(1.0)
+            mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
+            time.sleep(1.0)
 
+            if not check_line_break():
+                raise ValueError("Cap still not detected.")
+
+def capping_sequence(
+    mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink
+) -> None:
+    """Execute vial capping sequence with retry and manual fallback."""
+
+    def check_line_break() -> bool:
+        unit_version = config.getfloat("PANDA", "version")
+        if unit_version > 1.0:
+            return asyncio.run(ard_link.async_line_break())
+        else:
+            return True  # Assume success for legacy units
+
+    
+    mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+    time.sleep(0.5)  # Short pause to settle after move
+
+    
+    ard_link.ALL_CAP()
+    time.sleep(1.0)  # Wait for decapper to disengage 
+
+   
+    mill.move_to_position(
+        target_coords.x,
+        target_coords.y,
+        0,
+        tool="decapper",
+    )
+    time.sleep(3.0)  # Wait for motion to complete before checking sensor
+
+    
+    for attempt in range(3):
+        if not check_line_break():
+            return  # Success
+        elif attempt == 0:
+            # Retry
+            print("⚠️ Cap detected. Retrying capping...")
+            time.sleep(1.0)
+            mill.safe_move(target_coords.x, 0, 0, tool="decapper")
+            time.sleep(1.0)
+
+        else:
+            mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+            time.sleep(0.5)
+            ard_link.ALL_CAP
+            time.sleep(1.0)
+            mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
+            time.sleep(1.0)
+
+            if check_line_break():
+                raise ValueError("Cap still detected after manual intervention.")
+'''
 def capping_sequence(
     mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink
 ) -> None:
@@ -384,7 +443,7 @@ def capping_sequence(
         # For unit versions <= 1.0, we assume the cap is not present
         # as the line break sensor is not available
         pass
-
+'''
 
 if __name__ == "__main__":
     pass

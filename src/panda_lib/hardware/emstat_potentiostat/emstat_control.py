@@ -118,25 +118,34 @@ def validate_file_name(file_name: str) -> str:
 
 
 def OCP(params: potentiostat_ocp_parameters):
-    """Run OCP experiment on EmStat Pico."""
-    model = "emstatpico"
+    """Run OCP experiment on EmStat"""
+    model = "emstat4_lr"
     folder = read_data_dir()
     global COMPLETE_FILE_NAME
-    hp.potentiostat.Setup(model, None, folder, verbose=0)
-    ocp = hp.potentiostat.OCP(params.ttot, params.dt, COMPLETE_FILE_NAME, params.header)
-    ocp.run()
+    setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
+    connected = setup.check_connection()
+    if not connected:
+            raise RuntimeError("Could not connect to Pstat")
     COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
-    data = hp.load_data.OCP(COMPLETE_FILE_NAME, folder, model)
-    save_in_gamry_format(data, COMPLETE_FILE_NAME, params.header)
+    file_stem = pathlib.Path(COMPLETE_FILE_NAME).stem
+    ocp = hp.potentiostat.OCP(params.ttot, params.dt, file_stem, params.header)
+    ocp.run()
+    # save_in_gamry_format(ocp.data, COMPLETE_FILE_NAME, params.header)
+    return ocp.data
+    
 
 
 def cyclic(params: cv_parameters):
-    """Run CV experiment on EmStat Pico."""
-    model = "emstatpico"
+    """Run CV experiment on EmStat"""
+    model = "emstat4_lr"
     folder = read_data_dir()
-    hp.potentiostat.Setup(model, None, folder, verbose=0)
+    setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
+    connected = setup.check_connection()
+    if not connected:
+            raise RuntimeError("Could not connect to Pstat")
     global COMPLETE_FILE_NAME
     COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
+    file_stem = pathlib.Path(COMPLETE_FILE_NAME).stem
     cv = hp.potentiostat.CV(
         params.Eini,
         params.Ev1,
@@ -148,42 +157,49 @@ def cyclic(params: cv_parameters):
         params.sens,
         params.E2,
         params.sens2,
-        COMPLETE_FILE_NAME,
+        file_stem,
         params.header,
     )
     cv.run()
-    data = hp.load_data.CV(COMPLETE_FILE_NAME, folder, model)
-    save_in_gamry_format(data, COMPLETE_FILE_NAME, params.header)
+    # save_in_gamry_format(cv.data, COMPLETE_FILE_NAME, params.header)
+    return cv.data
+    
 
 
 def chrono(params: chrono_parameters):
-    """Run CA experiment on EmStat Pico."""
-    model = "emstatpico"
+    """Run CA experiment on EmStat."""
+    model = "emstat4_lr"
     folder = read_data_dir()
     global COMPLETE_FILE_NAME
-    hp.potentiostat.Setup(model, None, folder, verbose=0)
-    COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
-    ca = hp.potentiostat.CA(
-        params.Estep,
-        params.dt,
-        params.ttot,
-        params.sens,
-        params.E2,
-        params.sens2,
-        COMPLETE_FILE_NAME,
-        params.header,
-    )
-    ca.run()
-    data = hp.load_data.CA(COMPLETE_FILE_NAME, folder, model)
-    save_in_gamry_format(data, COMPLETE_FILE_NAME, params.header)
+    setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
+    connected = setup.check_connection()
+    if not connected:
+            raise RuntimeError("Could not connect to Pstat")
 
+    ca = hp.potentiostat.CA(
+        Estep=params.Estep,
+        dt=params.dt,
+        ttot=params.ttot,
+        sens=params.sens,
+        fileName=pathlib.Path(COMPLETE_FILE_NAME).stem,  # Use the stem of the path to avoid double extension
+        header=params.header,
+        E2=params.E2,        # if your subclass needs it
+        sens2=params.sens2   # if your subclass needs it
+    )
+
+    ca.run()
+    # save_in_gamry_format(ca.data, COMPLETE_FILE_NAME, params.header)
+    return ca.data
 
 def run_mscript(params: MScriptParameters):
-    """Run custom mscript file on EmStat Pico."""
-    model = "emstatpico"
+    """Run custom mscript file on EmStat."""
+    model = "emstat4_lr"
     folder = read_data_dir()
     global COMPLETE_FILE_NAME
-    hp.potentiostat.Setup(model, None, folder, verbose=0)
+    setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
+    connected = setup.check_connection()
+    if not connected:
+            raise RuntimeError("Could not connect to Pstat")
     COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
     mscript = hp.potentiostat.MethodScript(
         None,
@@ -191,8 +207,8 @@ def run_mscript(params: MScriptParameters):
         params.script_path,
     )
     mscript.run()
-    data = hp.load_data.MethodScript(COMPLETE_FILE_NAME, folder, model)
-    save_in_gamry_format(data, COMPLETE_FILE_NAME, params.header)
+    return mscript.data
+    #save_in_gamry_format(data, COMPLETE_FILE_NAME, params.header)
 
 
 # =====================
@@ -200,36 +216,22 @@ def run_mscript(params: MScriptParameters):
 # =====================
 def save_in_gamry_format(data, file_name: str, header: str):
     """
-    Custom function for the panda_lib. Save data from Hardpotato in the Gamry format:
-    ["Time", "Vf","Vu","Vsig","Ach","Overload","StopTest","Temp"]
+    Save Hardpotato data (as a list of dicts) in a format similar to Gamry:
+    ["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "Overload", "StopTest", "Cycle", "Ach2"]
     """
-    gamry_data = {
-        "Time": getattr(data, "t", None),  # Time in seconds
-        "Vf": getattr(data, "E", None),  # Measured E vs. Eref
-        "Vu": getattr(data, "U", None),  # Uncompensated voltage
-        "Im": getattr(data, "I", None),  # Measured current
-        "Vsig": getattr(data, "Vsig", None),  # Signal sent to Control Amp
-        "Ach": getattr(data, "Ach", None),  # Measured Aux channel voltage
-        "IERange": getattr(data, "IERange", None),  # Current range
-        "Overload": getattr(data, "Overload", None),  # Overload status
-        "StopTest": getattr(data, "StopTest", None),  # Stop flag
-        "Cycle": getattr(data, "Cycle", None),  # Cycle number
-        "Ach2": getattr(data, "Ach2", None),  # Second Aux channel voltage
-    }
+    if not isinstance(data, list) or len(data) == 0:
+        raise ValueError("Data must be a non-empty list of dictionaries")
 
     with open(file_name, "w") as f:
-        # Write header
+        # Write header row (optional)
         # f.write(f"{header}\n")
-        # Write data
-        for i in range(len(data.t)):
-            line = f"{gamry_data['Time'][i]},{gamry_data['Vf'][i]},{gamry_data['Vu'][i]},{gamry_data['Vsig'][i]},"
-            line += f"{gamry_data['Ach'] if gamry_data['Ach'] is not None else 'N/A'},"
-            line += f"{gamry_data['Overload'] if gamry_data['Overload'] is not None else 'N/A'},"
-            line += f"{gamry_data['StopTest'] if gamry_data['StopTest'] is not None else 'N/A'},"
-            line += (
-                f"{gamry_data['Temp'] if gamry_data['Temp'] is not None else 'N/A'}\n"
-            )
-            f.write(line)
+
+        for row in data:
+            line = ",".join(str(row.get(key, "N/A")) for key in [
+                "t", "E", "U", "I", "Vsig", "Ach", "Overload", "StopTest", "Cycle", "Ach2"
+            ])
+            f.write(line + "\n")
+
 
 
 # =====================
@@ -272,15 +274,15 @@ def setfilename(
     return COMPLETE_FILE_NAME
 
 
-def pstat_connect():
+def pstatconnect():
     pass
 
 
-def pstat_disconnect():
+def pstatdisconnect():
     pass
 
 
-def active_check():
+def activecheck():
     pass
 
 

@@ -13,15 +13,12 @@ from .interface import CameraInterface
 from .flir_camera_tools import file_enumeration
 
 # Try to import PySpin, but make it optional
-try:
-    import PySpin  # PySpin only works with Python <=3.10
-    import cv2
-    import numpy as np
-    PYSPIN_AVAILABLE = True
-except ImportError:
-    PYSPIN_AVAILABLE = False
 
+import PySpin  # PySpin only works with Python <=3.10
+import cv2
+import numpy as np
 
+PYSPIN_AVAILABLE = True
 class FlirCamera(CameraInterface):
     """
     Implementation of CameraInterface for FLIR cameras using PySpin

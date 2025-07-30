@@ -102,7 +102,11 @@ class OT2P300:
             raise RuntimeError("Pipette driver initialization failed")
 
         p300_control_logger.info("OT2P300 initialized")
-
+    
+    @classmethod
+    def from_config(cls, stepper=None, config: Optional[dict] = None) -> "OT2P300":
+        return cls(arduino=stepper)
+    
     def __enter__(self):
         """Enter the context manager"""
         return self
