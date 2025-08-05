@@ -18,6 +18,8 @@ node_modules/*
 *.swp
 .ipynb_checkpoints
 *.egg-info
+.matplotlib/fontlist-v*.json
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

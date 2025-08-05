@@ -36,6 +36,62 @@ except ConfigParserError as e:
 logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
 
+def drop_pipette_tip(toolkit: Union[Toolkit, Hardware]) -> bool:
+    """
+    Move the pipette to the tip disposal area and drop the tip.
+
+    Parameters
+    ----------
+    toolkit : Union[Toolkit, Hardware]
+        Toolkit object containing mill and pipette control.
+
+    Returns
+    -------
+    bool
+        True if tip was successfully dropped, False otherwise.
+    """
+    logger.info("Dropping pipette tip...")
+
+    drop_coords = toolkit.deck.get_position("tip_drop")  # customize if static
+    toolkit.mill.safe_move(drop_coords.x, drop_coords.y, drop_coords.z, tool=Instruments.PIPETTE)
+
+    success = toolkit.pipette.pipette_driver.drop_tip()
+    if not success:
+        logger.warning("Failed to drop pipette tip.")
+        return False
+
+    logger.info("Pipette tip dropped successfully.")
+    return True
+
+def pick_up_pipette_tip(toolkit: Union[Toolkit, Hardware], tip_index: int) -> bool:
+    """
+    Move the pipette to the next tip position and pick up a new tip.
+
+    Parameters
+    ----------
+    toolkit : Union[Toolkit, Hardware]
+        Toolkit object containing mill and pipette control.
+    tip_index : int
+        Index of tip in tip rack (can be linear or mapped)
+
+    Returns
+    -------
+    bool
+        True if tip was successfully picked up, False otherwise.
+    """
+    logger.info("Picking up pipette tip at index %d", tip_index)
+
+    tip_coords = toolkit.deck.get_tiprack_position(tip_index)
+    toolkit.mill.safe_move(tip_coords.x, tip_coords.y, tip_coords.z, tool=Instruments.PIPETTE)
+
+    success = toolkit.pipette.pipette_driver.pick_up_tip()
+    if not success:
+        logger.warning("Failed to pick up pipette tip.")
+        return False
+
+    toolkit.pipette.pipette_tracker.reset_contents()
+    logger.info("New tip picked up successfully.")
+    return True
 
 def _pipette_action(
     toolkit: Union[Toolkit, Hardware],
@@ -190,7 +246,7 @@ def _forward_pipette_v3(
         for vessel, desired_volume in source_vessel_volumes:
             if desired_volume <= 0.0:
                 continue
-            _pipette_action(toolkit, vessel, dst_vessel, desired_volume, dst_vessel_z_dispense_height)
+            _pipette_action(toolkit, src_vessel, dst_vessel, desired_volume, dst_vessel_z_dispense_height)
 
     except Exception as e:
         toolkit.global_logger.error("Exception occurred during pipetting: %s", e)

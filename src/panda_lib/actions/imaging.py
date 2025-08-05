@@ -116,7 +116,7 @@ def image_well(
                     ]
 
                     for i in range(num_steps):
-                        z = z_start + i * 0.2
+                        z = round(z_start + i * 0.2, 2)
                         toolkit.mill.safe_move(
                             x_coord=x,
                             y_coord=y,
@@ -131,7 +131,9 @@ def image_well(
                                 continue
 
                             base_label = str(image_label) if image_label else ""
-                            z_label = f"{base_label}_z{z:.2f}mm_b{brightness_label}"
+                            
+                            z_str = f"{z:.2f}".replace(".", "-")  # replace . with p to avoid file extension confusion
+                            z_label = f"{base_label}_z{z_str}mm_b{brightness_label}"
 
                             filepath_z = image_filepath_generator(
                                 exp_id, pjct_id, cmpgn_id, well_id, z_label, PATH_TO_DATA

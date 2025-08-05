@@ -380,6 +380,31 @@ class Pipette:
 
         return response.get("success", False)
 
+    @tip_check
+    def pick_up_tip(self, s: int = 2000):
+        """
+        Move the plunger to a defined position to pick up a new pipette tip.
+        Assumes the pipette is already physically aligned over a tip in the rack.
+
+        :param s: Speed of plunger movement in mm/min.
+        :return: True if tip pickup was successful, False otherwise.
+        """
+        logger.debug("Picking up new pipette tip...")
+
+        # Move the plunger down to seat into the tip
+        response = self.stepper.move_to(self.prime_position, s)
+
+        if not response.get("success", False):
+            logger.error("Failed to move to tip pickup position: %s",
+                        response.get("message", "Unknown error"))
+            return False
+
+        self.position = self.prime_position
+        self.has_tip = True  # Mark tip as attached
+        logger.info("Tip pickup sequence completed. Plunger at %s mm", self.position)
+
+        return True
+
     def get_status(self):
         """Returns the current status of the pipette
 

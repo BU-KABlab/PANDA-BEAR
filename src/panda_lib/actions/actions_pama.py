@@ -18,6 +18,9 @@ from panda_lib.actions.pipetting import (
     transfer,
     contact_angle_transfer,
 )
+
+from panda_lib.actions.pipetting import _pipette_action as clear_well_res
+
 from panda_lib.toolkit import Toolkit
 from panda_lib.utilities import Instruments
 
@@ -34,6 +37,9 @@ def measure_contact_angle(
     3. Rinse the well 3x with IPA
     """
     try:
+        
+        image_well(toolkit, experiment, "BeforeExperiment", curvature_image=False, add_datazone=False)
+
         toolkit.global_logger.info("0. Dispensing 10µL droplet of water into well")
         experiment.set_status_and_save(ExperimentStatus.DEPOSITING)
         contact_angle_transfer(
@@ -56,12 +62,11 @@ def measure_contact_angle(
 
         toolkit.global_logger.info("2. Clearing well contents into waste")
         experiment.set_status_and_save(ExperimentStatus.CLEARING)
-        contact_angle_transfer(
+        transfer(
             volume=10,
             src_vessel=toolkit.wellplate.wells[experiment.well_id],
             dst_vessel=waste_selector("waste", 10),
             toolkit=toolkit,
-            ca_dispense_height=toolkit.wellplate.bottom + 1, 
         )
 
         toolkit.global_logger.info("3. Rinsing the well 3x with IPA")
@@ -87,6 +92,16 @@ def measure_contact_angle(
                 dst_vessel=waste_selector("waste", 200),
                 toolkit=toolkit,
             )
+
+        image_well(toolkit, experiment, "BeforeClearingWell", curvature_image=False, add_datazone=False)
+
+        clear_well_res(
+            toolkit=toolkit, 
+            src_vessel=toolkit.wellplate.wells[experiment.well_id], 
+            dst_vessel=waste_selector("waste",200), 
+            desired_volume=200
+        )
+        image_well(toolkit, experiment, "AfterClearingWell", curvature_image=False, add_datazone=False)
 
         return experiment
 
@@ -129,12 +144,11 @@ def measure_contact_angle_norinse(
 
         toolkit.global_logger.info("2. Clearing well contents into waste")
         experiment.set_status_and_save(ExperimentStatus.CLEARING)
-        contact_angle_transfer(
+        transfer(
             volume=10,
             src_vessel=toolkit.wellplate.wells[experiment.well_id],
             dst_vessel=waste_selector("waste", 10),
             toolkit=toolkit,
-            ca_dispense_height=toolkit.wellplate.bottom + 0.1, 
         )
 
         return experiment

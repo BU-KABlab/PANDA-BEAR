@@ -10,6 +10,7 @@ from panda_lib.actions import (
     transfer,
     waste_selector,
 )
+from panda_lib.actions.pipetting import _pipette_action as clear_well_res
 from panda_lib.actions.actions_pama import (
     measure_contact_angle_norinse,
 )
@@ -79,13 +80,13 @@ def well_rinse_image(
         experiment=experiment,
         image_label="BeforeRinsing",
     )
-    '''
+    
     measure_contact_angle_norinse(
         toolkit=toolkit,
         experiment=experiment,
-        file_tag=f"initial_CA_measurement",
+        file_tag="initial_CA_measurement",
     )
-    '''
+    
     toolkit.global_logger.info("0. Rinse with IPA")
     experiment.set_status_and_save(ExperimentStatus.RINSING)
     for i in range(3):
@@ -114,6 +115,12 @@ def well_rinse_image(
             ),
             toolkit=toolkit,
         )
+        clear_well_res(
+            toolkit=toolkit, 
+            src_vessel=toolkit.wellplate.wells[experiment.well_id], 
+            dst_vessel=waste_selector("waste",200), 
+            desired_volume=200
+        )
 
     toolkit.global_logger.info("1. Image well")
     experiment.set_status_and_save(ExperimentStatus.IMAGING)
@@ -127,7 +134,7 @@ def well_rinse_image(
 
 
     # Generate imaging times (in minutes)
-    imaging_times = list(range(1, 30))
+    imaging_times = list(range(1, 60))
 
     # Track elapsed time
     previous_time = 0

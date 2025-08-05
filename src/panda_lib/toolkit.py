@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from logging import Logger
 from typing import Union
 
-from panda_lib.hardware import ArduinoLink, PandaMill, Scale
+from panda_lib.hardware import ArduinoLink, PandaMill
 from panda_lib.hardware.imaging.camera_factory import CameraFactory, CameraType
 from panda_lib.hardware.imaging.interface import CameraInterface
 from panda_lib.hardware.panda_pipettes import (
@@ -60,7 +60,7 @@ class Toolkit:
         self.experiment_logger = kwargs.get("experiment_logger", None)
 
     mill: Union[PandaMill, None] = None
-    scale: Union[Scale, None] = None
+    # scale: Union[Scale, None] = None
     pipette: Union[Pipette, None] = None
     wellplate: Wellplate = None
     arduino: ArduinoLink = None
@@ -106,8 +106,8 @@ class Toolkit:
             self.camera.close()
         if self.arduino:
             self.arduino.close()
-        if self.scale:
-            self.scale.hw.close()
+        #if self.scale:
+        #    self.scale.hw.close()
         if self.pipette:
             self.pipette.close()
 
@@ -121,7 +121,7 @@ class Hardware:
         if self.camera is None:
             self.initialize_camera(use_mock_instruments)
         self.mill = kwargs.get("mill", None)
-        self.scale = kwargs.get("scale", None)
+        #self.scale = kwargs.get("scale", None)
         self.pipette = kwargs.get("pipette", None)
         self.wellplate = kwargs.get("wellplate", None)
         self.arduino = kwargs.get("arduino", None)
@@ -130,7 +130,7 @@ class Hardware:
         self.experiment_logger = kwargs.get("experiment_logger", None)
 
     mill: Union[PandaMill, None] = None
-    scale: Union[Scale, None] = None
+    #scale: Union[Scale, None] = None
     pipette: Union[Pipette, None] = None
     arduino: ArduinoLink = None
     # include the global logger so that the hardware can log to the same file
@@ -212,7 +212,7 @@ def connect_to_instruments(
     instruments = Toolkit(
         use_mock_instruments=use_mock_instruments,
         mill=None,
-        scale=None,
+        #scale=None,
         pipette=None,
         wellplate=None,
         global_logger=logger,
@@ -343,7 +343,7 @@ def test_instrument_connections(
     instruments = Toolkit(
         use_mock_instruments=use_mock_instruments,
         mill=None,
-        scale=None,
+        #scale=None,
         pipette=None,
         wellplate=None,
         arduino=None,
@@ -363,7 +363,7 @@ def test_instrument_connections(
         instruments.mill.connect_to_mill()
         instruments.pipette = Pipette()
         instruments.arduino = ArduinoLink()
-        instruments.scale = Scale()
+        #instruments.scale = Scale()
         # Initialize the camera (mock)
         instruments.initialize_camera(use_mock=True)
         connected_instruments = ["PandaMill", "Pipette", "Arduino", "Camera"]
@@ -643,11 +643,11 @@ def disconnect_from_instruments(instruments: Toolkit):
     if instruments.mill:
         instruments.mill.disconnect()
     # if instruments.flir_camera: instruments.flir_camera.DeInit()
-    if instruments.camera:
-        instruments.camera.close()
+    #if instruments.camera:
+    #    instruments.camera.close()
     if instruments.arduino:
         instruments.arduino.close()
-    if instruments.scale:
-        instruments.scale.hw.close()
+    #if instruments.scale:
+    #    instruments.scale.hw.close()
     if instruments.pipette:
         instruments.pipette.close()

@@ -8,7 +8,7 @@ while tracking volumes and contents.
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
 from typing import Any, Dict, Optional, Union
-
+import time
 from panda_lib.hardware.arduino_interface import ArduinoLink, MockArduinoLink
 from panda_lib.labware import Vial
 from panda_lib.labware import wellplates as wp
@@ -284,8 +284,18 @@ class OT2P300:
         # If we have a solution, update the pipette contents and the solution volume
         if solution is not None and isinstance(solution, (Vial, wp.Well)):
             removed_contents = solution.remove_contents(volume_to_aspirate)
-            for soln, vol in removed_contents.items():
-                self.pipette_tracker.update_contents(soln, vol)
+
+            if removed_contents and sum(removed_contents.values()) > 0:
+                for soln, vol in removed_contents.items():
+                    self.pipette_tracker.update_contents(soln, vol)
+            else:
+                # No contents returned (e.g., overdraft), still update pipette volume as air or unknown liquid
+                self.pipette_tracker.volume += volume_to_aspirate
+                p300_control_logger.warning(
+                    f"Overdraft detected from {solution.name}. "
+                    f"Contents were empty but {volume_to_aspirate} µL was aspirated anyway. "
+                    "Pipette volume adjusted to reflect physical state."
+                )
 
             p300_control_logger.debug(
                 f"Aspirated: {volume_to_aspirate} µL at {rate} steps/s from {solution}. Pipette vol: {self.pipette_tracker.volume} µL"
@@ -659,6 +669,47 @@ class OT2P300:
             float: Volume in microliters, rounded to PRECISION decimal places
         """
         return round(float(volume_ml) * self.ML_TO_UL, PRECISION)
+
+    def replace_tip(self) -> bool:
+        """
+        Replace the pipette tip using the configured driver method.
+        Disposes of the current tip (if present) and picks up a new one.
+        
+        Returns:
+            bool: True if tip replacement was successful, False otherwise.
+        """
+        # Log the intent
+        p300_control_logger.info("Initiating pipette tip replacement.")
+
+        # Drop current tip, if supported
+        if hasattr(self.pipette_driver, "drop_tip"):
+            drop_success = self.pipette_driver.drop_tip()
+            if not drop_success:
+                p300_control_logger.warning("Failed to drop current pipette tip.")
+                return False
+            time.sleep(1.0)
+            p300_control_logger.debug("Old tip dropped successfully.")
+        else:
+            p300_control_logger.warning("drop_tip() not implemented in pipette driver.")
+
+        # Pick up a new tip
+        if hasattr(self.pipette_driver, "pick_up_tip"):
+            pick_success = self.pipette_driver.pick_up_tip()
+            if not pick_success:
+                p300_control_logger.error("Failed to pick up a new pipette tip.")
+                return False
+            time.sleep(2.0)
+            p300_control_logger.debug("New pipette tip picked up successfully.")
+        else:
+            p300_control_logger.error("pick_up_tip() not implemented in pipette driver.")
+            return False
+
+        # Reset internal state if needed
+        self.pipette_tracker.reset_contents()
+        p300_control_logger.info("Pipette tip successfully replaced and volume reset.")
+
+        return True
+
 
 
 class MockOT2P300(OT2P300):
