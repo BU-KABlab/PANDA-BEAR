@@ -188,3 +188,82 @@ class WellplateWriteModel(BaseModel):
     panda_unit_id: int = 99
 
     model_config = ConfigDict(from_attributes=True)
+
+# TODO: Fix the following to reflect pipette tips
+class TipWriteModel(BaseModel):
+    rack_id: int
+    tip_id: str
+    experiment_id: int = 0
+    project_id: int = 0
+    status: str = "new"
+    coordinates: Dict[str, float] = Field(
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
+    capacity: float = 200.0
+    name: str = "default"
+    type: int # solid handling or liquid handling
+    radius_mm: float # radius of bead for solid handling
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TipReadModel(VesselModel):
+    tip_id: str
+    rack_id: int
+    experiment_id: Optional[int]
+    project_id: Optional[int]
+    status: str = "new"
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RackTypeModel(BaseModel):
+    id: int
+    count: int
+    rows: str
+    cols: int
+    shape: str
+    radius_mm: float
+    y_spacing: float
+    x_spacing: float
+    rack_length_mm: float
+    rack_width_mm: float
+    rack_height_mm: float
+    x_offset: float
+    y_offset: float
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RackReadModel(DeckObjectModel):
+    id: int  # is allowed to be None, the db will autoincrement
+    type_id: int
+    current: bool
+    a1_x: float
+    a1_y: float
+    orientation: int
+    rows: str
+    cols: int
+    pickup_height: float  # height of pipette to pick up tips
+    panda_unit_id: int
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RackWriteModel(BaseModel):
+    id: Optional[int] = None  # is allowed to be None, the db will autoincrement
+    type_id: int
+    current: bool = False
+    a1_x: float = 0.0
+    a1_y: float = 0.0
+    orientation: int = 0
+    rows: str = "ABCD"
+    cols: int = 14
+    pickup_height: float = 0.0  # height of pipette to pick up tips
+    name: Optional[str] = f"{id}" if id is not None else None
+    coordinates: Dict[str, float] = Field(
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
+    panda_unit_id: int = 2
+
+    model_config = ConfigDict(from_attributes=True)

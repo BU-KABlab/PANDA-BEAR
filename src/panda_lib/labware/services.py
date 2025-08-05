@@ -12,8 +12,16 @@ from ..sql_tools import PlateTypes as PlateTypeDBModel
 from ..sql_tools import Vials  # SQLAlchemy models
 from ..sql_tools import WellModel as WellDBModel
 from ..sql_tools import Wellplates as WellPlateDBModel
+from ..sql_tools import Tips as TipDBModel
+from ..sql_tools import Racks as RackDBModel
+from ..sql_tools import RackTypes as RackTypeDBModel
 from .schemas import (  # PyDanctic models
     PlateTypeModel,
+    TipReadModel,
+    TipWriteModel,
+    RackTypeModel,
+    RackReadModel,
+    RackWriteModel,
     VialReadModel,
     VialWriteModel,
     WellplateReadModel,
@@ -22,6 +30,112 @@ from .schemas import (  # PyDanctic models
     WellWriteModel,
 )
 
+class TipService:
+    def __init__(self, session_maker: sessionmaker = SessionLocal):
+        self.session_maker = session_maker
+        self.logger = logging.getLogger(__name__)
+
+    def create_tip(self, tip_data: TipWriteModel) -> TipDBModel:
+        with self.session_maker() as active_db_session:
+            active_db_session: Session
+            try:
+                tip: TipDBModel = TipDBModel(**tip_data.model_dump())
+                active_db_session.add(tip)
+                active_db_session.commit()
+                active_db_session.refresh(tip)
+                return tip
+            except SQLAlchemyError as e:
+                active_db_session.rollback()
+                raise ValueError(f"Error creating tip: {e}")
+
+    def get_tip(self, tip_id: str, rack_id: int) -> TipReadModel:
+        with self.session_maker() as active_db_session:
+            stmt = select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
+            tip = active_db_session.execute(stmt).scalar()
+            if not tip:
+                return None
+            return TipReadModel.model_validate(tip)
+
+    def update_tip(self, tip_id: str, rack_id: int, updates: dict) -> TipDBModel:
+        with self.session_maker() as active_db_session:
+            try:
+                updated_model = TipWriteModel(**updates).model_dump()
+                stmt = select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
+                tip = active_db_session.execute(stmt).scalar()
+                if not tip:
+                    raise ValueError(f"Tip with id {tip_id} not found.")
+                for key, value in updated_model.items():
+                    setattr(tip, key, value)
+                active_db_session.commit()
+                active_db_session.refresh(tip)
+                return tip
+            except ValueError as e:
+                raise e
+            except SQLAlchemyError as e:
+                active_db_session.rollback()
+                raise ValueError(f"Error updating tip: {e}")
+
+    def delete_tip(self, tip_id: str) -> None:
+        with self.session_maker() as active_db_session:
+            try:
+                stmt = select(TipDBModel).filter_by(tip_id=tip_id)
+                tip = active_db_session.execute(stmt).scalar()
+                if not tip:
+                    raise ValueError(f"Tip with id {tip_id} not found.")
+                active_db_session.delete(tip)
+                active_db_session.commit()
+            except SQLAlchemyError as e:
+                active_db_session.rollback()
+                raise ValueError(f"Error deleting tip: {e}")
+
+    def fetch_tip_type_characteristics(
+        self,
+        db_session: sessionmaker = SessionLocal,
+        rack_id: Optional[int] = None,
+        type_id: Optional[int] = None,
+    ) -> RackTypeModel:
+        """
+        Fetches the characteristics of a tip rack type.
+
+        Args:
+            db_session (Session): The database session.
+            rack_id (Optional[int]): The ID of the tip rack.
+            type_id (Optional[int]): The ID of the tip rack type.
+
+        Returns:
+            RackTypeModel: The validated model of the tip rack type.
+
+        Raises:
+            ValueError: If neither rack_id nor type_id is provided.
+            ValueError: If the tip rack type is not found.
+
+        """
+        if not rack_id and not type_id:
+            raise ValueError("Either rack_id or type_id must be provided.")
+        with db_session() as active_db_session:
+            active_db_session: Session
+            if rack_id and not type_id:
+                # Fetch the plate using plate_id to get its type_id
+                stmt = select(RackDBModel).filter_by(id=rack_id)
+                rack: RackDBModel = active_db_session.execute(
+                    stmt
+                ).scalar_one_or_none()
+                if not rack:
+                    raise ValueError(f"Rack with given id {rack_id} not found.")
+
+                if type_id != rack.type_id and type_id is not None:
+                    raise ValueError(
+                        f"Type id {type_id} does not match the given rack type id {rack.type_id}"
+                    )
+                type_id = rack.type_id
+
+            # Fetch the plate type using type_id
+            stmt = select(RackTypeDBModel).filter_by(id=type_id)
+            rack_type = active_db_session.execute(stmt).scalar_one_or_none()
+            if not rack_type:
+                raise ValueError(f"Rack type with id {type_id} not found.")
+
+        return RackTypeModel.model_validate(rack_type)
 
 class VialService:
     """
