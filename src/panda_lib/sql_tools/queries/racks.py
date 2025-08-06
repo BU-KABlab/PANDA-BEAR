@@ -141,7 +141,7 @@ def _create_tips_for_rack(session: Session, rack: Racks) -> None:
 
     Args:
         session: SQLAlchemy session
-        rack: The wellplate to create wells for
+        rack: The rack to create tips for
     """
     rack_type = rack.rack_type
 
@@ -242,141 +242,139 @@ def get_number_of_tips(rack_id: Union[int, None] = None) -> int:
         result = session.query(TipModel).filter(TipModel.rack_id == rack_id).count()
         return result
 
-# TODO: ENDED HERE.......Continue fixing below this line
-def get_number_of_unused_tips(plate_id: Union[int, None] = None) -> int:
+
+def get_number_of_unused_tips(rack_id: Union[int, None] = None) -> int:
     """Query the tip_hx table and count tips with specific statuses.
 
     Counts tips with status in 'new', 'clear', 'queued' for the specified or
-    current wellplate.
+    current rack.
 
     Parameters
     ----------
-    plate_id : int, optional
-        The rack ID. If None, uses current wellplate.
+    rack_id : int, optional
+        The rack ID. If None, uses current rack.
 
     Returns
     -------
     int
-        The number of wells with status in 'new', 'clear', 'queued'.
+        The number of tips with status in 'new', 'clear', 'queued'.
     """
     with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = select_current_wellplate_id()
+        if rack_id is None:
+            rack_id = select_current_rack_id()
         result = (
-            session.query(WellModel)
-            .filter(WellModel.plate_id == plate_id)
-            .filter(WellModel.status.in_(["new", "clear", "queued"]))
+            session.query(TipModel)
+            .filter(TipModel.rack_id == rack_id)
+            .filter(TipModel.status.in_(["new", "clear", "queued"]))
             .count()
         )
         return result
 
 
-def select_current_wellplate_info() -> tuple[int, int, bool]:
-    """Get the current wellplate information.
+def select_current_rack_info() -> tuple[int, int, bool]:
+    """Get the current rack information.
 
     Returns
     -------
     tuple[int, int, bool]
         A tuple containing:
-        - wellplate ID (int)
-        - wellplate type ID (int)
-        - whether the wellplate is new (bool)
+        - rack ID (int)
+        - rack type ID (int)
+        - whether the rack is new (bool)
     """
     with SessionLocal() as session:
-        statement = select(Wellplates).filter_by(current=1, panda_unit_id=get_unit_id())
+        statement = select(Racks).filter_by(current=1, panda_unit_id=get_unit_id())
 
-        result: Wellplates = session.execute(statement).scalar()
-        current_plate_id = result.id
+        result: Racks = session.execute(statement).scalar()
+        current_rack_id = result.id
         current_type_number = result.type_id
-        is_new = check_if_current_wellplate_is_new()
+        is_new = check_if_current_rack_is_new()
 
-    return current_plate_id, current_type_number, is_new
+    return current_rack_id, current_type_number, is_new
 
 
-def select_wellplate_info(plate_id: int) -> Wellplates:
-    """Get the wellplate information from the wellplates table.
+def select_rack_info(rack_id: int) -> Racks:
+    """Get the rack information from the wellplates table.
 
     Parameters
     ----------
-    plate_id : int
+    rack_id : int
         The rack ID.
 
     Returns
     -------
-    Wellplates
-        The wellplate object that matches the plate_id.
+    Racks
+        The rack object that matches the rack_id.
     """
     with SessionLocal() as session:
-        statement = select(Wellplates).filter_by(
-            id=plate_id,
+        statement = select(Racks).filter_by(
+            id=rack_id,
             panda_unit_id=read_config_value("PANDA", "unit_id", 99),
         )
         result = session.execute(statement).scalar_one_or_none()
         return result
 
 
-def select_well_ids(plate_id: Union[int, None] = None) -> List[str]:
-    """Get the well IDs from the well_hx table.
+def select_tip_ids(rack_id: Union[int, None] = None) -> List[str]:
+    """Get the tip IDs from the tip_hx table.
 
     Parameters
     ----------
-    plate_id : int, optional
-        The rack ID. If None, uses current wellplate.
+    rack_id : int, optional
+        The rack ID. If None, uses current rack.
 
     Returns
     -------
     List[str]
-        List of well IDs.
+        List of tip IDs.
     """
     with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = select_current_wellplate_id()
+        if rack_id is None:
+            rack_id = select_current_rack_id()
 
         statement = (
-            select(WellModel.well_id)
-            .filter(WellModel.plate_id == plate_id)
-            .order_by(WellModel.well_id.asc())
+            select(TipModel.tip_id)
+            .filter(TipModel.rack_id == rack_id)
+            .order_by(TipModel.tip_id.asc())
         )
 
         result = session.execute(statement).all()
         return [row[0] for row in result]
 
 
-def select_wellplate_wells(plate_id: Union[int, None] = None) -> Sequence:
-    """Select all wells from the well_hx table for a specific wellplate.
+def select_rack_tips(rack_id: Union[int, None] = None) -> Sequence:
+    """Select all tips from the tip_hx table for a specific rack.
 
     Parameters
     ----------
-    plate_id : int, optional
-        The rack ID. If None, uses current wellplate.
+    rack_id : int, optional
+        The rack ID. If None, uses current rack.
 
     Returns
     -------
     Sequence
     """
     with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = select_current_wellplate_id()
+        if rack_id is None:
+            rack_id = select_current_rack_id()
 
         statement = (
             select(
-                WellModel.plate_id,
-                Wellplates.type_id,
-                WellModel.well_id,
-                WellModel.status,
-                WellModel.status_date,
-                WellModel.contents,
-                WellModel.experiment_id,
-                WellModel.project_id,
-                WellModel.volume,
-                WellModel.coordinates,
-                PlateTypes.capacity_ul,
-                PlateTypes.gasket_height_mm,
+                TipModel.rack_id,
+                Racks.type_id,
+                TipModel.tip_id,
+                TipModel.status,
+                TipModel.status_date,
+                TipModel.contents,
+                TipModel.experiment_id,
+                TipModel.project_id,
+                TipModel.volume,
+                TipModel.coordinates,
             )
-            .join(Wellplates, WellModel.plate_id == Wellplates.id)
-            .join(PlateTypes, Wellplates.type_id == PlateTypes.id)
-            .filter(WellModel.plate_id == plate_id)
-            .order_by(WellModel.well_id.asc())
+            .join(Racks, TipModel.rack_id == Racks.id)
+            .join(RackTypes, Racks.type_id == RackTypes.id)
+            .filter(TipModel.rack_id == rack_id)
+            .order_by(TipModel.tip_id.asc())
         )
 
         result = session.execute(statement).all()
@@ -386,87 +384,87 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> Sequence:
         return result
 
 
-def select_well_status(well_id: str, plate_id: Union[int, None] = None) -> str:
-    """Get the status of a well from the well_hx table.
+def select_tip_status(tip_id: str, rack_id: Union[int, None] = None) -> str:
+    """Get the status of a tip from the tip_hx table.
 
     Parameters
     ----------
-    well_id : str
-        The well ID.
-    plate_id : int, optional
-        The rack ID. If None, uses current wellplate.
+    tip_id : str
+        The tip ID.
+    rack_id : int, optional
+        The rack ID. If None, uses current rack.
 
     Returns
     -------
     str
-        The status of the well.
+        The status of the tip.
     """
     with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = select_current_wellplate_id()
+        if rack_id is None:
+            rack_id = select_current_rack_id()
 
         statement = (
-            select(WellModel.status)
-            .filter(WellModel.plate_id == plate_id)
-            .filter(WellModel.well_id == well_id)
+            select(TipModel.status)
+            .filter(TipModel.rack_id == rack_id)
+            .filter(TipModel.tip_id == tip_id)
         )
 
         result = session.execute(statement).scalar_one_or_none()
         return result
 
 
-def count_wells_with_new_status(plate_id: Union[int, None] = None) -> int:
-    """Count the number of wells with a status of 'new' in the well_hx table.
+def count_tips_with_new_status(rack_id: Union[int, None] = None) -> int:
+    """Count the number of tips with a status of 'new' in the tip_hx table.
 
     Parameters
     ----------
-    plate_id : int, optional
-        The rack ID. If None, uses current wellplate.
+    rack_id : int, optional
+        The rack ID. If None, uses current rack.
 
     Returns
     -------
     int
-        The number of wells with a status of 'new'.
+        The number of tips with a status of 'new'.
     """
     with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = select_current_wellplate_id()
+        if rack_id is None:
+            rack_id = select_current_rack_id()
 
         statement = (
             select(func.count())
-            .select_from(WellModel)
-            .filter(WellModel.status == "new")
-            .filter(WellModel.plate_id == plate_id)
+            .select_from(TipModel)
+            .filter(TipModel.status == "new")
+            .filter(TipModel.rack_id == rack_id)
         )
 
         result = session.execute(statement).scalar_one()
         return result
 
 
-def select_next_available_well(plate_id: Union[int, None] = None) -> str:
-    """Choose the next available well in the well_hx table.
+def select_next_available_tip(rack_id: Union[int, None] = None) -> str:
+    """Choose the next available tip in the tip_hx table.
 
     Parameters
     ----------
-    plate_id : int, optional
-        The rack ID. If None, uses current wellplate.
+    rack_id : int, optional
+        The rack ID. If None, uses current rack.
 
     Returns
     -------
     str
-        The well ID of the next available well.
+        The tip ID of the next available tip.
     """
     with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = select_current_wellplate_id()
+        if rack_id is None:
+            rack_id = select_current_rack_id()
 
         statement = (
-            select(WellModel.well_id)
-            .filter(WellModel.status == "new")
-            .filter(WellModel.plate_id == plate_id)
+            select(TipModel.tip_id)
+            .filter(TipModel.status == "new")
+            .filter(TipModel.rack_id == rack_id)
             .order_by(
-                func.substr(WellModel.well_id, 1, 1),
-                cast(func.substr(WellModel.well_id, 2), Integer).asc(),
+                func.substr(TipModel.tip_id, 1, 1),
+                cast(func.substr(TipModel.tip_id, 2), Integer).asc(),
             )
         )
 
@@ -476,169 +474,161 @@ def select_next_available_well(plate_id: Union[int, None] = None) -> str:
         return result[0]
 
 
-def save_well_to_db(well_to_save: object) -> None:
-    """First check if the well is in the table. If so update the well where the
-    values are different. Otherwise insert the well into the table.
+def save_tip_to_db(tip_to_save: object) -> None:
+    """First check if the tip is in the table. If so update the tip where the
+    values are different. Otherwise insert the tip into the table.
 
     Parameters
     ----------
-    well_to_save : object
-        The well object to save.
+    tip_to_save : object
+        The tip object to save.
     """
     with SessionLocal() as session:
-        if well_to_save.plate_id in [None, 0]:
-            current_plate_statement = select(Wellplates.id).filter(
-                Wellplates.current == 1
+        if tip_to_save.rack_id in [None, 0]:
+            current_rack_statement = select(Racks.id).filter(
+                Racks.current == 1
             )
-            well_to_save.plate_id = session.execute(
-                current_plate_statement
+            tip_to_save.rack_id = session.execute(
+                current_rack_statement
             ).scalar_one()
 
-        # Instead we will update the status of the well if it already exists
+        # Instead we will update the status of the tip if it already exists
         update_statement = (
-            update(WellModel)
-            .where(WellModel.plate_id == well_to_save.plate_id)
-            .where(WellModel.well_id == well_to_save.well_id)
+            update(TipModel)
+            .where(TipModel.rack_id == tip_to_save.rack_id)
+            .where(TipModel.tip_id == tip_to_save.tip_id)
             .values(
-                experiment_id=well_to_save.experiment_id,
-                project_id=well_to_save.project_id,
-                status=well_to_save.status,
+                experiment_id=tip_to_save.experiment_id,
+                project_id=tip_to_save.project_id,
+                status=tip_to_save.status,
                 status_date=datetime.now(tz=timezone.utc).isoformat(),
-                contents=json.dumps(well_to_save.contents),
-                volume=well_to_save.volume,
-                coordinates=json.dumps(asdict(well_to_save.coordinates)),
+                coordinates=json.dumps(asdict(tip_to_save.coordinates)),
             )
         )
         session.execute(update_statement)
         session.commit()
 
 
-def save_wells_to_db(wells_to_save: List[object]) -> None:
-    """First check if the well is in the table. If so update the well where the
-    values are different. Otherwise insert the well into the table.
+def save_tips_to_db(tips_to_save: List[object]) -> None:
+    """First check if the tip is in the table. If so update the tip where the
+    values are different. Otherwise insert the tip into the table.
 
     Parameters
     ----------
     wells_to_save : List[object]
-        List of well objects to save.
+        List of tip objects to save.
     """
     with SessionLocal() as session:
-        for well in wells_to_save:
-            if well.plate_id in [None, 0]:
-                current_plate_statement = select(Wellplates.id).filter(
-                    Wellplates.current == 1
+        for tip in tips_to_save:
+            if tip.rack_id in [None, 0]:
+                current_plate_statement = select(Racks.id).filter(
+                    Racks.current == 1
                 )
-                well.plate_id = session.execute(current_plate_statement).scalar_one()
+                tip.rack_id = session.execute(current_plate_statement).scalar_one()
 
-            # Check if well exists
-            exists_statement = select(WellModel).filter(
-                WellModel.plate_id == well.plate_id, WellModel.well_id == well.well_id
+            # Check if tip exists
+            exists_statement = select(TipModel).filter(
+                TipModel.rack_id == tip.rack_id, TipModel.tip_id == tip.tip_id
             )
             exists = session.execute(exists_statement).scalar_one_or_none()
 
             if exists:
-                # Update existing well
+                # Update existing tip
                 update_statement = (
-                    update(WellModel)
-                    .where(WellModel.plate_id == well.plate_id)
-                    .where(WellModel.well_id == well.well_id)
+                    update(TipModel)
+                    .where(TipModel.rack_id == tip.rack_id)
+                    .where(TipModel.tip_id == tip.tip_id)
                     .values(
-                        experiment_id=well.experiment_id,
-                        project_id=well.project_id,
-                        status=well.status,
+                        experiment_id=tip.experiment_id,
+                        project_id=tip.project_id,
+                        status=tip.status,
                         status_date=datetime.now(tz=timezone.utc).isoformat(),
-                        contents=json.dumps(well.contents),
-                        volume=well.volume,
-                        coordinates=json.dumps(asdict(well.coordinates)),
+                        coordinates=json.dumps(asdict(tip.coordinates)),
                     )
                 )
                 session.execute(update_statement)
             else:
-                # Insert new well
-                insert_statement = insert(WellModel).values(
-                    plate_id=well.plate_id,
-                    well_id=well.well_id,
-                    experiment_id=well.experiment_id,
-                    project_id=well.project_id,
-                    status=well.status,
+                # Insert new tip
+                insert_statement = insert(TipModel).values(
+                    rack_id=tip.rack_id,
+                    tip_id=tip.tip_id,
+                    experiment_id=tip.experiment_id,
+                    project_id=tip.project_id,
+                    status=tip.status,
                     status_date=datetime.now(tz=timezone.utc).isoformat(),
-                    contents=json.dumps(well.contents),
-                    volume=well.volume,
-                    coordinates=json.dumps(asdict(well.coordinates)),
+                    coordinates=json.dumps(asdict(tip.coordinates)),
                 )
                 session.execute(insert_statement)
 
         session.commit()
 
 
-def insert_well(well_to_insert: object) -> None:
-    """Insert a well into the well_hx table.
+def insert_tip(tip_to_insert: object) -> None:
+    """Insert a tip into the tip_hx table.
 
-    Insert_well will accept a well object, and using its attributes, insert a new
-    row into the well_hx table.
+    Insert_well will accept a tip object, and using its attributes, insert a new
+    row into the tip_hx table.
 
     Parameters
     ----------
-    well_to_insert : object
-        The well to insert.
+    tip_to_insert : object
+        The tip to insert.
     """
     with SessionLocal() as session:
-        session.add(WellModel(**well_to_insert.__dict__))
+        session.add(TipModel(**tip_to_insert.__dict__))
         session.commit()
 
 
-def update_well(well_to_update: object) -> None:
-    """Updating the entry in the well_hx table that matches the well and rack ids.
+def update_tip(tip_to_update: object) -> None:
+    """Updating the entry in the tip_hx table that matches the tip and rack ids.
 
     Parameters
     ----------
-    well_to_update : object
-        The well to update.
+    tip_to_update : object
+        The tip to update.
     """
     with SessionLocal() as session:
         update_statement = (
-            update(WellModel)
-            .where(WellModel.plate_id == well_to_update.well_data.plate_id)
-            .where(WellModel.well_id == well_to_update.well_data.well_id)
+            update(TipModel)
+            .where(TipModel.rack_id == tip_to_update.tip_data.rack_id)
+            .where(TipModel.tip_id == tip_to_update.tip_data.tip_id)
             .values(
-                experiment_id=well_to_update.well_data.experiment_id,
-                project_id=well_to_update.well_data.project_id,
-                status=well_to_update.well_data.status,
+                experiment_id=tip_to_update.tip_data.experiment_id,
+                project_id=tip_to_update.tip_data.project_id,
+                status=tip_to_update.tip_data.status,
                 status_date=datetime.now().isoformat(timespec="seconds"),
-                contents=json.dumps(well_to_update.well_data.contents),
-                volume=well_to_update.volume,
-                coordinates=json.dumps(well_to_update.well_data.coordinates),
+                coordinates=json.dumps(tip_to_update.tip_data.coordinates),
             )
         )
         session.execute(update_statement)
         session.commit()
 
 
-def get_well_by_id(
-    well_id: str,
-    plate_id: Union[int, None] = None,
-) -> WellModel:
-    """Get a well from the well_hx table.
+def get_tip_by_id(
+    tip_id: str,
+    rack_id: Union[int, None] = None,
+) -> TipModel:
+    """Get a tip from the tip_hx table.
 
     Parameters
     ----------
-    well_id : str
-        The well ID.
-    plate_id : int, optional
-        The rack ID. If None, uses current wellplate.
+    tip_id : str
+        The tip ID.
+    rack_id : int, optional
+        The rack ID. If None, uses current rack.
 
     Returns
     -------
-    WellModel
+    TipModel
     """
     with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = select_current_wellplate_id()
+        if rack_id is None:
+            rack_id = select_current_rack_id()
 
         statement = (
-            select(WellModel)
-            .filter(WellModel.plate_id == plate_id)
-            .filter(WellModel.well_id == well_id)
+            select(TipModel)
+            .filter(TipModel.rack_id == rack_id)
+            .filter(TipModel.tip_id == tip_id)
         )
 
         result = session.execute(statement).scalar_one_or_none()
@@ -648,8 +638,8 @@ def get_well_by_id(
         return result
 
 
-def get_well_by_experiment_id(experiment_id: str) -> Tuple:
-    """Get a well from the well_hx table by experiment ID.
+def get_tip_by_experiment_id(experiment_id: str) -> Tuple:
+    """Get a tip from the tip_hx table by experiment ID.
 
     Parameters
     ----------
@@ -659,29 +649,29 @@ def get_well_by_experiment_id(experiment_id: str) -> Tuple:
     Returns
     -------
     Tuple
-        The well.
+        The tip.
     """
     with SessionLocal() as session:
-        statement = select(WellModel).filter(WellModel.experiment_id == experiment_id)
+        statement = select(TipModel).filter(TipModel.experiment_id == experiment_id)
         result = session.execute(statement).scalar_one_or_none()
         return result
 
 
-def select_well_characteristics(type_id: int) -> PlateTypes:
-    """Select the well characteristics from the well_types table.
+def select_tip_characteristics(type_id: int) -> RackTypes:
+    """Select the tip characteristics from the well_types table.
 
     Parameters
     ----------
     type_id : int
-        The well type ID.
+        The tip type ID.
 
     Returns
     -------
-    PlateTypes
-        The SQL Alchemy object for the well type.
+    RackTypes
+        The SQL Alchemy object for the tip type.
     """
     with SessionLocal() as session:
-        statement = select(PlateTypes).filter(PlateTypes.id == type_id)
+        statement = select(RackTypes).filter(RackTypes.id == type_id)
         result = session.execute(statement).scalar_one_or_none()
         if result is None:
             logger.warning(f"No rack type found with ID {type_id}")
@@ -689,28 +679,28 @@ def select_well_characteristics(type_id: int) -> PlateTypes:
         return result
 
 
-def update_well_coordinates(
-    well_id: str, plate_id: Union[int, None], coordinates: object
+def update_tip_coordinates(
+    tip_id: str, rack_id: Union[int, None], coordinates: object
 ) -> None:
-    """Update the coordinates of an individal well in the well_hx table.
+    """Update the coordinates of an individal tip in the tip_hx table.
 
     Parameters
     ----------
-    well_id : str
-        The well ID.
-    plate_id : int
+    tip_id : str
+        The tip ID.
+    rack_id : int
         The rack ID.
     coordinates : object
         The coordinates.
     """
     with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = select_current_wellplate_id()
+        if rack_id is None:
+            rack_id = select_current_rack_id()
 
         update_stmt = (
-            update(WellModel)
-            .where(WellModel.plate_id == plate_id)
-            .where(WellModel.well_id == well_id)
+            update(TipModel)
+            .where(TipModel.rack_id == rack_id)
+            .where(TipModel.tip_id == tip_id)
         )
         update_stmt = update_stmt.values(
             coordinates=json.dumps(asdict(coordinates)),
@@ -719,31 +709,31 @@ def update_well_coordinates(
         session.commit()
 
 
-def update_well_status(
-    well_id: str, plate_id: Union[None, int] = None, status: Union[None, str] = None
+def update_tip_status(
+    tip_id: str, rack_id: Union[None, int] = None, status: Union[None, str] = None
 ) -> None:
-    """Update the status of a well in the well_hx table.
+    """Update the status of a tip in the tip_hx table.
 
     Parameters
     ----------
-    well_id : str
-        The well ID.
-    plate_id : int, optional
-        The rack ID. If None, uses current wellplate.
+    tip_id : str
+        The tip ID.
+    rack_id : int, optional
+        The rack ID. If None, uses current rack.
     status : str, optional
         The status. If None, uses current status.
     """
     with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = select_current_wellplate_id()
+        if rack_id is None:
+            rack_id = select_current_rack_id()
 
         if status is None:
-            status = select_well_status(well_id, plate_id)
+            status = select_tip_status(tip_id, rack_id)
 
         update_statement = (
-            update(WellModel)
-            .where(WellModel.plate_id == plate_id)
-            .where(WellModel.well_id == well_id)
+            update(TipModel)
+            .where(TipModel.rack_id == rack_id)
+            .where(TipModel.tip_id == tip_id)
             .values(
                 status=status, status_date=datetime.now().isoformat(timespec="seconds")
             )

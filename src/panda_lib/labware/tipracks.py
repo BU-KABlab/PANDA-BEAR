@@ -59,8 +59,6 @@ class RackKwargs(BaseModel, validate_assignment=True):
     pickup_height: float = 0.0
     coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0} 
 
-
-
 class Tip:
     """
     Class to represent a tip in a tiprack

@@ -189,7 +189,7 @@ class WellplateWriteModel(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-# TODO: Fix the following to reflect pipette tips
+
 class TipWriteModel(BaseModel):
     rack_id: int
     tip_id: str

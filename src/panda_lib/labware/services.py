@@ -12,7 +12,7 @@ from ..sql_tools import PlateTypes as PlateTypeDBModel
 from ..sql_tools import Vials  # SQLAlchemy models
 from ..sql_tools import WellModel as WellDBModel
 from ..sql_tools import Wellplates as WellPlateDBModel
-from ..sql_tools import Tips as TipDBModel
+from ..sql_tools import TipModel as TipDBModel
 from ..sql_tools import Racks as RackDBModel
 from ..sql_tools import RackTypes as RackTypeDBModel
 from .schemas import (  # PyDanctic models
@@ -136,6 +136,275 @@ class TipService:
                 raise ValueError(f"Rack type with id {type_id} not found.")
 
         return RackTypeModel.model_validate(rack_type)
+
+
+class RackService:
+    """
+    Service class for interacting with tip racks in the database.
+    """
+
+    def __init__(self, session_maker: sessionmaker = SessionLocal):
+        self.session_maker = session_maker
+
+    def create_rack(self, rack_data: RackWriteModel) -> RackDBModel:
+        with self.session_maker() as db_session:
+            try:
+                rack_data.panda_unit_id = get_unit_id()
+                rack: RackDBModel = RackDBModel(**rack_data.model_dump())
+                db_session.add(rack)
+                db_session.commit()
+                db_session.refresh(rack)
+                return rack
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error creating rack: {e}")
+
+    def get_rack(self, rack_id: int) -> RackReadModel:
+        with self.session_maker() as db_session:
+            stmt = select(RackDBModel).filter_by(id=rack_id)
+            rack = db_session.execute(stmt).scalar()
+            if not rack:
+                # raise ValueError(f"rack with id {rack_id} not found.")
+                return None
+            return RackReadModel.model_validate(rack)
+
+    def get_rack_type(self, type_id: int) -> RackTypeModel:
+        with self.session_maker() as db_session:
+            stmt = select(RackTypeDBModel).filter_by(id=type_id)
+            rack = db_session.execute(stmt).scalar()
+            if not rack:
+                raise ValueError(f"rack type with id {type_id} not found.")
+            return RackTypeModel.model_validate(rack)
+
+    def get_tips(self, rack_id: int) -> List[TipReadModel]:
+        with self.session_maker() as db_session:
+            stmt = select(TipDBModel).filter_by(rack_id=rack_id)
+            tips = db_session.execute(stmt).scalars().all()
+            return [TipReadModel.model_validate(tip) for tip in tips]
+
+    def update_rack(self, rack_id: int, updates: dict) -> RackDBModel:
+        with self.session_maker() as db_session:
+            try:
+                updates = RackWriteModel(**updates).model_dump()
+                stmt = select(RackDBModel).filter_by(id=rack_id)
+                rack = db_session.execute(stmt).scalar()
+                if not rack:
+                    raise ValueError(f"rack with id {rack_id} not found.")
+                for key, value in updates.items():
+                    setattr(rack, key, value)
+                db_session.commit()
+                db_session.refresh(rack)
+                return rack
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error updating rack: {e}")
+
+    def activate_rack(self, rack_id: int) -> RackReadModel:
+        with self.session_maker() as db_session:
+            try:
+                db_session.execute(update(RackDBModel).values(current=False))
+                stmt = select(RackDBModel).filter_by(id=rack_id)
+                rack = db_session.execute(stmt).scalar()
+                if not rack:
+                    raise ValueError(f"rack with id {rack_id} not found.")
+                rack.current = True
+                db_session.commit()
+
+                return RackReadModel.model_validate(rack)
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error activating rack: {e}")
+
+    def deactivate_rack(
+        self, rack_id: int, new_active_rack_id: int = None
+    ) -> RackReadModel:
+        with self.session_maker() as db_session:
+            try:
+                stmt = select(RackDBModel).filter_by(id=rack_id)
+                rack = db_session.execute(stmt).scalar()
+                if not rack:
+                    raise ValueError(f"rack with id {rack_id} not found.")
+                rack.current = False
+                db_session.commit()
+                if new_active_rack_id:
+                    new_active_rack = db_session.execute(
+                        select(RackDBModel).filter_by(id=new_active_rack_id)
+                    ).scalar_one_or_none()
+                    if new_active_rack:
+                        new_active_rack.current = True
+                        db_session.commit()
+
+                return RackReadModel.model_validate(rack)
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error deactivating rack: {e}")
+
+    def get_active_rack(self) -> RackReadModel:
+        with self.session_maker() as db_session:
+            stmt = select(RackDBModel).filter_by(current=True)
+            rack = db_session.execute(stmt).scalar()
+            if not rack:
+                return None
+            if not rack.name:
+                rack.name = f"{rack.id}"
+                db_session.commit()
+            return RackReadModel.model_validate(rack)
+
+    def check_rack_exists(self, rack_id: int) -> bool:
+        with self.session_maker() as db_session:
+            stmt = select(RackDBModel).filter_by(id=rack_id)
+            rack = db_session.execute(stmt).scalar()
+            return rack is not None
+
+    def get_rack_types(self) -> List[RackTypeModel]:
+        """
+        Fetches all rack types from the database.
+
+        Returns:
+            List[RackTypeModel]: List of Pydantic models representing all rack types.
+            str: Formatted string table of rack types.
+        """
+        with self.session_maker() as db_session:
+            stmt = select(RackTypeDBModel)
+            rack_types = db_session.execute(stmt).scalars().all()
+            rack_type_list = [
+                RackTypeModel.model_validate(rack_type) for rack_type in rack_types
+            ]
+
+            return rack_type_list
+
+    def tabulate_rack_type_list(self, rack_types: List[RackTypeModel] = None) -> str:
+        """
+        Prints a formatted string table of rack types.
+
+        Returns:
+            str: Formatted string table of rack types.
+        """
+        if not rack_types:
+            rack_types = self.get_rack_types()
+        if not rack_types:
+            return "No rack types found."
+
+        header = f"{'ID':<5} {'Count':<6}"
+        separator = "-" * len(header)
+        rows = [
+            f"{rack.id:<5} {rack.count:<6}"
+            for rack in rack_types
+        ]
+
+        return "\n".join([header, separator] + rows)
+
+
+class RackTypeService:
+    """
+    Class for interacting with tip types in the database, adding, updating, and deleting tip types.
+    """
+
+    def __init__(self, session_maker: sessionmaker = SessionLocal):
+        self.session_maker = session_maker
+
+    def create_rack_type(self, rack_type_data: RackTypeModel) -> RackTypeDBModel:
+        """
+        Creates a new tip rack type in the database.
+
+        Args:
+            rack_type_data (RackTypeModel): Pydantic model with tip rack type details.
+
+        Returns:
+            RackTypeDBModel: SQLAlchemy model instance representing the new tip rack type.
+        """
+        with self.session_maker() as db_session:
+            try:
+                rack_type: RackTypeDBModel = RackTypeDBModel(
+                    **rack_type_data.model_dump()
+                )
+                db_session.add(rack_type)
+                db_session.commit()
+                db_session.refresh(rack_type)
+                return rack_type
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error creating rack type: {e}")
+
+    def get_rack_type(self, type_id: int) -> RackTypeModel:
+        """
+        Fetches a tip rack type by ID from the database.
+
+        Args:
+            type_id (int): The ID of the tip rack type to fetch.
+
+        Returns:
+            RackTypeModel: Pydantic model representing the tip rack type.
+        """
+        with self.session_maker() as db_session:
+            stmt = select(RackTypeDBModel).filter_by(id=type_id)
+            rack_type = db_session.execute(stmt).scalar()
+            if not rack_type:
+                raise ValueError(f"rack type with id {type_id} not found.")
+            return RackTypeModel.model_validate(rack_type)
+
+    def update_rack_type(self, type_id: int, updates: dict) -> RackTypeDBModel:
+        """
+        Updates an existing tip rack type in the database.
+
+        Args:
+            type_id (int): The ID of the tip rack type to update.
+            updates (dict): Key-value pairs of attributes to update.
+
+        Returns:
+            RackTypeDBModel: Updated SQLAlchemy model instance.
+        """
+        with self.session_maker() as db_session:
+            try:
+                updates = RackTypeModel(**updates).model_dump()
+                stmt = select(RackTypeDBModel).filter_by(id=type_id)
+                rack_type = db_session.execute(stmt).scalar()
+                if not rack_type:
+                    raise ValueError(f"rack type with id {type_id} not found.")
+                for key, value in updates.items():
+                    setattr(
+                        rack=db_session.execute(stmt).scalar(), name=key, value=value
+                    )
+                    setattr(rack_type, key, value)
+                db_session.commit()
+                db_session.refresh(rack_type)
+                return rack_type
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error updating rack type: {e}")
+
+    def delete_rack_type(self, type_id: int) -> None:
+        """
+        Deletes a tip rack type from the database.
+
+        Args:
+            type_id (int): The ID of the tip rack type to delete.
+        """
+        with self.session_maker() as db_session:
+            try:
+                stmt = select(RackTypeDBModel).filter_by(id=type_id)
+                rack_type = db_session.execute(stmt).scalar()
+                if not rack_type:
+                    raise ValueError(f"rack type with id {type_id} not found.")
+                db_session.delete(rack_type)
+                db_session.commit()
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error deleting rack type: {e}")
+
+    def list_rack_types(self) -> List[RackTypeModel]:
+        """
+        Lists all tip rack types in the database.
+        Returns:
+            List[RackTypeModel]: List of Pydantic models representing all tip rack types.
+        """
+        with self.session_maker() as db_session:
+            stmt = select(RackTypeDBModel)
+            rack_types = db_session.execute(stmt).scalars().all()
+            return [
+                RackTypeModel.model_validate(rack_type) for rack_type in rack_types
+            ]
+
 
 class VialService:
     """

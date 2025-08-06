@@ -6,6 +6,7 @@ This module contains the SQLAlchemy ORM models for tip racks and tips.
 
 from datetime import datetime as dt
 from datetime import timezone
+from typing import Optional
 
 from sqlalchemy import Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -29,6 +30,7 @@ class TipModel(VesselBase, Base):
     updated: Mapped[str] = mapped_column(
         String, default=dt.now(timezone.utc), nullable=False
     )
+    tip_length: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     def __repr__(self):
         return f"<TipHx(rack_id={self.rack_id}, tip_id={self.tip_id}, experiment_id={self.experiment_id}, project_id={self.project_id}, status={self.status}, status_date={self.status_date}, coordinates={self.coordinates}, radius={self.radius}, capacity={self.capacity}, top={self.top}, bottom={self.bottom}, updated={self.updated})>"

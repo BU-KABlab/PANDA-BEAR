@@ -85,6 +85,8 @@ dependencies = [
     "simple-pyspin==0.1.1",
     "websocket-client==1.8.0",
     "spinnaker-python",
+    "alembic",
+    "mako"
 ]
 
 [project.urls]
