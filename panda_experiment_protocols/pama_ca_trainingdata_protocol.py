@@ -26,6 +26,8 @@ from panda_lib.labware.vials import Vial, read_vials
 from panda_lib.toolkit import Toolkit
 from panda_lib.utilities import Instruments, solve_vials_ilp
 from panda_lib.hardware.panda_pipettes import insert_new_pipette
+from panda_shared.db_setup import SessionLocal
+from panda_lib.sql_tools.queries.racks import select_current_rack_id
 
 PROTOCOL_ID = 30 
 
@@ -329,6 +331,8 @@ def pama_ipa_contact_angle(
         measure_contact_angle(
             toolkit=toolkit,
             experiment=experiment,
+            session=SessionLocal,
+            tiprack_id=select_current_rack_id(),
         )
 
     toolkit.global_logger.info("Contact angle measurement complete\n\n")

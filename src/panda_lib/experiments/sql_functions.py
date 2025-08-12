@@ -192,9 +192,13 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.project_id,
                 experiment.project_campaign_id,
                 experiment.wellplate_type_id,
-                experiment.protocol_name,
+                str(experiment.protocol_name),
                 experiment.priority,
                 experiment.filename,
+                experiment.needs_analysis,
+                experiment.analysis_id,
+                experiment.panda_version,
+                experiment.panda_unit_id,
                 datetime.now().isoformat(timespec="seconds"),
             )
         )
@@ -210,7 +214,11 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                     protocol_id=parameter[4],
                     priority=parameter[5],
                     filename=parameter[6],
-                    created=datetime.strptime(parameter[7], "%Y-%m-%dT%H:%M:%S"),
+                    needs_analysis=parameter[7],
+                    analysis_id=parameter[8],
+                    panda_version=parameter[9],
+                    panda_unit_id=parameter[10],
+                    created=datetime.strptime(parameter[11], "%Y-%m-%dT%H:%M:%S"),
                 )
             )
         session.commit()

@@ -227,15 +227,22 @@ class Users(Base):
     username: Mapped[str] = mapped_column(String, unique=True)
     password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False)
-    active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
+    full: Mapped[str] = mapped_column(
+        String, Computed("first || ' ' || last", persisted=True)
+    )
+    active: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
     updated: Mapped[str] = mapped_column(
         String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc)
     )
 
     def __repr__(self):
-        return f"<Users(id={self.id}, first_name={self.first}, last_name={self.last}, username={self.username}, password={self.password}, email={self.email}, created={self.created}, updated={self.updated})>"
-
+        return (
+            f"<Users(id={self.id}, first_name={self.first}, last_name={self.last}, "
+            f"username={self.username}, password={self.password}, email={self.email}, "
+            f"active={self.active}, full={self.full}, created_at={self.created_at}, "
+            f"updated={self.updated})>"
+        )
 
 def generate_username(mapper, connection, target):
     """Generate a unique username by concatenating the first letter of the first name with the last name and an auto-incremented number."""
@@ -324,7 +331,7 @@ def view(name, metadata, selectable):
 class PotentiostatReadout(Base):
     """PotentiostatReadout table model"""
 
-    __tablename__ = "potentiostat_readouts"
+    __tablename__ = "panda_potentiostat_readouts"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     timestamp = Column(String, nullable=False)
@@ -339,7 +346,7 @@ class PotentiostatReadout(Base):
     # def validate_interface(mapper, connection, target):
     #     """Validate if the technique is listed in the PotentiostatTechniques table and the interface is supported."""
     #     technique = connection.execute(
-    #         f"SELECT * FROM potentiostat_techniques WHERE technique = '{target.technique}'"
+    #         f"SELECT * FROM panda_potentiostat_techniques WHERE technique = '{target.technique}'"
     #     ).fetchone()
 
     #     if not technique:
@@ -357,7 +364,7 @@ class PotentiostatReadout(Base):
 class PotentiostatTechniques(Base):
     """PotentiostatTechniques table model"""
 
-    __tablename__ = "potentiostat_techniques"
+    __tablename__ = "panda_potentiostat_techniques"
 
     id = Column(Integer, primary_key=True)
     technique = Column(String, nullable=False)

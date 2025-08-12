@@ -28,6 +28,8 @@ from panda_lib.utilities import Instruments
 def measure_contact_angle(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
+    session,
+    tiprack_id: int,
     file_tag: str = "ContactAngle",
 ) -> EchemExperimentBase:
     """
@@ -48,6 +50,8 @@ def measure_contact_angle(
             dst_vessel=toolkit.wellplate.wells[experiment.well_id],
             toolkit=toolkit,
             ca_dispense_height=toolkit.wellplate.bottom + 4,
+            session=session,
+            tiprack_id=tiprack_id,
         )
 
         toolkit.global_logger.info("1. Imaging the well")
@@ -113,6 +117,8 @@ def measure_contact_angle(
 def measure_contact_angle_norinse(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
+    session,
+    tiprack_id: int,
     file_tag: str = "ContactAngle",
 ) -> EchemExperimentBase:
     """
@@ -130,6 +136,8 @@ def measure_contact_angle_norinse(
             dst_vessel=toolkit.wellplate.wells[experiment.well_id],
             toolkit=toolkit,
             ca_dispense_height=toolkit.wellplate.bottom + 4,
+            session=session,
+            tiprack_id=tiprack_id,
         )
 
         toolkit.global_logger.info("1. Imaging the well")

@@ -13,6 +13,7 @@ import os
 from panda_lib.exceptions import ProtocolNotFoundError
 from panda_shared.config.config_tools import read_config
 from panda_shared.db_setup import SessionLocal
+from sqlalchemy.exc import SQLAlchemyError
 
 from ..models import Protocols
 
@@ -130,10 +131,15 @@ def update_protocol(protocol_id, new_name):
     """
 
     with SessionLocal() as session:
-        # Update the name of the protocol in the database
-        session.query(Protocols).filter(Protocols.id == protocol_id).update(
-            {"name": new_name}
-        )
+        try:
+            # Update the name of the protocol in the database
+            session.query(Protocols).filter(Protocols.id == protocol_id).update(
+                {"name": new_name}
+            )
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            raise
 
 
 def delete_protocol(protocol_id):
@@ -148,8 +154,13 @@ def delete_protocol(protocol_id):
     """
 
     with SessionLocal() as session:
-        # Delete the protocol from the database
-        session.query(Protocols).filter(Protocols.id == protocol_id).delete()
+        try:
+            # Delete the protocol from the database
+            session.query(Protocols).filter(Protocols.id == protocol_id).delete()
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            raise
 
 
 def read_in_protocols():

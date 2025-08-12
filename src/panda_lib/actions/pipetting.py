@@ -1,15 +1,16 @@
 import logging
 import math
-from typing import Optional, Union
 import time
+from typing import Optional, Union
 from panda_lib.exceptions import NoAvailableSolution
-from panda_shared.db_setup import SessionLocal
 from panda_lib.hardware.grbl_cnc_mill import Instruments
 from panda_shared.config.config_tools import (
     ConfigParserError,
     read_config,
     read_testing_config,
 )
+from panda_shared.db_setup import SessionLocal
+from sqlalchemy.orm import Session, sessionmaker
 
 from ..experiments.experiment_types import (
     EchemExperimentBase,
@@ -39,9 +40,12 @@ except ConfigParserError as e:
 logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
 
+# Default location to discard tips when no drop coordinates are available
+DEFAULT_TIP_DROP_COORDINATES = {"x":-92.1,"y":-227.3,"z":-169.0}
+
 def replace_tip(
     toolkit: Union[Toolkit, Hardware],
-    session,
+    session_maker: sessionmaker,
     tiprack_id: int,
     tip_id: Optional[str] = None
 ) -> bool:
@@ -52,12 +56,17 @@ def replace_tip(
     ----------
     toolkit : Toolkit | Hardware
         Toolkit instance controlling motion and pipette actions.
-    session : SQLAlchemy session or sessionmaker
-        Database session for retrieving/updating tip info.
+    session_maker : sessionmaker
+        Database session factory for retrieving/updating tip info.
     tiprack_id : int
         The rack ID where tips are stored.
     tip_id : str, optional
         Specific tip ID to pick up. If None, the first unused tip will be selected.
+
+    Notes
+    -----
+    If the current tip lacks stored drop coordinates, the tip is dropped at
+    ``DEFAULT_TIP_DROP_COORDINATES`` instead of failing.
 
     Returns
     -------
@@ -65,8 +74,12 @@ def replace_tip(
         True if tip was successfully replaced, False otherwise.
     """
     logger.info("Replacing pipette tip...")
-
-    tip_service = TipService(session_maker=session)
+    if isinstance(session_maker, Session):
+        raise TypeError("replace_tip expects a session factory, not a live session")
+    if not isinstance(session_maker, sessionmaker):
+        raise TypeError("session_maker must be a SQLAlchemy sessionmaker instance")
+    
+    tip_service = TipService(session_maker=session_maker)
 
     # Select tip
     tip: Optional[TipReadModel] = None
@@ -87,26 +100,28 @@ def replace_tip(
 
     # Drop old tip if pipette currently has one
     current_tip_id = toolkit.pipette.pipette_tracker.tip_id
+    current_tip_rack_id = getattr(toolkit.pipette.pipette_tracker, "tip_rack_id", None)
+
     if current_tip_id:
         logger.info(f"Dropping old tip '{current_tip_id}'...")
-        old_tip = tip_service.get_tip(tip_id=current_tip_id, rack_id=tiprack_id)
+        old_tip = tip_service.get_tip(tip_id=current_tip_id, rack_id=current_tip_rack_id)
         drop_coords = getattr(old_tip, "drop_coordinates", None) if old_tip else None
-        if drop_coords:
-            toolkit.mill.safe_move(
-                drop_coords["x"], drop_coords["y"], drop_coords["z"],
-                tool=Instruments.PIPETTE
-            )
-            if toolkit.pipette.pipette_driver.drop_tip():
-                tip_service.update_tip(current_tip_id, tiprack_id, {"status": "discarded"})
-                logger.info(f"Old tip '{current_tip_id}' dropped and marked as discarded.")
-            else:
-                logger.warning("Failed to drop tip.")
-                return False
+        if not drop_coords:
+            logger.warning("No drop coordinates found for current tip. Using default drop location.")
+            drop_coords = DEFAULT_TIP_DROP_COORDINATES
+        
+        toolkit.mill.safe_move(
+            drop_coords["x"], drop_coords["y"], drop_coords["z"],
+            tool=Instruments.PIPETTE
+        )
+        if toolkit.pipette.pipette_driver.drop_tip():
+            tip_service.update_tip(current_tip_id, tiprack_id, {"status": "discarded"})
+            logger.info(f"Old tip '{current_tip_id}' dropped and marked as discarded.")
         else:
-            logger.warning("No drop coordinates found for current tip. Cannot drop.")
+            logger.warning("Failed to drop tip.")
             return False
     else:
-        logger.info("No tip currently in pipette. Skipping drop step.")
+        logger.info("No tip currently on pipette. Skipping drop step.")
 
     # Pick up new tip
     toolkit.mill.safe_move(
@@ -121,6 +136,7 @@ def replace_tip(
     tip_service.update_tip(tip.tip_id, tip.rack_id, {"status": "used"})
     toolkit.pipette.pipette_tracker.reset_contents()
     toolkit.pipette.pipette_tracker.tip_id = tip.tip_id
+    toolkit.pipette.pipette_tracker.tip_rack_id = tip.rack_id
 
     logger.info(f"New tip '{tip.tip_id}' picked up successfully.")
 
@@ -329,14 +345,14 @@ def contact_angle_transfer(
     dst_vessel: Union[str, Well, WasteVial],
     toolkit: Toolkit,
     ca_dispense_height: float,
-    session,
-    tiprack_id: int,
+    session_maker: sessionmaker = SessionLocal,
+    tiprack_id: int = 1,
     source_concentration: float = None,
     tip_id: Optional[str] = None
 ) -> int:
     """Transfer liquid between vessels."""
     
-    replace_tip(toolkit, session, tiprack_id, tip_id=tip_id)
+    replace_tip(toolkit, session_maker, tiprack_id, tip_id=tip_id)
 
     return _forward_pipette_v3(
         volume, src_vessel, dst_vessel, toolkit, source_concentration, ca_dispense_height
@@ -613,49 +629,6 @@ def clear_well(
         toolkit=toolkit,
     )
     return 0
-
-
-def replace_tip(toolkit: Union[Toolkit, Hardware], tip_index: int) -> bool:
-    """
-    Replace the current pipette tip with a new one from the specified tip rack index.
-
-    Parameters
-    ----------
-    toolkit : Union[Toolkit, Hardware]
-        Toolkit object containing mill, deck, and pipette control.
-    tip_index : int
-        Index of the new tip to pick up.
-
-    Returns
-    -------
-    bool
-        True if tip replacement succeeded, False otherwise.
-    """
-    logger.info("Replacing pipette tip...")
-
-    # 1. Move to drop location
-    drop_coords = toolkit.get_position("tip_drop")
-    toolkit.mill.safe_move(drop_coords.x, drop_coords.y, drop_coords.z, tool=Instruments.PIPETTE)
-
-    if not toolkit.pipette.pipette_driver.drop_tip():
-        logger.warning("Failed to drop tip.")
-        return False
-    logger.info("Old tip dropped.")
-
-    # 2. Move to new tip location
-    tip_coords = toolkit.deck.get_tiprack_position(tip_index)
-    toolkit.mill.safe_move(tip_coords.x, tip_coords.y, tip_coords.z, tool=Instruments.PIPETTE)
-
-    if not toolkit.pipette.pipette_driver.pick_up_tip():
-        logger.warning("Failed to pick up new tip.")
-        return False
-
-    toolkit.pipette.pipette_tracker.reset_contents()
-    logger.info("New tip picked up successfully.")
-
-    return True
-
-
 
 
 if __name__ == "__main__":

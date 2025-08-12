@@ -27,10 +27,10 @@ class Experiments(Base):
     priority = Column(Integer, default=0)
     filename = Column(String, default=None)
     needs_analysis = Column(Boolean, default=False)
-    panda_version = Column(Float, default=False)
-    panda_unit_id = Column(Integer, default=False)
-    created = Column(String)
-    updated = Column(String, default=dt.now(timezone.utc))
+    panda_version = Column(Float, default=1.0)
+    panda_unit_id = Column(Integer, ForeignKey("panda_units.id"), nullable=True)
+    created = Column(String, default=dt.now(timezone.utc))
+    updated = Column(String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc))
 
     results: Mapped[list["ExperimentResults"]] = relationship(
         "ExperimentResults", backref="experiment"
@@ -40,8 +40,14 @@ class Experiments(Base):
     )
 
     def __repr__(self):
-        return f"<Experiments(experiment_id={self.experiment_id}, project_id={self.project_id}, project_campaign_id={self.project_campaign_id}, well_type={self.well_type}, protocol_id={self.protocol_id}, pin={self.pin}, experiment_type={self.experiment_type}, jira_issue_key={self.jira_issue_key}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, created={self.created}, updated={self.updated})>"
-
+        return (
+            f"<Experiments(experiment_id={self.experiment_id}, project_id={self.project_id}, "
+            f"project_campaign_id={self.project_campaign_id}, well_type={self.well_type}, "
+            f"protocol_id={self.protocol_id}, priority={self.priority}, "
+            f"filename={self.filename}, needs_analysis={self.needs_analysis}, "
+            f"analysis_id={self.analysis_id}, panda_version={self.panda_version}, "
+            f"panda_unit_id={self.panda_unit_id}, created={self.created}, updated={self.updated})>"
+        )
 
 class ExperimentStatusView:
     """ExperimentStatus view model"""

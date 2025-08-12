@@ -80,10 +80,10 @@ class Experiments(Base):
     priority = Column(Integer, default=0)
     filename = Column(String, default=None)
     needs_analysis = Column(Boolean, default=False)
-    panda_version = Column(Float, default=False)
-    panda_unit_id = Column(Integer, default=False)
-    created = Column(String)
-    updated = Column(String, default=dt.now(timezone.utc))
+    panda_version = Column(Float, default=1.0)
+    panda_unit_id = Column(Integer, ForeignKey("panda_units.id"), nullable=True)
+    created = Column(String, default=dt.now(timezone.utc))
+    updated = Column(String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc))
 
     results: Mapped[list["ExperimentResults"]] = relationship(
         "ExperimentResults", backref="experiment"
@@ -93,8 +93,14 @@ class Experiments(Base):
     )
 
     def __repr__(self):
-        return f"<Experiments(experiment_id={self.experiment_id}, project_id={self.project_id}, project_campaign_id={self.project_campaign_id}, well_type={self.well_type}, protocol_id={self.protocol_id}, pin={self.pin}, experiment_type={self.experiment_type}, jira_issue_key={self.jira_issue_key}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, created={self.created}, updated={self.updated})>"
-
+        return (
+            f"<Experiments(experiment_id={self.experiment_id}, project_id={self.project_id}, "
+            f"project_campaign_id={self.project_campaign_id}, well_type={self.well_type}, "
+            f"protocol_id={self.protocol_id}, priority={self.priority}, "
+            f"filename={self.filename}, needs_analysis={self.needs_analysis}, "
+            f"analysis_id={self.analysis_id}, panda_version={self.panda_version}, "
+            f"panda_unit_id={self.panda_unit_id}, created={self.created}, updated={self.updated})>"
+        )
 
 class ExperimentStatusView:
     """ExperimentStatus view model"""
@@ -310,15 +316,22 @@ class Users(Base):
     username: Mapped[str] = mapped_column(String, unique=True)
     password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False)
-    active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
+    full: Mapped[str] = mapped_column(
+        String, Computed("first || ' ' || last", persisted=True)
+    )
+    active: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
     updated: Mapped[str] = mapped_column(
         String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc)
     )
 
     def __repr__(self):
-        return f"<Users(id={self.id}, first_name={self.first}, last_name={self.last}, username={self.username}, password={self.password}, email={self.email}, created={self.created}, updated={self.updated})>"
-
+        return (
+            f"<Users(id={self.id}, first_name={self.first}, last_name={self.last}, "
+            f"username={self.username}, password={self.password}, email={self.email}, "
+            f"active={self.active}, full={self.full}, created_at={self.created_at}, "
+            f"updated={self.updated})>"
+        )
 
 def generate_username(mapper, connection, target):
     """Generate a unique username by concatenating the first letter of the first name with the last name and an auto-incremented number."""
@@ -751,7 +764,7 @@ class Queue:
 class PotentiostatReadout(Base):
     """PotentiostatReadout table model"""
 
-    __tablename__ = "potentiostat_readouts"
+    __tablename__ = "panda_potentiostat_readouts"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     timestamp = Column(String, nullable=False)
@@ -766,7 +779,7 @@ class PotentiostatReadout(Base):
     # def validate_interface(mapper, connection, target):
     #     """Validate if the technique is listed in the PotentiostatTechniques table and the interface is supported."""
     #     technique = connection.execute(
-    #         f"SELECT * FROM potentiostat_techniques WHERE technique = '{target.technique}'"
+    #         f"SELECT * FROM panda_potentiostat_techniques WHERE technique = '{target.technique}'"
     #     ).fetchone()
 
     #     if not technique:
@@ -784,7 +797,7 @@ class PotentiostatReadout(Base):
 class PotentiostatTechniques(Base):
     """PotentiostatTechniques table model"""
 
-    __tablename__ = "potentiostat_techniques"
+    __tablename__ = "panda_potentiostat_techniques"
 
     id = Column(Integer, primary_key=True)
     technique = Column(String, nullable=False)

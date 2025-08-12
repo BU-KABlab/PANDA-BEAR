@@ -539,12 +539,12 @@ CREATE VIEW IF NOT EXISTS panda_new_wellplates AS
 -- View: panda_pipette_status
 DROP VIEW IF EXISTS panda_pipette_status;
 CREATE VIEW IF NOT EXISTS panda_pipette_status AS
-    SELECT *
-      FROM panda_pipette-- WHERE updated = (SELECT MAX(updated) FROM pipette)
-     WHERE id = (
-                    SELECT MAX(id) 
-                      FROM panda_pipette
-                )
+    SELECT pp.*
+      FROM panda_pipette pp
+     WHERE pp.id = (
+            SELECT MAX(pp2.id)
+              FROM panda_pipette pp2
+          )
      LIMIT 1;
 
 
