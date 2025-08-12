@@ -167,10 +167,27 @@ class Tip:
         return Coordinates(x=self.x, y=self.y, z=self.bottom)
 
     @property
+    def drop_x(self):
+        return getattr(self.tip_data, "drop_x", None)
+
+    @property
+    def drop_y(self):
+        return getattr(self.tip_data, "drop_y", None)
+
+    @property
+    def drop_z(self):
+        return getattr(self.tip_data, "drop_z", None)
+
+    @property
+    def drop_coordinates(self) -> Coordinates:
+        return Coordinates(**self.tip_data.drop_coordinates)
+
+    @property
     def experiment_id(self):
         return self.tip_data.experiment_id
 
     def create_new_tip(self, **kwargs: TipKwargs):
+        # Fetch rack type info
         if "type_id" in kwargs:
             rack_type = self.service.fetch_tip_type_characteristics(
                 db_session=self.session_maker,
@@ -179,25 +196,40 @@ class Tip:
             )
         else:
             rack_type = self.service.fetch_tip_type_characteristics(
-                db_session=self.session_maker, rack_id=self.rack_id
+                db_session=self.session_maker,
+                rack_id=self.rack_id
             )
-            # Remove rack_type attributes from kwargs
-        for key in [
-            "capacity",
-            "radius_mm",
-        ]:
+
+        # Remove rack_type attributes from kwargs if they exist
+        for key in ["capacity", "radius_mm"]:
             kwargs.pop(key, None)
+
+        # Fetch rack info so we can get drop coordinates
+        rack = self.service.get_rack_for_tip(self.rack_id)
+        drop_coords = getattr(rack, "drop_coordinates", None)
+        if not drop_coords:
+            # Default to rack coordinates but Z slightly above top
+            drop_coords = {
+                "x": rack.coordinates["x"],
+                "y": rack.coordinates["y"],
+                "z": rack.coordinates["z"] + rack.pickup_height + 20
+            }
+
+        # Create tip entry
         new_tip = TipWriteModel(
             tip_id=self.tip_id,
             rack_id=self.rack_id,
             capacity=rack_type.capacity_ul,
+            drop_coordinates=drop_coords,
             **kwargs,
         )
+
         self.tip_data = TipWriteModel.model_validate(
             self.service.create_tip(new_tip)
         )
         self.save()
         self.load_tip()
+
 
     def load_tip(self):
         """Load the tip data from the database"""

@@ -85,6 +85,9 @@ class Racks(Base, DeckObjectBase):
     rows: Mapped[str] = mapped_column(String, default="ABCDEFGH")
     cols: Mapped[int] = mapped_column(Integer, default=12)
     pickup_height: Mapped[float] = mapped_column(Float)
+    drop_coordinates: Mapped[dict] = mapped_column(
+        JSON, nullable=True, default={"x": 0.0, "y": 0.0, "z": 0.0}
+    )
     panda_unit_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("panda_units.id"), nullable=False
     )

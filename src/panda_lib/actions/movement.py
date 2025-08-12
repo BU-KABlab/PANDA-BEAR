@@ -40,7 +40,6 @@ except ConfigParserError as e:
 logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
 
-
 def move_to_well(
     well: Well,
     mill: Mill,

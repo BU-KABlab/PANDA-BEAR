@@ -199,12 +199,16 @@ class TipWriteModel(BaseModel):
     coordinates: Dict[str, float] = Field(
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
+    drop_coordinates: Dict[str, float] = Field(   
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
     capacity: float = 200.0
     name: str = "default"
-    type: int # solid handling or liquid handling
-    radius_mm: float # radius of bead for solid handling
+    type: int  # solid handling or liquid handling
+    radius_mm: float  # radius of bead for solid handling
 
     model_config = ConfigDict(from_attributes=True)
+
 
 
 class TipReadModel(VesselModel):
@@ -213,8 +217,12 @@ class TipReadModel(VesselModel):
     experiment_id: Optional[int]
     project_id: Optional[int]
     status: str = "new"
+    drop_coordinates: Dict[str, float] = Field(   
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
 
     model_config = ConfigDict(from_attributes=True)
+
 
 
 class RackTypeModel(BaseModel):
@@ -245,6 +253,10 @@ class RackReadModel(DeckObjectModel):
     rows: str
     cols: int
     pickup_height: float  # height of pipette to pick up tips
+    drop_coordinates: Dict[str, float] = Field(
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
+
     panda_unit_id: int
     
     model_config = ConfigDict(from_attributes=True)
@@ -262,6 +274,9 @@ class RackWriteModel(BaseModel):
     pickup_height: float = 0.0  # height of pipette to pick up tips
     name: Optional[str] = f"{id}" if id is not None else None
     coordinates: Dict[str, float] = Field(
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
+    drop_coordinates: Dict[str, float] = Field(
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
     panda_unit_id: int = 2

@@ -1,7 +1,7 @@
 import logging
 from typing import List, Optional
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -48,13 +48,23 @@ class TipService:
                 active_db_session.rollback()
                 raise ValueError(f"Error creating tip: {e}")
 
-    def get_tip(self, tip_id: str, rack_id: int) -> TipReadModel:
+    def get_tip(self, tip_id: str, rack_id: int) -> Optional[TipReadModel]:
         with self.session_maker() as active_db_session:
             stmt = select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
             tip = active_db_session.execute(stmt).scalar()
-            if not tip:
-                return None
-            return TipReadModel.model_validate(tip)
+            return TipReadModel.model_validate(tip) if tip else None
+
+        
+    def get_first_unused_tip(self, rack_id: int) -> Optional[TipReadModel]:
+        with self.session_maker() as session:
+            tip = (
+                session.query(TipDBModel)
+                .filter(TipDBModel.rack_id == rack_id, TipDBModel.status == "new")
+                .order_by(TipDBModel.tip_id.asc())
+                .first()
+            )
+            return TipReadModel.model_validate(tip) if tip else None
+
 
     def update_tip(self, tip_id: str, rack_id: int, updates: dict) -> TipDBModel:
         with self.session_maker() as active_db_session:
@@ -75,18 +85,19 @@ class TipService:
                 active_db_session.rollback()
                 raise ValueError(f"Error updating tip: {e}")
 
-    def delete_tip(self, tip_id: str) -> None:
+    def delete_tip(self, tip_id: str, rack_id: int) -> None:
         with self.session_maker() as active_db_session:
             try:
-                stmt = select(TipDBModel).filter_by(tip_id=tip_id)
+                stmt = select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
                 tip = active_db_session.execute(stmt).scalar()
                 if not tip:
-                    raise ValueError(f"Tip with id {tip_id} not found.")
+                    raise ValueError(f"Tip with id {tip_id} (rack {rack_id}) not found.")
                 active_db_session.delete(tip)
                 active_db_session.commit()
             except SQLAlchemyError as e:
                 active_db_session.rollback()
                 raise ValueError(f"Error deleting tip: {e}")
+
 
     def fetch_tip_type_characteristics(
         self,
@@ -136,8 +147,51 @@ class TipService:
                 raise ValueError(f"Rack type with id {type_id} not found.")
 
         return RackTypeModel.model_validate(rack_type)
+    
+    def get_rack_for_tip(self, rack_id: int):
+        # defer to RackService using the same session_maker
+        return RackService(self.session_maker).get_rack(rack_id)
+    
+    def get_tip_coordinates(self, session: Session, rack_id: int, tip_id: str) -> tuple[float,float,float]:
+        # tip_id like "A1", "B12", etc.
+        row_letter = tip_id[0].upper()
+        col_num = int(tip_id[1:])  # 1-indexed
 
+        rack = session.execute(
+            select(RackDBModel).where(RackDBModel.id == rack_id)
+        ).scalar_one()
 
+        rtype = session.execute(
+            select(RackTypeDBModel).where(RackTypeDBModel.id == rack.type_id)
+        ).scalar_one()
+
+        # find zero-based row index from rack.rows (e.g., "AB" or "ABCDEFGH")
+        r_idx = rack.rows.upper().index(row_letter)  # 0-indexed
+        c_idx = col_num - 1                           # 0-indexed
+
+        # your “more negative as you increment” convention
+        x_step = -abs(rtype.x_spacing)
+        y_step = -abs(rtype.y_spacing)
+
+        # base, before rotation
+        x = rack.a1_x + r_idx * x_step
+        y = rack.a1_y + c_idx * y_step
+
+        # handle orthogonal orientations if you use them
+        o = (rack.orientation or 0) % 360
+        if o in (90, 180, 270):
+            # rotate around A1 (simple right-angle rotations)
+            dx, dy = x - rack.a1_x, y - rack.a1_y
+            if o == 90:
+                x, y = rack.a1_x - dy, rack.a1_y + dx
+            elif o == 180:
+                x, y = rack.a1_x - dx, rack.a1_y - dy
+            else:  # 270
+                x, y = rack.a1_x + dy, rack.a1_y - dx
+
+        z = float(rack.pickup_height)
+        return float(x), float(y), z
+    
 class RackService:
     """
     Service class for interacting with tip racks in the database.
@@ -293,7 +347,94 @@ class RackService:
         ]
 
         return "\n".join([header, separator] + rows)
+    
+    @staticmethod
+    def _generate_positions_rows_x_cols_y(
+        a1_x: float,
+        a1_y: float,
+        rows: str,
+        cols: int,
+        x_spacing: float,
+        y_spacing: float,
+        orientation: int = 0,
+    ):
+        o = orientation % 360
 
+        def base_xy(r_idx, c_idx):
+            return a1_x + r_idx * x_spacing, a1_y + c_idx * y_spacing
+
+        def rotate(x, y):
+            if o == 0:
+                return x, y
+            dx, dy = x - a1_x, y - a1_y
+            if o == 90:   
+                return a1_x - dy, a1_y + dx
+            if o == 180:  
+                return a1_x - dx, a1_y - dy
+            if o == 270:  
+                return a1_x + dy, a1_y - dx
+            return x, y
+
+        out = []
+        for r_idx, row_letter in enumerate(rows):
+            for c_idx in range(cols):
+                tip_id = f"{row_letter}{c_idx + 1}"
+                x, y = rotate(*base_xy(r_idx, c_idx))
+                out.append((tip_id, x, y))
+        return out
+
+    def seed_tips_for_rack(
+        self,                     # <-- add self
+        session: Session,
+        rack_id: int,
+        *,
+        overwrite: bool = False,
+        default_status: str = "new",
+    ) -> int:
+        rack = session.execute(
+            select(RackDBModel).where(RackDBModel.id == rack_id)
+        ).scalar_one_or_none()
+        if not rack:
+            raise ValueError(f"Rack {rack_id} not found")
+
+        rtype = session.execute(
+            select(RackTypeDBModel).where(RackTypeDBModel.id == rack.type_id)
+        ).scalar_one_or_none()
+        if not rtype:
+            raise ValueError(f"RackType {rack.type_id} not found for rack {rack_id}")
+
+        # count existing tips (avoid .scalars().count())
+        existing_count = session.execute(
+            select(func.count(TipDBModel.id)).where(TipDBModel.rack_id == rack_id)
+        ).scalar_one()
+
+        if existing_count and not overwrite:
+            return 0
+        if existing_count and overwrite:
+            session.execute(delete(TipDBModel).where(TipDBModel.rack_id == rack_id))
+
+        positions = self._generate_positions_rows_x_cols_y(
+            a1_x=rack.a1_x,
+            a1_y=rack.a1_y,
+            rows=rack.rows,
+            cols=rack.cols,
+            x_spacing=rtype.x_spacing,
+            y_spacing=rtype.y_spacing,
+            orientation=rack.orientation,
+        )
+
+        tips = [
+            TipDBModel(
+                rack_id=rack_id,
+                tip_id=tip_id,
+                status=default_status,
+                coordinates={"x": float(x), "y": float(y), "z": float(rack.pickup_height)},
+            )
+            for tip_id, x, y in positions
+        ]
+        session.add_all(tips)
+        session.commit()
+        return len(tips)
 
 class RackTypeService:
     """
@@ -362,9 +503,6 @@ class RackTypeService:
                 if not rack_type:
                     raise ValueError(f"rack type with id {type_id} not found.")
                 for key, value in updates.items():
-                    setattr(
-                        rack=db_session.execute(stmt).scalar(), name=key, value=value
-                    )
                     setattr(rack_type, key, value)
                 db_session.commit()
                 db_session.refresh(rack_type)
@@ -960,9 +1098,6 @@ class WellTypeService:
                 if not plate_type:
                     raise ValueError(f"Plate type with id {type_id} not found.")
                 for key, value in updates.items():
-                    setattr(
-                        plate=db_session.execute(stmt).scalar(), name=key, value=value
-                    )
                     setattr(plate_type, key, value)
                 db_session.commit()
                 db_session.refresh(plate_type)
