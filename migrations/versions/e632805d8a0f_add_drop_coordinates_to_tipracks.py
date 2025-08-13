@@ -488,7 +488,7 @@ def downgrade() -> None:
     op.drop_column('panda_tip_hx', 'contamination')
     op.drop_column('panda_tip_hx', 'capacity')
     op.drop_column('panda_tip_hx', 'volume')
-    op.drop_column('panda_tip_hx', 'radius')
+    op.drop_column('panda_tip_hx', 'radius_mm')
     op.drop_column('panda_tip_hx', 'tip_length')
     op.alter_column('panda_system_status', 'panda_unit_id',
                existing_type=sa.INTEGER(),

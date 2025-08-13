@@ -22,8 +22,8 @@ def pipette_tip_test(experiment: EchemExperimentBase, toolkit: Toolkit):
     insert_new_pipette()
 
     # Deterministic order (update to 5 if that is the intended count)
-    tip_ids = ["A1", "A2", "A3", "B1", "B2", "B3"]
-
+    # tip_ids = ["A1", "A2", "A3", "B1", "B2", "B3"]
+    tip_ids = ["A1"]
     # Use the active rack if available
     tiprack_id = 1
     # tiprack_id = select_current_rack_id()

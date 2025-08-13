@@ -31,10 +31,19 @@ class TipModel(VesselBase, Base):
         String, default=dt.now(timezone.utc), nullable=False
     )
     tip_length: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-
+    @property
+    def radius_mm(self) -> Optional[float]:
+        return getattr(self, "radius", None)
+    
     def __repr__(self):
-        return f"<TipHx(rack_id={self.rack_id}, tip_id={self.tip_id}, experiment_id={self.experiment_id}, project_id={self.project_id}, status={self.status}, status_date={self.status_date}, coordinates={self.coordinates}, radius={self.radius}, capacity={self.capacity}, top={self.top}, bottom={self.bottom}, updated={self.updated})>"
-
+        return (
+            f"<TipHx(rack_id={self.rack_id}, tip_id={self.tip_id}, "
+            f"experiment_id={self.experiment_id}, project_id={self.project_id}, "
+            f"status={self.status}, status_date={self.status_date}, "
+            f"coordinates={self.coordinates}, radius_mm={self.radius_mm}, "
+            f"capacity={self.capacity}, top={self.top}, bottom={self.bottom}, "
+            f"updated={self.updated})>"
+        )
 
 class RackTypes(Base):
     """RackTypes table model"""
@@ -55,8 +64,14 @@ class RackTypes(Base):
     y_offset: Mapped[float] = mapped_column(Float)
     
     def __repr__(self):
-        return f"<RackTypes(id={self.id}, count={self.count}, shape={self.shape}, radius_mm={self.radius_mm}, offset_mm={self.y_spacing})>"
-
+        return (
+            f"<RackTypes(id={self.id}, count={self.count}, rows={self.rows}, cols={self.cols}, "
+            f"shape={self.shape}, radius_mm={self.radius_mm}, "
+            f"x_spacing={self.x_spacing}, y_spacing={self.y_spacing}, "
+            f"rack_length_mm={self.rack_length_mm}, rack_width_mm={self.rack_width_mm}, "
+            f"rack_height_mm={self.rack_height_mm}, "
+            f"x_offset={self.x_offset}, y_offset={self.y_offset})>"
+        )
 
 class Racks(Base, DeckObjectBase):
     """Tip Racks table model
