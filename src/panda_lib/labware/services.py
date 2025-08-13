@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import List, Optional
 
 from sqlalchemy import select, update, delete, func
@@ -35,6 +36,18 @@ class TipService:
         self.session_maker = session_maker
         self.logger = logging.getLogger(__name__)
 
+    # add near the top of TipService, after __init__
+ 
+
+    def execute(self, stmt, params=None, *, return_scalars=False, fetch_all=True):
+        """Shim for legacy call sites that used TipService().execute(...)."""
+        from sqlalchemy import text
+        with self.session_maker() as session:
+            res = session.execute(text(stmt) if isinstance(stmt, str) else stmt, params or {})
+            if return_scalars:
+                return res.scalars().all() if fetch_all else res.scalars().first()
+            return res.fetchall() if fetch_all else res.first()
+
     def create_tip(self, tip_data: TipWriteModel) -> TipDBModel:
         with self.session_maker() as active_db_session:
             active_db_session: Session
@@ -47,12 +60,58 @@ class TipService:
             except SQLAlchemyError as e:
                 active_db_session.rollback()
                 raise ValueError(f"Error creating tip: {e}")
+    @staticmethod
+    def compute_tip_xy(session: Session, rack_id: int, tip_id: str) -> tuple[float, float, float]:
+        rack: RackDBModel = session.execute(
+            select(RackDBModel).where(RackDBModel.id == rack_id)
+        ).scalar_one()
+        tt: RackTypeDBModel = rack.type
+        _row_re = re.compile(r"^([A-Za-z]+)")
+        _col_re = re.compile(r"(\d+)$")
+        
+        def _row_index(rows_letters: str, row_label: str) -> int:
+            # rows_letters example: "AB" or "ABCDEFGH"
+            row_label = row_label.upper()
+            idx = rows_letters.find(row_label)
+            if idx == -1:
+                raise ValueError(f"Row {row_label} not in rack rows {rows_letters}")
+            return idx
+        
+        mrow = _row_re.search(tip_id)
+        mcol = _col_re.search(tip_id)
+        if not mrow or not mcol:
+            raise ValueError(f"Unrecognized tip_id format: {tip_id}")
 
-    def get_tip(self, tip_id: str, rack_id: int) -> Optional[TipReadModel]:
-        with self.session_maker() as active_db_session:
-            stmt = select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
-            tip = active_db_session.execute(stmt).scalar()
-            return TipReadModel.model_validate(tip) if tip else None
+        row_label = mrow.group(1)            # "A"
+        col_num = int(mcol.group(1))         # 1-based
+
+        r = _row_index(tt.rows, row_label)   # 0-based
+        c = col_num - 1                      # 0-based
+
+        rows_count = len(tt.rows)
+        cols_count = tt.cols
+
+        # Start at A1 origin
+        x = rack.a1_x + tt.x_spacing * c
+        y = rack.a1_y + tt.y_spacing * r
+
+        orient = (rack.orientation or "standard").lower()
+        if orient == "rot180":
+            x = rack.a1_x + tt.x_spacing * (cols_count - 1 - c)
+            y = rack.a1_y + tt.y_spacing * (rows_count - 1 - r)
+        elif orient == "mirror_x":
+            x = rack.a1_x + tt.x_spacing * (cols_count - 1 - c)
+        elif orient == "mirror_y":
+            y = rack.a1_y + tt.y_spacing * (rows_count - 1 - r)
+        # Add rot90/rot270 if you use them
+
+        return x, y, rack.pickup_height
+
+    @staticmethod
+    def get_tip(session: Session, rack_id: int, tip_id: str) -> TipDBModel:
+        return session.execute(
+            select(TipDBModel).where(TipDBModel.rack_id == rack_id, TipDBModel.tip_id == tip_id)
+        ).scalar_one()
 
         
     def get_first_unused_tip(self, rack_id: int) -> Optional[TipReadModel]:
@@ -152,45 +211,9 @@ class TipService:
         # defer to RackService using the same session_maker
         return RackService(self.session_maker).get_rack(rack_id)
     
-    def get_tip_coordinates(self, session: Session, rack_id: int, tip_id: str) -> tuple[float,float,float]:
-        # tip_id like "A1", "B12", etc.
-        row_letter = tip_id[0].upper()
-        col_num = int(tip_id[1:])  # 1-indexed
+    def get_tip_coordinates(self, session: Session, rack_id: int, tip_id: str) -> tuple[float, float, float]:
+        return self.compute_tip_xy(session, rack_id, tip_id)
 
-        rack = session.execute(
-            select(RackDBModel).where(RackDBModel.id == rack_id)
-        ).scalar_one()
-
-        rtype = session.execute(
-            select(RackTypeDBModel).where(RackTypeDBModel.id == rack.type_id)
-        ).scalar_one()
-
-        # find zero-based row index from rack.rows (e.g., "AB" or "ABCDEFGH")
-        r_idx = rack.rows.upper().index(row_letter)  # 0-indexed
-        c_idx = col_num - 1                           # 0-indexed
-
-        # your “more negative as you increment” convention
-        x_step = -abs(rtype.x_spacing)
-        y_step = -abs(rtype.y_spacing)
-
-        # base, before rotation
-        x = rack.a1_x + r_idx * x_step
-        y = rack.a1_y + c_idx * y_step
-
-        # handle orthogonal orientations if you use them
-        o = (rack.orientation or 0) % 360
-        if o in (90, 180, 270):
-            # rotate around A1 (simple right-angle rotations)
-            dx, dy = x - rack.a1_x, y - rack.a1_y
-            if o == 90:
-                x, y = rack.a1_x - dy, rack.a1_y + dx
-            elif o == 180:
-                x, y = rack.a1_x - dx, rack.a1_y - dy
-            else:  # 270
-                x, y = rack.a1_x + dy, rack.a1_y - dx
-
-        z = float(rack.pickup_height)
-        return float(x), float(y), z
     
 class RackService:
     """
@@ -435,6 +458,7 @@ class RackService:
         session.add_all(tips)
         session.commit()
         return len(tips)
+
 
 class RackTypeService:
     """

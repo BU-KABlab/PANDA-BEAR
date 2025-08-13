@@ -1,7 +1,6 @@
 from typing import Dict, Optional
-
-from pydantic import BaseModel, ConfigDict, Field
-
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+import json
 
 class DeckObjectModel(BaseModel):
     name: str
@@ -193,39 +192,41 @@ class WellplateWriteModel(BaseModel):
 class TipWriteModel(BaseModel):
     rack_id: int
     tip_id: str
-    experiment_id: int = 0
-    project_id: int = 0
-    status: str = "new"
-    coordinates: Dict[str, float] = Field(
-        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
-    )
-    drop_coordinates: Dict[str, float] = Field(
-        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
-    )
-    pickup_height: float = 0.0  # height for pipette tip pickup
-    capacity: float = 200.0
-    name: str = "default"
-    type: int  # solid handling or liquid handling
-    radius: float  # radius of bead for solid handling
-
-    model_config = ConfigDict(from_attributes=True)
+    tip_length: float = 0
+    pickup_height: float = 0
+    radius_mm: float = 0
+    capacity: int = 300
+    dead_volume: float = 0
+    name: Optional[str] = "default"
 
 
 
-class TipReadModel(VesselModel):
-    tip_id: str
+class TipReadModel(BaseModel):
     rack_id: int
-    experiment_id: Optional[int]
-    project_id: Optional[int]
-    status: str = "new"
-    drop_coordinates: Dict[str, float] = Field(
-        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
-    )
-    pickup_height: float = 0.0
+    tip_id: str
+    status: str = "available"
+    tip_length: float = 0
+    pickup_height: float = 0
+    radius_mm: float = 0
+    capacity: int = 300
+    volume: float = 0
+    dead_volume: float = 0
+    contamination: int = 0
+    coordinates: Optional[dict] = None
+    drop_coordinates: Optional[dict] = None
+    name: Optional[str] = "default"
 
     model_config = ConfigDict(from_attributes=True)
 
-
+    @field_validator("coordinates", "drop_coordinates", mode="before")
+    @classmethod
+    def parse_json(cls, v):
+        if isinstance(v, str) and v:
+            try:
+                return json.loads(v)
+            except Exception:
+                return None
+        return v
 
 class RackTypeModel(BaseModel):
     id: int

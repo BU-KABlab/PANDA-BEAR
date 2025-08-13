@@ -54,16 +54,6 @@ class JSONEncodedDict(TypeDecorator):
 
 Base = declarative_base()
 
-class CoordinatesMixin:
-    coordinates: Mapped[str] = mapped_column(Text)          # JSON serialized
-    drop_coordinates: Mapped[str] = mapped_column(Text, default="{}")
-
-class AuditMixin:
-    status: Mapped[str] = mapped_column(String, default="ready")
-    status_date: Mapped[str] = mapped_column(String, default="")
-    updated: Mapped[str] = mapped_column(String, default="")
-
-
 class DeckObjectBase:
     """Base class for DeckObject models
 
