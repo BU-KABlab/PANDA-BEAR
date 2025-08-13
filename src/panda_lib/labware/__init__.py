@@ -17,7 +17,7 @@ from .schemas import (
 from .services import VialService, WellplateService, WellService
 from .vials import StockVial, Vial, WasteVial, read_vials
 from .wellplates import Well, Wellplate
-from .tipracks import Tip
+from .tipracks import Tip, Rack
 
 __all__ = [
     "Well",
@@ -40,7 +40,8 @@ __all__ = [
     "OverFillException",
     "OverDraftException",
     "read_vials",
-    "Tip"
+    "Tip",
+    "Rack",
 ]
 
 

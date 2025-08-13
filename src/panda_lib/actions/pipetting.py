@@ -124,9 +124,10 @@ def replace_tip(
         logger.info("No tip currently on pipette. Skipping drop step.")
 
     # Pick up new tip
+    approach_z = tip.pickup_height + 20
     toolkit.mill.safe_move(
-        tip.coordinates["x"], tip.coordinates["y"], tip.pickup_height,
-        tool=Instruments.PIPETTE
+        tip.coordinates["x"], tip.coordinates["y"], approach_z,
+        tool=Instruments.PIPETTE, second_z_coord=tip.pickup_height, second_z_coord_feed=1000
     )
     if not toolkit.pipette.pipette_driver.pick_up_tip():
         logger.warning("Failed to pick up new tip.")

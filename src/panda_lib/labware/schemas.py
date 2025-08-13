@@ -199,13 +199,14 @@ class TipWriteModel(BaseModel):
     coordinates: Dict[str, float] = Field(
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
-    drop_coordinates: Dict[str, float] = Field(   
+    drop_coordinates: Dict[str, float] = Field(
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
+    pickup_height: float = 0.0  # height for pipette tip pickup
     capacity: float = 200.0
     name: str = "default"
     type: int  # solid handling or liquid handling
-    radius_mm: float  # radius of bead for solid handling
+    radius: float  # radius of bead for solid handling
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -217,9 +218,10 @@ class TipReadModel(VesselModel):
     experiment_id: Optional[int]
     project_id: Optional[int]
     status: str = "new"
-    drop_coordinates: Dict[str, float] = Field(   
+    drop_coordinates: Dict[str, float] = Field(
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
+    pickup_height: float = 0.0
 
     model_config = ConfigDict(from_attributes=True)
 

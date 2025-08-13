@@ -8,17 +8,41 @@ from datetime import datetime as dt
 from datetime import timezone
 from typing import Optional
 
-from sqlalchemy import Float, ForeignKey, Integer, String
+from sqlalchemy import Float, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.sqltypes import JSON, Boolean
 
-from .base import Base, DeckObjectBase, VesselBase
+from .base import Base, DeckObjectBase, VesselBase, CoordinatesMixin, AuditMixin
 
+class Tip(Base, CoordinatesMixin, AuditMixin):
+    __tablename__ = "panda_tips"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    rack_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    tip_id: Mapped[str] = mapped_column(String, nullable=False)  # e.g. "A1"
+    tip_length: Mapped[float] = mapped_column(Float, default=0)
+    pickup_height: Mapped[float] = mapped_column(Float, default=0)
+    radius_mm: Mapped[float] = mapped_column(Float, default=0)
+    capacity: Mapped[int] = mapped_column(Integer, default=300)
+    volume: Mapped[float] = mapped_column(Float, default=0)
+    dead_volume: Mapped[float] = mapped_column(Float, default=0)
+    contamination: Mapped[int] = mapped_column(Integer, default=0)
+    name: Mapped[str] = mapped_column(String, default="default")
+
+    __table_args__ = (
+        UniqueConstraint("rack_id", "tip_id", name="uq_tip_slot"),
+    )
 
 class TipModel(VesselBase, Base):
     """TipHx table model"""
 
     __tablename__ = "panda_tip_hx"
+    __mapper_args__ = {
+        "concrete": True,
+        "exclude_properties": [
+            "volume_height", "top", "bottom", "height",
+            "base_thickness", "contents",
+        ],
+    }
     rack_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     tip_id: Mapped[str] = mapped_column(String, primary_key=True)
     experiment_id: Mapped[int] = mapped_column(Integer)
@@ -31,6 +55,7 @@ class TipModel(VesselBase, Base):
         String, default=dt.now(timezone.utc), nullable=False
     )
     tip_length: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    pickup_height: Mapped[float] = mapped_column(Float, default=0.0)
     @property
     def radius_mm(self) -> Optional[float]:
         return getattr(self, "radius", None)
@@ -40,8 +65,9 @@ class TipModel(VesselBase, Base):
             f"<TipHx(rack_id={self.rack_id}, tip_id={self.tip_id}, "
             f"experiment_id={self.experiment_id}, project_id={self.project_id}, "
             f"status={self.status}, status_date={self.status_date}, "
-            f"coordinates={self.coordinates}, radius_mm={self.radius_mm}, "
+            f"coordinates={self.coordinates}, radius_mm={self.radius}, "
             f"capacity={self.capacity}, top={self.top}, bottom={self.bottom}, "
+            f"pickup_height={self.pickup_height}, "
             f"updated={self.updated})>"
         )
 

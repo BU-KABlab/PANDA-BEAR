@@ -6,6 +6,7 @@ It uses openCV for image saving and numpy for image handling due to PySpin's unr
 """
 
 import logging
+import gc
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
@@ -94,16 +95,42 @@ class FlirCamera(CameraInterface):
 
         try:
             if self.camera is not None:
-                self.camera.DeInit()
-                self.camera = None
+                try:
+                    self.camera.DeInit()
+                except PySpin.SpinnakerException as ex:
+                    self.logger.warning(f"Error de-initializing camera: {ex}")
+                finally:
+                    try:
+                        del self.camera
+                    except Exception:
+                        pass
+                    self.camera = None
 
             if self.camera_list is not None:
-                self.camera_list.Clear()
-                self.camera_list = None
+                try:
+                    self.camera_list.Clear()
+                except PySpin.SpinnakerException as ex:
+                    self.logger.warning(f"Error clearing camera list: {ex}")
+                finally:
+                    try:
+                        del self.camera_list
+                    except Exception:
+                        pass
+                    self.camera_list = None
 
             if self.system is not None:
-                self.system.ReleaseInstance()
-                self.system = None
+                try:
+                    self.system.ReleaseInstance()
+                except PySpin.SpinnakerException as ex:
+                    self.logger.warning(f"Error releasing system instance: {ex}")
+                finally:
+                    try:
+                        del self.system
+                    except Exception:
+                        pass
+                    self.system = None
+
+            gc.collect()
 
             self.connected = False
             self.logger.info("Disconnected from FLIR camera")

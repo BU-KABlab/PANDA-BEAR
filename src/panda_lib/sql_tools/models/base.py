@@ -8,7 +8,7 @@ import json
 from datetime import datetime as dt
 from datetime import timezone
 from typing import Any, Dict, Optional
-
+from sqlalchemy import String, Integer, Float, Text, UniqueConstraint
 import sqlalchemy as sa
 from sqlalchemy import Column, Computed, ForeignKey, Table, Text, event, select
 from sqlalchemy.ext import compiler
@@ -53,6 +53,15 @@ class JSONEncodedDict(TypeDecorator):
 
 
 Base = declarative_base()
+
+class CoordinatesMixin:
+    coordinates: Mapped[str] = mapped_column(Text)          # JSON serialized
+    drop_coordinates: Mapped[str] = mapped_column(Text, default="{}")
+
+class AuditMixin:
+    status: Mapped[str] = mapped_column(String, default="ready")
+    status_date: Mapped[str] = mapped_column(String, default="")
+    updated: Mapped[str] = mapped_column(String, default="")
 
 
 class DeckObjectBase:

@@ -14,9 +14,9 @@ UPDATE panda_vials SET coordinates = '{"x": -394, "y": -92, "z": -197.8}' WHERE 
 UPDATE panda_well_hx SET status = 'errored' WHERE plate_id = 120 AND well_id = 'A1';
 UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'A2';
 UPDATE panda_well_hx SET status = 'new', contents = '{}', volume = '0' WHERE plate_id = 120 AND well_id = 'B7';
-
 UPDATE panda_wellplates SET echem_height = '-187' WHERE id = 120;
-UPDATE panda_pipette SET volume_ml = '' WHERE id = 1;
+
+UPDATE panda_tip_hx SET pickup_height = '-188.8' WHERE rack_id = 1;
 
 DELETE FROM panda_pipette WHERE id = 1;
 

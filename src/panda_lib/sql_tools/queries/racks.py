@@ -544,6 +544,7 @@ def save_tips_to_db(tips_to_save: List[object]) -> None:
                         status=tip.status,
                         status_date=datetime.now(tz=timezone.utc).isoformat(),
                         coordinates=json.dumps(asdict(tip.coordinates)),
+                        pickup_height=getattr(tip, "pickup_height", 0.0),
                     )
                 )
                 session.execute(update_statement)
@@ -557,6 +558,7 @@ def save_tips_to_db(tips_to_save: List[object]) -> None:
                     status=tip.status,
                     status_date=datetime.now(tz=timezone.utc).isoformat(),
                     coordinates=json.dumps(asdict(tip.coordinates)),
+                    pickup_height=getattr(tip, "pickup_height", 0.0),
                 )
                 session.execute(insert_statement)
 
@@ -598,6 +600,7 @@ def update_tip(tip_to_update: object) -> None:
                 status=tip_to_update.tip_data.status,
                 status_date=datetime.now().isoformat(timespec="seconds"),
                 coordinates=json.dumps(tip_to_update.tip_data.coordinates),
+                pickup_height=tip_to_update.tip_data.pickup_height,
             )
         )
         session.execute(update_statement)

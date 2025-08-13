@@ -76,6 +76,7 @@ class TipKwargs(TypedDict, total=False):
     name: str
     capacity: float
     coordinates: CoordinatesDict
+    pickup_height: float
 
 # Hardware types
 class PipetteState(TypedDict):

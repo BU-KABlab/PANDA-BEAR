@@ -57,7 +57,116 @@ class RackKwargs(BaseModel, validate_assignment=True):
     rows: str = "ABCD" 
     cols: int = 14 
     pickup_height: float = 0.0
-    coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0} 
+    coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0}
+
+
+class Rack:
+    """Tip rack container."""
+
+    def __init__(
+        self,
+        session_maker: sessionmaker = SessionLocal,
+        type_id: Optional[int] = None,
+        rack_id: Optional[int] = None,
+        create_new: bool = False,
+        **kwargs: RackKwargs,
+    ):
+        self.database_session = session_maker
+        self.service = RackService(session_maker)
+        self.tip_service = TipService(session_maker)
+        self.rack_data: RackReadModel = None
+        self.rack_type: RackTypeModel = None
+        self.tips: dict[str, TipReadModel] = {}
+
+        if create_new:
+            if type_id is None and "type_id" not in kwargs:
+                raise ValueError("Must provide a rack type_id to create a new rack.")
+            self.create_new_rack(id=rack_id, type_id=type_id, **kwargs)
+        else:
+            if rack_id is None:
+                active = self.service.get_active_rack()
+                if not active:
+                    raise ValueError(
+                        "No rack_id provided and no active rack found in the database."
+                    )
+                rack_id = active.id
+            self.load_rack(rack_id)
+
+    def create_new_rack(self, **kwargs: RackKwargs):
+        """Create a new rack and seed its tips."""
+
+        active_rack = self.service.get_active_rack()
+        if active_rack:
+            kwargs.setdefault("a1_x", active_rack.a1_x)
+            kwargs.setdefault("a1_y", active_rack.a1_y)
+            kwargs.setdefault("orientation", active_rack.orientation)
+            kwargs.setdefault("pickup_height", active_rack.pickup_height)
+            kwargs.setdefault("coordinates", active_rack.coordinates)
+
+        if "name" not in kwargs:
+            kwargs["name"] = f"{kwargs.get('id', 'default')}"
+
+        self.rack_type = self.service.get_rack_type(kwargs.get("type_id"))
+        for key, value in self.rack_type.model_dump().items():
+            if key == "id":
+                continue
+            if key not in kwargs:
+                kwargs[key] = value
+
+        new_rack = RackWriteModel(**kwargs)
+        self.rack_data = RackWriteModel.model_validate(
+            self.service.create_rack(new_rack)
+        )
+
+        self._create_tips_from_type()
+        self.load_rack(self.rack_data.id)
+
+    def load_rack(self, rack_id: int):
+        """Load rack information and associated tips."""
+        self.rack_data = self.service.get_rack(rack_id)
+        self.rack_type = self.service.get_rack_type(self.rack_data.type_id)
+        self.load_tips()
+
+    def load_tips(self):
+        """Load tips belonging to this rack using :class:`TipService`."""
+        tip_ids = [tip.tip_id for tip in self.service.get_tips(self.rack_data.id)]
+        self.tips = {
+            tip_id: self.tip_service.get_tip(tip_id, self.rack_data.id)
+            for tip_id in tip_ids
+        }
+
+    def save(self):
+        """Persist current rack data to the database."""
+        self.service.update_rack(self.rack_data.id, self.rack_data.model_dump())
+        self.load_rack(self.rack_data.id)
+
+    def _create_tips_from_type(self):
+        """Populate tip entries for this rack based on its type."""
+        with self.database_session() as session:
+            self.service.seed_tips_for_rack(session, self.rack_data.id)
+
+    def calculate_tip_coordinates(self, row: str, col: int) -> dict:
+        """Calculate tip coordinates based on A1 position and orientation."""
+
+        r_idx = self.rack_data.rows.index(row.upper())
+        c_idx = col - 1
+        a1_x = self.rack_data.a1_x
+        a1_y = self.rack_data.a1_y
+        x_spacing = self.rack_type.x_spacing
+        y_spacing = self.rack_type.y_spacing
+        o = self.rack_data.orientation % 360
+
+        x = a1_x + r_idx * x_spacing
+        y = a1_y + c_idx * y_spacing
+
+        if o == 90:
+            x, y = a1_x - (y - a1_y), a1_y + (x - a1_x)
+        elif o == 180:
+            x, y = a1_x - (x - a1_x), a1_y - (y - a1_y)
+        elif o == 270:
+            x, y = a1_x + (y - a1_y), a1_y - (x - a1_x)
+
+        return {"x": x, "y": y, "z": self.rack_data.pickup_height}
 
 class Tip:
     """
@@ -153,8 +262,8 @@ class Tip:
 
     @property
     def pickup_height(self) -> float:
-        """Returns the height of the pipette has to go to for tip pickup."""
-        return self.bottom
+        """Returns the height the pipette has to go to for tip pickup."""
+        return getattr(self.tip_data, "pickup_height", None) or self.bottom
 
     @property
     def top_coordinates(self) -> Coordinates:
@@ -201,7 +310,7 @@ class Tip:
             )
 
         # Remove rack_type attributes from kwargs if they exist
-        for key in ["capacity", "radius_mm"]:
+        for key in ["capacity", "radius"]:
             kwargs.pop(key, None)
 
         # Fetch rack info so we can get drop coordinates
@@ -214,8 +323,8 @@ class Tip:
                 "y": rack.coordinates["y"],
                 "z": rack.coordinates["z"] + rack.pickup_height + 20
             }
-
         # Create tip entry
+        kwargs.setdefault("pickup_height", rack.pickup_height)
         new_tip = TipWriteModel(
             tip_id=self.tip_id,
             rack_id=self.rack_id,
