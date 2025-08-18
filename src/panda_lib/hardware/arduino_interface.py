@@ -1,3 +1,6 @@
+import glob
+import threading
+import errno
 import asyncio
 import enum
 import logging
@@ -11,7 +14,7 @@ import serial.tools.list_ports
 from serial import Serial
 
 # Define Enums and Custom Exceptions at the top
-
+#TODO: Fix issue with no autoreconnect when dealing with communication failure
 
 class PawduinoFunctions(enum.Enum):
     """Enum for Arduino commands"""
@@ -180,6 +183,9 @@ class ArduinoLink:
         self.connected: bool = False
         self._monitor_task = None
         self._running = False
+        self._send_lock = threading.Lock()
+        self._max_reconnect_attempts = 5   # tweak as you like
+        self._reconnect_backoff_sec = 0.5  # base backoff
         self._event_queue: asyncio.Queue = asyncio.Queue()
         self.pipette_active = True  # Assuming pipette is active by default
         self.logger = logging.getLogger("panda")
@@ -191,40 +197,129 @@ class ArduinoLink:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
+    def _discover_port(self) -> Optional[str]:
+        """
+        Pick the most stable path for the Arduino:
+        1) /dev/serial/by-id/* (preferred)
+        2) VID/PID-matching ACM device
+        3) any /dev/ttyACM*
+        """
+        # 1) stable by-id symlinks
+        matches = sorted(glob.glob("/dev/serial/by-id/*Arduino*"))
+        if matches:
+            return matches[0]
+
+        # 2) VID/PID filter (add yours here if different)
+        for p in serial.tools.list_ports.comports():
+            if p.vid and p.pid and (p.vid, p.pid) in {(0x2341, 0x8037), (0x2A03, 0x0043)}:
+                return p.device
+
+        # 3) last resort
+        acms = sorted(glob.glob("/dev/ttyACM*"))
+        return acms[0] if acms else None
+
+
+    def _resolve_config_port(self, val: Optional[str]) -> Optional[str]:
+        """
+        Supports:
+        - 'auto'  -> discover
+        - globs   -> e.g. /dev/ttyACM*
+        - literal -> exact device path
+        """
+        if not val or val == "auto":
+            return self._discover_port()
+        if "*" in val or "?" in val:
+            m = sorted(glob.glob(val))
+            return m[0] if m else None
+        return val
+
+    def _set_dtr_once(self, level: bool = True) -> None:
+        if not self.ser:
+            return
+        try:
+            if hasattr(self.ser, "setDTR"):
+                self.ser.setDTR(level)  # type: ignore[attr-defined]
+            elif hasattr(self.ser, "dtr"):
+                self.ser.dtr = level    # type: ignore[attr-defined]
+        except Exception as e:
+            self.logger.debug("DTR set skipped: %s", e)
+
+
+
     def _choose_arduino_port(self, interactive: bool = False) -> Optional[str]:
-        """Interactive method to choose the port that the Arduino is connected to"""
         if os.name == "posix":
-            ports = serial.tools.list_ports.grep("ttyACM")
+            ports = list(serial.tools.list_ports.comports())
+            candidates = [p for p in ports if ("ttyACM" in p.device or "ttyUSB" in p.device)]
         elif os.name == "nt":
-            ports = list(serial.tools.list_ports.grep("COM"))
+            ports = list(serial.tools.list_ports.comports())
+            candidates = [p for p in ports if "COM" in p.device]
         else:
-            print("Unsupported OS")
+            self.logger.error("Unsupported OS")
             return None
+
         if not interactive:
-            for port in ports:
-                if "arduino" in port.manufacturer.lower():
-                    return port.name
+            for p in candidates:
+                manu = (p.manufacturer or "").lower()
+                desc = (p.description or "").lower()
+                if "arduino" in manu or "arduino" in desc:
+                    return p.device
+            return candidates[0].device if candidates else None
 
         print("Available ports:")
-        for i, port in enumerate(ports):
-            print(f"{i}: {port.device} ({port.description})")
-        while True:
+        for i, p in enumerate(ports):
+            print(f"{i}: {p.device} ({p.description})")
+        try:
+            choice = int(input("Choose the port number: "))
+            return ports[choice].device if 0 <= choice < len(ports) else None
+        except Exception:
+            return None
+
+    def _safe_reset_buffers(self):
+        if not self.ser:
+            return
+        try:
+            # Prefer pySerial APIs over termios-backed flushInput/flushOutput
+            self.ser.reset_input_buffer()
+        except Exception as e:
+            self.logger.warning("reset_input_buffer failed: %s", e)
+        try:
+            self.ser.reset_output_buffer()
+        except Exception as e:
+            self.logger.warning("reset_output_buffer failed: %s", e)
+
+    def _handle_serial_error(self, exc: Exception, during: str):
+        self.logger.error("Serial error during %s: %s", during, exc, exc_info=True)
+        self._attempt_reconnect()
+
+    def _attempt_reconnect(self):
+        # Close first
+        try:
+            if self.ser and self.ser.is_open:
+                self.ser.close()
+        except Exception:
+            pass
+        self.connected = False
+        self.configured = False
+
+        last_err = None
+        for attempt in range(1, self._max_reconnect_attempts + 1):
+            backoff = self._reconnect_backoff_sec * (2 ** (attempt - 1))
+            self.logger.info("Reconnecting to Arduino (attempt %d/%d)…", attempt, self._max_reconnect_attempts)
             try:
-                choice = int(input("Choose the port number: "))
-                if choice < 0 or choice >= len(ports):
-                    print("Invalid choice")
-                    return None
-                return ports[choice].device
-            except ValueError:
-                print("Invalid choice")
-                return None
-            except KeyboardInterrupt:
-                print("\nExiting...")
-                return None
+                # Force rediscovery on each attempt
+                old_cfg = self.port_address
+                self.port_address = "auto"
+                self.connect()  # will handshake and set self.port_address to the chosen port
+                self.logger.info("Reconnected successfully on attempt %d (port %s).", attempt, self.port_address)
+                return
             except Exception as e:
-                print(f"Error listing ports: {e}")
-                return None
-        return None
+                last_err = e
+                self.logger.warning("Reconnect attempt %d failed: %s. Retrying in %.2fs", attempt, e, backoff)
+                time.sleep(backoff)
+
+        raise ArduinoConnectionError(
+            f"Unable to reconnect to Arduino after {self._max_reconnect_attempts} attempts"
+        ) from last_err
 
     def close(self):
         """Close the connection to the Arduino."""
@@ -248,17 +343,24 @@ class ArduinoLink:
         if self.ser and self.ser.is_open:
             self.ser.close()
 
-        chosen_port = self.port_address
-        if chosen_port is None:
-            self.logger.info("No port address provided, attempting to choose one.")
-            chosen_port = self._choose_arduino_port(
-                interactive=True
-            )  # Make interactive if no port given
-            if chosen_port is None:
-                self.logger.error("No serial port selected. Arduino connection failed.")
-                self.connected = False
-                self.configured = False
-                raise ArduinoConnectionError("No serial port selected.")
+        chosen_port = None
+
+        cfg = self.port_address
+        if cfg in (None, "auto"):
+            self.logger.info("Auto-discovering Arduino serial port…")
+            chosen_port = self._discover_port()
+        else:
+            # allow globs like /dev/ttyACM*
+            if "*" in cfg or "?" in cfg:
+                chosen_port = self._resolve_config_port(cfg)
+            else:
+                chosen_port = cfg
+
+        if not chosen_port:
+            self.logger.error("No serial port found for Arduino (config=%r).", cfg)
+            self.connected = False
+            self.configured = False
+            raise ArduinoConnectionError("No Arduino serial port found")
 
         self.logger.info(
             "Attempting to connect to Arduino on port: %s at baudrate: %s",
@@ -267,7 +369,20 @@ class ArduinoLink:
         )
 
         try:
-            self.ser = Serial(chosen_port, self.baud_rate, timeout=self.read_timeout)
+            self.ser = Serial(
+                chosen_port,
+                self.baud_rate,
+                timeout=self.read_timeout,
+                write_timeout=self.read_timeout,
+                rtscts=False,
+                dsrdtr=False,
+                exclusive=True,  # Linux-only; safe to leave if unsupported elsewhere
+            )
+            try:
+                self.ser.setDTR(True)  # set once; avoids repeated reset loops on some boards
+            except Exception:
+                pass
+
             if not self.ser.is_open:
                 raise ArduinoConnectionError(
                     f"Failed to open serial port {chosen_port}"
@@ -279,6 +394,7 @@ class ArduinoLink:
                 chosen_port,
             )
             time.sleep(10)
+            self._safe_reset_buffers()
 
             self.logger.info("Attempting handshake with Arduino...")
             self.configured = True
@@ -326,99 +442,40 @@ class ArduinoLink:
                 f"IO error connecting to Arduino on {chosen_port}: {e}"
             ) from e
 
-    def _process_response(
-        self, response_str: str, command_to_send: str
-    ) -> Dict[str, Any]:
-        """
-        Process the response string from the Arduino and return a standardized result dictionary.
-
-        Args:
-            response_str: The response string from the Arduino
-            command_to_send: The command that was sent
-
-        Returns:
-            A dictionary with the processed response data
-
-        Raises:
-
-        """
-        self.logger.debug("Processing response: '%s'", response_str)
-
-        parsed_result: Dict[str, Any] = {
-            "success": False,
-            "raw_data": "",
-            "parsed_data": {},
-            "error_message": "",
-        }
-
-        if response_str.startswith("OK:"):
-            parsed_result["success"] = True
-            content = response_str[3:]
-            parsed_result["raw_data"] = content
-            parsed_result["parsed_data"] = self._parse_arduino_response_content(
-                content, command_to_send.strip()
-            )
-        elif response_str.startswith("ERR:"):
-            parsed_result["success"] = False
-            error_content = response_str[4:]
-            parsed_result["raw_data"] = error_content
-            parsed_result["error_message"] = error_content
-            parsed_result["parsed_data"] = self._parse_arduino_response_content(
-                error_content, command_to_send.strip()
-            )
-            self.logger.error(
-                "Arduino returned error: %s for command %s",
-                error_content,
-                command_to_send.strip(),
-            )
-        else:
-            self.logger.error(
-                "Unexpected response format from Arduino: '%s' for command '%s'",
-                response_str,
-                command_to_send.strip(),
-            )
-            parsed_result["success"] = False
-            parsed_result["raw_data"] = response_str
-            parsed_result["error_message"] = "Unexpected response format"
-            parsed_result["parsed_data"] = self._parse_arduino_response_content(
-                response_str, command_to_send.strip()
-            )
-
-        if not parsed_result["success"] and not parsed_result["error_message"]:
-            parsed_result["error_message"] = (
-                f"Command '{command_to_send.strip()}' failed with response: {response_str}"
-            )
-
-        return parsed_result
-
     def receive(self) -> Optional[str]:
-        """
-        Read a line from the Arduino.
-        Returns the decoded string or None if no data/timeout.
-        """
         if not self.ser or not self.ser.is_open:
             self.logger.warning("Receive called but serial port is not open.")
             return None
         try:
             line = self.ser.readline()
-            if line:
-                decoded_line = line.decode().strip()
-                self.logger.debug("Arduino Raw Receive: %s", decoded_line)
-                return decoded_line
-            return None
-        except serial.SerialException as e:
-            self.logger.error("SerialException during receive: %s", e)
-            raise ArduinoConnectionError("Serial error during receive") from e
-        except IOError as e:
-            self.logger.error("IOError during receive: %s", e)
-            raise ArduinoConnectionError("IO error during receive") from e
+            if not line:
+                return None
+            try:
+                decoded_line = line.decode(errors="replace").strip()
+            except Exception as e:
+                self.logger.warning("Decode error on serial line: %s", e)
+                decoded_line = line.decode("latin-1", errors="replace").strip()
+            self.logger.debug("Arduino Raw Receive: %s", decoded_line)
+            return decoded_line
+        except (serial.SerialException, OSError, IOError) as e:
+            self._handle_serial_error(e, during="receive")
+            return None  # after reconnect, caller may retry
 
     async def async_receive(self) -> Optional[str]:
         """Asynchronous version of receive"""
         loop = asyncio.get_event_loop()
         future = loop.run_in_executor(None, self.receive)
         return await future
+    
+    def send(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
+        if not isinstance(cmd_enum_member, PawduinoFunctions):
+            raise ArduinoCommandError(f"send expects a PawduinoFunctions member, got {cmd_enum_member!r}")
 
+        with self._send_lock:
+            return self._send_internal(cmd_enum_member, *args)
+    
+    '''
+    #TODO: ensure new function works before deleting old function
     def send(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
         """
         Send a command to the Arduino and get the response.
@@ -547,6 +604,63 @@ class ArduinoLink:
         raise ArduinoTimeoutError(
             f"Timeout after {elapsed:.1f} seconds waiting for properly formatted response for: {command_to_send.strip()}"
         )
+    '''
+
+    def _send_internal(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
+        if (not self.connected) or (not self.configured) or (not self.ser) or (not self.ser.is_open):
+            raise ArduinoConnectionError("Not connected to Arduino.")
+
+        command_code = cmd_enum_member.value
+        command_to_send = ",".join([command_code, *map(str, args)]) + "\n"
+        self.logger.debug("Sending to Arduino: %s", command_to_send.strip())
+
+        start_time = time.time()
+        max_total_time = 60.0
+        attempted_reconnect = False
+
+        while time.time() - start_time < max_total_time:
+            try:
+                self._safe_reset_buffers()
+                self.ser.write(command_to_send.encode())
+
+                # Wait for OK:/ERR: line
+                while time.time() - start_time < max_total_time:
+                    raw = self.ser.readline()
+                    if not raw:
+                        self.logger.warning("No response yet for: %s", command_to_send.strip())
+                        time.sleep(0.1)
+                        continue
+
+                    response_str = raw.decode(errors="replace").strip()
+                    self.logger.debug("Raw response: %s", response_str)
+
+                    if response_str.startswith(("OK:", "ERR:")):
+                        return self._process_response(response_str, command_to_send)
+                    else:
+                        self.logger.warning("Malformed response: %s", response_str)
+                        time.sleep(0.1)
+                        continue
+
+            except (serial.SerialTimeoutException,) as e:
+                self.logger.warning("Serial timeout for '%s': %s", command_to_send.strip(), e)
+                time.sleep(0.1)
+
+            except (serial.SerialException, OSError, IOError) as e:
+                msg = str(e)
+                # If the device vanished (EIO), don’t retry the same FD—jump to reconnect.
+                if "Errno 5" in msg or "Input/output error" in msg:
+                    self.logger.error("Device I/O error; forcing reconnection.")
+                # one reconnect mid-command
+                if not attempted_reconnect:
+                    attempted_reconnect = True
+                    self._handle_serial_error(e, during=f"send({cmd_enum_member.name})")
+                    continue
+                raise ArduinoConnectionError(f"Serial error during send for {cmd_enum_member.name}: {e}") from e
+
+            time.sleep(0.1)
+
+        elapsed = time.time() - start_time
+        raise ArduinoTimeoutError(f"Timeout after {elapsed:.1f}s waiting for response to: {command_to_send.strip()}")
 
     async def async_send(
         self, cmd_enum_member: PawduinoFunctions, *args

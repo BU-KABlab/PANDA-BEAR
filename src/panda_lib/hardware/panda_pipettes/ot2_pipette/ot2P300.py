@@ -627,14 +627,18 @@ class OT2P300:
 
         return status
 
+    
+    @property
     def has_tip(self) -> bool:
-        """
-        Check if the pipette has a tip attached
-
-        Returns:
-            bool: True if a tip is attached, False otherwise
-        """
-        return self.pipette_driver.has_tip
+        """Return True if a tip is attached."""
+        return bool(getattr(self.pipette_driver, "has_tip", False))
+    
+    @has_tip.setter
+    def has_tip(self, value: bool) -> None:
+        self.pipette_driver.has_tip = bool(value)
+        p300_control_logger.debug(
+            f"Pipette tip status set to: {'attached' if self.pipette_driver.has_tip else 'detached'}"
+        )
 
     def set_tip_status(self, has_tip: bool) -> None:
         """

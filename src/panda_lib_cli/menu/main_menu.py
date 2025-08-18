@@ -888,7 +888,7 @@ def main():
             try:
                 current_pipette = select_pipette_status()
             except (AttributeError, ValueError):
-                insert_new_pipette() # TODO: Remove this before next campaign
+                # insert_new_pipette() # TODO: Remove this before next campaign
                 current_pipette = select_pipette_status()
             remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
             exp_loop_status = get_process_status(

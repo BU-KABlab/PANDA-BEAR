@@ -27,7 +27,7 @@ def main():
                     experiment_id=experiment_id,
                     protocol_name="well_rinse_protocol",
                     analysis_id=999, # TODO: Update with actual analysis ID
-                    well_id="B7",
+                    well_id="A8",
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
                     project_id=PROJECT_ID,

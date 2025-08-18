@@ -1,8 +1,9 @@
 import logging
 import re
-from typing import List, Optional
-
-from sqlalchemy import select, update, delete, func
+from typing import List, Optional, Callable, ClassVar, Tuple
+from datetime import datetime, timezone
+from sqlalchemy import select, update, delete, func, text, Integer, cast
+from sqlalchemy.sql import func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -31,118 +32,132 @@ from .schemas import (  # PyDanctic models
     WellWriteModel,
 )
 
+def _now_dt():
+    return datetime.now(timezone.utc)
+
 class TipService:
-    def __init__(self, session_maker: sessionmaker = SessionLocal):
+    def __init__(self, session_maker=SessionLocal):
         self.session_maker = session_maker
-        self.logger = logging.getLogger(__name__)
 
-    # add near the top of TipService, after __init__
- 
-
+    # (optional) legacy shim — safe to keep
     def execute(self, stmt, params=None, *, return_scalars=False, fetch_all=True):
-        """Shim for legacy call sites that used TipService().execute(...)."""
-        from sqlalchemy import text
-        with self.session_maker() as session:
-            res = session.execute(text(stmt) if isinstance(stmt, str) else stmt, params or {})
+        with self.session_maker() as s:
+            res = s.execute(text(stmt) if isinstance(stmt, str) else stmt, params or {})
             if return_scalars:
                 return res.scalars().all() if fetch_all else res.scalars().first()
             return res.fetchall() if fetch_all else res.first()
 
-    def create_tip(self, tip_data: TipWriteModel) -> TipDBModel:
-        with self.session_maker() as active_db_session:
-            active_db_session: Session
-            try:
-                tip: TipDBModel = TipDBModel(**tip_data.model_dump())
-                active_db_session.add(tip)
-                active_db_session.commit()
-                active_db_session.refresh(tip)
-                return tip
-            except SQLAlchemyError as e:
-                active_db_session.rollback()
-                raise ValueError(f"Error creating tip: {e}")
-    @staticmethod
-    def compute_tip_xy(session: Session, rack_id: int, tip_id: str) -> tuple[float, float, float]:
-        rack: RackDBModel = session.execute(
-            select(RackDBModel).where(RackDBModel.id == rack_id)
-        ).scalar_one()
-        tt: RackTypeDBModel = rack.type
-        _row_re = re.compile(r"^([A-Za-z]+)")
-        _col_re = re.compile(r"(\d+)$")
-        
-        def _row_index(rows_letters: str, row_label: str) -> int:
-            # rows_letters example: "AB" or "ABCDEFGH"
-            row_label = row_label.upper()
-            idx = rows_letters.find(row_label)
-            if idx == -1:
-                raise ValueError(f"Row {row_label} not in rack rows {rows_letters}")
-            return idx
-        
-        mrow = _row_re.search(tip_id)
-        mcol = _col_re.search(tip_id)
-        if not mrow or not mcol:
-            raise ValueError(f"Unrecognized tip_id format: {tip_id}")
-
-        row_label = mrow.group(1)            # "A"
-        col_num = int(mcol.group(1))         # 1-based
-
-        r = _row_index(tt.rows, row_label)   # 0-based
-        c = col_num - 1                      # 0-based
-
-        rows_count = len(tt.rows)
-        cols_count = tt.cols
-
-        # Start at A1 origin
-        x = rack.a1_x + tt.x_spacing * c
-        y = rack.a1_y + tt.y_spacing * r
-
-        orient = (rack.orientation or "standard").lower()
-        if orient == "rot180":
-            x = rack.a1_x + tt.x_spacing * (cols_count - 1 - c)
-            y = rack.a1_y + tt.y_spacing * (rows_count - 1 - r)
-        elif orient == "mirror_x":
-            x = rack.a1_x + tt.x_spacing * (cols_count - 1 - c)
-        elif orient == "mirror_y":
-            y = rack.a1_y + tt.y_spacing * (rows_count - 1 - r)
-        # Add rot90/rot270 if you use them
-
-        return x, y, rack.pickup_height
-
-    @staticmethod
-    def get_tip(session: Session, rack_id: int, tip_id: str) -> TipDBModel:
-        return session.execute(
-            select(TipDBModel).where(TipDBModel.rack_id == rack_id, TipDBModel.tip_id == tip_id)
-        ).scalar_one()
-
-        
-    def get_first_unused_tip(self, rack_id: int) -> Optional[TipReadModel]:
+    def get_tip(self, tip_id: str, rack_id: int) -> Optional[TipReadModel]:
         with self.session_maker() as session:
-            tip = (
-                session.query(TipDBModel)
-                .filter(TipDBModel.rack_id == rack_id, TipDBModel.status == "new")
-                .order_by(TipDBModel.tip_id.asc())
-                .first()
+            tip = session.execute(
+                select(TipDBModel).where(
+                    TipDBModel.rack_id == rack_id, TipDBModel.tip_id == tip_id
+                )
+            ).scalar_one_or_none()
+            return TipReadModel.model_validate(tip) if tip else None
+
+    def compute_tip_xy(
+        self,
+        rack_id: int,
+        tip_id: str,
+        session: Optional[Session] = None,
+    ) -> Tuple[float, float, float]:
+        def _solve(s: Session) -> Tuple[float, float, float]:
+            rack: RackDBModel = s.execute(
+                select(RackDBModel).where(RackDBModel.id == rack_id)
+            ).scalar_one()
+            tt: RackTypeDBModel = rack.type
+
+            # parse "A1"
+            row_label = "".join(ch for ch in tip_id if ch.isalpha()).upper()
+            col_num = int("".join(ch for ch in tip_id if ch.isdigit()))
+            r = tt.rows.index(row_label)   # 0-based
+            c = col_num - 1                # 0-based
+
+            # A1 origin
+            x = rack.a1_x + tt.x_spacing * c
+            y = rack.a1_y + tt.y_spacing * r
+
+            orient = (rack.orientation or "standard").lower()
+            rows_count = len(tt.rows)
+            cols_count = tt.cols
+            if orient == "rot180":
+                x = rack.a1_x + tt.x_spacing * (cols_count - 1 - c)
+                y = rack.a1_y + tt.y_spacing * (rows_count - 1 - r)
+            elif orient == "mirror_x":
+                x = rack.a1_x + tt.x_spacing * (cols_count - 1 - c)
+            elif orient == "mirror_y":
+                y = rack.a1_y + tt.y_spacing * (rows_count - 1 - r)
+
+            return x, y, rack.pickup_height
+
+        if session is None:
+            with self.session_maker() as s:
+                return _solve(s)
+        return _solve(session)
+
+    def get_tip_coordinates(self, rack_id: int, tip_id: str) -> tuple[float, float, float]:
+        with self.session_maker() as session:
+            return self.compute_tip_xy(session, rack_id, tip_id)
+
+    def get_first_unused_tip(self, rack_id: int) -> Optional[TipReadModel]:
+        """
+        Return the first tip with status 'new' on the given rack, ordered A1..A12, B1..B12, ...
+        Assumes tip_id like 'A1', 'B12', etc.
+        """
+        with self.session_maker() as session:
+            stmt = (
+                select(TipDBModel)
+                .where(
+                    TipDBModel.rack_id == rack_id,
+                    func.lower(TipDBModel.status) == "new",  # robust to case
+                )
+                .order_by(
+                    func.substr(TipDBModel.tip_id, 1, 1).asc(),                 # row letter
+                    cast(func.substr(TipDBModel.tip_id, 2), Integer).asc(),      # numeric col
+                )
+                .limit(1)
             )
+            tip = session.execute(stmt).scalars().first()
             return TipReadModel.model_validate(tip) if tip else None
 
 
     def update_tip(self, tip_id: str, rack_id: int, updates: dict) -> TipDBModel:
-        with self.session_maker() as active_db_session:
-            try:
-                updated_model = TipWriteModel(**updates).model_dump()
-                stmt = select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
-                tip = active_db_session.execute(stmt).scalar()
-                if not tip:
-                    raise ValueError(f"Tip with id {tip_id} not found.")
-                for key, value in updated_model.items():
-                    setattr(tip, key, value)
-                active_db_session.commit()
-                active_db_session.refresh(tip)
-                return tip
-            except ValueError as e:
-                raise e
-            except SQLAlchemyError as e:
-                active_db_session.rollback()
-                raise ValueError(f"Error updating tip: {e}")
+            with self.session_maker() as s:
+                try:
+                    tip = s.execute(
+                        select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
+                    ).scalar()
+                    if not tip:
+                        raise ValueError(f"Tip not found for rack_id={rack_id}, tip_id={tip_id}")
+
+                    payload = {"tip_id": tip_id, "rack_id": rack_id, **(updates or {})}
+
+                    now = _now_dt()
+                    # always bump updated
+                    payload.setdefault("updated", now)
+                    # set status_date only when status actually changes
+                    if "status" in payload:
+                        new_status = str(payload["status"]).lower()
+                        old_status = (tip.status or "").lower()
+                        if new_status != old_status:
+                            payload.setdefault("status_date", now)
+
+                    # If you use Pydantic, make sure its field types match (see below)
+                    try:
+                        data = TipWriteModel(**payload).model_dump(exclude_none=True)
+                    except NameError:
+                        data = {k: v for k, v in payload.items() if v is not None}
+
+                    for k, v in data.items():
+                        setattr(tip, k, v)
+
+                    s.commit(); s.refresh(tip)
+                    return tip
+                except SQLAlchemyError as e:
+                    s.rollback()
+                    raise ValueError(f"Error updating tip: {e}") from e
+
 
     def delete_tip(self, tip_id: str, rack_id: int) -> None:
         with self.session_maker() as active_db_session:
@@ -210,9 +225,6 @@ class TipService:
     def get_rack_for_tip(self, rack_id: int):
         # defer to RackService using the same session_maker
         return RackService(self.session_maker).get_rack(rack_id)
-    
-    def get_tip_coordinates(self, session: Session, rack_id: int, tip_id: str) -> tuple[float, float, float]:
-        return self.compute_tip_xy(session, rack_id, tip_id)
 
     
 class RackService:

@@ -265,17 +265,37 @@ def connect_to_instruments(
 
     # Connect to Arduino
     try:
-        logger.debug("Connecting to Arduino")
-        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
-        if not arduino.configured:
-            logger.error("No Arduino connected")
+        cfg_port = (read_config_value("ARDUINO", "port") or "").strip()
+        # try the configured value first; if it's not "auto", also try auto as a fallback
+        candidates = [cfg_port] if cfg_port else []
+        if cfg_port.lower() != "auto":
+            candidates.append("auto")
+        if not candidates:
+            candidates = ["auto"]
+
+        arduino = None
+        for cand in candidates:
+            try:
+                logger.debug("Connecting to Arduino (port=%r)...", cand)
+                arduino = ArduinoLink(port_address=cand)
+                if arduino.configured:
+                    instruments.arduino = arduino
+                    logger.debug("Connected to Arduino on %s", arduino.port_address)
+                    break
+            except Exception as e:
+                logger.warning("Connect failed using %r: %s", cand, e, exc_info=True)
+                arduino = None
+
+        if not arduino or not arduino.configured:
+            logger.error("No Arduino connected (tried: %s)", ", ".join(map(repr, candidates)))
             incomplete = True
             instruments.arduino = None
-        logger.debug("Connected to Arduino")
-        instruments.arduino = arduino
+
     except Exception as error:
-        logger.error("Error connecting to Arduino, %s", error)
+        logger.error("Error connecting to Arduino: %s", error, exc_info=True)
         incomplete = True
+        instruments.arduino = None
+
 
     # Connect to the pump or pipette depending on configuration
     # Check if the config specifies a syringe pump. If not skip the check

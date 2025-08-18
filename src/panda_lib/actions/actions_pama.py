@@ -23,12 +23,13 @@ from panda_lib.actions.pipetting import _pipette_action as clear_well_res
 
 from panda_lib.toolkit import Toolkit
 from panda_lib.utilities import Instruments
-
+from panda_lib.actions.pipetting import replace_tip
+from panda_shared.db_setup import SessionLocal
 
 def measure_contact_angle(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
-    session,
+    session_maker,             # was `session`; this name matches how replace_tip expects it
     tiprack_id: int,
     file_tag: str = "ContactAngle",
 ) -> EchemExperimentBase:
@@ -39,19 +40,21 @@ def measure_contact_angle(
     3. Rinse the well 3x with IPA
     """
     try:
-        
         image_well(toolkit, experiment, "BeforeExperiment", curvature_image=False, add_datazone=False)
 
         toolkit.global_logger.info("0. Dispensing 10µL droplet of water into well")
         experiment.set_status_and_save(ExperimentStatus.DEPOSITING)
+
+        # do NOT overwrite the incoming tiprack_id
+        # replace_tip(toolkit, session_maker=session_maker, tiprack_id=tiprack_id, tip_id=None)
+
         contact_angle_transfer(
             volume=10,
             src_vessel=solution_selector("water", 10),
             dst_vessel=toolkit.wellplate.wells[experiment.well_id],
             toolkit=toolkit,
             ca_dispense_height=toolkit.wellplate.bottom + 4,
-            session=session,
-            tiprack_id=tiprack_id,
+            tiprack_id=tiprack_id,        # keep this only if contact_angle_transfer supports it
         )
 
         toolkit.global_logger.info("1. Imaging the well")
@@ -73,10 +76,10 @@ def measure_contact_angle(
             toolkit=toolkit,
         )
 
-        toolkit.global_logger.info("3. Rinsing the well 3x with IPA")
+        toolkit.global_logger.info("3. Rinsing the well 1x with IPA")
         experiment.set_status_and_save(ExperimentStatus.RINSING)
-        for i in range(3):
-            toolkit.global_logger.info("Rinse %d of 3", i + 1)
+        for i in range(1):
+            toolkit.global_logger.info("Rinse %d of 1", i + 1)
             transfer(
                 volume=200,
                 src_vessel=solution_selector("ipa", 200),
@@ -97,14 +100,6 @@ def measure_contact_angle(
                 toolkit=toolkit,
             )
 
-        image_well(toolkit, experiment, "BeforeClearingWell", curvature_image=False, add_datazone=False)
-
-        clear_well_res(
-            toolkit=toolkit, 
-            src_vessel=toolkit.wellplate.wells[experiment.well_id], 
-            dst_vessel=waste_selector("waste",200), 
-            desired_volume=200
-        )
         image_well(toolkit, experiment, "AfterClearingWell", curvature_image=False, add_datazone=False)
 
         return experiment
@@ -113,6 +108,7 @@ def measure_contact_angle(
         experiment.set_status_and_save(ExperimentStatus.ERROR)
         toolkit.global_logger.error("Exception occurred during contact angle measurement: %s", e)
         raise ContactAngleFailure(experiment.experiment_id, experiment.well_id) from e
+
 
 def measure_contact_angle_norinse(
     experiment: EchemExperimentBase,

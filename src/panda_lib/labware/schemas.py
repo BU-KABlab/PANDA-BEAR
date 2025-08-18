@@ -1,6 +1,7 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Literal, Any
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 import json
+from datetime import datetime
 
 class DeckObjectModel(BaseModel):
     name: str
@@ -192,14 +193,11 @@ class WellplateWriteModel(BaseModel):
 class TipWriteModel(BaseModel):
     rack_id: int
     tip_id: str
-    tip_length: float = 0
-    pickup_height: float = 0
-    radius_mm: float = 0
-    capacity: int = 300
-    dead_volume: float = 0
-    name: Optional[str] = "default"
-
-
+    status: str = "new"
+    status_date: Optional[datetime] = None
+    updated: Optional[datetime] = None
+    coordinates: Optional[Dict[str, Any]] = None
+    drop_coordinates: Optional[Dict[str, Any]] = None
 
 class TipReadModel(BaseModel):
     rack_id: int
@@ -212,9 +210,12 @@ class TipReadModel(BaseModel):
     volume: float = 0
     dead_volume: float = 0
     contamination: int = 0
-    coordinates: Optional[dict] = None
-    drop_coordinates: Optional[dict] = None
+    coordinates: Optional[dict]
+    drop_coordinates: Dict[str, Any] = Field(
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
     name: Optional[str] = "default"
+
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -256,11 +257,12 @@ class RackReadModel(DeckObjectModel):
     rows: str
     cols: int
     pickup_height: float  # height of pipette to pick up tips
-    drop_coordinates: Dict[str, float] = Field(
+    drop_coordinates: Dict[str, Any] = Field(
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
 
     panda_unit_id: int
+    current: bool
     
     model_config = ConfigDict(from_attributes=True)
 
@@ -276,12 +278,13 @@ class RackWriteModel(BaseModel):
     cols: int = 14
     pickup_height: float = 0.0  # height of pipette to pick up tips
     name: Optional[str] = f"{id}" if id is not None else None
-    coordinates: Dict[str, float] = Field(
+    coordinates: Dict[str, Any] = Field(
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
-    drop_coordinates: Dict[str, float] = Field(
+    drop_coordinates: Dict[str, Any] = Field(
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
+    current: bool = False
     panda_unit_id: int = 2
 
     model_config = ConfigDict(from_attributes=True)

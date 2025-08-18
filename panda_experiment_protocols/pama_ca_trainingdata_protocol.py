@@ -4,12 +4,12 @@
 import time 
 # Non-standard imports
 from panda_lib.actions import (
-    flush_pipette,
     image_well,
     solution_selector,
     transfer,
     waste_selector,
 )
+from panda_lib.actions.pipetting import _pipette_action as clear_well_res
 from panda_lib.actions.actions_pama import (
     measure_contact_angle,
 )
@@ -28,6 +28,9 @@ from panda_lib.utilities import Instruments, solve_vials_ilp
 from panda_lib.hardware.panda_pipettes import insert_new_pipette
 from panda_shared.db_setup import SessionLocal
 from panda_lib.sql_tools.queries.racks import select_current_rack_id
+from panda_lib.actions.pipetting import replace_tip
+from panda_shared.db_setup import SessionLocal
+
 
 PROTOCOL_ID = 30 
 
@@ -58,18 +61,17 @@ def pama_ca_drying(
     1. pama_ipa_rinse
     2. pama_ca_drying
     3. pama_contact_angle
-    """
     
+    """ 
 
     pama_deposition(
         experiment=experiment,
         toolkit=toolkit,
     )
    
-    pama_ipa_contact_angle(
-        experiment=experiment,
-        toolkit=toolkit,
-    )
+    pama_ipa_contact_angle(experiment=experiment, toolkit=toolkit)
+
+    # well_rinse_image(experiment=experiment, toolkit=toolkit)
 
     experiment.set_status_and_save(ExperimentStatus.COMPLETE)
 
@@ -94,11 +96,20 @@ def pama_deposition(
     toolkit.global_logger.info(
         "Running experiment %s part 1", experiment.experiment_id
     )
+    
+    if not toolkit.pipette.has_tip:
+        replace_tip(
+            toolkit,
+            session_maker=SessionLocal,
+            tiprack_id=select_current_rack_id()
+        )
+    
     toolkit.global_logger.info("0. Imaging the well")
     experiment.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(toolkit, experiment, "BeforeDeposition", curvature_image=False, add_datazone=False)
 
     experiment.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
+
     toolkit.global_logger.info("1. Dispensing PAMA/electrolyte mix into well: %s", experiment.well_id)
 
     # Define which solution keys to use for mixing
@@ -124,18 +135,16 @@ def pama_deposition(
 
     v_total = 300
     # Set your target concentration here (example: 100)
-    c_target = experiment.pama_concentration
-
-    # Solve for mixing volumes
+    target_dep_conc = experiment.dep_sol_conc
     vial_vol_by_conc, deviation_value, vial_vol_by_location = solve_vials_ilp(
         vial_concentration_map=vial_concentration_map,
         v_total=v_total,
-        c_target=c_target,
+        c_target=target_dep_conc,
     )
 
     if vial_vol_by_location is None:
         raise ValueError(
-            f"No solution combinations found for target {c_target} (deviation: {deviation_value})"
+            f"No solution combinations found for target {target_dep_conc} (deviation: {deviation_value})"
         )
     toolkit.global_logger.info(
         "Volumes to draw from each vial: %s uL", vial_vol_by_location
@@ -157,7 +166,13 @@ def pama_deposition(
     # --- END MIXING STRATEGY ---
     toolkit.global_logger.info("Flushing the pipette tip")
     experiment.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_pipette(flush_with="dmf", toolkit=toolkit)
+    
+    transfer(
+        volume=200,
+        src_vessel=solution_selector("dmf", 200),
+        dst_vessel=waste_selector("waste", 200),
+        toolkit=toolkit,
+    )
     ## Move the electrode to the well
     toolkit.global_logger.info("2. Moving electrode to well: %s", experiment.well_id)
 
@@ -206,10 +221,15 @@ def pama_deposition(
         ),
         toolkit=toolkit,
     )
+    clear_well_res(
+        toolkit=toolkit, 
+        src_vessel=toolkit.wellplate.wells[experiment.well_id], 
+        dst_vessel=waste_selector("waste",200), 
+        desired_volume=200
+    )
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     experiment.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_pipette(flush_with="dmf", toolkit=toolkit)
 
     toolkit.global_logger.info("7. Rinsing the well 3x with DMF")
     experiment.set_status_and_save(ExperimentStatus.RINSING)
@@ -232,6 +252,12 @@ def pama_deposition(
             src_vessel=toolkit.wellplate.wells[experiment.well_id],
             dst_vessel=waste_selector("waste", 200),
             toolkit=toolkit,
+        )
+        clear_well_res(
+            toolkit=toolkit, 
+            src_vessel=toolkit.wellplate.wells[experiment.well_id], 
+            dst_vessel=waste_selector("waste",200), 
+            desired_volume=200
         )
 
     toolkit.global_logger.info("8. Rinsing the well 3x with ACN")
@@ -256,8 +282,43 @@ def pama_deposition(
             dst_vessel=waste_selector("waste", 200),
             toolkit=toolkit,
         )
+        clear_well_res(
+            toolkit=toolkit, 
+            src_vessel=toolkit.wellplate.wells[experiment.well_id], 
+            dst_vessel=waste_selector("waste",200), 
+            desired_volume=200
+        )
+    
+    toolkit.global_logger.info("8. Rinsing the well 3x with IPA")
+    experiment.set_status_and_save(ExperimentStatus.RINSING)
+    for i in range(3):
+        toolkit.global_logger.info("Rinse %d of 3", i + 1)
+        transfer(
+            volume=200,
+            src_vessel=solution_selector("ipa", 200),
+            dst_vessel=toolkit.wellplate.wells[experiment.well_id],
+            toolkit=toolkit,
+        )
+        toolkit.mill.safe_move(
+            x_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "y"),
+            z_coord=toolkit.wellplate.top,
+            tool=Instruments.PIPETTE,
+        )
+        transfer(
+            volume=200,
+            src_vessel=toolkit.wellplate.wells[experiment.well_id],
+            dst_vessel=waste_selector("waste", 200),
+            toolkit=toolkit,
+        )
+        clear_well_res(
+            toolkit=toolkit, 
+            src_vessel=toolkit.wellplate.wells[experiment.well_id], 
+            dst_vessel=waste_selector("waste",200), 
+            desired_volume=200
+        )
 
-    toolkit.global_logger.info("9. Take after image")
+    toolkit.global_logger.info("10. Take after image")
     experiment.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
@@ -266,16 +327,17 @@ def pama_deposition(
     )
 
     toolkit.global_logger.info("PAMA deposition complete\n\n")
-
+ 
 
 def pama_ipa_contact_angle(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
-    0. Rinse with IPA
-    1. Image well
-    2. Contact angle measurement
+    
+    0. Image well
+    1. Contact angle measurement
+    2. Rinse with IPA
     
     Args:
         experiment (EchemExperimentBase): _description_
@@ -284,55 +346,31 @@ def pama_ipa_contact_angle(
     toolkit.global_logger.info(
         "Running experiment %s part 2", experiment.experiment_id
     )
-    toolkit.global_logger.info("0. Rinse with IPA")
-    experiment.set_status_and_save(ExperimentStatus.RINSING)
-    for i in range(3):
-        # Pipette the rinse solution into the well
-        toolkit.global_logger.info("Rinse %d of 3", i + 1)
-        transfer(
-            volume=200,
-            src_vessel=solution_selector("ipa", 200),
-            dst_vessel=toolkit.wellplate.wells[experiment.well_id],
-            toolkit=toolkit,
-        )
-
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "y"),
-            z_coord=toolkit.wellplate.top,
-            tool=Instruments.PIPETTE,
-        )
-        # Clear the well
-        transfer(
-            volume=200,
-            src_vessel=toolkit.wellplate.wells[experiment.well_id],
-            dst_vessel=waste_selector(
-                "waste",
-                200,
-            ),
-            toolkit=toolkit,
-        )
-
-    toolkit.global_logger.info("1. Image well")
+    toolkit.global_logger.info("Image well")
     experiment.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         experiment=experiment,
-        image_label="AfterRinsing",
+        image_label="BeforeContactAngle",
     )
     # create a loop for drying times combined with measuring contact angle at each time interval
-    toolkit.global_logger.info("2. Drying the well and measuring contact angle")
-    drying_times = [0]  # in minutes #TODO: update drying time
-    for time_min in drying_times:
-        toolkit.global_logger.info("Drying for %d minutes", time_min)
-        time.sleep(time_min * 60)
-        toolkit.global_logger.info("Measuring contact angle after %d minutes", time_min)    
-        experiment.set_status_and_save(ExperimentStatus.MEASURING_CA)
-        measure_contact_angle(
-            toolkit=toolkit,
-            experiment=experiment,
-            session=SessionLocal,
-            tiprack_id=select_current_rack_id(),
-        )
-
+    toolkit.global_logger.info("Drying the well and measuring contact angle")
+    time_min = 60  # in minutes
+    toolkit.global_logger.info("Drying for %d minutes", time_min)
+    time.sleep(time_min * 60)
+    toolkit.global_logger.info("Measuring contact angle after %d minutes", time_min)    
+    experiment.set_status_and_save(ExperimentStatus.MEASURING_CA)
+    measure_contact_angle(
+        toolkit=toolkit,
+        experiment=experiment,
+        session_maker=SessionLocal,           
+        tiprack_id=select_current_rack_id(),  
+        file_tag=f"ContactAngle_AfterDrying_{time_min}min",
+    )
+    image_well(
+        toolkit=toolkit,
+        experiment=experiment,
+        image_label="AfterContactAngle",
+    )
     toolkit.global_logger.info("Contact angle measurement complete\n\n")
+

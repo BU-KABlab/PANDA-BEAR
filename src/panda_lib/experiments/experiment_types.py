@@ -436,6 +436,8 @@ class EchemExperimentBase(ExperimentBase):
     cv: int = 1  # Cyclic Voltammetry
     baseline: int = 0  # Baseline
 
+    dep_sol_conc: float = 0.0  # Deposition solution concentration
+
     flush_sol_name: str = ""  # Flush solution name
     flush_sol_vol: Union[int, float] = 0  # Flush solution volume
     flush_count: int = 3  # Flush solution concentration

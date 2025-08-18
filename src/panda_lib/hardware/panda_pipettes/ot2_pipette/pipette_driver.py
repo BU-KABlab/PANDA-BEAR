@@ -25,20 +25,6 @@ class ToolStateError(Exception):
         logger.error(message)
 
 
-def tip_check(func):
-    """Decorator to check if the pipette has a tip attached before performing an action."""
-
-    def wrapper(self, *args, **kwargs):
-        if not self.has_tip:
-            raise ToolStateError(
-                "Error: No tip is attached. Cannot complete this action"
-            )
-        else:
-            return func(self, *args, **kwargs)
-
-    return wrapper
-
-
 class Pipette:
     """A class representation of an Opentrons OT2 pipette."""
 
@@ -93,7 +79,7 @@ class Pipette:
         self.is_primed = False
         self.position = 0.0
         self.stepper: ArduinoLink = stepper
-        self.has_tip = True
+        # self.has_tip = True
 
         # Initialize the pipette
         self._initialize()
@@ -139,7 +125,7 @@ class Pipette:
         ),
     ) -> "Pipette":
         """Initialize the pipette object from a config file
-#TODO fix this whole thing because it DOES NOT WORK.
+        #TODO fix this whole thing because it DOES NOT WORK.
         Use by calling the class method `from_config` with the appropriate parameters.
         example:
         .. code-block:: python
@@ -234,7 +220,6 @@ class Pipette:
 
         return response.get("success", False)
 
-    @tip_check
     def aspirate(self, vol: float, s: int = 2500):
         """Moves the plunger upwards to aspirate liquid into the pipette tip
 
@@ -265,7 +250,6 @@ class Pipette:
         return response.get("success", False)
 
 
-    @tip_check
     def dispense(self, vol: float, s: int = 2000):
         """Moves the plunger downwards to dispense liquid out of the pipette tip
 
@@ -302,7 +286,6 @@ class Pipette:
 
         return response.get("success", False)
     
-    @tip_check
     def blowout(self, s: int = 2500): #TODO remove this function and fix all references to it
         """Blows out any remaining liquid in the pipette tip
 
@@ -321,7 +304,6 @@ class Pipette:
 
         return response.get("success", False)
 
-    @tip_check
     def blowout_volume(self, vol, s: int = 2500): #TODO remove this function and all references to it
         """Moves the plunger upwards to aspirate air into the pipette tip
 
@@ -335,7 +317,7 @@ class Pipette:
         logger.info("Creating air gap of %s uL", vol)
         return self.aspirate(vol, s)
 
-    @tip_check
+
     def mix(self, vol: float, n: int, s: int = 2500): #TODO make function for this specifically, don't just use aspirate and dispense
         """Mixes liquid by alternating aspirate and dispense steps for the specified number of times
 
@@ -360,7 +342,6 @@ class Pipette:
                 self.dispense(vol, s)
             return True
 
-    @tip_check
     def drop_tip(self, s: int = 2000):
         """Moves the plunger to eject the pipette tip
 
@@ -380,11 +361,12 @@ class Pipette:
 
         return response.get("success", False)
 
-    @tip_check
+    def prime_tip_pickup(pipette_driver) -> bool:
+        return pipette_driver.pick_up_tip()  # primes only
+
     def pick_up_tip(self, s: int = 2000):
         """
         Move the plunger to a defined position to pick up a new pipette tip.
-        Assumes the pipette is already physically aligned over a tip in the rack.
 
         :param s: Speed of plunger movement in mm/min.
         :return: True if tip pickup was successful, False otherwise.
@@ -400,7 +382,7 @@ class Pipette:
             return False
 
         self.position = self.prime_position
-        self.has_tip = True  # Mark tip as attached
+        self.has_tip = True  # Mark tip as attached #TODO: Fix this so it's in a different location... technically it doesn't have the tip at this point
         logger.info("Tip pickup sequence completed. Plunger at %s mm", self.position)
 
         return True

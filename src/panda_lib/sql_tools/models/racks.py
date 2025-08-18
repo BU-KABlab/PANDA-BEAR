@@ -8,7 +8,7 @@ from datetime import datetime as dt
 from datetime import timezone
 from typing import Optional
 
-from sqlalchemy import Float, ForeignKey, Integer, String
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.sqltypes import JSON, Boolean
 
@@ -16,6 +16,18 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import Integer, Float, String, Text, ForeignKey, UniqueConstraint
 
 from .base import Base
+
+import json
+from typing import Any, Dict, Optional
+
+from sqlalchemy import create_engine
+
+engine = create_engine(
+    "sqlite:///panda.db",
+    json_serializer=json.dumps,
+    json_deserializer=json.loads,
+)
+
 
 class Base(DeclarativeBase):
     pass
@@ -65,11 +77,11 @@ class Racks(Base):
 
     pickup_height: Mapped[float] = mapped_column(Float, default=0.0)
     panda_unit_id: Mapped[int] = mapped_column(Integer, default=0)
-    drop_coordinates: Mapped[str | None] = mapped_column(Text, default=None)
+    drop_coordinates: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
 
     type: Mapped[RackTypes] = relationship(RackTypes)
     tips: Mapped[list[TipModel]] = relationship(back_populates="rack", cascade="all, delete-orphan")
-
+    current: Mapped[bool] = mapped_column(Boolean, default=False)
 
     def __repr__(self):
         return (
@@ -91,8 +103,8 @@ class TipModel(Base):
 
     # Status bookkeeping
     status: Mapped[str] = mapped_column(String, default="available")  # available, in_use, used, failed
-    status_date: Mapped[str] = mapped_column(String, default="")
-    updated: Mapped[str] = mapped_column(String, default="")
+    status_date: Mapped[dt] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated: Mapped[dt] = mapped_column(DateTime(timezone=True), nullable=False)
 
     # Geometry and capacity
     tip_length: Mapped[float] = mapped_column(Float, default=0.0)
@@ -101,9 +113,9 @@ class TipModel(Base):
     capacity: Mapped[int] = mapped_column(Integer, default=300)
     contamination: Mapped[int] = mapped_column(Integer, default=0)
 
-    # Optional cached JSON blobs if you want them
-    coordinates: Mapped[str | None] = mapped_column(Text, default=None)
-    drop_coordinates: Mapped[str | None] = mapped_column(Text, default=None)
+    coordinates: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    drop_coordinates: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
 
     name: Mapped[str] = mapped_column(String, default="default")
 
@@ -114,15 +126,13 @@ class TipModel(Base):
     )
 
     def __repr__(self):
-        return(
+        return (
             f"<TipHx(rack_id={self.rack_id}, tip_id={self.tip_id}, "
-            f"experiment_id={self.experiment_id}, project_id={self.project_id}, "
             f"status={self.status}, status_date={self.status_date}, "
-            f"coordinates={self.coordinates}, radius_mm={self.radius_mm}, "
-            f"capacity={self.capacity}, top={self.top}, bottom={self.bottom}, "
-            f"pickup_height={self.pickup_height}, "
-            f"updated={self.updated})>"
+            f"radius_mm={self.radius_mm}, capacity={self.capacity}, "
+            f"pickup_height={self.pickup_height}, updated={self.updated})>"
         )
+
     
 class TipStatus:
     """TipStatus view model"""

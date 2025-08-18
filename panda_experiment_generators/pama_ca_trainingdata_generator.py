@@ -2,7 +2,8 @@
 
 import pandas as pd
 from pydantic import ValidationError
-
+from pathlib import Path
+import pandas as pd
 from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
@@ -11,9 +12,10 @@ EXPERIMENT_NAME = "pama_CA_LHStraining"
 CAMPAIGN_ID = 2
 PLATE_TYPE = 8 
 
-params_df = pd.read_csv(
-    r".\panda_experiment_generators\pama_ca_trainingdata_params.csv"
-) # Update path with location on PANDA computer
+
+params_path = Path(__file__).parent / "pama_ca_trainingdata_params.csv"
+params_df = pd.read_csv(params_path)
+
 
 def main():
     """Runs the pama contact angle drying experiment generator."""
@@ -52,7 +54,7 @@ def main():
                     flush_sol_name="dmf",
                     flush_sol_vol=200,
                     flush_count=3,
-                    pama_concentration=pama_conc,
+                    dep_sol_conc=pama_conc,
                     filename=EXPERIMENT_NAME + "_" + str(experiment_id),
                     # Echem specific
                     ocp=1,
