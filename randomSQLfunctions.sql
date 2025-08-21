@@ -58,7 +58,7 @@ DELETE FROM panda_pipette WHERE id = 1;
 UPDATE panda_vials SET dead_volume = '1000' WHERE category = 0;
 UPDATE panda_vials SET contents = '{"acn": 19000}', volume = '19000' WHERE id = 4;
 UPDATE panda_vials SET contents = '{"ipa": 19000}', volume = '19000' WHERE id = 5;
-UPDATE panda_vials SET contents = '{"ipa": 1000}', volume = '1000' WHERE id = 7;
+UPDATE panda_vials SET contents = '{"waste": 0}', volume = '1000' WHERE id = 7;
 
 UPDATE panda_well_hx SET coordinates = '{"x": -228, "y": -151.0, "z": -194}' WHERE plate_id = 120 AND well_id = 'A1';
 UPDATE panda_well_hx SET coordinates = '{"x": -228, "y": -164.5, "z": -194}' WHERE plate_id = 120 AND well_id = 'A2';
