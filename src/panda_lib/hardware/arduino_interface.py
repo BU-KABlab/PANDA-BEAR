@@ -188,6 +188,7 @@ class ArduinoLink:
         self._reconnect_backoff_sec = 0.5  # base backoff
         self._event_queue: asyncio.Queue = asyncio.Queue()
         self.pipette_active = True  # Assuming pipette is active by default
+        self._tx_lock = threading.Lock()
         self.logger = logging.getLogger("panda")
         self.connect()
 
@@ -218,6 +219,21 @@ class ArduinoLink:
         acms = sorted(glob.glob("/dev/ttyACM*"))
         return acms[0] if acms else None
 
+    
+
+    def _wait_for_port(self, timeout_s=30.0, poll_s=0.5):
+        """Repeatedly call self._discover_port() until an existing device path is found."""
+        deadline = time.monotonic() + timeout_s
+        last_log = None
+        while time.monotonic() < deadline:
+            port = self._discover_port()          # <-- use your existing function
+            if port and os.path.exists(port):     # make sure it actually exists *now*
+                if port != last_log:
+                    self.logger.info("Arduino found on %s", port)
+                    last_log = port
+                return port
+            time.sleep(poll_s)
+        return None
 
     def _resolve_config_port(self, val: Optional[str]) -> Optional[str]:
         """
@@ -290,6 +306,49 @@ class ArduinoLink:
     def _handle_serial_error(self, exc: Exception, during: str):
         self.logger.error("Serial error during %s: %s", during, exc, exc_info=True)
         self._attempt_reconnect()
+
+    def _reconnect(self):
+        self.logger.info("Reconnecting to Arduino...")
+        try:
+            try:
+                if self.ser:
+                    self.ser.close()
+            except Exception:
+                pass
+
+            port = self._wait_for_port(timeout_s=30.0, poll_s=0.5)   # <— wait here
+            if not port:
+                raise ArduinoConnectionError("Arduino did not re-enumerate within timeout")
+
+            self.logger.info("Opening %s…", port)
+            self.ser = Serial(
+                port, self.baud_rate,
+                timeout=self.read_timeout,
+                write_timeout=self.read_timeout,
+                rtscts=False, dsrdtr=False, xonxoff=False, exclusive=True
+            )
+
+            # Restore your previously-stable handshake behavior:
+            try:
+                if hasattr(self.ser, "setDTR"): self.ser.setDTR(True)
+                if hasattr(self.ser, "setRTS"): self.ser.setRTS(False)
+            except Exception:
+                pass
+
+            time.sleep(10.0)              # your setup was stable with a long settle
+            self._safe_reset_buffers()     # clear once after open
+
+            # Optional: tolerate simple banners like 'Ready'
+            resp = self.send(PawduinoFunctions.CMD_HELLO)
+            raw = (resp.get("raw_data") or "").strip().lower()
+            if not (resp.get("success") or raw in {"ok", "ready", "hello"}):
+                self.logger.warning("Handshake after reconnect returned: %r", raw)
+
+            self.logger.info("Reconnected.")
+            return True
+        except Exception as e:
+            self.logger.error("Reconnect failed: %s", e, exc_info=True)
+            return False
 
     def _attempt_reconnect(self):
         # Close first
@@ -376,25 +435,30 @@ class ArduinoLink:
                 write_timeout=self.read_timeout,
                 rtscts=False,
                 dsrdtr=False,
-                exclusive=True,  # Linux-only; safe to leave if unsupported elsewhere
+                exclusive=True,  # OK on Linux
+                xonxoff=False,
             )
+
+            # Keep control lines quiet like Serial Monitor (prevents spurious resets)
             try:
-                self.ser.setDTR(True)  # set once; avoids repeated reset loops on some boards
+                if hasattr(self.ser, "setDTR"):
+                    self.ser.setDTR(False)
+                if hasattr(self.ser, "setRTS"):
+                    self.ser.setRTS(False)
             except Exception:
                 pass
 
             if not self.ser.is_open:
-                raise ArduinoConnectionError(
-                    f"Failed to open serial port {chosen_port}"
-                )
+                raise ArduinoConnectionError(f"Failed to open serial port {chosen_port}")
+
             self.port_address = chosen_port
             self.connected = True
-            self.logger.info(
-                "Serial port opened: %s. Waiting for Arduino to initialize...",
-                chosen_port,
-            )
+            self.logger.info("Serial port opened: %s. Letting MCU settle…", chosen_port)
+
+            # settle + clear buffers ONCE after open
             time.sleep(10)
             self._safe_reset_buffers()
+
 
             self.logger.info("Attempting handshake with Arduino...")
             self.configured = True
@@ -605,63 +669,81 @@ class ArduinoLink:
             f"Timeout after {elapsed:.1f} seconds waiting for properly formatted response for: {command_to_send.strip()}"
         )
     '''
-
     def _send_internal(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
         if (not self.connected) or (not self.configured) or (not self.ser) or (not self.ser.is_open):
             raise ArduinoConnectionError("Not connected to Arduino.")
 
         command_code = cmd_enum_member.value
         command_to_send = ",".join([command_code, *map(str, args)]) + "\n"
+        payload = command_to_send.encode()
         self.logger.debug("Sending to Arduino: %s", command_to_send.strip())
 
-        start_time = time.time()
-        max_total_time = 60.0
+        # Optional: avoid hitting USB exactly at a big motion/EM pulse
+        if cmd_enum_member in {PawduinoFunctions.CMD_EMAG_ON, PawduinoFunctions.CMD_EMAG_OFF}:
+            time.sleep(0.05)  # 50 ms settle
+
+        start_time = time.monotonic()
+        deadline = start_time + 60.0
         attempted_reconnect = False
 
-        while time.time() - start_time < max_total_time:
-            try:
-                self._safe_reset_buffers()
-                self.ser.write(command_to_send.encode())
+        # Serialize the entire transaction (write + read loop)
+        with getattr(self, "_tx_lock", threading.Lock()):
+            while time.monotonic() < deadline:
+                try:
+                    # --- WRITE ---
+                    self.ser.write(payload)
+                    self.ser.flush()
 
-                # Wait for OK:/ERR: line
-                while time.time() - start_time < max_total_time:
-                    raw = self.ser.readline()
-                    if not raw:
-                        self.logger.warning("No response yet for: %s", command_to_send.strip())
-                        time.sleep(0.1)
+                    # --- READ with a per-command window (e.g., 5s) ---
+                    read_deadline = time.monotonic() + 5.0
+                    while time.monotonic() < read_deadline:
+                        raw = self.ser.readline()
+                        if not raw:
+                            # no line yet, keep waiting briefly
+                            time.sleep(0.05)
+                            continue
+
+                        response_str = raw.decode(errors="replace").strip()
+                        self.logger.debug("Raw response: %s", response_str)
+
+                        # Protocol lines
+                        if response_str.startswith(("OK:", "ERR:")):
+                            return self._process_response(response_str, command_to_send)
+
+                        # Benign boot banners / noise after reconnect—ignore
+                        low = response_str.lower()
+                        if low in {"ready", "hello", "ok"}:
+                            continue
+
+                        # Ignore non-protocol lines quietly
+                        self.logger.debug("Ignoring non-protocol line: %s", response_str)
+
+                    # If we got here, no protocol line within the per-command window
+                    self.logger.warning("No protocol response within 5s for %s", command_to_send.strip())
+
+                except (serial.SerialTimeoutException,) as e:
+                    self.logger.warning("Serial timeout for '%s': %s", command_to_send.strip(), e)
+
+                except (serial.SerialException, OSError, IOError) as e:
+                    msg = str(e)
+                    if "Errno 5" in msg or "Input/output error" in msg:
+                        self.logger.error("Device I/O error; forcing reconnection.")
+                    # one reconnect mid-command
+                    if not attempted_reconnect:
+                        attempted_reconnect = True
+                        self._handle_serial_error(e, during=f"send({cmd_enum_member.name})")
+                        # _handle_serial_error should call your reconnect which waits for the port to reappear
                         continue
+                    raise ArduinoConnectionError(
+                        f"Serial error during send for {cmd_enum_member.name}: {e}"
+                    ) from e
 
-                    response_str = raw.decode(errors="replace").strip()
-                    self.logger.debug("Raw response: %s", response_str)
-
-                    if response_str.startswith(("OK:", "ERR:")):
-                        return self._process_response(response_str, command_to_send)
-                    else:
-                        self.logger.warning("Malformed response: %s", response_str)
-                        time.sleep(0.1)
-                        continue
-
-            except (serial.SerialTimeoutException,) as e:
-                self.logger.warning("Serial timeout for '%s': %s", command_to_send.strip(), e)
                 time.sleep(0.1)
 
-            except (serial.SerialException, OSError, IOError) as e:
-                msg = str(e)
-                # If the device vanished (EIO), don’t retry the same FD—jump to reconnect.
-                if "Errno 5" in msg or "Input/output error" in msg:
-                    self.logger.error("Device I/O error; forcing reconnection.")
-                # one reconnect mid-command
-                if not attempted_reconnect:
-                    attempted_reconnect = True
-                    self._handle_serial_error(e, during=f"send({cmd_enum_member.name})")
-                    continue
-                raise ArduinoConnectionError(f"Serial error during send for {cmd_enum_member.name}: {e}") from e
-
-            time.sleep(0.1)
-
-        elapsed = time.time() - start_time
-        raise ArduinoTimeoutError(f"Timeout after {elapsed:.1f}s waiting for response to: {command_to_send.strip()}")
-
+        elapsed = time.monotonic() - start_time
+        raise ArduinoTimeoutError(
+            f"Timeout after {elapsed:.1f}s waiting for response to: {command_to_send.strip()}"
+        )
     async def async_send(
         self, cmd_enum_member: PawduinoFunctions, *args
     ) -> Dict[str, Any]:
@@ -694,11 +776,7 @@ class ArduinoLink:
 
         while time.time() - start_time < max_total_time:
             try:
-                try:
-                    await loop.run_in_executor(None, self.ser.flushInput)
-                    await loop.run_in_executor(None, self.ser.flushOutput)
-                except Exception as e:
-                    self.logger.warning("Async: Could not flush buffers: %s", e)
+
 
                 await loop.run_in_executor(
                     None, lambda: self.ser.write(command_to_send.encode())

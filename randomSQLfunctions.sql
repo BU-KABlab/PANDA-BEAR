@@ -33,7 +33,7 @@ UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'B2';
 UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'B3';
 UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'B4';
 UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'B5';
-UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'B6';
+UPDATE panda_well_hx SET status = 'new', volume = '0', contents = '{}' WHERE plate_id = 120 AND well_id = 'B6';
 UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'B7';
 UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'B8';
 UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'C1';
@@ -51,7 +51,16 @@ UPDATE panda_well_hx SET status = 'new' WHERE plate_id = 120 AND well_id = 'A2';
 UPDATE panda_well_hx SET status = 'new', contents = '{}', volume = '0' WHERE plate_id = 120 AND well_id = 'B7';
 UPDATE panda_wellplates SET echem_height = '-187' WHERE id = 120;
 
-UPDATE panda_tip_hx SET status = 'new' WHERE rack_id = 1;
+UPDATE panda_tip_hx SET status = 'new' WHERE rack_id = 1 AND tip_id = 'A1';
+UPDATE panda_tip_hx SET status = 'new' WHERE rack_id = 1 AND tip_id = 'A2';
+UPDATE panda_tip_hx SET status = 'new' WHERE rack_id = 1 AND tip_id = 'A3';
+UPDATE panda_tip_hx SET status = 'new' WHERE rack_id = 1 AND tip_id = 'A4';
+UPDATE panda_tip_hx SET status = 'new' WHERE rack_id = 1 AND tip_id = 'A5';
+UPDATE panda_tip_hx SET status = 'new' WHERE rack_id = 1 AND tip_id = 'A6';
+UPDATE panda_tip_hx SET status = 'new' WHERE rack_id = 1 AND tip_id = 'A7';
+UPDATE panda_tip_hx SET status = 'new', pickup_height='-189' WHERE rack_id = 1 AND tip_id = 'B10';
+
+
 
 DELETE FROM panda_pipette WHERE id = 1;
 
@@ -59,6 +68,8 @@ UPDATE panda_vials SET dead_volume = '1000' WHERE category = 0;
 UPDATE panda_vials SET contents = '{"acn": 19000}', volume = '19000' WHERE id = 4;
 UPDATE panda_vials SET contents = '{"ipa": 19000}', volume = '19000' WHERE id = 5;
 UPDATE panda_vials SET contents = '{"waste": 0}', volume = '1000' WHERE id = 7;
+UPDATE panda_vials SET contents = '{"waste": 0}', volume = '1000' WHERE id = 8;
+UPDATE panda_vials SET contents = '{"waste": 0}', volume = '1000' WHERE id = 9;
 
 UPDATE panda_well_hx SET coordinates = '{"x": -228, "y": -151.0, "z": -194}' WHERE plate_id = 120 AND well_id = 'A1';
 UPDATE panda_well_hx SET coordinates = '{"x": -228, "y": -164.5, "z": -194}' WHERE plate_id = 120 AND well_id = 'A2';

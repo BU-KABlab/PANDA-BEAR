@@ -1,23 +1,16 @@
 import serial
 import time
-
-ser = serial.Serial("/dev/ttyACM1", 115200, timeout=1, rtscts=False, dsrdtr=False, xonxoff=False)
+port = "/dev/ttyACM1"
+ser = serial.Serial(port, 115200, timeout=0.5, write_timeout=0.5, rtscts=False, dsrdtr=False, xonxoff=False)
 ser.setDTR(False)
 ser.setRTS(False)
-time.sleep(0.2)
+time.sleep(0.3)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
-time.sleep(0.1)
-
-print("Sending CMD_EMAG_ON")
 ser.write(b"5\n")
-ser.flush()
+ser.flush()   # EMAG ON
 time.sleep(0.5)
-
-print("Sending CMD_EMAG_OFF")
 ser.write(b"6\n")
-ser.flush()
-time.sleep(0.5)
-
+ser.flush()   # EMAG OFF
 ser.close()
-print("Done")
+print("Script completed")

@@ -82,7 +82,7 @@ class OT2P300:
         # Set up database tracker for volumes and contents
         self.pipette_tracker = PipetteDBHandler()
         self.pipette_tracker.set_capacity(
-            config.getfloat("P300", "pipette_capacity", fallback=300.0)
+            config.getfloat("P300", "pipette_capacity", fallback=200.0)
         )  # µL
 
         # If there is volume in the pipette, warn the user

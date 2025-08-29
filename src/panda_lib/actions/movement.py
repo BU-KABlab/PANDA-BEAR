@@ -378,26 +378,50 @@ def capping_sequence(
     time.sleep(3.0)  # Wait for motion to complete before checking sensor
 
     
-    for attempt in range(3):
-        if not check_line_break():
-            return  # Success
-        elif attempt == 0:
-            # Retry
-            print("⚠️ Cap detected. Retrying capping...")
-            time.sleep(1.0)
-            mill.safe_move(target_coords.x, 0, 0, tool="decapper")
-            time.sleep(1.0)
+    MAX_ATTEMPTS = 3  # total tries before failing
 
+    for attempt in range(MAX_ATTEMPTS):
+        # Success path: cap not detected
+        if not check_line_break():
+            return
+
+        # Still detected
+        print(f"⚠️ Cap detected. Attempt {attempt + 1} of {MAX_ATTEMPTS}...")
+
+        if attempt == 0:
+            time.sleep(1.0)
+            mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+            mill.move_to_position(target_coords.x, target_coords.y + 5, target_coords.z, tool="decapper")
+            time.sleep(1.0)
+            ard_link.ALL_CAP() 
+            time.sleep(1.0)
+            mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
+            time.sleep(1.0)
         else:
             mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
-            time.sleep(0.5)
-            ard_link.ALL_CAP
+            mill.move_to_position(target_coords.x, target_coords.y + 5, target_coords.z, tool="decapper")
+            time.sleep(1.0)
+            ard_link.ALL_CAP() 
             time.sleep(1.0)
             mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
             time.sleep(1.0)
 
-            if check_line_break():
-                raise ValueError("Cap still detected after manual intervention.")
+        # Re-check after the action
+        if not check_line_break():
+            return
+
+    # If we get here, all attempts failed
+    mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+    time.sleep(0.5)
+    ard_link.ALL_CAP()
+    time.sleep(1.0)
+    mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
+    time.sleep(1.0)
+
+    if check_line_break():
+        print("⚠️ Cap still detected after capping.")
+        raise ValueError("Cap still detected after manual intervention.")
+
 '''
 def capping_sequence(
     mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink

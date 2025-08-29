@@ -29,7 +29,7 @@ from panda_shared.db_setup import SessionLocal
 def measure_contact_angle(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
-    session_maker,             # was `session`; this name matches how replace_tip expects it
+    session_maker,             
     tiprack_id: int,
     file_tag: str = "ContactAngle",
 ) -> EchemExperimentBase:

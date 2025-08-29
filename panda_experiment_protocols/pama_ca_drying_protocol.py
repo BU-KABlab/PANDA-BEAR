@@ -31,6 +31,7 @@ from panda_shared.db_setup import SessionLocal
 from panda_lib.sql_tools.queries.racks import select_current_rack_id
 from panda_lib.actions.pipetting import replace_tip
 from panda_shared.db_setup import SessionLocal
+from tests.unit.actions.test_actions import toolkit
 
 
 PROTOCOL_ID = 30 
@@ -65,14 +66,13 @@ def pama_ca_drying(
     
     """ 
 
-    pama_deposition(
-        experiment=experiment,
-        toolkit=toolkit,
-    )
+    # pama_deposition(experiment=experiment, toolkit=toolkit)
    
     # pama_ipa_contact_angle(experiment=experiment, toolkit=toolkit)
 
-    well_rinse_image(experiment=experiment, toolkit=toolkit)
+    # well_rinse_image(experiment=experiment, toolkit=toolkit)
+    
+    pama_contact_angle(experiment=experiment, toolkit=toolkit)
 
     experiment.set_status_and_save(ExperimentStatus.COMPLETE)
 
@@ -429,5 +429,52 @@ def well_rinse_image(
         image_well(toolkit=toolkit, experiment=experiment, image_label=f"AfterDrying_{time_min}min")
         previous_time = time_min
 
-
+    measure_contact_angle(
+        toolkit=toolkit,
+        experiment=experiment,
+        session_maker=SessionLocal,
+        tiprack_id=select_current_rack_id(),
+        file_tag="final_CA_measurement",
+    )
     toolkit.global_logger.info("Drying imaging complete\n\n")
+
+
+def pama_contact_angle(
+    experiment: EchemExperimentBase,
+    toolkit: Toolkit,
+):
+    """
+    
+    0. Image well
+    1. Contact angle measurement
+    2. Rinse with IPA
+    
+    Args:
+        experiment (EchemExperimentBase): _description_
+        toolkit (Toolkit): _description_
+    """
+    toolkit.global_logger.info(
+        "Running experiment %s part 2", experiment.experiment_id
+    )
+    toolkit.global_logger.info("Image well")
+    experiment.set_status_and_save(ExperimentStatus.IMAGING)
+    image_well(
+        toolkit=toolkit,
+        experiment=experiment,
+        image_label="BeforeExperiment",
+    )
+    toolkit.global_logger.info("Measuring contact angle after 1 day")
+    experiment.set_status_and_save(ExperimentStatus.MEASURING_CA)
+    measure_contact_angle(
+        toolkit=toolkit,
+        experiment=experiment,
+        session_maker=SessionLocal,           
+        tiprack_id=select_current_rack_id(),  
+        file_tag="CA_after1day",
+    )
+    image_well(
+        toolkit=toolkit,
+        experiment=experiment,
+        image_label="AfterContactAngle",
+    )
+    toolkit.global_logger.info("Contact angle measurement complete\n\n")

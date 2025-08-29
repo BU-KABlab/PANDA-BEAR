@@ -108,10 +108,6 @@ def image_well(
 
                     # Define brightness levels and associated functions
                     brightness_levels = [
-                        ("05", toolkit.arduino.ca_lights_on_5),
-                        ("10", toolkit.arduino.ca_lights_on_10),
-                        ("20", toolkit.arduino.ca_lights_on_20),
-                        ("30", toolkit.arduino.ca_lights_on_30),
                         ("50", toolkit.arduino.ca_lights_on_50),
                     ]
 
