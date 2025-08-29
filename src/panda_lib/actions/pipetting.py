@@ -684,7 +684,7 @@ def mix(
         mix_height (float): The height to mix at
     """
     if mix_height is None:
-        mix_height = well.well_data.bottom + well.well_data.height
+        mix_height = well.well_data.bottom + 2
     else:
         mix_height = well.well_data.bottom + mix_height
 
@@ -693,8 +693,6 @@ def mix(
 
     logger.info("Mixing well %s %dx...", well.name, mix_count)
 
-    # Withdraw air for blow out volume
-    toolkit.pipette.aspirate(40)
 
     for i in range(mix_count):
         logger.info("Mixing well %s %d of %d...", well.name, i + 1, mix_count)
@@ -702,33 +700,23 @@ def mix(
         toolkit.mill.safe_move(
             x_coord=well.x,
             y_coord=well.y,
-            z_coord=well.bottom,
+            z_coord=well.bottom + 2,
             tool=Instruments.PIPETTE,
         )
 
         # Withdraw the solutions from the well
-        toolkit.pipette.aspirate(
+        toolkit.pipette.mix(
             volume,
-            solution=well,
-            rate=toolkit.pipette.max_pump_rate,
+            solution=well
         )
+    toolkit.mill.move_to_position(
+        x_coord=well.x,
+        y_coord=well.y,
+        z_coord=well.top + 2,
+        tool=Instruments.PIPETTE,
+    )
+    toolkit.pipette.blowout_no_tracker()
 
-        toolkit.mill.safe_move(
-            x_coord=well.x,
-            y_coord=well.y,
-            z_coord=well.top,
-            tool=Instruments.PIPETTE,
-        )
-
-        # Deposit the solution back into the well
-        toolkit.pipette.dispense(
-            volume_to_dispense=volume,
-            being_infused=None,
-            infused_into=well,
-            rate=toolkit.pipette.max_pump_rate,
-        )
-
-    toolkit.pipette.dispense(40)
     toolkit.mill.move_to_safe_position()
     return 0
 

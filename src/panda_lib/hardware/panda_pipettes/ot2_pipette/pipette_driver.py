@@ -318,8 +318,8 @@ class Pipette:
         return self.aspirate(vol, s)
 
 
-    def mix(self, vol: float, n: int, s: int = 2500): #TODO make function for this specifically, don't just use aspirate and dispense
-        """Mixes liquid by alternating aspirate and dispense steps for the specified number of times
+    def mix(self, vol: float, n: int, s: int = 2500): 
+        """Mixes liquid by moving plunger a set distance (calculated from volume specified) for the specified number of times
 
         :param vol: The volume of liquid to mix in uL
         :type vol: float
@@ -335,12 +335,8 @@ class Pipette:
             logger.info("Mixed %s uL %s times at speed %s", vol, n, s)
             return True
         else:
-            # Fall back to manual mixing if the command failed
-            logger.warning("Mix command failed, falling back to manual mixing")
-            for _ in range(n):
-                self.aspirate(vol, s)
-                self.dispense(vol, s)
-            return True
+            logger.warning("Mix command failed")
+
 
     def drop_tip(self, s: int = 2000):
         """Moves the plunger to eject the pipette tip

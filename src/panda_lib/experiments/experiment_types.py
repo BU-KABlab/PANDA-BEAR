@@ -437,6 +437,7 @@ class EchemExperimentBase(ExperimentBase):
     baseline: int = 0  # Baseline
 
     dep_sol_conc: float = 0.0  # Deposition solution concentration
+    dep_sol2_conc: float = 0.0  # Co-deposition solution concentration (for use when two solutions concentrations are varied)
 
     flush_sol_name: str = ""  # Flush solution name
     flush_sol_vol: Union[int, float] = 0  # Flush solution volume
