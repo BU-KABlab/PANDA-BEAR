@@ -433,6 +433,36 @@ class OT2P300:
         )
 
         return None
+    
+    def blowout_no_tracker(self, rate: float | None = None) -> None:
+        """
+        Move plunger to BLOWOUT_POSITION to clear the tip after mixing.
+        NOTE: Call only when the tip is out of liquid (gantry lifted).
+
+        Args:
+            rate: Optional firmware velocity (steps/s). If None, uses firmware default.
+        """
+        # Log intent (avoid unit mismatch in the message)
+        if rate is None:
+            p300_control_logger.info("Blowout at firmware default velocity")
+        else:
+            p300_control_logger.info(f"Blowout at firmware velocity={rate}")
+
+        # Send dispense with volume=0 so firmware performs blowout
+        if rate is None:
+            success = self.pipette_driver.dispense(0.0)                    # -> CMD_PIPETTE_DISPENSE,0
+        else:
+            success = self.pipette_driver.dispense(0.0, float(rate))       # -> CMD_PIPETTE_DISPENSE,0,<rate>
+
+        if not success:
+            p300_control_logger.error("Blowout failed")
+            return
+
+        # On success, plunger is at blowout -> no liquid in tip
+        self.pipette_tracker.volume = 0
+        p300_control_logger.debug("Blowout complete; tracker volume reset to 0 µL")
+
+        return None
     #TODO remove this blowout function, but verify that nothing references it.
     ''' 
     def blowout(self, reprime: bool = True) -> bool:

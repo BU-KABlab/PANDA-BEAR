@@ -1338,27 +1338,27 @@ class ArduinoLink:
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE, volume)
         return response
-
-    def mix(
-        self, repetitions: int, volume: float, rate: Optional[float] = None
-    ) -> Dict[str, Any]:
+    
+    def mix(self, repetitions: int, volume: float, rate: Optional[float] = None) -> Dict[str, Any]:
         """
-        Mix by performing multiple aspirate/dispense cycles.
+        Mix in place by plunger oscillation.
 
         Args:
             repetitions: Number of mix cycles
-            volume: Volume to mix in µL
-            rate: Mixing rate in µL/s (optional)
+            volume: Stroke volume in µL (peak-to-peak per cycle)
+            rate: Optional; ignored if None. If set, it’s passed directly to firmware.
 
         Returns:
-            Dict: Response dictionary containing success status and any additional data.
+            Dict: Response from firmware
         """
         if rate is not None:
-            response = self.send(
-                PawduinoFunctions.CMD_PIPETTE_MIX, repetitions, volume, rate
-            )
+            # Pass directly to firmware (firmware will interpret as steps/sec)
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_MIX,
+                                repetitions, volume, rate)
         else:
-            response = self.send(PawduinoFunctions.CMD_PIPETTE_MIX, repetitions, volume)
+            # Don’t send a rate arg → firmware uses its default
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_MIX,
+                                repetitions, volume)
         return response
 
     def hello(self) -> bool:

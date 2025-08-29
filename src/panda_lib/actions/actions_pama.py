@@ -40,12 +40,11 @@ def measure_contact_angle(
     3. Rinse the well 3x with IPA
     """
     try:
-        image_well(toolkit, experiment, "BeforeExperiment", curvature_image=False, add_datazone=False)
+        image_well(toolkit, experiment, "BeforeCAmeasurement", curvature_image=False, add_datazone=False)
 
         toolkit.global_logger.info("0. Dispensing 10µL droplet of water into well")
         experiment.set_status_and_save(ExperimentStatus.DEPOSITING)
 
-        # do NOT overwrite the incoming tiprack_id
         # replace_tip(toolkit, session_maker=session_maker, tiprack_id=tiprack_id, tip_id=None)
 
         contact_angle_transfer(
@@ -54,7 +53,7 @@ def measure_contact_angle(
             dst_vessel=toolkit.wellplate.wells[experiment.well_id],
             toolkit=toolkit,
             ca_dispense_height=toolkit.wellplate.bottom + 4,
-            tiprack_id=tiprack_id,        # keep this only if contact_angle_transfer supports it
+            tiprack_id=tiprack_id,        
         )
 
         toolkit.global_logger.info("1. Imaging the well")
@@ -66,6 +65,7 @@ def measure_contact_angle(
             curvature_image=True,
             add_datazone=False,
         )
+        image_well(toolkit, experiment, "DuringCAmeasurement", curvature_image=False, add_datazone=False)
 
         toolkit.global_logger.info("2. Clearing well contents into waste")
         experiment.set_status_and_save(ExperimentStatus.CLEARING)
@@ -100,7 +100,7 @@ def measure_contact_angle(
                 toolkit=toolkit,
             )
 
-        image_well(toolkit, experiment, "AfterClearingWell", curvature_image=False, add_datazone=False)
+        image_well(toolkit, experiment, "AfterCA_ClearWell", curvature_image=False, add_datazone=False)
 
         return experiment
 
