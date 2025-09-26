@@ -14,7 +14,6 @@ import serial.tools.list_ports
 from serial import Serial
 
 # Define Enums and Custom Exceptions at the top
-#TODO: Fix issue with no autoreconnect when dealing with communication failure
 
 class PawduinoFunctions(enum.Enum):
     """Enum for Arduino commands"""
@@ -46,6 +45,7 @@ class PawduinoFunctions(enum.Enum):
     CMD_CONTACT_ON_20 = "25"
     CMD_CONTACT_ON_10 = "26"
     CMD_CONTACT_ON_5 = "27"
+    CMD_PIPETTE_ASPIRATE_REL = "28"  # Expected: 28,vol_uL,rate_opt
     
 
 class PawduinoReturnCodes(enum.Enum):
@@ -73,6 +73,7 @@ class PawduinoReturnCodes(enum.Enum):
     RESP_CONTACT_ON_20 = "OK:Contact angle lights on 20%"
     RESP_CONTACT_ON_10 = "OK:Contact angle lights on 10%"
     RESP_CONTACT_ON_5 = "OK:Contact angle lights on 5%"
+    RESP_PIPETTE_ASPIRATE_REL = "OK:Pipette aspirated relative"
 
 class ArduinoException(Exception):
     """Base class for Arduino communication errors."""
@@ -538,137 +539,6 @@ class ArduinoLink:
         with self._send_lock:
             return self._send_internal(cmd_enum_member, *args)
     
-    '''
-    #TODO: ensure new function works before deleting old function
-    def send(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
-        """
-        Send a command to the Arduino and get the response.
-        Handles command construction, retries, and basic response parsing.
-        Will block until a properly formatted response (starting with OK: or ERR:) is received,
-        or until the total timeout of 60 seconds is reached.
-
-        Args:
-            cmd_enum_member: The PawduinoFunctions enum member for the command.
-            *args: Any arguments required by the command.
-
-        Returns:
-            A dictionary containing:
-                'success': bool,
-                'raw_data': str (the raw string from Arduino after OK:/ERR:),
-                'parsed_data': dict (if response was JSON-like or key-value),
-                'error_message': str (if ERR: was received)
-        """
-        if (
-            not self.connected
-            or not self.configured
-            or not self.ser
-            or not self.ser.is_open
-        ):
-            self.logger.error("Send attempt while not connected or configured.")
-            raise ArduinoConnectionError("Not connected to Arduino.")
-
-        command_code = cmd_enum_member.value
-        command_str_parts = [command_code]
-        command_str_parts.extend(map(str, args))
-        command_to_send = ",".join(command_str_parts) + "\n"
-
-        self.logger.debug("Sending to Arduino: %s", command_to_send.strip())
-
-        # Set up total timeout of 60 seconds
-        start_time = time.time()
-        max_total_time = 60.0  # 1 minute total timeout
-        response_str = None
-
-        while time.time() - start_time < max_total_time:
-            try:
-                self.ser.flushInput()
-                self.ser.flushOutput()
-                self.ser.write(command_to_send.encode())
-
-                attempt_start_time = time.time()
-                attempts_remaining = True
-
-                # Keep reading until we get a properly formatted response or timeout
-                while attempts_remaining and time.time() - start_time < max_total_time:
-                    # Blocking read until a line ending is received
-                    raw_response_bytes = self.ser.readline()
-
-                    if not raw_response_bytes:
-                        elapsed = time.time() - attempt_start_time
-                        self.logger.warning(
-                            "No response from Arduino (elapsed: %.2fs, timeout: %ss) for: %s",
-                            elapsed,
-                            max_total_time,
-                            command_to_send.strip(),
-                        )
-
-                        # # If we've been waiting too long for this attempt, reset and try again
-                        # if elapsed >= max_total_time * 2:
-                        #     attempts_remaining = False
-
-                        time.sleep(1)
-                        continue
-
-                    response_str = raw_response_bytes.decode().strip()
-                    self.logger.debug(
-                        "Raw response: %s (elapsed: %.2fs)",
-                        response_str,
-                        time.time() - start_time,
-                    )
-
-                    # Only accept responses that start with OK: or ERR:
-                    if response_str.startswith("OK:") or response_str.startswith(
-                        "ERR:"
-                    ):
-                        return self._process_response(response_str, command_to_send)
-                    else:
-                        self.logger.warning(
-                            "Received malformed response: %s, continuing to wait for proper response",
-                            response_str,
-                        )
-                        # Keep trying with the current attempt
-                        time.sleep(1)
-
-            except serial.SerialTimeoutException:
-                self.logger.warning(
-                    "SerialTimeoutException (elapsed: %.2fs) for: %s",
-                    time.time() - start_time,
-                    command_to_send.strip(),
-                )
-                time.sleep(0.1)
-            except serial.SerialException as e:
-                self.logger.error(
-                    "Serial communication error (elapsed: %.2fs) for '%s': %s",
-                    time.time() - start_time,
-                    command_to_send.strip(),
-                    e,
-                    exc_info=True,
-                )
-                time.sleep(1)
-            except IOError as e:
-                self.logger.error(
-                    "IO error during send (elapsed: %.2fs) for '%s': %s",
-                    time.time() - start_time,
-                    command_to_send.strip(),
-                    e,
-                    exc_info=True,
-                )
-                time.sleep(1)
-
-            # Small delay before retrying
-            time.sleep(0.2)
-
-        # If we get here, we've reached the 1-minute timeout without a properly formatted response
-        elapsed = time.time() - start_time
-        self.logger.error(
-            "Total timeout exceeded (%.2f seconds) waiting for response to: %s",
-            elapsed,
-            command_to_send.strip(),
-        )
-        raise ArduinoTimeoutError(
-            f"Timeout after {elapsed:.1f} seconds waiting for properly formatted response for: {command_to_send.strip()}"
-        )
-    '''
     def _send_internal(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
         if (not self.connected) or (not self.configured) or (not self.ser) or (not self.ser.is_open):
             raise ArduinoConnectionError("Not connected to Arduino.")
@@ -683,7 +553,7 @@ class ArduinoLink:
             time.sleep(0.05)  # 50 ms settle
 
         start_time = time.monotonic()
-        deadline = start_time + 60.0
+        deadline = start_time + 120.0
         attempted_reconnect = False
 
         # Serialize the entire transaction (write + read loop)

@@ -663,8 +663,8 @@ def disconnect_from_instruments(instruments: Toolkit):
     if instruments.mill:
         instruments.mill.disconnect()
     # if instruments.flir_camera: instruments.flir_camera.DeInit()
-    #if instruments.camera:
-    #    instruments.camera.close()
+    if instruments.camera:
+        instruments.camera.close()
     if instruments.arduino:
         instruments.arduino.close()
     #if instruments.scale:

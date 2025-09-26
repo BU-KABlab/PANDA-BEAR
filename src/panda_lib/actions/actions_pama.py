@@ -1,5 +1,6 @@
 """Custom functions for the PANDA_SDL library which are specific to a particular experiment type."""
 
+import time
 from panda_lib.exceptions import (
     ContactAngleFailure,
 )
@@ -45,14 +46,12 @@ def measure_contact_angle(
         toolkit.global_logger.info("0. Dispensing 10µL droplet of water into well")
         experiment.set_status_and_save(ExperimentStatus.DEPOSITING)
 
-        # replace_tip(toolkit, session_maker=session_maker, tiprack_id=tiprack_id, tip_id=None)
-
         contact_angle_transfer(
             volume=10,
             src_vessel=solution_selector("water", 10),
             dst_vessel=toolkit.wellplate.wells[experiment.well_id],
             toolkit=toolkit,
-            ca_dispense_height=toolkit.wellplate.bottom + 4,
+            ca_dispense_height=toolkit.wellplate.bottom + 3,
             tiprack_id=tiprack_id,        
         )
 
@@ -66,7 +65,7 @@ def measure_contact_angle(
             add_datazone=False,
         )
         image_well(toolkit, experiment, "DuringCAmeasurement", curvature_image=False, add_datazone=False)
-
+        
         toolkit.global_logger.info("2. Clearing well contents into waste")
         experiment.set_status_and_save(ExperimentStatus.CLEARING)
         transfer(
@@ -75,7 +74,7 @@ def measure_contact_angle(
             dst_vessel=waste_selector("waste", 10),
             toolkit=toolkit,
         )
-
+        '''
         toolkit.global_logger.info("3. Rinsing the well 1x with IPA")
         experiment.set_status_and_save(ExperimentStatus.RINSING)
         for i in range(1):
@@ -101,7 +100,7 @@ def measure_contact_angle(
             )
 
         image_well(toolkit, experiment, "AfterCA_ClearWell", curvature_image=False, add_datazone=False)
-
+        '''
         return experiment
 
     except Exception as e:
@@ -110,10 +109,104 @@ def measure_contact_angle(
         raise ContactAngleFailure(experiment.experiment_id, experiment.well_id) from e
 
 
+def measure_contact_angle_timecourse(
+    experiment: EchemExperimentBase,
+    toolkit: Toolkit,
+    session_maker,             
+    tiprack_id: int,
+    file_tag: str = "ContactAngle",
+) -> EchemExperimentBase:
+    """
+    0. Dispense 10µL droplet of water into well
+    1. Measure contact angle by capturing images
+    2. Clear well contents into waste
+    3. Rinse the well 3x with IPA
+    """
+    try:
+        image_well(toolkit, experiment, "BeforeCAmeasurement", curvature_image=False, add_datazone=False)
+
+        toolkit.global_logger.info("0. Dispensing 10µL droplet of water into well")
+        experiment.set_status_and_save(ExperimentStatus.DEPOSITING)
+
+        contact_angle_transfer(
+            volume=10,
+            src_vessel=solution_selector("water", 10),
+            dst_vessel=toolkit.wellplate.wells[experiment.well_id],
+            toolkit=toolkit,
+            ca_dispense_height=toolkit.wellplate.bottom + 3,
+            tiprack_id=tiprack_id,
+        )
+
+        toolkit.global_logger.info("1. Imaging the well")
+        experiment.set_status_and_save(ExperimentStatus.IMAGING)
+                
+        for i in range(10):  # Capture images every minute for 10 minutes
+            image_well(
+                toolkit=toolkit,
+                experiment=experiment,
+                image_label=f"{file_tag}_{i}min",  # add timepoint to file_tag
+                curvature_image=True,
+                add_datazone=False,
+            )
+            image_well(
+                toolkit,
+                experiment,
+                f"DuringCAmeasurement_{i}min",
+                curvature_image=False,
+                add_datazone=False,
+            )
+
+            if i < 9:  # don’t sleep after the last image
+                time.sleep(60)
+
+
+
+        toolkit.global_logger.info("2. Clearing well contents into waste")
+        experiment.set_status_and_save(ExperimentStatus.CLEARING)
+        transfer(
+            volume=10,
+            src_vessel=toolkit.wellplate.wells[experiment.well_id],
+            dst_vessel=waste_selector("waste", 10),
+            toolkit=toolkit,
+        )
+
+        toolkit.global_logger.info("3. Rinsing the well 1x with IPA")
+        experiment.set_status_and_save(ExperimentStatus.RINSING)
+        for i in range(1):
+            toolkit.global_logger.info("Rinse %d of 1", i + 1)
+            transfer(
+                volume=200,
+                src_vessel=solution_selector("acn", 200),
+                dst_vessel=toolkit.wellplate.wells[experiment.well_id],
+                toolkit=toolkit,
+            )
+
+            toolkit.mill.safe_move(
+                x_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "x"),
+                y_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "y"),
+                z_coord=toolkit.wellplate.top,
+                tool=Instruments.PIPETTE,
+            )
+            transfer(
+                volume=200,
+                src_vessel=toolkit.wellplate.wells[experiment.well_id],
+                dst_vessel=waste_selector("waste", 200),
+                toolkit=toolkit,
+            )
+
+        image_well(toolkit, experiment, "AfterCA_ClearWell", curvature_image=False, add_datazone=False)
+
+        return experiment
+
+    except Exception as e:
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
+        toolkit.global_logger.error("Exception occurred during contact angle measurement: %s", e)
+        raise ContactAngleFailure(experiment.experiment_id, experiment.well_id) from e
+    
 def measure_contact_angle_norinse(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
-    session,
+    session_maker,
     tiprack_id: int,
     file_tag: str = "ContactAngle",
 ) -> EchemExperimentBase:
@@ -132,7 +225,7 @@ def measure_contact_angle_norinse(
             dst_vessel=toolkit.wellplate.wells[experiment.well_id],
             toolkit=toolkit,
             ca_dispense_height=toolkit.wellplate.bottom + 4,
-            session=session,
+            session_maker=session_maker,
             tiprack_id=tiprack_id,
         )
 

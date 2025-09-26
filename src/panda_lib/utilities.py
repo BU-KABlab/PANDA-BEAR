@@ -303,63 +303,92 @@ def solve_vials_ilp(
         return None, None, None
 
 
+
 def solve_multisolute_mix(
-    vial_comp: Dict[str, Dict[str, float]],  # {vial: {species: conc_in_units_per_vol}}
-    v_total: float,
-    target: Dict[str, float],                # {species: target_conc_in_same_units}
+    vial_comp: Dict[str, Dict[str, float]],  # {vial: {species: conc_in_mg_per_mL}}
+    v_total: float,                           # total volume in µL
+    target: Dict[str, float],                 # {species: target_conc_mg_per_mL}
     *,
-    min_vol: float = 10.0,
-    max_vol: Optional[float] = None,
-    allow_slack: bool = True                # if True, minimize sum of abs deviations
-) -> Tuple[Dict[str, float], Dict[str, float], float]:
+    min_vol: float = 10.0,                    # µL
+    max_vol: Optional[float] = None,          # µL
+    allow_slack: bool = True                  # if True, minimize sum of abs deviations
+) -> Tuple[Optional[Dict[str, float]], Optional[Dict[str, float]], Optional[float]]:
     """
-    Returns (vol_by_vial, species_deviation, objective_value).
-    If allow_slack=False, enforces exact species targets (feasible problems only).
-    Units are arbitrary but must be consistent.
+    Returns (vol_by_vial_µL, species_deviation, objective_value).
+    Concentrations are mg/mL; volumes are µL.
     """
     vials = list(vial_comp.keys())
     species = list(target.keys())
-    if max_vol is None: max_vol = v_total
+    if max_vol is None:
+        max_vol = v_total
 
     prob = pulp.LpProblem("MultiSoluteMix", pulp.LpMinimize)
     v = {p: pulp.LpVariable(f"V_{p}", lowBound=0, upBound=max_vol) for p in vials}
 
-    # Optional absolute deviations per species
+    # Slack vars for |deviation| if allowed
     if allow_slack:
         dpos = {s: pulp.LpVariable(f"dpos_{s}", lowBound=0) for s in species}
         dneg = {s: pulp.LpVariable(f"dneg_{s}", lowBound=0) for s in species}
+        # OBJECTIVE: minimize sum of absolute deviations
         prob += pulp.lpSum(dpos[s] + dneg[s] for s in species)
     else:
-        dpos = dneg = {s: 0 for s in species}  # dummy
+        dpos = {s: 0 for s in species}
+        dneg = {s: 0 for s in species}
+        # Ensure there is *always* an objective
+        prob += 0 * pulp.lpSum(v[p] for p in vials)
 
-    # Total volume
-    prob += pulp.lpSum(v[p] for p in vials) == v_total
+    # Total volume (µL)
+    prob += pulp.lpSum(v[p] for p in vials) == v_total, "total_volume"
 
-    # Species balances
+    # Species balances: conc (mg/mL) * vol (µL→mL) = mg
+    UL_TO_ML = 1e-3
     for s in species:
-        lhs = pulp.lpSum(vial_comp[p].get(s, 0.0) * v[p] for p in vials)
-        rhs = target[s] * v_total
+        lhs = pulp.lpSum(vial_comp[p].get(s, 0.0) * (v[p] * UL_TO_ML) for p in vials)  # mg
+        rhs = target[s] * (v_total * UL_TO_ML)                                         # mg
+        cname = f"balance_{s}"
         if allow_slack:
-            prob += lhs - rhs == dpos[s] - dneg[s]
+            prob += lhs - rhs == dpos[s] - dneg[s], cname
         else:
-            prob += lhs == rhs
+            prob += lhs == rhs, cname
 
-    # Per-vial minimum volume when used (soft usage: min_vol can be 0)
+    # Optional min volume per used vial
     if min_vol > 0:
         b = {p: pulp.LpVariable(f"B_{p}", cat="Binary") for p in vials}
         for p in vials:
-            prob += v[p] >= min_vol * b[p]
-            prob += v[p] <= max_vol * b[p]
+            prob += v[p] >= min_vol * b[p], f"min_use_{p}"
+            prob += v[p] <= max_vol * b[p], f"cap_use_{p}"
 
-    solver = pulp.PULP_CBC_CMD(msg=False)
-    status = prob.solve(solver)
+    # Solve
+    status = prob.solve(pulp.PULP_CBC_CMD(msg=False))
     if pulp.LpStatus[status] != "Optimal":
         return None, None, None
+    
+    def _val(x):
+        try:
+            vx = pulp.value(x)
+            return None if vx is None else float(vx)
+        except Exception:
+            return None
 
-    vol_by_vial = {p: float(pulp.value(v[p])) for p in vials}
-    species_dev = {s: (float(pulp.value(dpos[s] + dneg[s])) if allow_slack else 0.0) for s in species}
-    obj = float(pulp.value(prob.objective))
+    vol_by_vial = {}
+    for p in vials:
+        vp = _val(v[p])
+        if vp is None:
+            # If any variable lacks a value, treat as not solved
+            return None, None, None
+        vol_by_vial[p] = vp
+
+    # Species devs (0 if no slack)
+    species_dev = (
+        {s: float(_val(dpos[s]) + _val(dneg[s])) for s in species}
+        if allow_slack else {s: 0.0 for s in species}
+    )
+
+    # Safe objective read (falls back to 0.0)
+    obj = _val(prob.objective)
+    obj = 0.0 if obj is None else obj
     return vol_by_vial, species_dev, obj
+
 
 def file_picker(file_types=None):
     """Open a file picker dialog and return the selected file path."""

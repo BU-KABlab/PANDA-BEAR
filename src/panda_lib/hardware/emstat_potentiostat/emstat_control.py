@@ -7,10 +7,90 @@ import logging
 from decimal import Decimal
 from typing import Tuple
 import pandas as pd
+import inspect
 
 global COMPLETE_FILE_NAME
 logger = logging.getLogger("panda")
 
+# ========
+# Helpers
+# ========
+
+def _as_dict_like(params):
+    """Return a (key->value) mapping from params which may be a dict or object."""
+    if isinstance(params, dict):
+        return dict(params)
+    # object with attributes
+    return {k: getattr(params, k) for k in dir(params)
+            if not k.startswith("_") and hasattr(params, k)}
+
+def _coerce_float(v):
+    try:
+        return float(v)
+    except Exception:
+        return v
+
+def _coerce_int(v):
+    try:
+        return int(v)
+    except Exception:
+        return v
+
+def _normalize_cv_kwargs(params):
+    """
+    Accepts cv_parameters | dict | any attr object.
+    Returns kwargs filtered to what hp.potentiostat.CV accepts.
+    Handles common alias names (Gamry-style -> EmStat-style).
+    """
+    raw = _as_dict_like(params)
+
+    aliases = {
+        "CVvi": "Eini",
+        "CVap1": "Ev1",
+        "CVap2": "Ev2",
+        "CVvf": "Efin",
+        "sr1": "sr",
+        "sr2": "sr",  
+        "sr3": "sr",
+        "nCycles": "nSweeps",
+        "cycleCount": "nSweeps",
+        "step": "dE",
+        "step_size": "dE",
+        "file_stem": "fileName",
+        "filename": "fileName",
+        "name": "fileName",
+        "title": "header",
+    }
+
+    for old, new in list(aliases.items()):
+        if old in raw and new not in raw:
+            raw[new] = raw.pop(old)
+
+    # Coerce core fields to numeric types if present
+    numeric_float_keys = ("Eini","Ev1","Ev2","Efin","sr","dE","sens","sens2","E2")
+    for k in numeric_float_keys:
+        if k in raw and raw[k] is not None:
+            raw[k] = _coerce_float(raw[k])
+
+    numeric_int_keys = ("nSweeps",)
+    for k in numeric_int_keys:
+        if k in raw and raw[k] is not None:
+            raw[k] = _coerce_int(raw[k])
+
+    # Filter to CV.__init__ signature
+    sig = inspect.signature(hp.potentiostat.CV.__init__)
+    allowed = {name for name in sig.parameters if name != "self"}
+
+    kwargs = {k: v for k, v in raw.items() if (v is not None and k in allowed)}
+
+    # Optionally enforce a minimal set that EmStat needs
+    required = {"Eini","Ev1","Ev2","Efin","sr","dE","nSweeps","fileName","header"}
+    missing = [k for k in required if k not in kwargs]
+    if missing:
+        # You may prefer to log a warning and fill defaults instead of raising
+        raise ValueError(f"Missing required EmStat CV parameters: {missing}")
+
+    return kwargs
 
 # =====================
 # Parameter dataclasses
@@ -132,9 +212,60 @@ def OCP(params: potentiostat_ocp_parameters):
     ocp.run()
     # save_in_gamry_format(ocp.data, COMPLETE_FILE_NAME, params.header)
     return ocp.data
+
+def OCP_check(params: potentiostat_ocp_parameters):
+    """Run OCP experiment on EmStat"""
+    model = "emstat4_lr"
+    folder = read_data_dir()
+    global COMPLETE_FILE_NAME
+    setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
+    connected = setup.check_connection()
+    if not connected:
+            raise RuntimeError("Could not connect to Pstat")
+    COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
+    file_stem = pathlib.Path(COMPLETE_FILE_NAME).stem
+    ocp = hp.potentiostat.OCP(params.ttot, params.dt, file_stem, params.header)
+    ocp.run()
+    # save_in_gamry_format(ocp.data, COMPLETE_FILE_NAME, params.header)
+    return ocp.data
     
 
+def cyclic(params: cv_parameters | dict):
+    """Run CV experiment on EmStat (accepts dataclass OR dict)."""
+    model = "emstat4_lr"
+    folder = read_data_dir()
+    setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
+    if not setup.check_connection():
+        raise RuntimeError("Could not connect to Pstat")
 
+    global COMPLETE_FILE_NAME
+    COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
+    file_stem = pathlib.Path(COMPLETE_FILE_NAME).stem
+
+    if isinstance(params, dict):
+        params = {**params, "fileName": file_stem, "header": "CV"}
+    else:
+        if not getattr(params, "fileName", None): setattr(params, "fileName", file_stem)
+        if not getattr(params, "header", None):   setattr(params, "header", "CV")
+
+    kwargs = _normalize_cv_kwargs(params)
+    if "nSweeps" in kwargs:
+        kwargs["nSweeps"] = int(kwargs["nSweeps"])
+
+    logger.debug("EmStat CV kwargs: %s", kwargs)
+
+    try:
+        cv = hp.potentiostat.CV(**kwargs)
+    except TypeError:
+        logger.error("Failed to construct CV with kwargs=%s", kwargs)
+        raise
+
+    cv.run()
+    return cv.data
+
+
+'''
+Saving to verify new function works before replacing old one
 def cyclic(params: cv_parameters):
     """Run CV experiment on EmStat"""
     model = "emstat4_lr"
@@ -147,23 +278,23 @@ def cyclic(params: cv_parameters):
     COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
     file_stem = pathlib.Path(COMPLETE_FILE_NAME).stem
     cv = hp.potentiostat.CV(
-        params.Eini,
-        params.Ev1,
-        params.Ev2,
-        params.Efin,
-        params.sr,
-        params.dE,
-        params.nSweeps,
-        params.sens,
-        params.E2,
-        params.sens2,
-        file_stem,
-        params.header,
+        Eini=params.Eini,
+        Ev1=params.Ev1,
+        Ev2=params.Ev2,
+        Efin=params.Efin,
+        sr=params.sr,
+        dE=params.dE,
+        nSweeps=params.nSweeps,
+        sens=params.sens,
+        E2=params.E2,
+        sens2=params.sens2,
+        fileName=file_stem,
+        header=params.header,
     )
     cv.run()
     # save_in_gamry_format(cv.data, COMPLETE_FILE_NAME, params.header)
     return cv.data
-    
+'''
 
 
 def chrono(params: chrono_parameters):
@@ -289,23 +420,41 @@ def activecheck():
 def check_vf_range(filename) -> Tuple[bool, float]:
     """Check if the Vf value is in the valid range for an echem experiment."""
     try:
+        # Read with a tolerant parser:
+        # - treat '#' as comments
+        # - allow commas OR whitespace as separators
+        # - force exactly two columns (Time, Vf)
         ocp_data = pd.read_csv(
             filename,
-            sep=" ",
+            comment="#",
             header=None,
-            names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"],
+            names=["Time", "Vf"],
+            usecols=[0, 1],
+            sep=r"\s*,\s*|\s+",
+            engine="python",
+            skip_blank_lines=True,
         )
-        vf_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vf")]
-        logger.debug("Vf last row (sci): %.2E", Decimal(vf_last_row_scientific))
-        vf_last_row_decimal = float(vf_last_row_scientific)
-        logger.debug("Vf last row (float): %f", vf_last_row_decimal)
 
-        if -1 < vf_last_row_decimal and vf_last_row_decimal < 1:
-            logger.debug("Vf in valid range (-1 to 1). Proceeding to echem experiment")
+        # Ensure numeric; drop any rows that failed to parse
+        ocp_data["Time"] = pd.to_numeric(ocp_data["Time"], errors="coerce")
+        ocp_data["Vf"] = pd.to_numeric(ocp_data["Vf"], errors="coerce")
+        ocp_data = ocp_data.dropna(subset=["Time", "Vf"])
+
+        if ocp_data.empty:
+            raise ValueError(f"OCP file has no numeric data: {filename}")
+
+        vf_last_row_decimal = float(ocp_data["Vf"].iloc[-1])
+        # Scientific + float logs (no Decimal required)
+        # logger.debug("Vf last row (sci): %.2E", vf_last_row_decimal)
+        # logger.debug("Vf last row (float): %f", vf_last_row_decimal)
+
+        if 0.001 < abs(vf_last_row_decimal) < 0.5:
+            # logger.debug("Vf in valid range (0.001 to 0.5). Proceeding to echem experiment")
             return True, vf_last_row_decimal
         else:
-            logger.error("Vf not in valid range. Aborting echem experiment")
+            # logger.error("Vf not in valid range. Aborting echem experiment")
             return False, 0.0
+
     except Exception as error:
-        logger.error("Error occurred while checking Vf: %s", error)
+        # logger.error("Error occurred while checking Vf: %s", error)
         return False, 0.0

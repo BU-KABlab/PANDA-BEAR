@@ -2,7 +2,7 @@
     "name": "P300",
     "brand": "Opentrons OT2",
     "model": "P300 Gen 2",
-    "max_volume": 300,
+    "max_volume": 200,
     "min_volume": 1,
     "zero_position": 0.0,
     "prime_position":36,

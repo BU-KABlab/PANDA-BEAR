@@ -81,10 +81,10 @@ class OT2P300:
 
         # Set up database tracker for volumes and contents
         self.pipette_tracker = PipetteDBHandler()
-        self.pipette_tracker.set_capacity(
-            config.getfloat("P300", "pipette_capacity", fallback=200.0)
-        )  # µL
-
+        self.pipette_tracker.set_capacity(200)  # µL
+        #self.pipette_tracker.set_capacity(
+        #    config.getfloat("P300", "pipette_capacity", fallback=200.0)
+        #)  # µL
         # If there is volume in the pipette, warn the user
         if self.pipette_tracker.volume > 0:
             vessel_logger.warning(
@@ -188,9 +188,9 @@ class OT2P300:
                 return False
 
             # Use the pipette driver to aspirate air
-            #TODO fix the drip_stop function, because right now it uses aspirate as a function which starts at the prime position
+            
             # as is, the drip_stop function will push out the volume it already aspirated, then aspirate the drip_stop volume.
-            success = self.pipette_driver.aspirate( #TODO change this to an actual drip_stop function, not aspirate.
+            success = self.pipette_driver.drip_stop( 
                 vol=drip_volume, s=self.max_p300_rate
             )
 

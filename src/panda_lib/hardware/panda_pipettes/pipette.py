@@ -26,7 +26,7 @@ class PipetteDBHandler:
         self, pipette_id: int = None, db_session_maker: sessionmaker = SessionLocal
     ):
         """Initialize the pipette"""
-        self.capacity_ul: float = 0.0
+        self.capacity_ul: float = 200.0
         self.capacity_ml: float = 0.0
         self._volume_ul: float = 0.0
         self._volume_ml: float = 0.0

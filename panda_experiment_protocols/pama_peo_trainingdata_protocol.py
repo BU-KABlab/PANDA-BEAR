@@ -138,8 +138,8 @@ def pama_peo_deposition(
 
     # Either pull from your experiment (preferred):
     target = {
-        "pama": experiment.targets["pama_conc"],
-        "peo":  experiment.targets["peo_conc"],
+        "pama": experiment.dep_sol_conc,
+        "peo":  experiment.dep_sol2_conc,
     }
     # Or set explicitly for this run:
     # target = {"pama": 50.0, "peo": 50.0}  # mg/mL
@@ -182,16 +182,12 @@ def pama_peo_deposition(
             dst_vessel=toolkit.wellplate.wells[experiment.well_id],
             toolkit=toolkit,
         )
-        toolkit.global_logger.info("Flushing the pipette tip")
-        transfer(
-            volume=200,
-            src_vessel=solution_selector("dmf", 200),
-            dst_vessel=waste_selector("waste", 200),
-            toolkit=toolkit,
-        )
-        mix(toolkit=toolkit, well=toolkit.wellplate.wells[experiment.well_id],
-            volume=150, mix_count=3, mix_height=2)
 
+    toolkit.global_logger.info("Mixing solution in the well")
+
+    mix(toolkit=toolkit, well=toolkit.wellplate.wells[experiment.well_id],
+        volume=100, mix_count=3, mix_height=2)
+    
     # --- END MIXING STRATEGY ---
 
     ## Move the electrode to the well
@@ -245,7 +241,7 @@ def pama_peo_deposition(
     clear_well_res(
         toolkit=toolkit, 
         src_vessel=toolkit.wellplate.wells[experiment.well_id], 
-        dst_vessel=waste_selector("waste",200), 
+        dst_vessel=waste_selector("waste",100), 
         desired_volume=100
     )
 

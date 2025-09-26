@@ -1,3 +1,4 @@
+import time
 import logging
 from pathlib import Path
 from typing import Optional
@@ -160,7 +161,7 @@ def image_well(
                     )
                 else:
                     pass
-                
+                time.sleep(0.2)
                 toolkit.arduino.white_lights_on5()
                 logger.debug("Capturing image of well %s", experiment.well_id)
                 filepath, result = capture_new_image(

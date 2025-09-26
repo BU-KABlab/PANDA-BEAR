@@ -249,6 +249,21 @@ class Pipette:
 
         return response.get("success", False)
 
+    def drip_stop(self, vol: float, s: int = 2000):
+        """Moves the plunger upwards to aspirate air into the pipette tip
+        without going to PRIME_POSITION."""
+        logger.info("Performing drip stop with %s uL of air", vol)
+        response = self.stepper.send(CMD.CMD_PIPETTE_ASPIRATE_REL, vol, s)
+        if response.get("success", False):
+            if "value2" in response:
+                self.position = response["value2"]
+            logger.info("Aspirated %s uL (relative), new position: %s mm",
+                        vol, self.position)
+        else:
+            error_msg = response.get("message", "Unknown error")
+            logger.error("Failed drip stop %s uL: %s", vol, error_msg)
+        return response.get("success", False)
+
 
     def dispense(self, vol: float, s: int = 2000):
         """Moves the plunger downwards to dispense liquid out of the pipette tip

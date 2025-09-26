@@ -34,7 +34,7 @@ def main():
             experiments.append(
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
-                    protocol_name="pama_peo_ca_trainingdata_protocol",
+                    protocol_name="pama_peo_trainingdata_protocol",
                     analysis_id=999, 
                     well_id="C5",
                     wellplate_type_id=PLATE_TYPE,

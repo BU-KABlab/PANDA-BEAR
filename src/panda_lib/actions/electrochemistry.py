@@ -117,8 +117,8 @@ def open_circuit_potential(
     float
         The final open circuit potential voltage
     """
-    well = "test"
-    experiment = "test"
+    #well = "test"
+    #experiment = "test"
     try:
         if TESTING or testing:
             pstat = echem()
@@ -232,7 +232,7 @@ def ocp_check(
 
         if not passed:
             if (
-                abs(potential) < 0.001
+                abs(potential) < 0.01
             ):  # if the potential is less than 1mV, then the counter electrode maybe touching the working electrode
                 adjustment += adjust_by
                 log.error("OCP failed to read a potential")
@@ -253,6 +253,7 @@ def ocp_check(
                 raise OCPError("CV")
         else:
             break
+
 
 
 def perform_chronoamperometry(
@@ -567,12 +568,12 @@ def perform_cyclic_voltammetry(
     experiment: EchemExperimentBase,
     file_tag: str = None,
     overwrite_initial_voltage: bool = True,
-    custom_parameters = None,  # Remove type hint
-) -> Tuple[EchemExperimentBase]:
+    custom_parameters = None,
+) -> EchemExperimentBase:
     """
-    Cyclicvoltamety in a well. This includes the OCP and CV steps.
+    Cyclic voltammetry in a well. This includes the OCP and CV steps.
     Will perform OCP and then set the initial voltage for the CV based on the final OCP voltage.
-    To not change the instructions object, set overwrite_inital_voltage to False.
+    To not change the instructions object, set overwrite_initial_voltage to False.
     No pipetting is performed in this step.
     Rinse the electrode after characterization.
 
@@ -582,7 +583,7 @@ def perform_cyclic_voltammetry(
     Args:
         char_instructions (Experiment): The experiment instructions
         file_tag (str): The file tag to be used for the data files
-        overwrite_inital_voltage (bool): Whether to overwrite the initial voltage with the final OCP voltage
+        overwrite_initial_voltage (bool): Whether to overwrite the initial voltage with the final OCP voltage
         custom_parameters (potentiostat_cv_parameters): The custom CV parameters to be used
 
     Returns:
@@ -610,7 +611,7 @@ def perform_cyclic_voltammetry(
             experiment.project_campaign_id,
             experiment.well_id,
         )
-
+        cv_results = experiment.results
         try:
             # Fill in the correct parameters based on the potentiostat type
             if PSTAT == "gamry":
@@ -623,19 +624,15 @@ def perform_cyclic_voltammetry(
                 raise ValueError(
                     f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
                 )
-            pstat.OCP(
-                params,
-            )  # OCP
+
+            pstat.OCP(params)  # OCP
             pstat.activecheck()
 
         except Exception as e:
             experiment.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during OCP: %s", e)
             raise OCPError("CV") from e
-        (
-            ocp_char_pass,
-            ocp_final_voltage,
-        ) = pstat.check_vf_range(ocp_char_file)
+        (ocp_char_pass, ocp_final_voltage) = pstat.check_vf_range(ocp_char_file)
         experiment.results.set_ocp_cv_file(
             ocp_char_file, ocp_char_pass, ocp_final_voltage, file_tag
         )
@@ -668,14 +665,16 @@ def perform_cyclic_voltammetry(
             experiment.project_campaign_id,
             experiment.well_id,
         )
-        # FEATURE have cyclic return the max and min values for the characterization
-        # and save them to the results
+
         if overwrite_initial_voltage:
             experiment.cv_initial_voltage = ocp_final_voltage
 
-        if custom_parameters:  # if not none then use the custom parameters
+        if custom_parameters:  
             cv_params = custom_parameters
-            cv_params.CVvi = ocp_final_voltage  # still need to set the initial voltage, not overwriting the original
+            if hasattr(cv_params, "CVvi"):
+                cv_params.CVvi = ocp_final_voltage
+            elif hasattr(cv_params, "Eini"):
+                cv_params.Eini = ocp_final_voltage
         else:
             if PSTAT == "gamry":
                 cv_params = gamry_cv_parameters(
@@ -689,34 +688,24 @@ def perform_cyclic_voltammetry(
                     CVcycle=experiment.cv_cycle_count,
                 )
             elif PSTAT == "emstat":
-                # Emstat CV parameters are different, so we need to set them accordingly
-                if experiment.cv_cycle_count == 1:
-                    cv_params = emstat_cv_parameters(
-                        Eini=experiment.cv_initial_voltage,
-                        Ev1=experiment.cv_first_anodic_peak,
-                        Ev2=experiment.cv_second_anodic_peak,
-                        Efin=experiment.cv_final_voltage,
-                        sr=experiment.cv_scan_rate_cycle_1,
-                        dE=experiment.cv_step_size,
-                        nSweeps=1,  # Emstat does not support multiple sweeps in the same way
-                    )
-                else:
-                    # For multiple sweeps, we can set the second sweep parameters
-                    cv_params = emstat_cv_parameters(
-                        Eini=experiment.cv_initial_voltage,
-                        Ev1=experiment.cv_first_anodic_peak,
-                        Ev2=experiment.cv_second_anodic_peak,
-                        Efin=experiment.cv_final_voltage,
-                        sr=experiment.cv_scan_rate_cycle_1,
-                        dE=experiment.cv_step_size,
-                        nSweeps= experiment.cv_cycle_count,
-                        E2=experiment.cv_second_sweep_voltage,
-                        sens2=experiment.cv_second_sweep_sensitivity,
-                    )
+                cv_params = {
+                    "Eini":  float(experiment.cv_initial_voltage),
+                    "Ev1":   float(experiment.cv_first_anodic_peak),
+                    "Ev2":   float(experiment.cv_second_anodic_peak),
+                    "Efin":  float(experiment.cv_final_voltage),
+                    "sr":    float(experiment.cv_scan_rate_cycle_1),
+                    "dE":    float(experiment.cv_step_size),
+                    "nSweeps": int(experiment.cv_cycle_count),
+                }
+            else:
+                raise ValueError(
+                    f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+                )
 
         try:
             pstat.cyclic(cv_params)
             pstat.activecheck()
+            cv_results.set_cv_data_file(characterization_data_file, context=file_tag)
 
         except Exception as e:
             experiment.set_status_and_save(ExperimentStatus.ERROR)
@@ -741,12 +730,10 @@ def perform_cyclic_voltammetry(
         raise CVFailure(experiment.experiment_id, experiment.well_id) from e
     finally:
         try:
-            experiment.results.set_cv_data_file(characterization_data_file, file_tag)
-
+            if pstat:
+                pstat.pstatdisconnect()
         except Exception as e:
-            logger.error("Failed to set CV data file: %s", e)
-
-        pstat.pstatdisconnect()
+            logger.warning("Failed to disconnect potentiostat cleanly: %s", e)
 
     return experiment
 

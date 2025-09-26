@@ -298,7 +298,7 @@ def _pipette_action(
     - Multi-step transfers for volumes exceeding pipette capacity
     """
     repetitions = math.ceil(
-        desired_volume / (toolkit.pipette.pipette_tracker.capacity_ul - DRIP_STOP)
+        desired_volume / (toolkit.pipette.pipette_tracker.capacity_ul)
     )
     if isinstance(src_vessel, Well):
         repetition_vol = correction_factor(desired_volume / repetitions, 1.0)
@@ -334,7 +334,7 @@ def _pipette_action(
         toolkit.pipette.aspirate(repetition_vol, solution=src_vessel)
         time.sleep(3)  # Allow time for aspirate to complete
         toolkit.mill.move_to_safe_position()
-        #toolkit.pipette.drip_stop() #TODO: add this as a separation function to the pipette.cpp that does not use the aspirate function
+        # toolkit.pipette.drip_stop()
 
         if isinstance(src_vessel, StockVial):
             capping_sequence(
@@ -706,13 +706,12 @@ def mix(
 
         # Withdraw the solutions from the well
         toolkit.pipette.mix(
-            volume,
-            solution=well
+            repetitions=3, volume=150
         )
     toolkit.mill.move_to_position(
-        x_coord=well.x,
-        y_coord=well.y,
-        z_coord=well.top + 2,
+        x_coordinate=well.x,
+        y_coordinate=well.y,
+        z_coordinate=well.top + 2,
         tool=Instruments.PIPETTE,
     )
     toolkit.pipette.blowout_no_tracker()

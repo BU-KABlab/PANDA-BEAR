@@ -11,6 +11,7 @@ class ExperimentStatus(str, Enum):
     RUNNING = "running"
     OCPCHECK = "ocpcheck"
     DEPOSITING = "depositing"
+    DISPENSING = "dispensing"
     EDEPOSITING = "e_depositing"
     RINSING = "rinsing"
     ERINSING = "rinsing electrode"

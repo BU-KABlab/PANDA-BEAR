@@ -335,6 +335,8 @@ def decapping_sequence(
             time.sleep(1.0)
             mill.move_to_position(target_coords.x, target_coords.y, 0, tool="decapper")
             time.sleep(1.0)
+            if check_line_break():
+                return  # Success
         else:
             # Final failure
 
