@@ -3,6 +3,7 @@
 import json
 import logging
 import time
+from typing import Optional
 
 from panda_lib.hardware.panda_pipettes.sql_pipette import (
     SessionLocal,
@@ -25,11 +26,13 @@ class PipetteDBHandler:
         self, pipette_id: int = None, db_session_maker: sessionmaker = SessionLocal
     ):
         """Initialize the pipette"""
-        self.capacity_ul: float = 0.0
+        self.capacity_ul: float = 200.0
         self.capacity_ml: float = 0.0
         self._volume_ul: float = 0.0
         self._volume_ml: float = 0.0
         self.contents = {}
+        self.tip_id: Optional[str] = None
+        self.tip_rack_id: Optional[int] = None
         self.id = pipette_id
         self.uses = 0
         self.panda_unit_id = 99

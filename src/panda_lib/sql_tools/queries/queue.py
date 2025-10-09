@@ -19,7 +19,7 @@ from typing import Optional
 
 from sqlalchemy import and_, select
 
-from panda_shared import get_unit_id
+from panda_shared.config.config_tools import get_unit_id
 from panda_shared.db_setup import SessionLocal
 
 

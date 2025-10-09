@@ -1,4 +1,0 @@
-Pipette Validation Summary
-========================
-Date: 2025-06-09 17:06:16
-

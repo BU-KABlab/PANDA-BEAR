@@ -22,12 +22,17 @@ def home_mill():
         print("Homing mill...")
         mill.homing_sequence()
         print("Mill successfully homed!")
-        
+        '''
         # Move to a safe position
         print("Moving to safe position...")
-        mill.move_to_safe_position()
+        mill.safe_move(
+            x_coord=-80.0,
+            y_coord=-39.0,
+            z_coord=-52.0
+        )
         print("Mill in safe position")
-        
+        '''
+
     except Exception as e:
         print(f"Error: {e}")
     finally:

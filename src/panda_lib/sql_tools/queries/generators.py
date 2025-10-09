@@ -10,7 +10,7 @@ generators from the generators folder and running generators.
 import importlib
 import os
 
-from panda_shared import read_config
+from panda_shared.config.config_tools import read_config
 from panda_shared.db_setup import SessionLocal
 
 from ..models import ExperimentGenerators

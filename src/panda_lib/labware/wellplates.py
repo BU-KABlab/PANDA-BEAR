@@ -13,7 +13,8 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from panda_lib.exceptions import OverDraftException, OverFillException
+# from panda_lib.exceptions import OverDraftException, OverFillException
+from panda_lib.exceptions import OverFillException
 from panda_lib.hardware.gantry_interface import Coordinates
 from panda_lib.labware.services import WellplateService, WellService, get_unit_id
 from panda_lib.sql_tools import (
@@ -27,7 +28,7 @@ from panda_lib.types import WellKwargs
 from panda_shared.config.config_tools import read_config_value
 from panda_shared.db_setup import SessionLocal
 
-from .schemas import (
+from panda_lib.labware.schemas import (
     PlateTypeModel,
     WellplateReadModel,
     WellplateWriteModel,
@@ -278,37 +279,43 @@ class Well:
 
     def remove_contents(self, volume: float) -> dict:
         """
-        Remove contents from the well
+        Remove contents from the well.
 
         Parameters:
         -----------
         volume: float
-            The volume to remove
+            The volume to remove, which may exceed the recorded volume.
+            This handles physical cases where residual solvent exists.
 
-        Raises:
-        -------
-        OverDraftException
-            If the well is overdrafted
+        Returns:
+        --------
+        removed_contents: dict
+            Dictionary of removed content volumes by component.
         """
-        if self.well_data.volume - volume < 0:
-            raise OverDraftException(
-                self.well_data.name,
-                self.well_data.volume,
-                -volume,
-                self.well_data.capacity,
-            )
+        current_volume = self.well_data.volume
+        total_content = sum(self.well_data.contents.values())
 
+        # Prevent divide by zero if no contents are left
+        if total_content == 0 or current_volume <= 0:
+            self.well_data.volume = 0.0
+            self.save()
+            return {key: 0.0 for key in self.well_data.contents}
+
+        # Proportional removal based on actual contents
         current_content_ratios = {
-            key: value / sum(self.well_data.contents.values())
+            key: value / total_content
             for key, value in self.well_data.contents.items()
         }
+
         removed_contents = {}
         for key in self.well_data.contents:
             removed_volume = round(volume * current_content_ratios[key], 6)
-            self.well_data.contents[key] -= removed_volume
+            self.well_data.contents[key] = max(self.well_data.contents[key] - removed_volume, 0.0)
             removed_contents[key] = removed_volume
 
-        self.well_data.volume -= volume
+        # Logically subtract, but clamp to zero to avoid negative volume
+        self.well_data.volume = max(self.well_data.volume - volume, 0.0)
+
         self.save()
         return removed_contents
 
@@ -608,7 +615,7 @@ class Wellplate:
     def bottom(self):
         """The z-coordinate of the wellplate bottom"""
         return self.plate_data.bottom
-
+    
     @property
     def echem_height(self):
         return self.plate_data.echem_height + self.plate_data.bottom
@@ -723,7 +730,7 @@ def _remove_experiment_from_db(
         return False, f"Error occurred while deleting the experiment: {e}"
 
 
-def load_configuration(filename: str = "hardware/grbl_cnc_mill/_configuration.json"):
+def load_configuration(filename: str = "src/panda_lib/hardware/grbl_cnc_mill/_configuration.json"):
     """Load the configuration from the JSON file"""
 
     filename: Path = Path(filename)
@@ -738,7 +745,7 @@ def load_configuration(filename: str = "hardware/grbl_cnc_mill/_configuration.js
 
 
 def save_configuration(
-    config, filename: str = "hardware/grbl_cnc_mill/_configuration.json"
+    config, filename: str = "src/panda_lib/hardware/grbl_cnc_mill/_configuration.json"
 ):
     """Save the configuration to the JSON file"""
 
@@ -924,5 +931,6 @@ def read_current_wellplate_info(
 
 
 if __name__ == "__main__":
+    change_wellplate_location()
     # Lets add a wellplate to the database
     pass

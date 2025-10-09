@@ -7,6 +7,8 @@ from .actions_pgma import (
     cyclic_volt_pgma_fc,
     cyclic_volt_pgma_pama,
 )
+from .actions_pama import (measure_contact_angle, measure_contact_angle_norinse)
+
 from .electrochemistry import (
     move_to_and_perform_ca,
     move_to_and_perform_cv,
@@ -22,6 +24,7 @@ from .pipetting import (
     purge_pipette,
     rinse_well,
     transfer,
+    contact_angle_transfer,
     volume_correction,
 )
 from .vessel_handling import _handle_source_vessels, solution_selector, waste_selector
@@ -35,6 +38,9 @@ __all__ = [
     # From .actions_pgma
     "cyclic_volt_pgma_fc",
     "cyclic_volt_pgma_pama",
+    # From .actions_pama
+    "measure_contact_angle",
+    "measure_contact_angle_norinse",
     # From .electrochemistry
     "move_to_and_perform_ca",
     "move_to_and_perform_cv",
@@ -55,6 +61,7 @@ __all__ = [
     "purge_pipette",
     "rinse_well",
     "transfer",
+    "contact_angle_transfer",
     "volume_correction",
     # From .vessel_handling
     "_handle_source_vessels",

@@ -22,7 +22,7 @@ if pipette_type == "WPI":
     else:
         from .wpi_syringe_pump.syringepump import SyringePump as Pipette
 
-elif pipette_type == "OT2":
+elif pipette_type == "OT2P300":
     if read_testing_config():
         from .ot2_pipette.ot2P300 import MockOT2P300 as Pipette
     else:

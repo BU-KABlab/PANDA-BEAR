@@ -24,6 +24,7 @@
     "twxs.cmake",
     "yzhang.markdown-all-in-one",
     "ms-python.vscode-python-envs",
-    "vscode-arduino.vscode-arduino-community"
+    "vscode-arduino.vscode-arduino-community",
+    "alexcvzz.vscode-sqlite"
   ]
 }

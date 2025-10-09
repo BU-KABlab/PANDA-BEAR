@@ -4,15 +4,42 @@ from typing import Tuple
 
 from panda_lib.actions.electrochemistry import (
     ExperimentStatus,
-    cv_parameters,
     logger,
     perform_cyclic_voltammetry,
+    PSTAT,
+    TESTING,
 )
 from panda_lib.exceptions import (
     CVFailure,
     OCPError,
 )
 from panda_lib.experiments.experiment_types import EchemExperimentBase
+
+# Import the correct parameter classes based on potentiostat type
+if TESTING:
+    if PSTAT == "gamry":
+        from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+            cv_parameters,
+        )
+    elif PSTAT == "emstat":
+        from panda_lib.hardware.emstat_potentiostat.emstat_control_mock import (
+            cv_parameters,
+        )
+else:
+    if PSTAT == "gamry":
+        try:
+            from panda_lib.hardware.gamry_potentiostat.gamry_control import (
+                cv_parameters,
+            )
+        except ImportError:
+            # Fall back to mock if real Gamry not available
+            from panda_lib.hardware.gamry_potentiostat.gamry_control_mock import (
+                cv_parameters,
+            )
+    elif PSTAT == "emstat":
+        from panda_lib.hardware.emstat_potentiostat.emstat_control import (
+            cv_parameters,
+        )
 
 
 def cyclic_volt_pgma_fc(
@@ -52,7 +79,7 @@ def cyclic_volt_pgma_fc(
             # Do not change the instructions initial voltage during custom CV
             # We only change this for the deposition step which is the only step that
             # The instruction parameters apply to.
-            overwrite_inital_voltage=False,
+            overwrite_initial_voltage=False,
             custom_parameters=characterizing_cyclic_volt_params,
         )
 
@@ -111,7 +138,7 @@ def cyclic_volt_pgma_pama(
             # Do not change the instructions initial voltage during custom CV
             # We only change this for the deposition step which is the only step that
             # The instruction parameters apply to.
-            overwrite_inital_voltage=False,
+            overwrite_initial_voltage=False,
             custom_parameters=characterizing_cyclic_volt_params,
         )
 

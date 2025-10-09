@@ -84,6 +84,9 @@ dependencies = [
     "uv>=0.6.4",
     "simple-pyspin==0.1.1",
     "websocket-client==1.8.0",
+    "spinnaker-python",
+    "alembic",
+    "mako"
 ]
 
 [project.urls]
@@ -168,6 +171,7 @@ panda_sdl = { workspace = true }
 panda-lib = { workspace = true }
 hardpotato = { git = "https://github.com/BU-KABlab/hardpotato.git" }
 nesp-lib = { git = "https://github.com/BU-KABlab/nesp-lib-py.git" }
+spinnaker-python = { path = "../../spinnaker_python-4.2.0.46-cp310-cp310-linux_aarch64.whl" }
 
 [dependency-groups]
 dev = ["panda-lib"]

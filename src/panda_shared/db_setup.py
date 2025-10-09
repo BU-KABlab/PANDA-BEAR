@@ -20,6 +20,7 @@ database.
 """
 
 import os
+import re
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
@@ -48,7 +49,19 @@ else:
 if db_type == "sqlite":
     DATABASE_URL = f"sqlite:///{db_address}"
 elif db_type == "mysql":
-    DATABASE_URL = f"mysql+pymysql://{db_user}:{db_password}@{db_address}"
+    # Prefer full URL from config if present
+    db_url = config.get("PRODUCTION", "production_db_url", fallback=None)
+    if db_url:
+        DATABASE_URL = db_url.strip('"')
+    else:
+        # Parse db_address into host, port, dbname
+        # Example: "100.84.246.115:3306/panda"
+        match = re.match(r"([^:/]+):(\d+)/(.*)", db_address)
+        if match:
+            host, port, dbname = match.groups()
+            DATABASE_URL = f"mysql+pymysql://{db_user}:{db_password}@{host}:{port}/{dbname}"
+        else:
+            raise ValueError(f"Malformed db_address: {db_address}")
 else:
     raise ValueError(f"Unsupported database type: {db_type}")
 

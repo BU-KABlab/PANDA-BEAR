@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 from sqlalchemy import Integer, cast, func, insert, select, update
 from sqlalchemy.orm import Session
 
-from panda_shared import read_config_value
+from panda_shared.config.config_tools import read_config_value
 from panda_shared.db_setup import SessionLocal
 
 from ..models.wellplates import PlateTypes, WellModel, Wellplates

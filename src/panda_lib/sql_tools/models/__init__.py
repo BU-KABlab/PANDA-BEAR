@@ -31,6 +31,7 @@ from .protocols import Protocols
 # from .analyzers import
 from .vials import Vials, VialsBase, VialStatus
 from .wellplates import PlateTypes, WellModel, Wellplates
+from .racks import TipModel, Racks, RackTypes
 
 __all__ = [
     "Base",
@@ -59,4 +60,7 @@ __all__ = [
     "Pipette",
     "PipetteLog",
     "VialsBase",
+    "TipModel",
+    "Racks",
+    "RackTypes"
 ]

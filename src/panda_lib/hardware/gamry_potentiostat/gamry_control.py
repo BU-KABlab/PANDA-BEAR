@@ -397,7 +397,7 @@ def chrono(params: chrono_parameters):
     logger.debug("chrono: made it to run end")
 
 
-def OCP(OCPvi, OCPti, OCPrate):
+def OCP(params: potentiostat_ocp_parameters):
     """
     open circuit potential
 
@@ -426,7 +426,7 @@ def OCP(OCPvi, OCPti, OCPrate):
     DTAQ_SINK = GamryDtaqEvents(DTAQ, COMPLETE_FILE_NAME)
     CONNECTION = client.GetEvents(DTAQ, DTAQ_SINK)
 
-    SIGNAL.Init(PSTAT, OCPvi, OCPti, OCPrate, GAMRY_COM.PstatMode)
+    SIGNAL.Init(PSTAT, params.OCPvi, params.OCPti, params.OCPrate, GAMRY_COM.PstatMode)
     initializepstat()
 
     DTAQ.Init(PSTAT)

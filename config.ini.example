@@ -63,11 +63,6 @@ syringe_capacity = 1
 max_pumping_rate = 0.654
 units = MM
 
-[SCALE]
-port = COM6
-baudrate = 9600
-timeout = 10
-
 [CAMERA]
 camera_type = webcam 
 webcam_id = 0  

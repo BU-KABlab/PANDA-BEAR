@@ -8,7 +8,7 @@ while tracking volumes and contents.
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
 from typing import Any, Dict, Optional, Union
-
+import time
 from panda_lib.hardware.arduino_interface import ArduinoLink, MockArduinoLink
 from panda_lib.labware import Vial
 from panda_lib.labware import wellplates as wp
@@ -81,10 +81,10 @@ class OT2P300:
 
         # Set up database tracker for volumes and contents
         self.pipette_tracker = PipetteDBHandler()
-        self.pipette_tracker.set_capacity(
-            config.getfloat("P300", "pipette_capacity", fallback=300.0)
-        )  # µL
-
+        self.pipette_tracker.set_capacity(200)  # µL
+        #self.pipette_tracker.set_capacity(
+        #    config.getfloat("P300", "pipette_capacity", fallback=200.0)
+        #)  # µL
         # If there is volume in the pipette, warn the user
         if self.pipette_tracker.volume > 0:
             vessel_logger.warning(
@@ -102,7 +102,11 @@ class OT2P300:
             raise RuntimeError("Pipette driver initialization failed")
 
         p300_control_logger.info("OT2P300 initialized")
-
+    
+    @classmethod
+    def from_config(cls, stepper=None, config: Optional[dict] = None) -> "OT2P300":
+        return cls(arduino=stepper)
+    
     def __enter__(self):
         """Enter the context manager"""
         return self
@@ -184,9 +188,9 @@ class OT2P300:
                 return False
 
             # Use the pipette driver to aspirate air
-            #TODO fix the drip_stop function, because right now it uses aspirate as a function which starts at the prime position
+            
             # as is, the drip_stop function will push out the volume it already aspirated, then aspirate the drip_stop volume.
-            success = self.pipette_driver.aspirate( #TODO change this to an actual drip_stop function, not aspirate.
+            success = self.pipette_driver.drip_stop( 
                 vol=drip_volume, s=self.max_p300_rate
             )
 
@@ -280,8 +284,18 @@ class OT2P300:
         # If we have a solution, update the pipette contents and the solution volume
         if solution is not None and isinstance(solution, (Vial, wp.Well)):
             removed_contents = solution.remove_contents(volume_to_aspirate)
-            for soln, vol in removed_contents.items():
-                self.pipette_tracker.update_contents(soln, vol)
+
+            if removed_contents and sum(removed_contents.values()) > 0:
+                for soln, vol in removed_contents.items():
+                    self.pipette_tracker.update_contents(soln, vol)
+            else:
+                # No contents returned (e.g., overdraft), still update pipette volume as air or unknown liquid
+                self.pipette_tracker.volume += volume_to_aspirate
+                p300_control_logger.warning(
+                    f"Overdraft detected from {solution.name}. "
+                    f"Contents were empty but {volume_to_aspirate} µL was aspirated anyway. "
+                    "Pipette volume adjusted to reflect physical state."
+                )
 
             p300_control_logger.debug(
                 f"Aspirated: {volume_to_aspirate} µL at {rate} steps/s from {solution}. Pipette vol: {self.pipette_tracker.volume} µL"
@@ -417,6 +431,36 @@ class OT2P300:
             f"Dispensed: {volume_to_dispense} µL"
             f" at {rate} steps/s. Pipette vol: {self.pipette_tracker.volume} µL"
         )
+
+        return None
+    
+    def blowout_no_tracker(self, rate: float | None = None) -> None:
+        """
+        Move plunger to BLOWOUT_POSITION to clear the tip after mixing.
+        NOTE: Call only when the tip is out of liquid (gantry lifted).
+
+        Args:
+            rate: Optional firmware velocity (steps/s). If None, uses firmware default.
+        """
+        # Log intent (avoid unit mismatch in the message)
+        if rate is None:
+            p300_control_logger.info("Blowout at firmware default velocity")
+        else:
+            p300_control_logger.info(f"Blowout at firmware velocity={rate}")
+
+        # Send dispense with volume=0 so firmware performs blowout
+        if rate is None:
+            success = self.pipette_driver.dispense(0.0)                    # -> CMD_PIPETTE_DISPENSE,0
+        else:
+            success = self.pipette_driver.dispense(0.0, float(rate))       # -> CMD_PIPETTE_DISPENSE,0,<rate>
+
+        if not success:
+            p300_control_logger.error("Blowout failed")
+            return
+
+        # On success, plunger is at blowout -> no liquid in tip
+        self.pipette_tracker.volume = 0
+        p300_control_logger.debug("Blowout complete; tracker volume reset to 0 µL")
 
         return None
     #TODO remove this blowout function, but verify that nothing references it.
@@ -613,14 +657,18 @@ class OT2P300:
 
         return status
 
+    
+    @property
     def has_tip(self) -> bool:
-        """
-        Check if the pipette has a tip attached
-
-        Returns:
-            bool: True if a tip is attached, False otherwise
-        """
-        return self.pipette_driver.has_tip
+        """Return True if a tip is attached."""
+        return bool(getattr(self.pipette_driver, "has_tip", False))
+    
+    @has_tip.setter
+    def has_tip(self, value: bool) -> None:
+        self.pipette_driver.has_tip = bool(value)
+        p300_control_logger.debug(
+            f"Pipette tip status set to: {'attached' if self.pipette_driver.has_tip else 'detached'}"
+        )
 
     def set_tip_status(self, has_tip: bool) -> None:
         """
@@ -655,6 +703,47 @@ class OT2P300:
             float: Volume in microliters, rounded to PRECISION decimal places
         """
         return round(float(volume_ml) * self.ML_TO_UL, PRECISION)
+
+    def replace_tip(self) -> bool:
+        """
+        Replace the pipette tip using the configured driver method.
+        Disposes of the current tip (if present) and picks up a new one.
+        
+        Returns:
+            bool: True if tip replacement was successful, False otherwise.
+        """
+        # Log the intent
+        p300_control_logger.info("Initiating pipette tip replacement.")
+
+        # Drop current tip, if supported
+        if hasattr(self.pipette_driver, "drop_tip"):
+            drop_success = self.pipette_driver.drop_tip()
+            if not drop_success:
+                p300_control_logger.warning("Failed to drop current pipette tip.")
+                return False
+            time.sleep(1.0)
+            p300_control_logger.debug("Old tip dropped successfully.")
+        else:
+            p300_control_logger.warning("drop_tip() not implemented in pipette driver.")
+
+        # Pick up a new tip
+        if hasattr(self.pipette_driver, "pick_up_tip"):
+            pick_success = self.pipette_driver.pick_up_tip()
+            if not pick_success:
+                p300_control_logger.error("Failed to pick up a new pipette tip.")
+                return False
+            time.sleep(2.0)
+            p300_control_logger.debug("New pipette tip picked up successfully.")
+        else:
+            p300_control_logger.error("pick_up_tip() not implemented in pipette driver.")
+            return False
+
+        # Reset internal state if needed
+        self.pipette_tracker.reset_contents()
+        p300_control_logger.info("Pipette tip successfully replaced and volume reset.")
+
+        return True
+
 
 
 class MockOT2P300(OT2P300):

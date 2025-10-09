@@ -131,7 +131,8 @@ def get_config_path() -> str:
     # Otherwise use the standard config path
     var = get_env_var(
         "PANDA_SDL_CONFIG_PATH",
-        default=str(get_repo_path() / "config" / "settings.ini"),
+        # default=str(get_repo_path() / "config" / "settings.ini"),
+        default=str(get_repo_path() / "unit_2_config.ini"),
     )
 
     logger.debug(f"Using standard config path: {var}")

@@ -7,7 +7,7 @@ import datetime
 from pytz import utc
 
 from panda_lib.utilities import SystemState
-from panda_shared import read_config
+from panda_shared.config.config_tools import read_config
 from panda_shared.db_setup import SessionLocal
 
 from ..models import SystemStatus

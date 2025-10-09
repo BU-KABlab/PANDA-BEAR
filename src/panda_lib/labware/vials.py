@@ -128,14 +128,14 @@ class Vial:
     @property
     def withdrawal_height(self) -> float:
         """Returns the height of the vial from which contents are withdrawn."""
-        height = self.vial_data.volume_height - 2
+        height = self.vial_data.volume_height - 10
         bottom = self.bottom if self.bottom else 0
         if self.vial_data.dead_volume == 0:
-            dead_height = bottom
+            dead_height = bottom + 3.5
         else:
-            dead_height = bottom + self.vial_data.dead_volume / (
+            dead_height = bottom + 3.5 + ( self.vial_data.dead_volume / (
                 3.14 * self.vial_data.radius**2
-            )
+            ))
         if height < dead_height:
             return dead_height
         else:

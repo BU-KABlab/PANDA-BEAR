@@ -1,7 +1,7 @@
-from typing import Dict, Optional
-
-from pydantic import BaseModel, ConfigDict, Field
-
+from typing import Dict, Optional, Literal, Any
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+import json
+from datetime import datetime
 
 class DeckObjectModel(BaseModel):
     name: str
@@ -186,5 +186,105 @@ class WellplateWriteModel(BaseModel):
     )
     base_thickness: float = 1.0
     panda_unit_id: int = 99
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TipWriteModel(BaseModel):
+    rack_id: int
+    tip_id: str
+    status: str = "new"
+    status_date: Optional[datetime] = None
+    updated: Optional[datetime] = None
+    coordinates: Optional[Dict[str, Any]] = None
+    drop_coordinates: Optional[Dict[str, Any]] = None
+
+class TipReadModel(BaseModel):
+    rack_id: int
+    tip_id: str
+    status: str = "available"
+    tip_length: float = 0
+    pickup_height: float = 0
+    radius_mm: float = 0
+    capacity: int = 300
+    volume: float = 0
+    dead_volume: float = 0
+    contamination: int = 0
+    coordinates: Optional[dict]
+    drop_coordinates: Dict[str, Any] = Field(
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
+    name: Optional[str] = "default"
+
+
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("coordinates", "drop_coordinates", mode="before")
+    @classmethod
+    def parse_json(cls, v):
+        if isinstance(v, str) and v:
+            try:
+                return json.loads(v)
+            except Exception:
+                return None
+        return v
+
+class RackTypeModel(BaseModel):
+    id: int
+    count: int
+    rows: str
+    cols: int
+    shape: str
+    radius_mm: float
+    y_spacing: float
+    x_spacing: float
+    rack_length_mm: float
+    rack_width_mm: float
+    rack_height_mm: float
+    x_offset: float
+    y_offset: float
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RackReadModel(DeckObjectModel):
+    id: int  # is allowed to be None, the db will autoincrement
+    type_id: int
+    current: bool
+    a1_x: float
+    a1_y: float
+    orientation: int
+    rows: str
+    cols: int
+    pickup_height: float  # height of pipette to pick up tips
+    drop_coordinates: Dict[str, Any] = Field(
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
+
+    panda_unit_id: int
+    current: bool
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RackWriteModel(BaseModel):
+    id: Optional[int] = None  # is allowed to be None, the db will autoincrement
+    type_id: int
+    current: bool = False
+    a1_x: float = 0.0
+    a1_y: float = 0.0
+    orientation: int = 0
+    rows: str = "ABCD"
+    cols: int = 14
+    pickup_height: float = 0.0  # height of pipette to pick up tips
+    name: Optional[str] = f"{id}" if id is not None else None
+    coordinates: Dict[str, Any] = Field(
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
+    drop_coordinates: Dict[str, Any] = Field(
+        default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
+    )
+    current: bool = False
+    panda_unit_id: int = 2
 
     model_config = ConfigDict(from_attributes=True)

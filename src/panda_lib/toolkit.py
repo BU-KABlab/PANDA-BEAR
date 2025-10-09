@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from logging import Logger
 from typing import Union
 
-from panda_lib.hardware import ArduinoLink, PandaMill, Scale
+from panda_lib.hardware import ArduinoLink, PandaMill
 from panda_lib.hardware.imaging.camera_factory import CameraFactory, CameraType
 from panda_lib.hardware.imaging.interface import CameraInterface
 from panda_lib.hardware.panda_pipettes import (
@@ -20,6 +20,8 @@ from panda_shared.config.config_tools import (
     read_config_value,
     read_webcam_settings,
 )
+from panda_lib.hardware.panda_pipettes.ot2_pipette.ot2P300 import OT2P300
+
 
 if os.name == "nt":
     from panda_lib.hardware.gamry_potentiostat import gamry_control
@@ -50,7 +52,7 @@ class Toolkit:
             self.initialize_camera(use_mock_instruments)
         self.mill = kwargs.get("mill", None)
         self.scale = kwargs.get("scale", None)
-        self.pipette = kwargs.get("pump", None)
+        self.pipette = kwargs.get("pipette", None)
         self.wellplate = kwargs.get("wellplate", None)
         self.arduino = kwargs.get("arduino", None)
         self.slack_monitor = kwargs.get("slack_monitor", None)
@@ -58,7 +60,7 @@ class Toolkit:
         self.experiment_logger = kwargs.get("experiment_logger", None)
 
     mill: Union[PandaMill, None] = None
-    scale: Union[Scale, None] = None
+    # scale: Union[Scale, None] = None
     pipette: Union[Pipette, None] = None
     wellplate: Wellplate = None
     arduino: ArduinoLink = None
@@ -104,8 +106,8 @@ class Toolkit:
             self.camera.close()
         if self.arduino:
             self.arduino.close()
-        if self.scale:
-            self.scale.hw.close()
+        #if self.scale:
+        #    self.scale.hw.close()
         if self.pipette:
             self.pipette.close()
 
@@ -119,8 +121,8 @@ class Hardware:
         if self.camera is None:
             self.initialize_camera(use_mock_instruments)
         self.mill = kwargs.get("mill", None)
-        self.scale = kwargs.get("scale", None)
-        self.pipette = kwargs.get("pump", None)
+        #self.scale = kwargs.get("scale", None)
+        self.pipette = kwargs.get("pipette", None)
         self.wellplate = kwargs.get("wellplate", None)
         self.arduino = kwargs.get("arduino", None)
         self.slack_monitor = kwargs.get("slack_monitor", None)
@@ -128,7 +130,7 @@ class Hardware:
         self.experiment_logger = kwargs.get("experiment_logger", None)
 
     mill: Union[PandaMill, None] = None
-    scale: Union[Scale, None] = None
+    #scale: Union[Scale, None] = None
     pipette: Union[Pipette, None] = None
     arduino: ArduinoLink = None
     # include the global logger so that the hardware can log to the same file
@@ -196,7 +198,7 @@ def connect_to_instruments(
     """Connect to the PANDA SDL instruments:
     - PandaMill
     - Scale
-    - Pump
+    - Pipette
     - Camera (FLIR or Webcam)
     - Arduino
     Args:
@@ -210,12 +212,12 @@ def connect_to_instruments(
     instruments = Toolkit(
         use_mock_instruments=use_mock_instruments,
         mill=None,
-        scale=None,
-        pump=None,
+        #scale=None,
+        pipette=None,
         wellplate=None,
         global_logger=logger,
         experiment_logger=logger,
-        camera=None,
+        camera=CameraFactory.create_camera(camera_type=CameraType.FLIR),
         arduino=None,
     )
 
@@ -223,7 +225,6 @@ def connect_to_instruments(
         logger.info("Using mock instruments")
         instruments.mill = PandaMill()
         instruments.mill.connect_to_mill()
-        instruments.scale = Scale()
         instruments.pipette = Pipette()
         # pstat = echem_mock.GamryPotentiostat.connect()
         instruments.arduino = ArduinoLink()
@@ -247,66 +248,58 @@ def connect_to_instruments(
         # raise error
         incomplete = True
 
-    # Connect to scale
-    try:
-        logger.debug("Connecting to scale")
-        port = read_config_value("SCALE", "port")
-        if not port:
-            raise Exception("No scale port specified in the configuration file")
-        instruments.scale = Scale(address=port)
-        info_dict = instruments.scale.get_info()
-        model = info_dict["model"]
-        if not model:
-            instruments.scale.hw.close()
-            raise Exception("Scale connected but no model information returned")
-        logger.debug("Connected to scale: %s", model)
-
-    except Exception as error:
-        logger.error("No scale connected, %s", error)
-        instruments.scale = None
-        incomplete = True
-    finally:
-        if instruments.scale is not None:
-            try:
-                instruments.scale.disconnect()
-            except Exception as error:
-                logger.error("Error closing scale connection, %s", error)
-                instruments.scale = None
-                incomplete = True
-
     # Initialize the camera
     logger.debug("Connecting to camera")
-    if instruments.camera is None:
-        instruments.initialize_camera(use_mock=False)
+    #if instruments.camera is None:
+    #    instruments.initialize_camera(use_mock=False)
 
     # Connect to the camera
     if instruments.camera is not None:
-        if not instruments.camera.connect():
-            logger.error("Failed to connect to camera")
-            instruments.camera = None
-            incomplete = True
+        if instruments.camera.connect():
+            logger.error("Connected to FLIR camera successfully")
         else:
-            logger.debug("Connected to camera")
+            logger.debug("Failed to connect to FLIR camera")
     else:
-        logger.error("Failed to initialize camera")
+        logger.error("Failed to initialize FLIR camera")
         incomplete = True
 
     # Connect to Arduino
     try:
-        logger.debug("Connecting to Arduino")
-        arduino = ArduinoLink(port_address=read_config_value("ARDUINO", "port"))
-        if not arduino.configured:
-            logger.error("No Arduino connected")
+        cfg_port = (read_config_value("ARDUINO", "port") or "").strip()
+        # try the configured value first; if it's not "auto", also try auto as a fallback
+        candidates = [cfg_port] if cfg_port else []
+        if cfg_port.lower() != "auto":
+            candidates.append("auto")
+        if not candidates:
+            candidates = ["auto"]
+
+        arduino = None
+        for cand in candidates:
+            try:
+                logger.debug("Connecting to Arduino (port=%r)...", cand)
+                arduino = ArduinoLink(port_address=cand)
+                if arduino.configured:
+                    instruments.arduino = arduino
+                    logger.debug("Connected to Arduino on %s", arduino.port_address)
+                    break
+            except Exception as e:
+                logger.warning("Connect failed using %r: %s", cand, e, exc_info=True)
+                arduino = None
+
+        if not arduino or not arduino.configured:
+            logger.error("No Arduino connected (tried: %s)", ", ".join(map(repr, candidates)))
             incomplete = True
             instruments.arduino = None
-        logger.debug("Connected to Arduino")
-        instruments.arduino = arduino
+
     except Exception as error:
-        logger.error("Error connecting to Arduino, %s", error)
+        logger.error("Error connecting to Arduino: %s", error, exc_info=True)
         incomplete = True
+        instruments.arduino = None
+
 
     # Connect to the pump or pipette depending on configuration
     # Check if the config specifies a syringe pump. If not skip the check
+    '''
     syringe_pump = read_config_value("PIPETTE", "PIPETTE_TYPE")
     pump_port = read_config_value("PUMP", "PORT")
 
@@ -332,7 +325,21 @@ def connect_to_instruments(
             logger.error("No OT2 Pipette connected, %s", error)
             instruments.pipette = None
             incomplete = True
-
+    '''
+    # TODO: look into why the pump logic wasn't working, for now....specify pipette directly instead of syringe pump because it wasn't connecting to the pipette
+    try:
+        if instruments.arduino is None:
+            raise Exception("No Arduino connected")
+        instruments.pipette = OT2P300(arduino=instruments.arduino)
+        status = instruments.pipette.get_status()
+        if status:
+            logger.debug("Connected to OT2 Pipette")
+        else:
+            raise Exception("Failed to connect to OT2 Pipette")
+    except Exception as error:
+        logger.error("No OT2 Pipette connected, %s", error)
+        instruments.pipette = None
+        incomplete = True
     if incomplete:
         print("Not all instruments connected")
         return instruments, False
@@ -356,8 +363,8 @@ def test_instrument_connections(
     instruments = Toolkit(
         use_mock_instruments=use_mock_instruments,
         mill=None,
-        scale=None,
-        pump=None,
+        #scale=None,
+        pipette=None,
         wellplate=None,
         arduino=None,
         global_logger=logger,
@@ -376,10 +383,10 @@ def test_instrument_connections(
         instruments.mill.connect_to_mill()
         instruments.pipette = Pipette()
         instruments.arduino = ArduinoLink()
-        instruments.scale = Scale()
+        #instruments.scale = Scale()
         # Initialize the camera (mock)
         instruments.initialize_camera(use_mock=True)
-        connected_instruments = ["PandaMill", "Pump", "Arduino", "Camera"]
+        connected_instruments = ["PandaMill", "Pipette", "Arduino", "Camera"]
 
         print("\nMock instruments initialized successfully!")
         return instruments, True
@@ -400,28 +407,6 @@ def test_instrument_connections(
         logger.error("No mill connected, %s", error)
         print("PandaMill not found                        ", flush=True)
         disconnected_instruments.append("PandaMill")
-        incomplete = True
-
-    # Scale connection
-    print("Checking scale connection...", end="\r", flush=True)
-    try:
-        port = read_config_value("SCALE", "port")
-        if not port:
-            raise Exception("No scale port specified in the configuration file")
-        logger.debug("Connecting to scale")
-        with Scale(address=port) as scale:
-            info_dict = scale.get_info()
-            model = info_dict["model"]
-            if not model:
-                raise Exception("Scale connected but no model information returned")
-            logger.debug("Connected to scale: %s", model)
-            print("Scale connected                        ", flush=True)
-            connected_instruments.append("Scale")
-
-    except Exception as error:
-        logger.error("No scale connected, %s", error)
-        print("Scale not found                        ", flush=True)
-        disconnected_instruments.append("Scale")
         incomplete = True
 
     # Camera connection
@@ -599,6 +584,7 @@ def test_instrument_connections(
         disconnected_instruments.append("Arduino")
         incomplete = True
 
+    
     # Pump connection
     # Check if the config specifies a syringe pump. If not skip the check
     syringe_pump = read_config_value("PIPETTE", "PIPETTE_TYPE")
@@ -638,7 +624,7 @@ def test_instrument_connections(
             print("OT2 pipette not found                        ", flush=True)
             disconnected_instruments.append("OT2 Pipette")
             incomplete = True
-
+    
     else:
         print(
             "No pump port nor syringe pump specified in the configuration file",
@@ -681,7 +667,7 @@ def disconnect_from_instruments(instruments: Toolkit):
         instruments.camera.close()
     if instruments.arduino:
         instruments.arduino.close()
-    if instruments.scale:
-        instruments.scale.hw.close()
+    #if instruments.scale:
+    #    instruments.scale.hw.close()
     if instruments.pipette:
         instruments.pipette.close()

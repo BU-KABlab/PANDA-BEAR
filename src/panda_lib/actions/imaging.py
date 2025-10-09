@@ -1,3 +1,4 @@
+import time
 import logging
 from pathlib import Path
 from typing import Optional
@@ -57,6 +58,7 @@ def image_well(
     experiment: Optional[EchemExperimentBase] = None,
     image_label: Optional[str] = None,
     curvature_image: bool = False,
+    add_datazone: bool = False,
 ) -> None:
     """Move to and capture an image of a well.
 
@@ -93,46 +95,96 @@ def image_well(
             exp_id, pjct_id, cmpgn_id, well_id, image_label, PATH_TO_DATA
         )
 
-        # position lens above the well
-        logger.debug("Moving camera above well %s", well_id)
-        if well_id != "test":
-            toolkit.mill.safe_move(
-                x_coord=experiment.well.well_data.x,
-                y_coord=experiment.well.well_data.y,
-                z_coord=toolkit.wellplate.plate_data.image_height,
-                tool=Instruments.LENS,
-            )
-        else:
-            pass
-
         if TESTING:
             Path(filepath).touch()
+        
         else:
             if curvature_image:
-                toolkit.arduino.curvature_lights_on()
+                logger.debug("Moving camera above well %s", well_id)
+                if well_id != "test":
+                    x = experiment.well.well_data.x
+                    y = experiment.well.well_data.y
+                    z_start = toolkit.wellplate.plate_data.image_height
+                    num_steps = int(2.0 / 0.2) + 1  # 11 steps: 0, -0.2, ..., -2.0
+
+                    # Define brightness levels and associated functions
+                    brightness_levels = [
+                        ("50", toolkit.arduino.ca_lights_on_50),
+                    ]
+
+                    for i in range(num_steps):
+                        z = round(z_start + i * 0.2, 2)
+                        toolkit.mill.safe_move(
+                            x_coord=x,
+                            y_coord=y,
+                            z_coord=z,
+                            tool=Instruments.LENS,
+                        )
+
+                        for brightness_label, brightness_func in brightness_levels:
+                            success = brightness_func()
+                            if not success:
+                                logger.warning("Failed to set curvature lights to %s%% brightness", brightness_label)
+                                continue
+
+                            base_label = str(image_label) if image_label else ""
+                            
+                            z_str = f"{z:.2f}".replace(".", "-")  # replace . with p to avoid file extension confusion
+                            z_label = f"{base_label}_z{z_str}mm_b{brightness_label}"
+
+                            filepath_z = image_filepath_generator(
+                                exp_id, pjct_id, cmpgn_id, well_id, z_label, PATH_TO_DATA
+                            )
+                            logger.debug("Capturing image of well %s at Z=%.2f, brightness=%s%%",
+                                        experiment.well_id, z, brightness_label)
+                            filepath_result, result = capture_new_image(
+                                save=True, num_images=1, file_name=filepath_z, logger=logger,
+                            )
+                            toolkit.arduino.lights_off()
+
+                            if not result:
+                                logger.error("Failed to capture image at Z=%.2f, brightness=%s%%", z, brightness_label)
+                                continue
+                            experiment.results.append_image_file(filepath_result, context=z_label)
+                else:
+                    pass
+
+        
             else:
-                toolkit.arduino.white_lights_on()
-            logger.debug("Capturing image of well %s", experiment.well_id)
-            filepath, result = capture_new_image(
-                save=True, num_images=1, file_name=filepath, logger=logger
-            )
-            toolkit.arduino.lights_off()
+                logger.debug("Moving camera above well %s", well_id)
+                if well_id != "test":
+                    toolkit.mill.safe_move(
+                        x_coord=experiment.well.well_data.x,
+                        y_coord=experiment.well.well_data.y,
+                        z_coord=toolkit.wellplate.plate_data.image_height,
+                        tool=Instruments.LENS,
+                    )
+                else:
+                    pass
+                time.sleep(0.2)
+                toolkit.arduino.white_lights_on5()
+                logger.debug("Capturing image of well %s", experiment.well_id)
+                filepath, result = capture_new_image(
+                    save=True, num_images=1, file_name=filepath, logger=logger,
+                )
+                toolkit.arduino.lights_off()
 
-            if not result:
-                raise ImageFailure("Failed to capture image")
+                if not result:
+                    raise ImageFailure("Failed to capture image")
 
-            dz_filename = filepath.stem + "_dz" + filepath.suffix
-            dz_filepath = filepath.with_name(dz_filename)
+            if add_datazone:
+                dz_filename = filepath.stem + "_dz" + filepath.suffix
+                dz_filepath = filepath.with_name(dz_filename)
 
-            img: Image = add_data_zone(
-                experiment=experiment,
-                image=Image.open(filepath),
-                context=image_label,
-            )
-            img.save(dz_filepath)
-            experiment.results.append_image_file(
-                dz_filepath, context=image_label + "_dz"
-            )
+                img: Image = add_data_zone(
+                    experiment=experiment,
+                    image=Image.open(filepath),
+                    context=image_label,
+                )
+                img.save(dz_filepath)
+                experiment.results.append_image_file(
+                    dz_filepath, context=image_label + "_dz"
+                )
         logger.debug("Image of well %s captured", experiment.well_id)
 
         experiment.results.append_image_file(filepath, context=image_label)

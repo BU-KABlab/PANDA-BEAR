@@ -8,6 +8,21 @@ resolution-markers = [
 ]
 
 [[package]]
+name = "alembic"
+version = "1.16.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "mako" },
+    { name = "sqlalchemy" },
+    { name = "tomli" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/83/52/72e791b75c6b1efa803e491f7cbab78e963695e76d4ada05385252927e76/alembic-1.16.4.tar.gz", hash = "sha256:efab6ada0dd0fae2c92060800e0bf5c1dc26af15a10e02fb4babff164b4725e2", size = 1968161, upload-time = "2025-07-10T16:17:20.192Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c2/62/96b5217b742805236614f05904541000f55422a6060a90d7fd4ce26c172d/alembic-1.16.4-py3-none-any.whl", hash = "sha256:b05e51e8e82efc1abd14ba2af6392897e145930c3e0a2faf2b0da2f7f7fd660d", size = 247026, upload-time = "2025-07-10T16:17:21.845Z" },
+]
+
+[[package]]
 name = "annotated-types"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -358,6 +373,18 @@ wheels = [
 ]
 
 [[package]]
+name = "mako"
+version = "1.3.10"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markupsafe" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9e/38/bd5b78a920a64d708fe6bc8e0a2c075e1389d53bef8413725c63ba041535/mako-1.3.10.tar.gz", hash = "sha256:99579a6f39583fa7e5630a28c3c1f440e4e97a414b80372649c0ce338da2ea28", size = 392474, upload-time = "2025-04-10T12:44:31.16Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl", hash = "sha256:baef24a52fc4fc514a0887ac600f9f1cff3d82c61d4d700a1fa84d597b88db59", size = 78509, upload-time = "2025-04-10T12:50:53.297Z" },
+]
+
+[[package]]
 name = "markupsafe"
 version = "2.1.5"
 source = { registry = "https://pypi.org/simple" }
@@ -625,6 +652,7 @@ name = "panda-lib"
 version = "2.0"
 source = { editable = "." }
 dependencies = [
+    { name = "alembic" },
     { name = "annotated-types" },
     { name = "comtypes" },
     { name = "contourpy" },
@@ -644,6 +672,7 @@ dependencies = [
     { name = "kiwisolver" },
     { name = "lazy-loader" },
     { name = "linear-operator" },
+    { name = "mako" },
     { name = "markupsafe" },
     { name = "matplotlib" },
     { name = "mpmath" },
@@ -676,6 +705,7 @@ dependencies = [
     { name = "six" },
     { name = "slack-sdk" },
     { name = "smmap" },
+    { name = "spinnaker-python" },
     { name = "sqlalchemy" },
     { name = "sympy" },
     { name = "threadpoolctl" },
@@ -713,6 +743,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "alembic" },
     { name = "annotated-types", specifier = "==0.7.0" },
     { name = "black", marker = "extra == 'dev'", specifier = ">=24.3.0" },
     { name = "comtypes", specifier = "==1.4.8" },
@@ -733,6 +764,7 @@ requires-dist = [
     { name = "kiwisolver", specifier = "==1.4.7" },
     { name = "lazy-loader", specifier = "==0.4" },
     { name = "linear-operator", specifier = "==0.5.3" },
+    { name = "mako" },
     { name = "markupsafe", specifier = "==2.1.5" },
     { name = "matplotlib", specifier = "==3.9.2" },
     { name = "mpmath", specifier = "==1.3.0" },
@@ -770,6 +802,7 @@ requires-dist = [
     { name = "six", specifier = "==1.16.0" },
     { name = "slack-sdk", specifier = ">=3.4.0" },
     { name = "smmap", specifier = "==5.0.1" },
+    { name = "spinnaker-python", path = "../../spinnaker_python-4.2.0.46-cp310-cp310-linux_aarch64.whl" },
     { name = "sqlalchemy", specifier = "==2.0.34" },
     { name = "sympy", specifier = "==1.13.2" },
     { name = "threadpoolctl", specifier = "==3.5.0" },
@@ -1206,6 +1239,20 @@ dependencies = [
     { name = "scipy" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7c/84/8d40852637fa1a0132216cb2fed49a3ef1f7b09a727ee55d47832ddae038/softpotato-1.0.18.tar.gz", hash = "sha256:55f56dc8ba5feb495e0afc0a9ed475e7dc53a9dbeef6984e171e692f6dcba846", size = 21361, upload-time = "2022-10-25T21:12:59.64Z" }
+
+[[package]]
+name = "spinnaker-python"
+version = "4.2.0.46"
+source = { path = "../../spinnaker_python-4.2.0.46-cp310-cp310-linux_aarch64.whl" }
+dependencies = [
+    { name = "numpy" },
+]
+wheels = [
+    { filename = "spinnaker_python-4.2.0.46-cp310-cp310-linux_aarch64.whl", hash = "sha256:22cffbbb94a85fa0e6534827ff9ddb17bd8e192f85253bb9f3b2aec0f7b7b963" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "numpy", specifier = ">=2.0" }]
 
 [[package]]
 name = "sqlalchemy"

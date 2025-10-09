@@ -12,7 +12,7 @@ import sys
 import sqlalchemy as sa
 
 # Import models - assuming they're available in panda_lib.sql_tools
-from .panda_models import Base
+from panda_lib.sql_tools.models import Base
 
 
 def return_sql_dump_file():
@@ -125,3 +125,50 @@ def setup_database(db_path, sql_dump=None, drop_existing=False):
     except Exception as e:
         print(f"Error setting up database: {e}", file=sys.stderr)
         return False
+
+
+if __name__ == "__main__":
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.orm import sessionmaker
+    from panda_shared.config.config_tools import read_config
+
+    config = read_config()
+    db_type = config.get("PRODUCTION", "production_db_type")
+    db_address = config.get("PRODUCTION", "production_db_address")
+    db_user = config.get("PRODUCTION", "production_db_user", fallback=None)
+    db_password = config.get("PRODUCTION", "production_db_password", fallback=None)
+    db_url = config.get("PRODUCTION", "production_db_url", fallback=None)
+
+    if db_type == "sqlite":
+        DATABASE_URL = f"sqlite:///{db_address}"
+    elif db_type == "mysql":
+        if db_url:
+            DATABASE_URL = db_url.strip('"')
+        else:
+            import re
+
+            match = re.match(r"([^:/]+):(\d+)/(.*)", db_address)
+            if match:
+                host, port, dbname = match.groups()
+                DATABASE_URL = f"mysql+pymysql://{db_user}:{db_password}@{host}:{port}/{dbname}"
+            else:
+                raise ValueError(f"Malformed db_address: {db_address}")
+    else:
+        raise ValueError(f"Unsupported database type: {db_type}")
+
+    engine = create_engine(DATABASE_URL, echo=True)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+    try:
+        engine.connect()
+        print("Connection successful")
+        print("Tables in the database:")
+        with SessionLocal() as session:
+            if db_type == "sqlite":
+                result = session.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
+            else:
+                result = session.execute(text("SHOW TABLES;"))
+            for row in result:
+                print(row)
+    except Exception as e:
+        print(f"Connection failed: {e}")

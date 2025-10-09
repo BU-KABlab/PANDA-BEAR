@@ -11,14 +11,14 @@ logging.basicConfig(level=logging.INFO)
 # =====================
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class OCPParameters:
+class potentiostat_ocp_parameters:
     ttot: float = 1
     dt: float = 0.01
     fileName: str = "OCP"
     header: str = "OCP"
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class CVParameters:
+class cv_parameters:
     Eini: float = -0.5
     Ev1: float = 0.5
     Ev2: float = -0.5
@@ -33,7 +33,7 @@ class CVParameters:
     header: str = "CV"
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class CAParameters:
+class chrono_parameters:
     Estep: float = 0.5
     dt: float = 0.01
     ttot: float = 1
@@ -58,17 +58,17 @@ def validate_file_name(file_name: str) -> str:
 # Mock Experiment functions
 # =====================
 
-def OCP(params: OCPParameters):
+def OCP(params: potentiostat_ocp_parameters):
     logging.info(f"[MOCK] Running OCP with params: {params}")
     data = DummyData(params.ttot, params.dt)
     save_in_gamry_format(data, validate_file_name(params.fileName), params.header)
 
-def cyclic(params: CVParameters):
+def cyclic(params: cv_parameters):
     logging.info(f"[MOCK] Running CV with params: {params}")
     data = DummyData(2 * params.nSweeps * (params.Ev1 - params.Eini) / params.sr, params.dE)
     save_in_gamry_format(data, validate_file_name(params.fileName), params.header)
 
-def chrono(params: CAParameters):
+def chrono(params: chrono_parameters):
     logging.info(f"[MOCK] Running CA with params: {params}")
     data = DummyData(params.ttot, params.dt)
     save_in_gamry_format(data, validate_file_name(params.fileName), params.header)
