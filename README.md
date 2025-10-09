@@ -75,7 +75,7 @@ Polymer analysis and discovery array (PANDA) - self-driving lab (SDL): an automa
 
 ## Team
 
-- Harley Quinn
+- Dr. Harley Quinn
 - Gregory Robben
 - Zhaoyi Zhang
 - Alan Gardner
