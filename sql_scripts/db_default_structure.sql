@@ -44,17 +44,15 @@ CREATE TABLE IF NOT EXISTS panda_experiments (
     project_id          INTEGER,
     project_campaign_id INTEGER,
     well_type           INTEGER,
-    protocol_id         INTEGER,
-    pin                 TEXT,
-    experiment_type     INTEGER,
-    jira_issue_key      TEXT,
+    protocol_id         TEXT,
     priority            INTEGER DEFAULT 0,
-    process_type        INTEGER DEFAULT 0,
     filename            TEXT    DEFAULT NULL,
     created             TEXT    DEFAULT (CURRENT_TIMESTAMP),
     updated             TEXT    DEFAULT (CURRENT_TIMESTAMP),
     needs_analysis      INTEGER DEFAULT (0),
-    analysis_id         INTEGER
+    analysis_id         INTEGER,
+    panda_version       NUMERIC DEFAULT (1.0),
+    panda_unit_id       INTEGER
 );
 
 
@@ -716,11 +714,11 @@ CREATE VIEW IF NOT EXISTS panda_new_wellplates AS
 -- View: panda_pipette_status
 DROP VIEW IF EXISTS panda_pipette_status;
 CREATE VIEW IF NOT EXISTS panda_pipette_status AS
-    SELECT *
-      FROM panda_pipette-- WHERE updated = (SELECT MAX(updated) FROM pipette)
-     WHERE id = (
-                    SELECT MAX(id) 
-                      FROM panda_pipette
+    SELECT pp.*
+      FROM panda_pipette pp
+     WHERE pp.id = (
+                    SELECT MAX(pp2.id) 
+                      FROM panda_pipette pp2
                 )
      LIMIT 1;
 

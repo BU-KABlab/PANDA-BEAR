@@ -842,15 +842,15 @@ CREATE VIEW IF NOT EXISTS new_wellplates AS
     HAVING COUNT( * ) = 96;
 
 
--- View: pipette_status
-DROP VIEW IF EXISTS pipette_status;
-CREATE VIEW IF NOT EXISTS pipette_status AS
-    SELECT *
-      FROM pipette-- WHERE updated = (SELECT MAX(updated) FROM pipette)
-     WHERE id = (
-                    SELECT MAX(id) 
-                      FROM pipette
-                )
+-- View: panda_pipette_status
+DROP VIEW IF EXISTS panda_pipette_status;
+CREATE VIEW IF NOT EXISTS panda_pipette_status AS
+    SELECT pp.*
+      FROM panda_pipette pp
+     WHERE pp.id = (
+            SELECT MAX(pp2.id)
+              FROM panda_pipette pp2
+          )
      LIMIT 1;
 
 

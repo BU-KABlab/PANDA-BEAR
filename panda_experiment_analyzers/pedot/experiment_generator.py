@@ -7,7 +7,7 @@ from pedot_analyzer import analyze
 
 from panda_lib import scheduler
 from panda_lib.experiments import ExperimentStatus, experiment_types
-from panda_lib.sql_tools.sql_system_state import get_current_pin
+from panda_lib.sql_tools.queries.system import get_current_pin
 
 from .pedot_classes import PEDOTParams
 
@@ -23,7 +23,7 @@ def pedot_generator(
     experiment_id = scheduler.determine_next_experiment_id()
     experiment = experiment_types.EchemExperimentBase(
         experiment_id=experiment_id,
-        protocol_id=15,  # PEDOT protocol v4
+        protocol_name=15,  # PEDOT protocol v4
         well_id="A1",  # Default to A1, let the program decide where else to put it
         well_type_number=4,
         experiment_name=experiment_name,

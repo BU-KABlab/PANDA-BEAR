@@ -3,10 +3,7 @@
     "aaron-bond.better-comments",
     "analytic-signal.preview-tiff",
     "charliermarsh.ruff",
-    "esbenp.prettier-vscode",
-    "foxundermoon.shell-format",
     "github.vscode-pull-request-github",
-    "hangxingliu.vscode-systemd-support",
     "ms-python.debugpy",
     "ms-python.python",
     "ms-python.vscode-pylance",
@@ -22,14 +19,12 @@
     "ms-vscode.powershell",
     "ms-vscode.remote-explorer",
     "ms-vscode.remote-server",
-    "mtxr.sqltools",
-    "mtxr.sqltools-driver-mysql",
-    "mtxr.sqltools-driver-sqlite",
     "redhat.vscode-yaml",
     "tamasfe.even-better-toml",
     "twxs.cmake",
     "yzhang.markdown-all-in-one",
     "ms-python.vscode-python-envs",
-    "vscode-arduino.vscode-arduino-community"
+    "vscode-arduino.vscode-arduino-community",
+    "alexcvzz.vscode-sqlite"
   ]
 }

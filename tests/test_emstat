@@ -1,0 +1,20 @@
+import hardpotato as hp
+from pathlib import Path
+
+def test_emstat_connection():
+    folder = Path("/tmp")
+    model = "emstat4_lr"
+
+    try:
+        setup = hp.potentiostat.Setup(model, None, folder, verbose=1)
+        connected = setup.check_connection()
+        if connected:
+            print("✅ Successfully connected to EmStat potentiostat.")
+        else:
+            print("❌ Failed to connect: check_connection() returned False.")
+    except Exception as e:
+        print("❌ Exception during connection:")
+        print(e)
+
+if __name__ == "__main__":
+    test_emstat_connection()

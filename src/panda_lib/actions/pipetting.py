@@ -1,0 +1,788 @@
+import logging
+import math
+import time
+from typing import Optional, Union
+from panda_lib.exceptions import NoAvailableSolution
+from panda_lib.hardware.grbl_cnc_mill import Instruments
+from panda_shared.config.config_tools import (
+    ConfigParserError,
+    read_config,
+    read_testing_config,
+)
+from panda_shared.db_setup import SessionLocal
+from sqlalchemy.orm import Session, sessionmaker
+
+from ..experiments.experiment_types import (
+    EchemExperimentBase,
+    ExperimentBase,
+    ExperimentStatus,
+)
+from ..labware import StockVial, Vial, WasteVial, Well, Tip 
+from ..labware.services import TipService
+from ..labware.schemas import TipReadModel 
+from ..toolkit import Hardware, Labware, Toolkit
+from ..utilities import Coordinates, correction_factor
+from .movement import capping_sequence, decapping_sequence
+from .vessel_handling import _handle_source_vessels, solution_selector, waste_selector
+
+TESTING = read_testing_config()
+config = read_config()
+
+# Constants
+try:
+    blowout_volume = config.getfloat("DEFAULTS", "blowout_volume")
+    DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
+except ConfigParserError as e:
+    logging.error("Failed to read config file. Error: %s", e)
+    raise e
+
+# Set up logging
+logger = logging.getLogger("panda")
+testing_logging = logging.getLogger("panda")
+
+# Default location to discard tips when no drop coordinates are available
+DEFAULT_TIP_DROP_COORDINATES = {"x":-92.1,"y":-227.3,"z":-169.0}
+
+class NoTipAttachedError(Exception):
+    ...
+class TipAlreadyAttachedError(Exception):
+    ...
+def replace_tip(
+    toolkit: Union[Toolkit, Hardware],
+    session_maker: sessionmaker,
+    tiprack_id: int,
+    tip_id: Optional[str] = None
+) -> bool:
+    logger.info("Replacing pipette tip...")
+
+    # Validate session_maker type
+    if isinstance(session_maker, Session):
+        raise TypeError("replace_tip expects a session factory, not a live session")
+    if not isinstance(session_maker, sessionmaker):
+        raise TypeError("session_maker must be a SQLAlchemy sessionmaker instance")
+
+    tip_service = TipService(session_maker=session_maker)
+
+    # ----------------------------
+    # 1) Select next tip
+    # ----------------------------
+    # If tip_id is provided but not available/new, fall back to first unused in this rack.
+    if tip_id:
+        tip = tip_service.get_tip(tip_id=tip_id, rack_id=tiprack_id)
+        if not tip or str(getattr(tip, "status", "")).lower() != "new":
+            logger.warning(f"Tip '{tip_id}' unavailable or not new. Selecting next unused tip instead.")
+            tip = tip_service.get_first_unused_tip(rack_id=tiprack_id)
+    else:
+        tip = tip_service.get_first_unused_tip(rack_id=tiprack_id)
+
+    if not tip:
+        logger.warning(f"No unused tips available in rack {tiprack_id}.")
+        return False
+
+    # ----------------------------
+    # 2) Drop any currently attached tip - even if tracker says none
+    # ----------------------------
+    # Prefer tracker metadata for a precise drop location, else fallback to default.
+    current_tip_id = getattr(toolkit.pipette.pipette_tracker, "tip_id", None)
+    current_tip_rack_id = getattr(toolkit.pipette.pipette_tracker, "tip_rack_id", None)
+
+    drop_coords = None
+    if current_tip_id and current_tip_rack_id is not None:
+        old_tip = tip_service.get_tip(tip_id=current_tip_id, rack_id=current_tip_rack_id)
+        drop_coords = getattr(old_tip, "drop_coordinates", None)
+
+    if not drop_coords:
+        drop_coords = DEFAULT_TIP_DROP_COORDINATES
+
+    try:
+        toolkit.mill.safe_move(
+            drop_coords["x"], drop_coords["y"], drop_coords["z"],
+            tool=Instruments.PIPETTE
+        )
+    except Exception as e:
+        logger.warning(f"Safe move to drop location failed: {e}. Attempting drop anyway at current pos.")
+
+    # Try dropping regardless of tracker state. If no tip is attached, many drivers simply return False.
+    try:
+        dropped = toolkit.pipette.pipette_driver.drop_tip()
+    except Exception as e:
+        logger.warning(f"drop_tip raised an exception: {e}. Continuing as if no tip was attached.")
+        dropped = False
+
+    # If we believe a specific old tip was on, mark it discarded when the drop succeeds.
+    if dropped and current_tip_id:
+        try:
+            tip_service.update_tip(
+                tip_id=current_tip_id,
+                rack_id=current_tip_rack_id if current_tip_rack_id is not None else tiprack_id,
+                updates={"status": "discarded", "rack_id": current_tip_rack_id, "tip_id": current_tip_id},
+            )
+            logger.info(f"Old tip '{current_tip_id}' dropped and marked as discarded.")
+        except Exception as e:
+            logger.warning(f"Failed to mark previous tip discarded in DB: {e}")
+
+    # Reset tracker regardless, so we start clean for pickup.
+    toolkit.pipette.pipette_tracker.reset_contents()
+    toolkit.pipette.pipette_tracker.tip_id = None
+    toolkit.pipette.pipette_tracker.tip_rack_id = None
+    if hasattr(toolkit.pipette, "set_tip_status"):
+        toolkit.pipette.set_tip_status(False)
+    else:
+        toolkit.pipette.pipette_driver.has_tip = False
+
+    # ----------------------------
+    # 3) Prime pickup and approach the new tip
+    # ----------------------------
+    if not toolkit.pipette.pipette_driver.prime_tip_pickup():
+        logger.warning("Failed to prime pipette.")
+        return False
+
+    # Defensive guards for coordinates and heights
+    if not getattr(tip, "coordinates", None) or "x" not in tip.coordinates or "y" not in tip.coordinates:
+        logger.error(f"Tip '{tip.tip_id}' is missing XY coordinates.")
+        return False
+
+    pickup_height = getattr(tip, "pickup_height", None)
+    if pickup_height is None:
+        logger.warning(f"Tip '{tip.tip_id}' missing pickup_height. Using default height of 0.0.")
+        pickup_height = 0.0
+
+    approach_z = float(pickup_height) + 20.0
+
+    toolkit.mill.safe_move(
+        tip.coordinates["x"], tip.coordinates["y"], approach_z,
+        tool=Instruments.PIPETTE,
+        second_z_cord=pickup_height,
+        second_z_cord_feed=1000
+    )
+
+    # ----------------------------
+    # 4) Mark new tip used and update tracker
+    # ----------------------------
+    try:
+        tip_service.update_tip(
+            tip.tip_id, tip.rack_id,
+            {"rack_id": tip.rack_id, "tip_id": tip.tip_id, "status": "used"}
+        )
+    except Exception as e:
+        logger.warning(f"Failed to mark new tip used in DB: {e}")
+        # Not a hard failure for motion, but the DB should be fixed later.
+
+    toolkit.pipette.pipette_tracker.tip_id = tip.tip_id
+    toolkit.pipette.pipette_tracker.tip_rack_id = tip.rack_id
+    if hasattr(toolkit.pipette, "set_tip_status"):
+        toolkit.pipette.set_tip_status(True)
+    else:
+        toolkit.pipette.pipette_driver.has_tip = True
+
+    logger.info(f"New tip '{tip.tip_id}' picked up successfully.")
+    return True
+
+
+'''
+def replace_tip(
+    toolkit: Union[Toolkit, Hardware],
+    session_maker: sessionmaker,
+    tiprack_id: int,
+    tip_id: Optional[str] = None
+) -> bool:
+    logger.info("Replacing pipette tip...")
+    if isinstance(session_maker, Session):
+        raise TypeError("replace_tip expects a session factory, not a live session")
+    if not isinstance(session_maker, sessionmaker):
+        raise TypeError("session_maker must be a SQLAlchemy sessionmaker instance")
+
+    tip_service = TipService(session_maker=session_maker)
+    try:
+        _safe_drop_current_tip(toolkit, session_maker)
+    except NoTipAttachedError:
+        toolkit.global_logger.debug("No tip detected during drop — continuing.")
+    except Exception as e:
+        # Don't proceed with a possibly stuck tip if drop failed for other reasons
+        raise RuntimeError(f"Unable to drop existing tip safely: {e}")
+
+    # Select tip
+    if tip_id:
+        tip = tip_service.get_tip(tip_id=tip_id, rack_id=tiprack_id)
+        if not tip or tip.status.lower() != "new":
+            logger.warning(f"Tip '{tip_id}' unavailable/new? Selecting next unused tip instead...")
+            tip = tip_service.get_first_unused_tip(rack_id=tiprack_id)
+    else:
+        tip = tip_service.get_first_unused_tip(rack_id=tiprack_id)
+
+    if not tip:
+        logger.warning(f"No unused tips available in rack {tiprack_id}.")
+        return False
+
+    # Drop old tip if present
+    current_tip_id = getattr(toolkit.pipette.pipette_tracker, "tip_id", None)
+    current_tip_rack_id = getattr(toolkit.pipette.pipette_tracker, "tip_rack_id", None)
+
+    if current_tip_id:
+        logger.info(f"Dropping old tip '{current_tip_id}'...")
+        old_tip = None
+        if current_tip_rack_id is not None:
+            old_tip = tip_service.get_tip(tip_id=current_tip_id, rack_id=current_tip_rack_id)
+
+        drop_coords = getattr(old_tip, "drop_coordinates", None) if old_tip else None
+        if not drop_coords:
+            logger.warning("No drop coordinates for current tip. Using default drop location.")
+            drop_coords = DEFAULT_TIP_DROP_COORDINATES
+
+        toolkit.mill.safe_move(
+            drop_coords["x"], drop_coords["y"], drop_coords["z"],
+            tool=Instruments.PIPETTE
+        )
+        if toolkit.pipette.pipette_driver.drop_tip():
+            tip_service.update_tip(
+                tip_id=current_tip_id,
+                rack_id=current_tip_rack_id if current_tip_rack_id is not None else tiprack_id,
+                updates={"status": "discarded", "rack_id": current_tip_rack_id, "tip_id": current_tip_id},
+            )
+            logger.info(f"Old tip '{current_tip_id}' dropped and marked as discarded.")
+        else:
+            logger.warning("Failed to drop tip.")
+            return False
+    else:
+        logger.info("No tip currently on pipette. Skipping drop step.")
+
+    # Prime and pick up new tip
+    if not toolkit.pipette.pipette_driver.prime_tip_pickup():
+        logger.warning("Failed to prime pipette.")
+        return False
+
+    approach_z = tip.pickup_height + 20
+    toolkit.mill.safe_move(
+        tip.coordinates["x"], tip.coordinates["y"], approach_z,
+        tool=Instruments.PIPETTE, second_z_cord=tip.pickup_height, second_z_cord_feed=1000
+    )
+
+    # Mark tip as used and update tracker
+    tip_service.update_tip(tip.tip_id, tip.rack_id, {
+        "rack_id": tip.rack_id,
+        "tip_id": tip.tip_id,
+        "status": "used"
+    })
+    toolkit.pipette.pipette_tracker.reset_contents()
+    toolkit.pipette.pipette_tracker.tip_id = tip.tip_id
+    toolkit.pipette.pipette_tracker.tip_rack_id = tip.rack_id
+
+    logger.info(f"New tip '{tip.tip_id}' picked up successfully.")
+    return True
+'''
+def _pipette_action(
+    toolkit: Union[Toolkit, Hardware],
+    src_vessel: Union[Vial, Well],
+    dst_vessel: Union[Well, WasteVial],
+    desired_volume: float,
+    ca_dispense_height: Optional[float] = None,  # <-- Accept custom height
+) -> None:
+    """Perform pipetting action from source to destination vessel.
+
+    Parameters
+    ----------
+    toolkit : Union[Toolkit, Hardware]
+        The toolkit object containing mill and pump controls
+    src_vessel : Union[Vial, Well]
+        The source vessel to withdraw from
+    dst_vessel : Union[Well, WasteVial]
+        The destination vessel to deposit into
+    desired_volume : float
+        The volume to be transferred in microliters
+
+    Notes
+    -----
+    This function handles the physical movement of liquid between vessels, including:
+    - Air gap management
+    - Decapping/capping of vials
+    - Multi-step transfers for volumes exceeding pipette capacity
+    """
+    repetitions = math.ceil(
+        desired_volume / (toolkit.pipette.pipette_tracker.capacity_ul)
+    )
+    if isinstance(src_vessel, Well):
+        repetition_vol = correction_factor(desired_volume / repetitions, 1.0)
+    else:
+        repetition_vol = correction_factor(
+            desired_volume / repetitions, src_vessel.viscosity_cp
+        )
+    logger.info(
+        "Pipetting %f uL from %s to %s",
+        desired_volume,
+        src_vessel.name,
+        dst_vessel.name,
+    )
+
+    for j in range(repetitions):
+        logger.info("Repetition %d of %d", j + 1, repetitions)
+
+        if isinstance(src_vessel, StockVial):
+            decapping_sequence(
+                toolkit.mill,
+                Coordinates(src_vessel.x, src_vessel.y, src_vessel.top),
+                toolkit.arduino,
+            )
+
+        toolkit.pipette.prime()
+        # Use standard interface for aspirate
+        toolkit.mill.safe_move(
+            src_vessel.x,
+            src_vessel.y,
+            src_vessel.withdrawal_height,
+            tool=Instruments.PIPETTE,
+        )
+        toolkit.pipette.aspirate(repetition_vol, solution=src_vessel)
+        time.sleep(3)  # Allow time for aspirate to complete
+        toolkit.mill.move_to_safe_position()
+        # toolkit.pipette.drip_stop()
+
+        if isinstance(src_vessel, StockVial):
+            capping_sequence(
+                toolkit.mill,
+                Coordinates(src_vessel.x, src_vessel.y, src_vessel.top),
+                toolkit.arduino,
+            )
+
+        if isinstance(dst_vessel, WasteVial):
+            decapping_sequence(
+                toolkit.mill,
+                Coordinates(dst_vessel.x, dst_vessel.y, dst_vessel.top),
+                toolkit.arduino,
+            )
+
+        # Use standard interface for dispense
+        dispense_z = ca_dispense_height if ca_dispense_height is not None else dst_vessel.top
+        toolkit.mill.safe_move(
+            dst_vessel.x,
+            dst_vessel.y,
+            dispense_z,
+            tool=Instruments.PIPETTE,
+        )
+        toolkit.pipette.dispense(
+            volume_to_dispense=repetition_vol,
+            being_infused=src_vessel,
+            infused_into=dst_vessel,
+        )
+        
+        if isinstance(dst_vessel, WasteVial):
+            capping_sequence(
+                toolkit.mill,
+                Coordinates(dst_vessel.x, dst_vessel.y, dst_vessel.top),
+                toolkit.arduino,
+            )
+
+
+def _forward_pipette_v3(
+    volume: float,
+    src_vessel: Union[str, Well, StockVial],
+    dst_vessel: Union[str, Well, WasteVial],
+    toolkit: Union[Toolkit, Hardware],
+    source_concentration: float = None,
+    labware: Optional[Labware] = None,
+    dst_vessel_z_dispense_height: float = None
+) -> int:
+    try:
+        if volume <= 0.0:
+            return
+        try:
+            if isinstance(dst_vessel, str):
+                if dst_vessel.lower() == "waste":
+                    dst_vessel = waste_selector("waste", volume)
+                elif len(dst_vessel) in [2, 3]:
+                    dst_vessel = toolkit.wellplate.get_well(dst_vessel)
+                else:
+                    dst_vessel = solution_selector(dst_vessel, volume)
+
+        except NoAvailableSolution as e:
+            toolkit.global_logger.error("No available destination vial found: %s", e)
+            raise e
+
+        except KeyError as e:
+            toolkit.global_logger.error(
+                "Well %s not found on wellplate: %s", dst_vessel, e
+            )
+            raise e
+
+        selected_source_vessels, source_vessel_volumes = _handle_source_vessels(
+            volume=volume,
+            src_vessel=src_vessel,
+            source_concentration=source_concentration,
+            pjct_logger=toolkit.global_logger,
+        )
+
+        for origin_vessel, _ in source_vessel_volumes:
+            if isinstance(origin_vessel, Well) and isinstance(dst_vessel, StockVial):
+                raise ValueError("Cannot pipette from a well to a stock vial")
+            if isinstance(origin_vessel, WasteVial) and isinstance(dst_vessel, Well):
+                raise ValueError("Cannot pipette from a waste vial to a well")
+            if isinstance(origin_vessel, StockVial) and isinstance(
+                dst_vessel, StockVial
+            ):
+                raise ValueError("Cannot pipette from a stock vial to a stock vial")
+
+        for vessel, desired_volume in source_vessel_volumes:
+            if desired_volume <= 0.0:
+                continue
+            _pipette_action(toolkit, src_vessel, dst_vessel, desired_volume, dst_vessel_z_dispense_height)
+
+    except Exception as e:
+        toolkit.global_logger.error("Exception occurred during pipetting: %s", e)
+        raise e
+    return 0
+
+
+# No timer wrapper for this function since its a wrapper itself
+def transfer(
+    volume: float,
+    src_vessel: Union[str, Well, StockVial],
+    dst_vessel: Union[str, Well, WasteVial],
+    toolkit: Toolkit,
+    source_concentration: float = None,
+) -> int:
+    """Transfer liquid between vessels.
+
+    Parameters
+    ----------
+    volume : float
+        Volume to transfer in microliters
+    src_vessel : Union[str, Well, StockVial]
+        Source vessel identifier or object
+    dst_vessel : Union[Well, WasteVial]
+        Destination vessel object
+    toolkit : Toolkit
+        Toolkit object for hardware control
+    source_concentration : float, optional
+        Target concentration in mM, by default None
+
+    Returns
+    -------
+    int
+        0 on success
+
+    Notes
+    -----
+    This is a wrapper around _forward_pipette_v3 for more convenient usage
+    """
+    return _forward_pipette_v3(
+        volume, src_vessel, dst_vessel, toolkit, source_concentration
+    )
+
+def contact_angle_transfer(
+    volume: float,
+    src_vessel: Union[str, Well, StockVial],
+    dst_vessel: Union[str, Well, WasteVial],
+    toolkit: Toolkit,
+    ca_dispense_height: float,
+    session_maker: sessionmaker = SessionLocal,
+    tiprack_id: int = 1,
+    source_concentration: float = None,
+    tip_id: Optional[str] = None
+) -> int:
+    """Transfer liquid between vessels."""
+    
+    replace_tip(toolkit, session_maker, tiprack_id, tip_id=tip_id)
+
+    return _forward_pipette_v3(
+        volume, src_vessel, dst_vessel, toolkit, source_concentration, ca_dispense_height
+    )
+
+
+def rinse_well(
+    instructions: EchemExperimentBase,
+    toolkit: Toolkit,
+    alt_sol_name: Optional[str] = None,
+    alt_vol: Optional[float] = None,
+    alt_count: Optional[int] = None,
+) -> int:
+    """Rinse a well with specified solution.
+
+    Parameters
+    ----------
+    instructions : EchemExperimentBase
+        Experiment instructions containing rinse parameters
+    toolkit : Toolkit
+        Toolkit object for hardware control
+    alt_sol_name : str, optional
+        Alternative solution name to use, by default None
+    alt_vol : float, optional
+        Alternative volume to use, by default None
+    alt_count : int, optional
+        Alternative rinse count to use, by default None
+
+    Returns
+    -------
+    int
+        0 on success
+
+    Notes
+    -----
+    Performs multiple rinse cycles of pipetting solution in and out of the well
+    """
+    sol_name = instructions.rinse_sol_name if alt_sol_name is None else alt_sol_name
+    vol = instructions.rinse_vol if alt_vol is None else alt_vol
+    count = instructions.rinse_count if alt_count is None else alt_count
+
+    logger.info(
+        "Rinsing well %s %dx...", instructions.well_id, instructions.rinse_count
+    )
+    instructions.set_status_and_save(ExperimentStatus.RINSING)
+    for _ in range(count):
+        logger.info("Rinse %d of %d", _ + 1, count)
+        # Pipette the rinse solution into the well
+        _forward_pipette_v3(
+            volume=vol,
+            src_vessel=sol_name,
+            dst_vessel=instructions.well,
+            toolkit=toolkit,
+        )
+
+        # Clear the well
+        _forward_pipette_v3(
+            volume=vol,
+            src_vessel=instructions.well,
+            dst_vessel=waste_selector(
+                "waste",
+                instructions.rinse_vol,
+            ),
+            toolkit=toolkit,
+        )
+
+    return 0
+
+
+def flush_pipette(
+    flush_with: str,
+    toolkit: Toolkit,
+    flush_volume: float = 200.0,
+    flush_count: int = 1,
+    instructions: Optional[ExperimentBase] = None,
+):
+    """
+    Flush the pipette tip with the designated flush_volume ul to remove any residue
+    Args:
+        flush_solution_name (str): The name of the solution to flush with
+        toolkit (Toolkit): The toolkit object
+        flush_volume (float): The volume to flush with in microliters
+        flush_count (int): The number of times to flush
+        instructions (ExperimentBase): The experiment instructions for setting the status
+
+    Returns:
+        None (void function) since the objects are passed by reference
+    """
+
+    if flush_volume > 0.000:
+        if instructions is not None:
+            instructions.set_status_and_save(ExperimentStatus.FLUSHING)
+        logger.info(
+            "Flushing pipette tip with %f ul of %s...",
+            flush_volume,
+            flush_with,
+        )
+
+        for _ in range(flush_count):
+            _forward_pipette_v3(
+                flush_volume,
+                src_vessel=flush_with,
+                dst_vessel=waste_selector("waste", flush_volume),
+                toolkit=toolkit,
+            )
+
+        logger.debug(
+            "Flushed pipette tip with %f ul of %s %dx times...",
+            flush_volume,
+            flush_with,
+            flush_count,
+        )
+    else:
+        logger.info("No flushing required. Flush volume is 0. Continuing...")
+    return 0
+
+
+def purge_pipette(
+    toolkit: Toolkit,
+):
+    """
+    Move the pipette over an available waste vessel and purge its contents
+
+    Args:
+        mill (Union[Mill]): _description_
+        pump (Union[Pump]): _description_
+    """
+    liquid_volume = toolkit.pipette.pipette_tracker.liquid_volume()
+    total_volume = toolkit.pipette.pipette_tracker.volume
+    purge_vial = waste_selector("waste", liquid_volume)
+
+    # Decap the waste vial
+    decapping_sequence(
+        toolkit.mill,
+        Coordinates(purge_vial.x, purge_vial.y, purge_vial.top),
+        toolkit.arduino,
+    )
+
+    # Move to the waste vial
+    toolkit.mill.safe_move(
+        purge_vial.x,
+        purge_vial.y,
+        purge_vial.top,
+        tool=Instruments.PIPETTE,
+    )
+
+    # Purge the pipette
+    toolkit.pipette.dispense(
+        volume_to_dispense=liquid_volume,
+        being_infused=None,
+        infused_into=purge_vial,
+    )
+
+    # Cap the waste vial
+    capping_sequence(
+        toolkit.mill,
+        Coordinates(purge_vial.x, purge_vial.y, purge_vial.top),
+        toolkit.arduino,
+    )
+
+
+def volume_correction(
+    volume: float, density: float = None, viscosity: float = None
+) -> float:
+    """
+    Corrects the volume of the solution based on the density and viscosity of the solution
+
+    Args:
+        volume (float): The volume to be corrected
+        density (float): The density of the solution
+        viscosity (float): The viscosity of the solution
+
+    Returns:
+        corrected_volume (float): The corrected volume
+    """
+    if density is None:
+        density = float(1.0)
+    if viscosity is None:
+        viscosity = float(1.0)
+    corrected_volume = round(
+        volume * (float(1.0) + (float(1.0) - density) * (float(1.0) - viscosity)), 6
+    )
+    return float(corrected_volume)
+
+
+def mix(
+    toolkit: Union[Toolkit, Hardware],
+    well: Well,
+    volume: float,
+    mix_count: int = 3,
+    mix_height: float = None,
+):
+    """
+    Mix the solution in the well by pipetting it up and down
+
+    Args:
+        toolkit (object): The toolkit object for hardware control
+        well (Well, str): The well to be mixed
+        volume (float): The volume to be mixed
+        mix_count (int): The number of times to mix
+        mix_height (float): The height to mix at
+    """
+    if mix_height is None:
+        mix_height = well.well_data.bottom + 2
+    else:
+        mix_height = well.well_data.bottom + mix_height
+
+    if isinstance(well, str):
+        well = toolkit.wellplate.get_well(well)
+
+    logger.info("Mixing well %s %dx...", well.name, mix_count)
+
+
+    for i in range(mix_count):
+        logger.info("Mixing well %s %d of %d...", well.name, i + 1, mix_count)
+        # Move to the bottom of the target well
+        toolkit.mill.safe_move(
+            x_coord=well.x,
+            y_coord=well.y,
+            z_coord=well.bottom + 2,
+            tool=Instruments.PIPETTE,
+        )
+
+        # Withdraw the solutions from the well
+        toolkit.pipette.mix(
+            repetitions=3, volume=150
+        )
+    toolkit.mill.move_to_position(
+        x_coordinate=well.x,
+        y_coordinate=well.y,
+        z_coordinate=well.top + 2,
+        tool=Instruments.PIPETTE,
+    )
+    toolkit.pipette.blowout_no_tracker()
+
+    toolkit.mill.move_to_safe_position()
+    return 0
+
+
+def clear_well(
+    toolkit: Union[Toolkit, Hardware],
+    well: Well,
+):
+    """
+    Clear the well by pipetting the solution out of the well
+
+    Args:
+        toolkit (object): The toolkit object for hardware control
+        well (Well, str): The well to be cleared
+        volume (float): The volume to be cleared
+    """
+    if isinstance(well, str):
+        well = toolkit.wellplate.get_well(well)
+
+    logger.info("Clearing well %s...", well.name)
+
+    transfer(
+        volume=well.volume,
+        src_vessel=well,
+        dst_vessel=waste_selector("waste", well.volume),
+        toolkit=toolkit,
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    pass
+
+
+# class PipettingOperations:
+#     """Handles core pipetting operations."""
+
+#     @staticmethod
+#     def transfer(
+#         volume: float,
+#         src_vessel: Union[str, Well, StockVial],
+#         dst_vessel: Union[Well, WasteVial],
+#         toolkit: Toolkit,
+#         source_concentration: Optional[float] = None,
+#     ) -> int:
+#         """Main transfer operation."""
+#         # Move _forward_pipette_v3 here
+#         pass
+
+#     @staticmethod
+#     def rinse_well(
+#         instructions: EchemExperimentBase,
+#         toolkit: Toolkit,
+#         alt_sol_name: Optional[str] = None,
+#         alt_vol: Optional[float] = None,
+#         alt_count: Optional[int] = None,
+#     ) -> int:
+#         """Well rinsing operation."""
+#         pass
+
+#     @staticmethod
+#     def flush_pipette(
+#         flush_with: str,
+#         toolkit: Toolkit,
+#         flush_volume: float = 120.0,
+#         flush_count: int = 1,
+#         instructions: Optional[ExperimentBase] = None,
+#     ) -> int:
+#         """Pipette flushing operation."""
+#         pass

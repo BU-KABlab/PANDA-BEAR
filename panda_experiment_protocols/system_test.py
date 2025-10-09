@@ -1,22 +1,13 @@
 """The sequence of steps for a pedotLHSv1_screening experiment."""
 
 # For writing a protocol, use the available actions from the panda_lib.actions module.
-from panda_lib.actions.actions_default import (
-    CAFailure,
-    CVFailure,
-    DepositionFailure,
-    ExperimentStatus,
-    Hardware,
-    Instruments,
-    Labware,
-    OCPError,
-    Optional,
-    Toolkit,
-    _forward_pipette_v3,
-    chrono_amp,
+from typing import Optional
+
+from panda_lib.actions import (
     flush_pipette,
     image_well,
     rinse_well,
+    transfer,
     waste_selector,
 )
 
@@ -26,7 +17,25 @@ from panda_lib.actions.actions_pedot import (
     chrono_amp_edot_bleaching,
     chrono_amp_edot_coloring,
 )
+from panda_lib.actions.electrochemistry import (
+    ExperimentStatus,
+)
+from panda_lib.actions.electrochemistry import (
+    perform_chronoamperometry as chrono_amp,
+)
+from panda_lib.exceptions import (
+    CAFailure,
+    CVFailure,
+    DepositionFailure,
+    OCPError,
+)
 from panda_lib.experiments.experiment_types import EchemExperimentBase
+from panda_lib.toolkit import (
+    Hardware,
+    Instruments,
+    Labware,
+    Toolkit,
+)
 
 PROTOCOL_ID = 999
 metadata = {
@@ -58,11 +67,11 @@ def run(
     toolkit = Toolkit(
         mill=hardware.mill,
         scale=hardware.scale,
-        pump=hardware.pump,
+        pump=hardware.pipette,
         wellplate=labware.wellplate,
         global_logger=hardware.global_logger,
         experiment_logger=hardware.experiment_logger,
-        flir_camera=hardware.flir_camera,
+        flir_camera=hardware.camera,
         arduino=hardware.arduino,
     )
     hardware.global_logger.info("Running experiment %s", experiment.experiment_id)
@@ -131,7 +140,7 @@ def ca_deposition(
     exp_obj.declare_step(
         f"Depositing {soln_name} into well", ExperimentStatus.DEPOSITING
     )
-    _forward_pipette_v3(
+    transfer(
         volume=exp_obj.solutions[soln_name]["volume"],
         src_vessel=soln_name,
         dst_vessel=exp_obj.well,
@@ -178,7 +187,7 @@ def ca_deposition(
 
     # Clear the well
     exp_obj.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
-    _forward_pipette_v3(
+    transfer(
         volume=exp_obj.well.well_data.volume,
         src_vessel=exp_obj.well,
         dst_vessel=waste_selector(
@@ -210,8 +219,8 @@ def ca_deposition(
     exp_obj.declare_step("Take after deposition image", ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
-        instructions=exp_obj,
-        step_description="AfterDeposition",
+        experiment=exp_obj,
+        image_label="AfterDeposition",
     )
     toolkit.global_logger.info("Deposition of %scomplete\n\n", soln_name)
 

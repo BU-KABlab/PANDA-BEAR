@@ -6,7 +6,7 @@ data_test/
 .devcontainer/installers/*
 panda_sdl_config.ini
 node_modules/*
-*scratch.py
+*scratch*.py
 
 #Untracked files
 *.pyc
@@ -18,6 +18,8 @@ node_modules/*
 *.swp
 .ipynb_checkpoints
 *.egg-info
+.matplotlib/fontlist-v*.json
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -131,7 +133,6 @@ ipython_config.py
 .pdm.toml
 
 # UV
-uv.lock
 
 # Ruff
 .ruff_cache
@@ -192,3 +193,9 @@ cython_debug/
 hardware/grbl_cnc_mill/_configuration.json
 hardware/grbl_cnc_mill/mill_port.txt
 temp.db
+# Local configuration files
+*.local
+# Ignore INI files in the root directory only
+/*.ini
+hardware/grbl_cnc_mill/tools.json
+*.db

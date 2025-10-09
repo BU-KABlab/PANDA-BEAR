@@ -14,7 +14,7 @@ def setup_logger(log_path: str = "pedot_ml.log") -> logging.Logger:
 
     # Set levels
     file_handler.setLevel(logging.DEBUG)
-    console_handler.setLevel(logging.INFO)
+    console_handler.setLevel(logging.WARNING)
 
     # Create formatters
     file_formatter = logging.Formatter(

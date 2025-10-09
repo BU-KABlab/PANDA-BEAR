@@ -201,8 +201,8 @@ from configparser import ConfigParser
 import numpy as np
 import pandas as pd
 
-from panda_lib.sql_tools.panda_models import MlPedotBestTestPoints, MlPedotTrainingData
-from shared_utilities.db_setup import SessionLocal
+from panda_lib.sql_tools import MlPedotBestTestPoints, MlPedotTrainingData
+from panda_shared.db_setup import SessionLocal
 
 config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")

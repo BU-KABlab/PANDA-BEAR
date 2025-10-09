@@ -1,0 +1,93 @@
+import sys
+
+
+class GamryError(Exception):
+    """Base exception for Gamry errors."""
+
+    pass
+
+
+class GamryCOMError(GamryError):
+    """Exception raised when a COM error occurs."""
+
+    pass
+
+
+class GamryPlatformError(GamryError):
+    """Exception raised when using Gamry on unsupported platforms."""
+
+    pass
+
+
+class ErrorCodeLookup:
+    ERROR_CODES = {
+        3758096386: "Device Load",
+        3758096387: "Address Invalid",
+        3758096388: "Address Used",
+        3758096389: "Device Allocation",
+        3758096390: "Device Not Responding",
+        3758096391: "IRQ Device Count",
+        3758096392: "IRQ Invalid",
+        3758096393: "IRQ Device Invalid",
+        3758096394: "Device Init",
+        3758096395: "Board Number Invalid",
+        3758096396: "Device Acq Mode",
+        3758096397: "Queue Allocation",
+        3758096398: "Device Control Mode",
+        3758096399: "Device Not Open",
+        3758096400: "Device Signal",
+        3758096401: "Device Signal Control",
+        3758096402: "Device Signal No Data",
+        3758096403: "Device Create Event",
+        3758096404: "IRQ VXD Load",
+        3758096405: "IRQ Unavailable",
+        3758096406: "IRQ Did Not Install",
+        3758096407: "IRQ Create Thread",
+        3758096408: "IRQ Create Event",
+        3758096409: "Queue Full",
+        3758096410: "Queue Empty",
+        3758096411: "Queue Invalid",
+        3758096412: "Queue Event",
+        3758096413: "Alloc",
+        3758096414: "Event",
+        3758096415: "Invalid Key",
+        3758096416: "Invalid Classname",
+        3758096417: "Invalid Device",
+        3758096418: "Device List Load",
+        3758096419: "Register Device Notify",
+        3758096420: "Device Serial Number Not Unique",
+        3758096421: "Device Not Found",
+        3758096422: "Memory Object",
+        3758096423: "Device In Use",
+        3758096424: "Invalid Device Type",
+        3758096425: "Invalid Device Model",
+        3758096426: "Device Interface Not Found",
+        3758096427: "Device Needs Reset",
+        3758096428: "Queue Register",
+        3758096429: "List Invalid",
+        3758096430: "Device Not Authorized",
+        3758227620: "Invalid Signal Generation Parameters",
+        2148007941: "Reference Family Version Mismatch",
+    }
+
+    @classmethod
+    def get_error_description(cls, code):
+        return cls.ERROR_CODES.get(code, "Unknown Error Code")
+
+
+def check_platform_compatibility():
+    """Check if the current platform is supported for Gamry potentiostat.
+
+    Returns:
+        bool: True if platform is supported, False otherwise
+
+    Raises:
+        GamryPlatformError: If platform is not Windows
+    """
+    if sys.platform != "win32":
+        raise GamryPlatformError(
+            f"Gamry potentiostats are only supported on Windows platforms. "
+            f"Current platform: {sys.platform}. "
+            f"Use mock implementation for testing on non-Windows platforms."
+        )
+    return True

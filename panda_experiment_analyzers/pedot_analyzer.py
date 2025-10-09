@@ -30,8 +30,8 @@ from panda_lib.experiments.results import (
     select_specific_result,
 )
 from panda_lib.slack_tools.slackbot_module import SlackBot
-from panda_lib.sql_tools.sql_system_state import get_current_pin
-from shared_utilities.config.config_tools import read_testing_config
+from panda_lib.sql_tools.queries.system import get_current_pin
+from panda_shared.config.config_tools import read_testing_config
 
 CURRENT_PIN = get_current_pin()
 ANALYSIS_ID = 3
@@ -112,7 +112,7 @@ def generator(
     experiment_id = scheduler.determine_next_experiment_id()
     experiment = experiment_types.EchemExperimentBase(
         experiment_id=experiment_id,
-        protocol_id=15,  # PEDOT protocol v4
+        protocol_name=15,  # PEDOT protocol v4
         well_id="A1",  # Default to A1, let the program decide where else to put it
         well_type_number=4,
         experiment_name=experiment_name,
