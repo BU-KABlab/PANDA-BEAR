@@ -45,7 +45,9 @@ Polymer analysis and discovery array (PANDA) - self-driving lab (SDL): an automa
 
 - [Genmitsu PROVerXL 4030 CNC Router](https://www.sainsmart.com/products/genmitsu-proverxl-4030-cnc-router-with-carveco-maker-subscription)
 - [WPI Aladin Syringe Pump - Model A-1000](https://www.wpiinc.com/var-al1000hp-aladdin-single-syringe-pump-high-pressure)
+- [Opentrons OT2 P300](https://opentrons.com/products/single-channel-electronic-pipette-p20)
 - [Gamry Potentiostat Interface 1010E](https://www.gamry.com/potentiostats/interface-1010e-potentiostat/)
+- [PalmSens EMStat4S](https://www.palmsens.com/product/emstat4s/)
 - [FLIR grasshopper3 USB](https://www.flir.com/products/grasshopper3-usb3/)
 - [Edmunds Optics 55mm Focal Length Partially Telecentric Video Lens](https://www.edmundoptics.com/p/55mm-focal-length-partially-telecentric-video-lens/10573/)
 - [Electroluminescent Panel](https://www.technolight.com/product/4-x-6-inch-uv-fade-resistant-white-rectangle-electroluminescent-el-light-panel/)
@@ -56,14 +58,15 @@ Polymer analysis and discovery array (PANDA) - self-driving lab (SDL): an automa
 - [ITO-coated Glass Substrate]()
 - [20 mL Stock Vials](https://www.fishersci.com/shop/products/clear-voa-glass-vials-0-125in-septa/12-100-112)
 - [200 µl Pipette tips]()
+- [Custom Vial Caps](https://github.com/BU-KABlab/PANDA-BEAR/blob/0c87d3690d6859b006e714fc3e648995843cf5f1/documentation/sops/vialcapfabrication.md)
 
 ## Designs
 
-- [Instrument Holder](https://cad.onshape.com/documents/c75fe6bc68ee2746309c067f/w/80942d9f5953df01d216df22/e/fce6103128a9bdf7b907dcd4)
-- [Tubing to Pipette Adaptor](https://github.com/erasmus95/PANDA-BEAR/blob/main/3d-prints/Adapter_v3_fine.stl)
-- [Substrate Holder](https://cad.onshape.com/documents/ccde1516ba2f6a9f288ba4a5/w/6078df451920f962c99dc5d0/e/e23eb57422b3a293c7468839)
-- [Vial tube rack](https://github.com/erasmus95/PANDA-BEAR/blob/main/3d-prints/TubeRack_2mLx10_v1_scaled.stl)
-
+- [Instrument Holder/PAW](https://github.com/BU-KABlab/PANDA-BEAR/tree/0c87d3690d6859b006e714fc3e648995843cf5f1/documentation/3D-prints/PAW)
+- [Substrate Holder](https://github.com/BU-KABlab/PANDA-BEAR/tree/0c87d3690d6859b006e714fc3e648995843cf5f1/documentation/3D-prints/DeckAccessories)
+- [Vial Rack](https://github.com/BU-KABlab/PANDA-BEAR/blob/0c87d3690d6859b006e714fc3e648995843cf5f1/documentation/3D-prints/DeckAccessories/9VialHolder20mL_TightFit.step)
+- [Custom Vial Caps](https://github.com/BU-KABlab/PANDA-BEAR/tree/0c87d3690d6859b006e714fc3e648995843cf5f1/documentation/3D-prints/VialCap)
+  
 ## Software
 
 - [Python 3.10](https://www.python.org/)
