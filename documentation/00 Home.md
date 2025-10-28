@@ -27,7 +27,7 @@ PANDA is an open-source self-driving lab developed by the [KABLab](https://www.k
 
 ### Physical Build
 - [Build Guide](Build-Guide.md) - Instructions for physical components
-- [3D Printed Components](documentation/3D-prints) - Details on 3D printed parts
+- [3D Printed Components](https://github.com/BU-KABlab/PANDA-BEAR/tree/ea9261512b1d26d4b04cb9642cade89f40dd34b6/documentation/3D-prints) - Details on 3D printed parts
 - [Arduino Wiring](Arduino-Wiring.md) - Electronics and wiring guides
 
 ## Additional Resources
