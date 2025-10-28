@@ -1,12 +1,12 @@
-# PANDA-SDL Wiki
+# PANDA-BEAR Wiki
 
 ![PANDA Logo](../PANDAlogo.png)
 
-Welcome to the PANDA-SDL (Polymer Analysis and Discovery Array - Self-Driving Lab) wiki! This wiki provides comprehensive documentation for both end users and developers working with the PANDA system.
+Welcome to the PANDA (Polymer Analysis and Discovery Array) wiki! This wiki provides comprehensive documentation for both end users and developers working with the PANDA system.
 
 ## What is PANDA?
 
-PANDA SDL is an open-source self-driving lab developed by the [KABLab](https://www.kablab.org/) at [Boston University](https://www.bu.edu/). The PANDA electrodeposits and functionally characterizes polymer films using a combination of electrochemical and optical techniques in a novel well plate architecture.
+PANDA is an open-source self-driving lab developed by the [KABLab](https://www.kablab.org/) at [Boston University](https://www.bu.edu/). The PANDA electrodeposits and functionally characterizes polymer films using a combination of electrochemical and optical techniques in a novel well plate architecture.
 
 ## Wiki Navigation
 
@@ -27,7 +27,7 @@ PANDA SDL is an open-source self-driving lab developed by the [KABLab](https://w
 
 ### Physical Build
 - [Build Guide](Build-Guide.md) - Instructions for physical components
-- [3D Printed Components](3D-Printed-Components.md) - Details on 3D printed parts
+- [3D Printed Components](documentation/3D-prints) - Details on 3D printed parts
 - [Arduino Wiring](Arduino-Wiring.md) - Electronics and wiring guides
 
 ## Additional Resources
