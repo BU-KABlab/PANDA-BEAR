@@ -1,5 +1,7 @@
 **Substrate fabrication**
-Using an Electron Beam Evaporator (Angstrom Engineering EVOVAC), deposit ITO with the following profile:
+Settings may vary based on your setup, we are targeting 300 nm ITO thickness deposited with an approximate wattage between 120 - 130 W using DC sputtering for 15 minutes.
+
+Using an Electron Beam Evaporator (Angstrom Engineering EVOVAC), deposit ITO using Direct Current sputtering with the following profile:
   Ramp 1 power: 0%
   Ramp 1 time: 0 sec
   Soak 1 time: 0 sec
@@ -32,9 +34,9 @@ _After deposition, heat the substrate on a hotplate at 400°F for 5-10 minutes. 
 
 
 **Gasket fabrication**
-Laser cut mylar with adhesive backing using this template: [https://github.com/BU-KABlab/PANDA-BEAR/blob/e12f17b71f0ca1619ce1f2e5ce441cd34fc1a6a5/documentation/3D-prints/PDMS%20adhesive%20lasercut%20-%2040%20Wells%20d10mm.dxf](documentation/3D-prints/PDMS adhesive lasercut - 40 Wells d10mm.dxf)
-3D print this mold using 0.2 mm layer height: [https://github.com/BU-KABlab/PANDA-BEAR/blob/e12f17b71f0ca1619ce1f2e5ce441cd34fc1a6a5/documentation/3D-prints/PDMS%20Mold%20-%2040%20Wells%20d10mm.step](documentation/3D-prints/PDMS Mold - 40 Wells d10mm.step)
-3D print these tools to help with gasket removal from the mold: [https://github.com/BU-KABlab/PANDA-BEAR/tree/d4180eaa3575ac604cb0f5268dbaa70384e03784/documentation/3D-prints/MoldTools](documentation/3D-prints/MoldTools)
+Laser cut mylar with adhesive backing using this template: (documentation/3D-prints/PDMS adhesive lasercut - 40 Wells d10mm.dxf)[https://github.com/BU-KABlab/PANDA-BEAR/blob/e12f17b71f0ca1619ce1f2e5ce441cd34fc1a6a5/documentation/3D-prints/PDMS%20adhesive%20lasercut%20-%2040%20Wells%20d10mm.dxf]
+3D print this mold using 0.2 mm layer height: (documentation/3D-prints/PDMS Mold - 40 Wells d10mm.step)[https://github.com/BU-KABlab/PANDA-BEAR/blob/e12f17b71f0ca1619ce1f2e5ce441cd34fc1a6a5/documentation/3D-prints/PDMS%20Mold%20-%2040%20Wells%20d10mm.step]
+3D print these tools to help with gasket removal from the mold: (documentation/3D-prints/MoldTools)[https://github.com/BU-KABlab/PANDA-BEAR/tree/d4180eaa3575ac604cb0f5268dbaa70384e03784/documentation/3D-prints/MoldTools]
 
 Procedure steps:
 1. Remove sheet to expose adhesive
@@ -70,3 +72,4 @@ Removal from mold:
 
 _Use any prepared substrates with attached gaskets within 2 months. 
 Delamination has been noted in gaskets older than this._
+
