@@ -1,4 +1,5 @@
 **Substrate fabrication**
+
 Settings may vary based on your setup, we are targeting 300 nm ITO thickness deposited with an approximate wattage between 120 - 130 W using DC sputtering for 15 minutes.
 
 Using an Electron Beam Evaporator (Angstrom Engineering EVOVAC), deposit ITO using Direct Current sputtering with the following profile:
@@ -34,6 +35,7 @@ _After deposition, heat the substrate on a hotplate at 400°F for 5-10 minutes. 
 
 
 **Gasket fabrication**
+
 Laser cut mylar with adhesive backing using this template: [documentation/3D-prints/PDMS adhesive lasercut - 40 Wells d10mm.dxf](https://github.com/BU-KABlab/PANDA-BEAR/blob/e12f17b71f0ca1619ce1f2e5ce441cd34fc1a6a5/documentation/3D-prints/PDMS%20adhesive%20lasercut%20-%2040%20Wells%20d10mm.dxf)
 
 3D print this mold using 0.2 mm layer height: [documentation/3D-prints/PDMS Mold - 40 Wells d10mm.step](https://github.com/BU-KABlab/PANDA-BEAR/blob/e12f17b71f0ca1619ce1f2e5ce441cd34fc1a6a5/documentation/3D-prints/PDMS%20Mold%20-%2040%20Wells%20d10mm.step)
@@ -61,6 +63,7 @@ Removal from mold:
 
 
 **Gasket mounting**
+
 1. Prepare ~1-2 mL of PDMS in a 10:1 ratio (base:crosslinker) - this will be your "PDMS glue"
 2. Using a small silicone spatula, q-tips, paint brush, your tool of choice carefully spread a thin layer of PDMS glue on the side of the gasket that touched the mylar sheet in the bottom of the mold
 3. Place the gasket (uncured PDMS side down) on the substrate, using the alignment tool, by aligning two corners on one of the short sides and slowly lowering the PDMS gasket from one short side to the other
@@ -74,6 +77,7 @@ Removal from mold:
 
 _Use any prepared substrates with attached gaskets within 2 months. 
 Delamination has been noted in gaskets older than this._
+
 
 
 
