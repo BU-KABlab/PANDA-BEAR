@@ -3,32 +3,32 @@
 Settings may vary based on your setup, we are targeting 300 nm ITO thickness deposited with an approximate wattage between 120 - 130 W using DC sputtering for 15 minutes.
 
 Using an Electron Beam Evaporator (Angstrom Engineering EVOVAC), deposit ITO using Direct Current sputtering with the following profile:
-  Ramp 1 power: 0%
-  Ramp 1 time: 0 sec
-  Soak 1 time: 0 sec
-  Ramp 2 power: 27%
-  Ramp 2 time: 500 sec
-  Soak 2 time: 100 sec
-  Shutter Acc. 20.0%
-  Shutter Wait: 180 sec
-  Shutter Hold: 3 sec
-  *Final Thickness: 0.000 kA
-  *Rate: 27.00 A/s
-  *Thick End Pt: 0.000 kA
-  Time End Pt: 900 sec
-  *P Term: 75
-  *I Term: 5.0
-  *D Term: 0.00
-  Ctrl Acc: 30%
-  Max Power: 30.00%
-  Slew Rate: 3%/sec
-  Feed Power: 0.00
-  Feed Ramp: 300 sec
-  Feed Time: 0 sec
-  Idle Power: 0.00%
-  Idle Ramp: 0 sec
+  - Ramp 1 power: 0%
+  - Ramp 1 time: 0 sec
+  - Soak 1 time: 0 sec
+  - Ramp 2 power: 27%
+  - Ramp 2 time: 500 sec
+  - Soak 2 time: 100 sec
+  - Shutter Acc. 20.0%
+  - Shutter Wait: 180 sec
+  - Shutter Hold: 3 sec
+  - *Final Thickness: 0.000 kA
+  - *Rate: 27.00 A/s
+  - *Thick End Pt: 0.000 kA
+  - Time End Pt: 900 sec
+  - *P Term: 75
+  - *I Term: 5.0
+  - *D Term: 0.00
+  - Ctrl Acc: 30%
+  - Max Power: 30.00%
+  - Slew Rate: 3%/sec
+  - Feed Power: 0.00
+  - Feed Ramp: 300 sec
+  - Feed Time: 0 sec
+  - Idle Power: 0.00%
+  - Idle Ramp: 0 sec
 
-*Settings are related to electron beam evaporation and not relevant for DC sputtering. 
+(*) Settings are related to electron beam evaporation and not relevant for DC sputtering. 
 HOWEVER, **the rate must be set as the same value as your ramp power %** even though the units don't match or the main process will default to 0%, rapidly cool, and possibly crack your target.
 
 _After deposition, heat the substrate on a hotplate at 400°F for 5-10 minutes. It should change color from pink to yellow. Verify this step worked by checking resistivity (it should be < 600 ohms)._
@@ -77,6 +77,7 @@ Removal from mold:
 
 _Use any prepared substrates with attached gaskets within 2 months. 
 Delamination has been noted in gaskets older than this._
+
 
 
 
