@@ -1,6 +1,6 @@
 # Construction | [Installation](installation.md) | [End User Manual](end_user_manual.md) | [Dev User Manual](developer_manual.md) | [Contents](user_manual.md) <!-- omit from toc -->
 
-## Table of Contnets <!-- omit from toc -->
+## Table of Contents <!-- omit from toc -->
 - [Parts](#parts)
 - [Constructing the Process Automation Widget (PAW)](#constructing-the-process-automation-widget-paw)
   - [PAWduino (Arduino)](#pawduino-arduino)
@@ -15,24 +15,22 @@
 
 For purchased parts please see [Bill of Materials (BOM)](documents/bom.md) for a parts list. It includes estimated prices and possible vendors to obtain the parts from (biased towards United States).
 
-For 3D-Printed parts please see [3d files](files/3d_printed_parts.md)
+For 3D-Printed parts please see [3D files](3D-prints)
 
 # Constructing the Process Automation Widget (PAW)
 
-The PANDA's PAW is what physically performs all of the physical actions the SDL offers. It is also the location of most of the system's scientific hardware.
+The PANDA's PAW is what physically performs all of the physical actions the SDL offers. It is also the location of most of the system's experiment-related instrumentation (i.e., supporting electrodes, camera, electromagnet, lighting for contact angle and in process images, pipette, etc.).
 
 3D Printed Parts:
 
 - [ ] Body
-- [ ] Lightring layer 01
-- [ ] Lightring layer 02
+- [ ] Lightring
 - [ ] Electrode mount
-  - [ ] Arm
-  - [ ] Housing
+  - [ ] Base
+  - [ ] Front
   - [ ] Clips
 - [ ] Pipette mount
-- [ ] Magnet mount
-- [ ] Camera mount
+- [ ] Electromagnet mount
 
 Purchased Parts:
 - [ ] Arduino Uno R3
@@ -44,21 +42,22 @@ Purchased Parts:
 - [ ] FLIR Grasshopper3
 - [ ] Edmunds Optics Telcentric Lense
 - [ ] 5V Electromagnet
-- [ ] TP120 Transistor
-- [ ] 1k Ohm Resistor x2
-- [ ] 2.2k Ohm Resistor 
-- [ ] Diode
-- [ ]   _
+- [ ] 5V DC Power Supply
+- [ ] IRLZ44 MOSFET
+- [ ] 1k Ohm Resistor
+- [ ] 200 Ohm Resistor
+- [ ] 3k Ohm Resistor 
+- [ ] Flyback Diode
 
 ## PAWduino (Arduino)
 
 The PAWduino is a microcontroller that allows us to simply our connection to the PAW to just two USB cables and the potentiostat leads. Refer to the diagram below while wiring the dev shield (Note: The motor is representing the electromagnet):
 
 Using Red LEDS
-![PAWduino](images/pawduino-120PG-transistor.png)
+
 
 Using Neopixel Dots
-![PAWduino with Neopixel Dots](images/Pawduino%20-%20Neopixels.png)
+
 
 
 
@@ -66,7 +65,7 @@ Using Neopixel Dots
 
 ## Vials
 
-Use the vial holder found in 3d-prints. Vials should be positioned along the Y-axis with the first vial having the highest y-value. 
+Use the vial holder found in 3d-prints. Vials should be positioned along the Y-axis with the first vial having the lowest y-value. 
 
 ## Wellplates
 
