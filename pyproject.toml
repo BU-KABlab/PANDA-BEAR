@@ -48,7 +48,7 @@ dependencies = [
     "packaging==24.1",
     "pandas==2.2.2",
     "pillow==10.4.0",
-    "pip>=25.3",
+    # "pip>=25.3",  # REMOVED: Package manager, not a dependency
     "pre-commit>=4.2.0",
     "PuLP==2.9.0",
     "pydantic==2.9.1",
@@ -81,7 +81,10 @@ dependencies = [
     "typeguard==4.3.0",
     "typing_extensions==4.12.2",
     "tzdata==2024.1",
-    "uv>=0.8.6",
+    # NOTE: pip and uv are package managers, not library dependencies
+    # They should be installed separately, not as dependencies
+    # "pip>=25.3",  # REMOVED: Package manager, not a dependency
+    # "uv>=0.8.6",  # REMOVED: Package manager, not a dependency
     "simple-pyspin==0.1.1",
     "websocket-client==1.8.0",
     # UNCOMMENT THE LINE BELOW WHEN YOU HAVE THE SPINNKER WHL FILE 
