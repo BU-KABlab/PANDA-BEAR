@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = "==3.10.*"
 resolution-markers = [
     "sys_platform == 'darwin'",
@@ -705,7 +705,6 @@ dependencies = [
     { name = "six" },
     { name = "slack-sdk" },
     { name = "smmap" },
-    { name = "spinnaker-python" },
     { name = "sqlalchemy" },
     { name = "sympy" },
     { name = "threadpoolctl" },
@@ -802,7 +801,6 @@ requires-dist = [
     { name = "six", specifier = "==1.16.0" },
     { name = "slack-sdk", specifier = ">=3.4.0" },
     { name = "smmap", specifier = "==5.0.1" },
-    { name = "spinnaker-python", path = "../../spinnaker_python-4.2.0.46-cp310-cp310-linux_aarch64.whl" },
     { name = "sqlalchemy", specifier = "==2.0.34" },
     { name = "sympy", specifier = "==1.13.2" },
     { name = "threadpoolctl", specifier = "==3.5.0" },
@@ -1239,20 +1237,6 @@ dependencies = [
     { name = "scipy" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7c/84/8d40852637fa1a0132216cb2fed49a3ef1f7b09a727ee55d47832ddae038/softpotato-1.0.18.tar.gz", hash = "sha256:55f56dc8ba5feb495e0afc0a9ed475e7dc53a9dbeef6984e171e692f6dcba846", size = 21361, upload-time = "2022-10-25T21:12:59.64Z" }
-
-[[package]]
-name = "spinnaker-python"
-version = "4.2.0.46"
-source = { path = "../../spinnaker_python-4.2.0.46-cp310-cp310-linux_aarch64.whl" }
-dependencies = [
-    { name = "numpy" },
-]
-wheels = [
-    { filename = "spinnaker_python-4.2.0.46-cp310-cp310-linux_aarch64.whl", hash = "sha256:22cffbbb94a85fa0e6534827ff9ddb17bd8e192f85253bb9f3b2aec0f7b7b963" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "numpy", specifier = ">=2.0" }]
 
 [[package]]
 name = "sqlalchemy"
