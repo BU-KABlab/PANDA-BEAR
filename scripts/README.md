@@ -4,6 +4,26 @@ This directory contains standalone utility scripts for various tasks.
 
 ## Scripts
 
+### panda-slack-bot.py
+
+Standalone Slack bot runner for PANDA SDL. Allows running the Slack bot in parallel with the main PANDA SDL application.
+
+**Usage:**
+```bash
+# Production mode (default)
+python scripts/panda-slack-bot.py
+
+# Testing mode
+python scripts/panda-slack-bot.py --testing
+```
+
+**Note**: After installation, you can also use the CLI command:
+```bash
+panda-slack-bot [--testing] [--production]
+```
+
+See [SLACK_BOT_ORGANIZATION.md](../SLACK_BOT_ORGANIZATION.md) for detailed documentation.
+
 ### LHSgenerator.py
 
 Generates Latin Hypercube samples for experimental design.

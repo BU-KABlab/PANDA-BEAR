@@ -104,6 +104,7 @@ dev = ["pytest>=8.3.4", "ruff>=0.8.3", "mypy>=1.8.0", "black>=24.3.0"]
 [project.scripts]
 panda-cli = "panda_lib_cli.main:main"
 panda-db-setup = "panda_lib_db.cli:main"
+panda-slack-bot = "panda_lib.slack_tools.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

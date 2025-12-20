@@ -214,3 +214,5 @@ please_delete/
 *export*.csv
 *backup*.sql
 *backup*.db
+.cursor/worktrees.json
+.vscode/settings.json
