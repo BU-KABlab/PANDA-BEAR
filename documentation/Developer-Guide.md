@@ -1,6 +1,16 @@
 # Developer Guide
 
-This guide provides essential information for developers who want to contribute to the PANDA-SDL project or extend its functionality.
+Essential information for developers contributing to or extending PANDA-SDL functionality.
+
+**Navigation**: [Home](00-Home.md) | Developer Guide | [Code Architecture](Code-Architecture.md) | [Contributing](Contributing.md) | [API Reference](API-Reference.md)
+
+## Table of Contents
+
+- [Project Architecture](#project-architecture)
+- [Development Environment Setup](#development-environment-setup)
+- [Code Organization](#code-organization)
+- [Testing](#testing)
+- [Next Steps](#next-steps)
 
 ## Project Architecture
 
@@ -333,5 +343,7 @@ The PANDA system uses Python's logging module. Logs are stored in the `logs_test
 
 As a developer, you might want to explore:
 
-- [API Reference](API-Reference.md) for detailed information on the PANDA-SDL APIs
-- [Physical Build Guide](Build-Guide.md) to understand the physical system design
+- [Code Architecture](Code-Architecture.md) for detailed system architecture information
+- [API Reference](API-Reference.md) for complete API documentation
+- [Contributing](Contributing.md) for contribution guidelines and best practices
+- [Build Guide](Build-Guide.md) to understand the physical system design

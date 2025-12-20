@@ -1,6 +1,8 @@
 # Code Architecture
 
-This document provides an overview of the PANDA-SDL codebase architecture, explaining the key components and their relationships. Understanding this architecture will help developers navigate the codebase and make effective contributions.
+Overview of the PANDA-SDL codebase architecture, including key components and their relationships. This document helps developers understand the system structure and navigate the codebase effectively.
+
+**Navigation**: [Home](00-Home.md) | [Developer Guide](Developer-Guide.md) | Code Architecture | [API Reference](API-Reference.md)
 
 ## High-Level Architecture
 
@@ -301,10 +303,11 @@ Areas being considered for future development:
 4. **Improved parallel processing**: Enhanced support for parallel experiment execution
 5. **Machine learning integration**: Deeper integration with ML frameworks
 
-## Additional Resources
+## Next Steps
 
 For more detailed information:
 
-- Source code docstrings
-- [Developer Guide](Developer-Guide.md)
-- [API Reference](API-Reference.md)
+- [Developer Guide](Developer-Guide.md) for development setup and guidelines
+- [API Reference](API-Reference.md) for complete API documentation
+- [Contributing](Contributing.md) for contribution process
+- Source code docstrings for implementation details

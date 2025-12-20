@@ -1,6 +1,20 @@
 # Getting Started with PANDA-SDL
 
-This guide will help you set up your environment and get started with the PANDA-SDL system. Follow these steps to install the required software, configure your environment, and run your first experiment.
+This guide provides step-by-step instructions for installing PANDA-SDL, configuring your environment, and running your first experiment.
+
+**Navigation**: [Home](00-Home.md) | Getting Started | [Writing Protocols](03%20Writing-Protocols.md) | [Creating Generators](02%20Creating-Generators.md) | [Using Analyzers](04%20Using-Analyzers.md)
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Set Up the Database](#4-set-up-the-database)
+- [Configure the Environment](#5-configure-the-environment)
+- [Setting up Slack](#6-setting-up-slack-optional)
+- [Running Your First Experiment](#7-running-your-first-experiment)
+- [Next Steps](#8-next-steps)
+- [Verifying Your Installation](#9-verifying-your-installation)
+- [Troubleshooting](#10-troubleshooting)
 
 ## Prerequisites
 
@@ -14,14 +28,22 @@ Before you begin, ensure you have the following:
 
 ## Installation
 
-### 1. Clone the Repository
+### 1. Clone the Repository or Install from GitHub
 
-First, clone the PANDA-SDL repository to your local machine:
+You can either clone the repository for development or install directly from GitHub:
 
+**Option A: Clone for Development**
 ```bash
-git clone https://github.com/BU-KABlab/PANDA-SDL.git
-cd PANDA-SDL
+git clone https://github.com/BU-KABlab/PANDA-BEAR.git
+cd PANDA-BEAR
 ```
+
+**Option B: Install from GitHub (Recommended for End Users)**
+```bash
+pip install git+https://github.com/BU-KABlab/PANDA-BEAR.git
+```
+
+If installing from GitHub, you can skip to step 3 (Choose Your Installation Method) after creating a virtual environment.
 
 ### 2. Drivers and SDKs
 
@@ -114,7 +136,7 @@ c. Install dependencies:
 pip install -r requirements.txt
 ```
 
-### 4. Set Up the Database
+## 4. Set Up the Database
 
 Before running experiments, you need to initialize the database:
 
@@ -124,7 +146,7 @@ panda-db-setup
 
 This creates a SQLite database with the required schema. For custom database paths or options, see the [Database Setup README](../src/panda_lib_db/README.md).
 
-### 5. Configure the Environment
+## 5. Configure the Environment
 
 a. Create a `.env` file in the project root:
 
@@ -269,7 +291,7 @@ max_pipetting_rate = 50.0
 pipette_capacity = 300
 ```
 
-## Setting up Slack [Optional]
+## 6. Setting up Slack (Optional)
 
 To obtain a token for your own SlackBot you will need to follow the [instructions](https://api.slack.com/quickstart) from Slack on making a Slack App.
 
@@ -285,7 +307,7 @@ Get the access token from the OAuth & Permissions page and add it to your ini fi
 
 For each channel that you want the app to have access to you first need to add the bot to the channel, and then find the channel ID by going to that channel in the Slack app, click the channel name at the top, and scroll to the bottom of the pop-up. There will be Channel ID: ######### and a copy button. Repeat for each channel and add the appropriate code in the ini file.
 
-## Running Your First Experiment
+## 7. Running Your First Experiment
 
 ### Method 1: Using the CLI Menu (Interactive)
 
@@ -352,15 +374,16 @@ experiment_loop_worker(
 )
 ```
 
-## Next Steps
+## 8. Next Steps
 
 Now that you've set up your environment and run your first experiment, you can:
 
-- Learn to [write your own protocols](Writing-Protocols.md)
-- Create [custom experiment generators](Creating-Generators.md)
+- Learn to [write your own protocols](03%20Writing-Protocols.md)
+- Create [custom experiment generators](02%20Creating-Generators.md)
 - Explore the [main menu options](Main-Menu-Reference.md) in more detail
+- Review the [API Reference](API-Reference.md) for available functions
 
-## Verifying Your Installation
+## 9. Verifying Your Installation
 
 Before running experiments, verify your installation works:
 
@@ -374,7 +397,7 @@ pytest tests/unit/ --cov=src --cov-report=html
 
 If tests pass, your installation is working correctly!
 
-## Troubleshooting
+## 10. Troubleshooting
 
 If you encounter issues during installation or running:
 
@@ -400,4 +423,4 @@ If you encounter issues during installation or running:
 - Review logs in `logs_test/` directory
 - Open an issue on [GitHub](https://github.com/BU-KABlab/PANDA-BEAR/issues)
 
-For more detailed information, refer to the [End User Manual](../documentation/end_user_manual.md).
+For additional information, see the [Main Menu Reference](Main-Menu-Reference.md) and [API Reference](API-Reference.md).
