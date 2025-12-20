@@ -35,6 +35,10 @@ PANDA-SDL is a comprehensive automation framework for conducting high-throughput
 
 **Note**: It is recommended that you install into a virtual environment and not globally.
 
+**Choose your installation method:**
+- **Install from GitHub** (recommended for end users): Use `pip install git+...` below
+- **Clone for development**: See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup
+
 #### Using UV (Recommended)
 
 ```bash
@@ -78,25 +82,55 @@ Install drivers for your specific hardware:
 - USB-serial adapters (CP210x, FTDI, etc.)
 - Camera drivers (if not using FLIR)
 
-### Step 3: Configuration
+### Step 3: Database Setup
 
-1. Create a `.env` file in the project root:
+Initialize the database:
+
+```bash
+panda-db-setup
+```
+
+This creates the SQLite database with the required schema.
+
+### Step 4: Configuration
+
+1. Create a `.env` file in your working directory:
    ```bash
    PANDA_SDL_CONFIG_PATH=/path/to/your/config.ini
    ```
 
-2. Create a configuration file (see `config.ini.example` or `src/panda_shared/config/default_config.ini` for template)
+2. Create a configuration file:
+   - Copy `config.ini.example` or `src/panda_shared/config/default_config.ini`
+   - Place it at the path specified in `.env`
+   - See [CONFIG_FILES.md](CONFIG_FILES.md) for details
 
 3. Update configuration with your hardware settings (ports, calibration values, etc.)
 
-## Quick Start
+### Step 5: Verify Installation
+
+Run the test suite to verify everything works:
 
 ```bash
+pytest tests/unit/ -v
+```
+
+## Quick Start
+
+**New to PANDA-SDL?** Start here: [QUICK_START.md](QUICK_START.md)
+
+**Quick commands:**
+```bash
+# Install from GitHub
+pip install git+https://github.com/BU-KABlab/PANDA-BEAR.git
+
+# Set up database
+panda-db-setup
+
 # Launch the CLI
 panda-cli
 
-# Or run directly
-python -m panda_lib_cli
+# Run tests to verify installation
+pytest tests/unit/ -v
 ```
 
 See the [Getting Started Guide](documentation/01%20Getting-Started.md) for detailed setup instructions.
@@ -147,8 +181,10 @@ See the [Getting Started Guide](documentation/01%20Getting-Started.md) for detai
 
 ## Documentation
 
-- [Getting Started Guide](documentation/01%20Getting-Started.md)
+- **[Quick Start Guide](QUICK_START.md)** - Get running in 10 minutes
+- [Getting Started Guide](documentation/01%20Getting-Started.md) - Detailed setup
 - [Code Architecture](documentation/Code-Architecture.md)
+- [Example Scripts](examples/README.md) - Programmatic usage examples
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
 
@@ -164,6 +200,7 @@ PANDA-BEAR/
 ├── panda_experiment_protocols/    # User-defined experiment protocols
 ├── panda_experiment_generators/   # User-defined experiment generators
 ├── panda_experiment_analyzers/    # User-defined analysis modules
+├── examples/              # Example scripts for programmatic usage
 ├── tests/                # Test suite
 ├── documentation/       # Additional documentation
 └── scripts/             # Utility scripts
@@ -173,13 +210,45 @@ PANDA-BEAR/
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines and setup instructions.
 
+## Running Tests
+
+Verify your installation works by running the test suite:
+
+```bash
+# Run all unit tests
+pytest tests/unit/ -v
+
+# Run with coverage report
+pytest tests/unit/ --cov=src --cov-report=html
+
+# Run specific test file
+pytest tests/unit/test_specific.py -v
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more testing options.
+
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Import errors**: Ensure you're using Python 3.10 and have activated your virtual environment
-2. **Hardware connection failures**: Check device drivers and port configurations in your config file
-3. **Database errors**: Run `panda-db-setup` to initialize the database
+1. **Import errors**: 
+   - Ensure you're using Python 3.10: `python --version`
+   - Verify virtual environment is activated
+   - Reinstall: `pip install --force-reinstall git+https://github.com/BU-KABlab/PANDA-BEAR.git`
+
+2. **Database errors**: 
+   - Run `panda-db-setup` to initialize the database
+   - Use `panda-db-setup --force` to recreate if corrupted
+
+3. **Hardware connection failures**: 
+   - Check device drivers are installed
+   - Verify port configurations in your config file
+   - Test with `testing = True` in config first (uses mock instruments)
+
+4. **Configuration errors**:
+   - Verify `.env` file exists with `PANDA_SDL_CONFIG_PATH` set
+   - Check `config.ini` exists at the specified path
+   - Review logs in `logs_test/` directory
 
 For more help, please open an issue on GitHub.
 
