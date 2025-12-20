@@ -1,9 +1,6 @@
 import datetime
-import os
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 import time
 import gc
 import comtypes
@@ -12,7 +9,8 @@ import pathlib
 import random
 import Analyzer
 
-def pstatconnect():    
+
+def pstatconnect():
     global pstat
     global devices
     global GamryCOM
@@ -27,6 +25,7 @@ def pstatconnect():
     else:
         print("\tPstat not connected")
 
+
 class GamryCOMError(Exception):
     pass
 
@@ -35,25 +34,24 @@ def gamry_error_decoder(e):
     if isinstance(e, comtypes.COMError):
         hresult = 2**32 + e.args[0]
         if hresult & 0x20000000:
-            return GamryCOMError(
-                "0x{0:08x}: {1}".format(2**32 + e.args[0], e.args[1])
-            )
+            return GamryCOMError("0x{0:08x}: {1}".format(2**32 + e.args[0], e.args[1]))
     return e
+
 
 def initializepstat():
     pstat.SetCtrlMode(GamryCOM.PstatMode)
     pstat.SetCell(GamryCOM.CellOff)
     pstat.SetIEStability(GamryCOM.StabilityNorm)
     pstat.SetVchRangeMode(True)
-    pstat.SetVchRange(10.0) #Expected Max Voltage
-    pstat.SetIERangeMode(True) #True = Auto, False = Manual
+    pstat.SetVchRange(10.0)  # Expected Max Voltage
+    pstat.SetIERangeMode(True)  # True = Auto, False = Manual
     # the following command allows us to set our range manually
     # pstat.SetIERange (x)
 
 
 def stopacq():
     global active
-    
+
     active = False
     pstat.SetCell(GamryCOM.CellOff)
     time.sleep(1)
@@ -101,8 +99,8 @@ def disconnectpstat():
 
 
 def savedata(complete_file_name):
-    ''' save the data to a file'''
-    #print(dtaqsink.acquired_points)
+    """save the data to a file"""
+    # print(dtaqsink.acquired_points)
     print("number of data points acquired")
     print(len(dtaqsink.acquired_points))
     # savedata
@@ -112,15 +110,16 @@ def savedata(complete_file_name):
     np.savetxt(complete_file_name.with_suffix(".txt"), output)
     print("data saved")
 
+
 def setfilename(id, experiment):
-    ''' set the file name for the experiment'''
+    """set the file name for the experiment"""
     global complete_file_name
     current_time = datetime.datetime.now()
     fileDate = current_time.strftime("%Y-%m-%d")
     cwd = pathlib.Path().absolute()
     filePathPar = pathlib.Path(cwd.parents[1].__str__() + "/data")
     filePath = filePathPar / fileDate
-    #complete_file_name = filePath / (target_well + "_" + experiment)
+    # complete_file_name = filePath / (target_well + "_" + experiment)
     complete_file_name = filePath / ("experiment-" + id + "_" + experiment)
     print(f"eChem: complete file name is: {complete_file_name}")
     if not pathlib.Path.exists(filePath):
@@ -129,19 +128,18 @@ def setfilename(id, experiment):
     else:
         print(f"folder {filePath} exists")
     return complete_file_name
-        
-        
+
 
 def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
-    ''' cyclic voltammetry'''
+    """cyclic voltammetry"""
     global dtaq
     global signal
     global dtaqsink
     global connection
     global start_time
     global active
-    #global complete_file_name
-    
+    # global complete_file_name
+
     print("made it to run")
     active = True
 
@@ -173,7 +171,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     pstat.SetCell(GamryCOM.CellOn)
     dtaq.Run(True)
     # Code for timing started
-    #start_time = time.time()
+    # start_time = time.time()
     print("made it to run end")
 
 
@@ -184,7 +182,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     global connection
     global start_time
     global active
-    #global complete_file_name
+    # global complete_file_name
 
     active = True
     print("made it to run")
@@ -208,7 +206,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     dtaq.Run(True)
 
     # Code for timing started
-    #start_time = time.time()
+    # start_time = time.time()
     print("made it to run end")
 
 
@@ -230,7 +228,7 @@ def OCP(OCPvi, OCPti, OCPrate):
 
     dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
-    
+
     signal.Init(pstat, OCPvi, OCPti, OCPrate, GamryCOM.PstatMode)
     initializepstat()
 
@@ -239,8 +237,8 @@ def OCP(OCPvi, OCPti, OCPrate):
     pstat.SetCell(GamryCOM.CellOff)
 
     dtaq.Run(True)
-    #start_time = time.time()
-    #print("made it to run end")
+    # start_time = time.time()
+    # print("made it to run end")
 
 
 def mock_CA(MCAvi, MCAti, MCArate):
@@ -261,7 +259,7 @@ def mock_CA(MCAvi, MCAti, MCArate):
 
     dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
-    
+
     signal.Init(pstat, MCAvi, MCAti, MCArate, GamryCOM.PstatMode)
     initializepstat()
 
@@ -270,17 +268,24 @@ def mock_CA(MCAvi, MCAti, MCArate):
     pstat.SetCell(GamryCOM.CellOff)
 
     dtaq.Run(True)
-    #start_time = time.time()
-    #print("made it to run end")
+    # start_time = time.time()
+    # print("made it to run end")
+
 
 def activecheck():
     while active == True:
         client.PumpEvents(1)
         time.sleep(0.5)
 
+
 def check_vf_range(filename):
     try:
-        ocp_data = pd.read_csv(filename, sep=" ", header=None, names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
+        ocp_data = pd.read_csv(
+            filename,
+            sep=" ",
+            header=None,
+            names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"],
+        )
         vf_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vf")]
         print("Vf last row:", vf_last_row_scientific)
         vf_last_row_decimal = float(vf_last_row_scientific)
@@ -295,6 +300,7 @@ def check_vf_range(filename):
     except Exception as e:
         print("Error occurred while checking Vf:", e)
         return False
+
 
 # CV Setup Parameters
 CVvi = 0.0  # initial voltage
@@ -311,13 +317,13 @@ CVsr3 = CVsr1
 CVsamplerate = CVstep / CVsr1
 
 # CA/CP Setup Parameters
-CAvi = 0.0 #Pre-step voltage (V)
-CAti = 0.0 #Pre-step delay time (s)
-CAv1 = -2.4 #Step 1 voltage (V)
-CAt1 = 300 #run time 300 seconds
-CAv2 = 0 #Step 2 voltage (V)
-CAt2 = 0 #Step 2 time (s)
-CAsamplerate = 0.05 #sample period (s)
+CAvi = 0.0  # Pre-step voltage (V)
+CAti = 0.0  # Pre-step delay time (s)
+CAv1 = -2.4  # Step 1 voltage (V)
+CAt1 = 300  # run time 300 seconds
+CAv2 = 0  # Step 2 voltage (V)
+CAt2 = 0  # Step 2 time (s)
+CAsamplerate = 0.05  # sample period (s)
 # Max current (mA)
 # Limit I (mA/cm^2)
 # PF Corr. (ohm)
@@ -332,7 +338,7 @@ OCPvi = 0.0
 OCPti = 15
 OCPrate = 0.5
 
-#Mock_CA Setup parameters
+# Mock_CA Setup parameters
 MCAvi = 0.0
 MCAti = 300
 MCArate = 0.5
@@ -340,23 +346,23 @@ MCArate = 0.5
 if __name__ == "__main__":
     try:
         pstatconnect()  # grab first pstat
-        complete_file_name = setfilename('F1','OCP')
-        OCP(OCPvi, OCPti,OCPrate)
+        complete_file_name = setfilename("F1", "OCP")
+        OCP(OCPvi, OCPti, OCPrate)
         activecheck()
-#        while active == True:
-                #client.PumpEvents(1)
-                #time.sleep(0.5)
+        #        while active == True:
+        # client.PumpEvents(1)
+        # time.sleep(0.5)
         ## echem CA - deposition
-        if check_vsig_range(complete_file_name.with_suffix('.txt')):
-            complete_file_name = setfilename('F1', 'CV')
+        if check_vsig_range(complete_file_name.with_suffix(".txt")):
+            complete_file_name = setfilename("F1", "CV")
             cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
-            #chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
+            # chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
             print("made it to try")
             while active == True:
                 client.PumpEvents(1)
                 time.sleep(0.5)
             ## echem plot the data
-            Analyzer.plotdata('CV', complete_file_name)
+            Analyzer.plotdata("CV", complete_file_name)
         disconnectpstat()
         del connection
 

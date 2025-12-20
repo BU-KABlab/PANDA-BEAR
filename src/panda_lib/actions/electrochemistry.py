@@ -3,7 +3,6 @@ import os
 from logging import Logger
 from pathlib import Path
 from typing import Optional, Tuple
-import copy
 
 from panda_shared.config.config_tools import (
     ConfigParserError,
@@ -43,7 +42,6 @@ if TESTING:
         import panda_lib.hardware.emstat_potentiostat.emstat_control_mock as echem
         from panda_lib.hardware.emstat_potentiostat.emstat_control_mock import (
             chrono_parameters as emstat_chrono_parameters,
-            cv_parameters as emstat_cv_parameters,
             potentiostat_ocp_parameters as emstat_potentiostat_ocp_parameters,
         )
 
@@ -76,7 +74,6 @@ else:
         import panda_lib.hardware.emstat_potentiostat.emstat_control as echem
         from panda_lib.hardware.emstat_potentiostat.emstat_control import (
             chrono_parameters as emstat_chrono_parameters,
-            cv_parameters as emstat_cv_parameters,
             potentiostat_ocp_parameters as emstat_potentiostat_ocp_parameters,
         )
 
@@ -117,8 +114,8 @@ def open_circuit_potential(
     float
         The final open circuit potential voltage
     """
-    #well = "test"
-    #experiment = "test"
+    # well = "test"
+    # experiment = "test"
     try:
         if TESTING or testing:
             pstat = echem()
@@ -159,11 +156,8 @@ def open_circuit_potential(
             raise ValueError(
                 f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
             )
-        
 
-        pstat.OCP(
-            params
-        )  # OCP
+        pstat.OCP(params)  # OCP
         pstat.activecheck()
         ocp_pass, ocp_final_voltage = pstat.check_vf_range(base_filename)
         exp.results.set_ocp_file(base_filename, ocp_pass, ocp_final_voltage, file_tag)
@@ -255,11 +249,10 @@ def ocp_check(
             break
 
 
-
 def perform_chronoamperometry(
     experiment: EchemExperimentBase,
     file_tag: Optional[str] = None,
-    custom_parameters = None,  # Remove type hint
+    custom_parameters=None,  # Remove type hint
 ) -> EchemExperimentBase:
     """Perform chronoamperometry measurement sequence.
 
@@ -317,13 +310,10 @@ def perform_chronoamperometry(
             raise ValueError(
                 f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
             )
-        
 
-        pstat.OCP(
-            params
-        )  # OCP
+        pstat.OCP(params)  # OCP
         pstat.activecheck()
-        '''
+        """
         ocp_dep_pass, ocp_char_final_voltage = pstat.check_vf_range(base_filename)
         ca_results.set_ocp_ca_file(
             base_filename, ocp_dep_pass, ocp_char_final_voltage, file_tag
@@ -339,7 +329,7 @@ def perform_chronoamperometry(
         if not ocp_dep_pass:
             experiment.set_status_and_save(ExperimentStatus.ERROR)
             raise OCPError("CA")
-        '''
+        """
         try:
             experiment.set_status_and_save(ExperimentStatus.EDEPOSITING)
             logger.info("Beginning eChem deposition of well: %s", experiment.well_id)
@@ -357,7 +347,6 @@ def perform_chronoamperometry(
             if custom_parameters:  # if not none then use the custom parameters
                 chrono_params = custom_parameters
             else:
-                
                 if PSTAT == "gamry":
                     chrono_params = gamry_chrono_parameters(
                         CAvi=experiment.ca_prestep_voltage,
@@ -373,7 +362,7 @@ def perform_chronoamperometry(
                         Estep=experiment.ca_step_1_voltage,
                         dt=experiment.ca_sample_period,
                         ttot=experiment.ca_step_1_time,
-                        E2=experiment.ca_step_2_voltage, # TODO: I dont think this is right, we need to see how the emstat expects CA 
+                        E2=experiment.ca_step_2_voltage,  # TODO: I dont think this is right, we need to see how the emstat expects CA
                         # TODO: E2 is the voltage for a second working electrode, not a second step
                     )
             pstat.chrono(chrono_params)
@@ -413,7 +402,7 @@ def pulsed_chronoamperometry(
     pulse_count: int,
     pause_time: float,
     file_tag: Optional[str] = None,
-    custom_parameters = None,  # Remove type hint
+    custom_parameters=None,  # Remove type hint
 ) -> EchemExperimentBase:
     """Perform pulsed chronoamperometry measurement sequence.
 
@@ -568,7 +557,7 @@ def perform_cyclic_voltammetry(
     experiment: EchemExperimentBase,
     file_tag: str = None,
     overwrite_initial_voltage: bool = True,
-    custom_parameters = None,
+    custom_parameters=None,
 ) -> EchemExperimentBase:
     """
     Cyclic voltammetry in a well. This includes the OCP and CV steps.
@@ -669,7 +658,7 @@ def perform_cyclic_voltammetry(
         if overwrite_initial_voltage:
             experiment.cv_initial_voltage = ocp_final_voltage
 
-        if custom_parameters:  
+        if custom_parameters:
             cv_params = custom_parameters
             if hasattr(cv_params, "CVvi"):
                 cv_params.CVvi = ocp_final_voltage
@@ -689,12 +678,12 @@ def perform_cyclic_voltammetry(
                 )
             elif PSTAT == "emstat":
                 cv_params = {
-                    "Eini":  float(experiment.cv_initial_voltage),
-                    "Ev1":   float(experiment.cv_first_anodic_peak),
-                    "Ev2":   float(experiment.cv_second_anodic_peak),
-                    "Efin":  float(experiment.cv_final_voltage),
-                    "sr":    float(experiment.cv_scan_rate_cycle_1),
-                    "dE":    float(experiment.cv_step_size),
+                    "Eini": float(experiment.cv_initial_voltage),
+                    "Ev1": float(experiment.cv_first_anodic_peak),
+                    "Ev2": float(experiment.cv_second_anodic_peak),
+                    "Efin": float(experiment.cv_final_voltage),
+                    "sr": float(experiment.cv_scan_rate_cycle_1),
+                    "dE": float(experiment.cv_step_size),
                     "nSweeps": int(experiment.cv_cycle_count),
                 }
             else:

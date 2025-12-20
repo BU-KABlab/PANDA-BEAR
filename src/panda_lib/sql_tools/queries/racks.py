@@ -66,9 +66,7 @@ def get_all_racks() -> List[Dict[str, Any]]:
                 {
                     "id": rack.id,
                     "rack_type_id": rack.rack_type_id,
-                    "rack_type_name": rack.rack_type.name
-                    if rack.rack_type
-                    else None,
+                    "rack_type_name": rack.rack_type.name if rack.rack_type else None,
                     "barcode": rack.barcode,
                     "label": rack.label,
                     "created_at": rack.created_at.isoformat()
@@ -170,9 +168,7 @@ def check_if_rack_type_exists(type_id: int) -> bool:
     """
     with SessionLocal() as session:
         return (
-            session.execute(
-                select(RackTypes).filter(RackTypes.id == type_id)
-            ).scalar()
+            session.execute(select(RackTypes).filter(RackTypes.id == type_id)).scalar()
             is not None
         )
 
@@ -485,12 +481,8 @@ def save_tip_to_db(tip_to_save: object) -> None:
     """
     with SessionLocal() as session:
         if tip_to_save.rack_id in [None, 0]:
-            current_rack_statement = select(Racks.id).filter(
-                Racks.current == 1
-            )
-            tip_to_save.rack_id = session.execute(
-                current_rack_statement
-            ).scalar_one()
+            current_rack_statement = select(Racks.id).filter(Racks.current == 1)
+            tip_to_save.rack_id = session.execute(current_rack_statement).scalar_one()
 
         # Instead we will update the status of the tip if it already exists
         update_statement = (
@@ -521,9 +513,7 @@ def save_tips_to_db(tips_to_save: List[object]) -> None:
     with SessionLocal() as session:
         for tip in tips_to_save:
             if tip.rack_id in [None, 0]:
-                current_plate_statement = select(Racks.id).filter(
-                    Racks.current == 1
-                )
+                current_plate_statement = select(Racks.id).filter(Racks.current == 1)
                 tip.rack_id = session.execute(current_plate_statement).scalar_one()
 
             # Check if tip exists

@@ -51,13 +51,21 @@ class OT2P300:
         mix(repetitions, volume, rate): Mix the solution by aspirating and dispensing.
     """
 
-    def __init__(self, arduino: Optional[ArduinoLink] = None, prime_position: Optional[float] = None):
+    def __init__(
+        self,
+        arduino: Optional[ArduinoLink] = None,
+        prime_position: Optional[float] = None,
+    ):
         """Initialize the OT2P300 Pipette interface."""
         # Set up Arduino connection
         self.arduino = ArduinoLink() if arduino is None else arduino
         # Configuration constants
-        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=36.0)
-      
+        self.prime_position = (
+            prime_position
+            if prime_position is not None
+            else config.getfloat("P300", "prime_position", fallback=36.0)
+        )
+
         self.max_p300_rate = config.getfloat(
             "P300", "max_pipetting_rate", fallback=3000
         )  # µL/s for Arduino pipette
@@ -82,9 +90,9 @@ class OT2P300:
         # Set up database tracker for volumes and contents
         self.pipette_tracker = PipetteDBHandler()
         self.pipette_tracker.set_capacity(200)  # µL
-        #self.pipette_tracker.set_capacity(
+        # self.pipette_tracker.set_capacity(
         #    config.getfloat("P300", "pipette_capacity", fallback=200.0)
-        #)  # µL
+        # )  # µL
         # If there is volume in the pipette, warn the user
         if self.pipette_tracker.volume > 0:
             vessel_logger.warning(
@@ -102,11 +110,11 @@ class OT2P300:
             raise RuntimeError("Pipette driver initialization failed")
 
         p300_control_logger.info("OT2P300 initialized")
-    
+
     @classmethod
     def from_config(cls, stepper=None, config: Optional[dict] = None) -> "OT2P300":
         return cls(arduino=stepper)
-    
+
     def __enter__(self):
         """Enter the context manager"""
         return self
@@ -188,9 +196,9 @@ class OT2P300:
                 return False
 
             # Use the pipette driver to aspirate air
-            
+
             # as is, the drip_stop function will push out the volume it already aspirated, then aspirate the drip_stop volume.
-            success = self.pipette_driver.drip_stop( 
+            success = self.pipette_driver.drip_stop(
                 vol=drip_volume, s=self.max_p300_rate
             )
 
@@ -365,7 +373,6 @@ class OT2P300:
         total_volume_to_dispense = volume_to_dispense
         drip_stop_volume = 0.0
 
-
         # Log the operation
         p300_control_logger.info(
             f"Dispensing {volume_to_dispense} µL at {rate} steps/s"
@@ -433,7 +440,7 @@ class OT2P300:
         )
 
         return None
-    
+
     def blowout_no_tracker(self, rate: float | None = None) -> None:
         """
         Move plunger to BLOWOUT_POSITION to clear the tip after mixing.
@@ -450,9 +457,11 @@ class OT2P300:
 
         # Send dispense with volume=0 so firmware performs blowout
         if rate is None:
-            success = self.pipette_driver.dispense(0.0)                    # -> CMD_PIPETTE_DISPENSE,0
+            success = self.pipette_driver.dispense(0.0)  # -> CMD_PIPETTE_DISPENSE,0
         else:
-            success = self.pipette_driver.dispense(0.0, float(rate))       # -> CMD_PIPETTE_DISPENSE,0,<rate>
+            success = self.pipette_driver.dispense(
+                0.0, float(rate)
+            )  # -> CMD_PIPETTE_DISPENSE,0,<rate>
 
         if not success:
             p300_control_logger.error("Blowout failed")
@@ -463,7 +472,8 @@ class OT2P300:
         p300_control_logger.debug("Blowout complete; tracker volume reset to 0 µL")
 
         return None
-    #TODO remove this blowout function, but verify that nothing references it.
+
+    # TODO remove this blowout function, but verify that nothing references it.
     ''' 
     def blowout(self, reprime: bool = True) -> bool:
         """
@@ -524,6 +534,7 @@ class OT2P300:
 
         return success
     '''
+
     def mix(
         self, repetitions: int, volume: float, rate: Optional[float] = None
     ) -> bool:
@@ -657,12 +668,11 @@ class OT2P300:
 
         return status
 
-    
     @property
     def has_tip(self) -> bool:
         """Return True if a tip is attached."""
         return bool(getattr(self.pipette_driver, "has_tip", False))
-    
+
     @has_tip.setter
     def has_tip(self, value: bool) -> None:
         self.pipette_driver.has_tip = bool(value)
@@ -708,7 +718,7 @@ class OT2P300:
         """
         Replace the pipette tip using the configured driver method.
         Disposes of the current tip (if present) and picks up a new one.
-        
+
         Returns:
             bool: True if tip replacement was successful, False otherwise.
         """
@@ -735,7 +745,9 @@ class OT2P300:
             time.sleep(2.0)
             p300_control_logger.debug("New pipette tip picked up successfully.")
         else:
-            p300_control_logger.error("pick_up_tip() not implemented in pipette driver.")
+            p300_control_logger.error(
+                "pick_up_tip() not implemented in pipette driver."
+            )
             return False
 
         # Reset internal state if needed
@@ -743,7 +755,6 @@ class OT2P300:
         p300_control_logger.info("Pipette tip successfully replaced and volume reset.")
 
         return True
-
 
 
 class MockOT2P300(OT2P300):
@@ -754,14 +765,21 @@ class MockOT2P300(OT2P300):
     Maintains accurate volume tracking, state management, and simulated timing.
     """
 
-    def __init__(self, arduino: Optional[ArduinoLink] = None, prime_position: Optional[float] = None):
-
+    def __init__(
+        self,
+        arduino: Optional[ArduinoLink] = None,
+        prime_position: Optional[float] = None,
+    ):
         """Initialize the mock OT2P300 interface"""
         # Use the mock Arduino interface
         self.arduino = MockArduinoLink() if arduino is None else arduino
 
         # Configuration constants
-        self.prime_position = prime_position if prime_position is not None else config.getfloat("P300", "prime_position", fallback=36)
+        self.prime_position = (
+            prime_position
+            if prime_position is not None
+            else config.getfloat("P300", "prime_position", fallback=36)
+        )
 
         self.max_p300_rate = config.getfloat(
             "P300", "max_pipetting_rate", fallback=2500.0

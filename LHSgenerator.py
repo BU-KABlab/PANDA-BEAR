@@ -20,23 +20,24 @@ import math
 import csv
 
 # --- Config ---
-N = 6                 # number of samples
-SEED = 42              # RNG seed
-FINAL_VOL_UL = 300.0   # final volume (µL)
+N = 6  # number of samples
+SEED = 42  # RNG seed
+FINAL_VOL_UL = 300.0  # final volume (µL)
 OUTFILE = "lhs_pama_peo_dep2.csv"
 
 # Ranges
 PAMA_MIN, PAMA_MAX = 10.0, 50.0
-PEO_MIN,  PEO_MAX  = 10.0, 50.0
+PEO_MIN, PEO_MAX = 10.0, 50.0
 DEP_V_MIN, DEP_V_MAX = 0.8, 2.0
 
 # Stock concentrations (mg/mL)
 STOCK_PAMA = 200.0
-STOCK_PEO  = 70.0
+STOCK_PEO = 70.0
 
 # Allow zero?
 ALLOW_ZERO_PAMA = True
-ALLOW_ZERO_PEO  = True
+ALLOW_ZERO_PEO = True
+
 
 # --- Helpers ---
 def latin_hypercube_01(n, d, rng):
@@ -47,9 +48,11 @@ def latin_hypercube_01(n, d, rng):
         H[:, j] = strata
     return H
 
+
 def u_to_logrange(u, lo, hi):
     lo_log, hi_log = math.log10(lo), math.log10(hi)
     return 10.0 ** (lo_log + u * (hi_log - lo_log))
+
 
 def transform_with_zero(u, lo, hi, allow_zero):
     if allow_zero:
@@ -58,17 +61,18 @@ def transform_with_zero(u, lo, hi, allow_zero):
     else:
         return u_to_logrange(u, lo, hi)
 
+
 # --- Main ---
 def main():
     rng = np.random.default_rng(SEED)
     U = latin_hypercube_01(N, 3, rng)
 
     pama_conc = transform_with_zero(U[:, 0], PAMA_MIN, PAMA_MAX, ALLOW_ZERO_PAMA)
-    peo_conc  = transform_with_zero(U[:, 1], PEO_MIN,  PEO_MAX,  ALLOW_ZERO_PEO)
-    dep_v     = DEP_V_MIN + U[:, 2] * (DEP_V_MAX - DEP_V_MIN)
+    peo_conc = transform_with_zero(U[:, 1], PEO_MIN, PEO_MAX, ALLOW_ZERO_PEO)
+    dep_v = DEP_V_MIN + U[:, 2] * (DEP_V_MAX - DEP_V_MIN)
 
     vol_pama_uL = (pama_conc * FINAL_VOL_UL) / STOCK_PAMA
-    vol_peo_uL  = (peo_conc  * FINAL_VOL_UL) / STOCK_PEO
+    vol_peo_uL = (peo_conc * FINAL_VOL_UL) / STOCK_PEO
     vol_solvent_uL = FINAL_VOL_UL - (vol_pama_uL + vol_peo_uL)
     vol_solvent_uL = np.maximum(vol_solvent_uL, 0.0)
 
@@ -80,23 +84,25 @@ def main():
         "vol_pama_uL",
         "vol_peo_uL",
         "vol_solvent_uL",
-        "final_vol_uL"
+        "final_vol_uL",
     ]
 
     with open(OUTFILE, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames)
         w.writeheader()
         for i in range(N):
-            w.writerow({
-                "sample_id": i + 1,
-                "pama_conc_mg_per_mL": f"{pama_conc[i]:.6f}",
-                "peo_conc_mg_per_mL":  f"{peo_conc[i]:.6f}",
-                "dep_v":               f"{dep_v[i]:.6f}",
-                "vol_pama_uL":         f"{vol_pama_uL[i]:.3f}",
-                "vol_peo_uL":          f"{vol_peo_uL[i]:.3f}",
-                "vol_solvent_uL":      f"{vol_solvent_uL[i]:.3f}",
-                "final_vol_uL":        f"{FINAL_VOL_UL:.3f}",
-            })
+            w.writerow(
+                {
+                    "sample_id": i + 1,
+                    "pama_conc_mg_per_mL": f"{pama_conc[i]:.6f}",
+                    "peo_conc_mg_per_mL": f"{peo_conc[i]:.6f}",
+                    "dep_v": f"{dep_v[i]:.6f}",
+                    "vol_pama_uL": f"{vol_pama_uL[i]:.3f}",
+                    "vol_peo_uL": f"{vol_peo_uL[i]:.3f}",
+                    "vol_solvent_uL": f"{vol_solvent_uL[i]:.3f}",
+                    "final_vol_uL": f"{FINAL_VOL_UL:.3f}",
+                }
+            )
 
     print(f"Wrote {N} samples to {OUTFILE}")
 

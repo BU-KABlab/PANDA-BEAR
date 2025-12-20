@@ -3,14 +3,13 @@
 import pandas as pd
 from pydantic import ValidationError
 from pathlib import Path
-import pandas as pd
 from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
-PROJECT_ID = 300 
+PROJECT_ID = 300
 EXPERIMENT_NAME = "pama_CA_LHStraining"
 CAMPAIGN_ID = 2
-PLATE_TYPE = 8 
+PLATE_TYPE = 8
 
 
 params_path = Path(__file__).parent / "pama_ca_trainingdata_params.csv"
@@ -34,7 +33,7 @@ def main():
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_name="pama_ca_trainingdata_protocol",
-                    analysis_id=999, 
+                    analysis_id=999,
                     well_id="A1",
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
@@ -42,7 +41,11 @@ def main():
                     project_campaign_id=CAMPAIGN_ID,
                     solutions={
                         "pama_200": {"volume": 0, "concentration": 200, "repeated": 1},
-                        "electrolyte": {"volume": 0, "concentration": 0.0, "repeated": 1},
+                        "electrolyte": {
+                            "volume": 0,
+                            "concentration": 0.0,
+                            "repeated": 1,
+                        },
                         "ipa": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "dmf": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "acn": {"volume": 0, "concentration": 0.0, "repeated": 1},
@@ -65,7 +68,7 @@ def main():
                     ca_prestep_voltage=0.0,
                     ca_prestep_time_delay=0.0,
                     ca_step_1_voltage=v_dep,
-                    ca_step_1_time=600, # deposition time in seconds
+                    ca_step_1_time=600,  # deposition time in seconds
                     ca_step_2_voltage=0.0,
                     ca_step_2_time=0.0,
                     ca_sample_rate=0.5,
@@ -77,5 +80,3 @@ def main():
 
     except ValidationError as e:
         raise e
-
-

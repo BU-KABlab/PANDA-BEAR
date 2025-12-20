@@ -10,8 +10,11 @@ from panda_shared.db_setup import SessionLocal
 
 PROTOCOL_ID = 9999
 produces_images = False
+
+
 def main(experiment: EchemExperimentBase, toolkit: Toolkit):
     pipette_tip_test(experiment=experiment, toolkit=toolkit)
+
 
 def pipette_tip_test(experiment: EchemExperimentBase, toolkit: Toolkit):
     """Pick up and drop a sequence of pipette tips to validate replace_tip."""
@@ -24,7 +27,7 @@ def pipette_tip_test(experiment: EchemExperimentBase, toolkit: Toolkit):
 
     replace_tip(toolkit, session_maker=SessionLocal, tiprack_id=tiprack_id, tip_id=None)
 
-    '''
+    """
     tip_ids = ["A1", "A2", "A3", "A4", "A5", "A6", "B1", "B2", "B3", "B4", "B5", "B6"]
 
     # Use the active rack if available
@@ -39,6 +42,6 @@ def pipette_tip_test(experiment: EchemExperimentBase, toolkit: Toolkit):
             
         except Exception as e:
             toolkit.global_logger.error("Failed replace_tip for %s: %s", tip, e)
-    '''
+    """
     experiment.set_status_and_save(ExperimentStatus.COMPLETE)
     toolkit.global_logger.info("Pipette tip test complete.")

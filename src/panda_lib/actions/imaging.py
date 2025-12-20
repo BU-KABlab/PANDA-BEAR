@@ -97,7 +97,7 @@ def image_well(
 
         if TESTING:
             Path(filepath).touch()
-        
+
         else:
             if curvature_image:
                 logger.debug("Moving camera above well %s", well_id)
@@ -124,32 +124,54 @@ def image_well(
                         for brightness_label, brightness_func in brightness_levels:
                             success = brightness_func()
                             if not success:
-                                logger.warning("Failed to set curvature lights to %s%% brightness", brightness_label)
+                                logger.warning(
+                                    "Failed to set curvature lights to %s%% brightness",
+                                    brightness_label,
+                                )
                                 continue
 
                             base_label = str(image_label) if image_label else ""
-                            
-                            z_str = f"{z:.2f}".replace(".", "-")  # replace . with p to avoid file extension confusion
+
+                            z_str = f"{z:.2f}".replace(
+                                ".", "-"
+                            )  # replace . with p to avoid file extension confusion
                             z_label = f"{base_label}_z{z_str}mm_b{brightness_label}"
 
                             filepath_z = image_filepath_generator(
-                                exp_id, pjct_id, cmpgn_id, well_id, z_label, PATH_TO_DATA
+                                exp_id,
+                                pjct_id,
+                                cmpgn_id,
+                                well_id,
+                                z_label,
+                                PATH_TO_DATA,
                             )
-                            logger.debug("Capturing image of well %s at Z=%.2f, brightness=%s%%",
-                                        experiment.well_id, z, brightness_label)
+                            logger.debug(
+                                "Capturing image of well %s at Z=%.2f, brightness=%s%%",
+                                experiment.well_id,
+                                z,
+                                brightness_label,
+                            )
                             filepath_result, result = capture_new_image(
-                                save=True, num_images=1, file_name=filepath_z, logger=logger,
+                                save=True,
+                                num_images=1,
+                                file_name=filepath_z,
+                                logger=logger,
                             )
                             toolkit.arduino.lights_off()
 
                             if not result:
-                                logger.error("Failed to capture image at Z=%.2f, brightness=%s%%", z, brightness_label)
+                                logger.error(
+                                    "Failed to capture image at Z=%.2f, brightness=%s%%",
+                                    z,
+                                    brightness_label,
+                                )
                                 continue
-                            experiment.results.append_image_file(filepath_result, context=z_label)
+                            experiment.results.append_image_file(
+                                filepath_result, context=z_label
+                            )
                 else:
                     pass
 
-        
             else:
                 logger.debug("Moving camera above well %s", well_id)
                 if well_id != "test":
@@ -165,7 +187,10 @@ def image_well(
                 toolkit.arduino.white_lights_on5()
                 logger.debug("Capturing image of well %s", experiment.well_id)
                 filepath, result = capture_new_image(
-                    save=True, num_images=1, file_name=filepath, logger=logger,
+                    save=True,
+                    num_images=1,
+                    file_name=filepath,
+                    logger=logger,
                 )
                 toolkit.arduino.lights_off()
 

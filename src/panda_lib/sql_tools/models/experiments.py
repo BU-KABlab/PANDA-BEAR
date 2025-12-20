@@ -30,7 +30,9 @@ class Experiments(Base):
     panda_version = Column(Float, default=1.0)
     panda_unit_id = Column(Integer, ForeignKey("panda_units.id"), nullable=True)
     created = Column(String, default=dt.now(timezone.utc))
-    updated = Column(String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc))
+    updated = Column(
+        String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc)
+    )
 
     results: Mapped[list["ExperimentResults"]] = relationship(
         "ExperimentResults", backref="experiment"
@@ -48,6 +50,7 @@ class Experiments(Base):
             f"analysis_id={self.analysis_id}, panda_version={self.panda_version}, "
             f"panda_unit_id={self.panda_unit_id}, created={self.created}, updated={self.updated})>"
         )
+
 
 class ExperimentStatusView:
     """ExperimentStatus view model"""

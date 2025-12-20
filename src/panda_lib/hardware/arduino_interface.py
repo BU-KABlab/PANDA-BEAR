@@ -1,6 +1,5 @@
 import glob
 import threading
-import errno
 import asyncio
 import enum
 import logging
@@ -14,6 +13,7 @@ import serial.tools.list_ports
 from serial import Serial
 
 # Define Enums and Custom Exceptions at the top
+
 
 class PawduinoFunctions(enum.Enum):
     """Enum for Arduino commands"""
@@ -46,7 +46,7 @@ class PawduinoFunctions(enum.Enum):
     CMD_CONTACT_ON_10 = "26"
     CMD_CONTACT_ON_5 = "27"
     CMD_PIPETTE_ASPIRATE_REL = "28"  # Expected: 28,vol_uL,rate_opt
-    
+
 
 class PawduinoReturnCodes(enum.Enum):
     """Enum for Arduino return codes (used in mock and for validation)"""
@@ -74,6 +74,7 @@ class PawduinoReturnCodes(enum.Enum):
     RESP_CONTACT_ON_10 = "OK:Contact angle lights on 10%"
     RESP_CONTACT_ON_5 = "OK:Contact angle lights on 5%"
     RESP_PIPETTE_ASPIRATE_REL = "OK:Pipette aspirated relative"
+
 
 class ArduinoException(Exception):
     """Base class for Arduino communication errors."""
@@ -185,7 +186,7 @@ class ArduinoLink:
         self._monitor_task = None
         self._running = False
         self._send_lock = threading.Lock()
-        self._max_reconnect_attempts = 5   # tweak as you like
+        self._max_reconnect_attempts = 5  # tweak as you like
         self._reconnect_backoff_sec = 0.5  # base backoff
         self._event_queue: asyncio.Queue = asyncio.Queue()
         self.pipette_active = True  # Assuming pipette is active by default
@@ -213,22 +214,24 @@ class ArduinoLink:
 
         # 2) VID/PID filter (add yours here if different)
         for p in serial.tools.list_ports.comports():
-            if p.vid and p.pid and (p.vid, p.pid) in {(0x2341, 0x8037), (0x2A03, 0x0043)}:
+            if (
+                p.vid
+                and p.pid
+                and (p.vid, p.pid) in {(0x2341, 0x8037), (0x2A03, 0x0043)}
+            ):
                 return p.device
 
         # 3) last resort
         acms = sorted(glob.glob("/dev/ttyACM*"))
         return acms[0] if acms else None
 
-    
-
     def _wait_for_port(self, timeout_s=30.0, poll_s=0.5):
         """Repeatedly call self._discover_port() until an existing device path is found."""
         deadline = time.monotonic() + timeout_s
         last_log = None
         while time.monotonic() < deadline:
-            port = self._discover_port()          # <-- use your existing function
-            if port and os.path.exists(port):     # make sure it actually exists *now*
+            port = self._discover_port()  # <-- use your existing function
+            if port and os.path.exists(port):  # make sure it actually exists *now*
                 if port != last_log:
                     self.logger.info("Arduino found on %s", port)
                     last_log = port
@@ -257,16 +260,16 @@ class ArduinoLink:
             if hasattr(self.ser, "setDTR"):
                 self.ser.setDTR(level)  # type: ignore[attr-defined]
             elif hasattr(self.ser, "dtr"):
-                self.ser.dtr = level    # type: ignore[attr-defined]
+                self.ser.dtr = level  # type: ignore[attr-defined]
         except Exception as e:
             self.logger.debug("DTR set skipped: %s", e)
-
-
 
     def _choose_arduino_port(self, interactive: bool = False) -> Optional[str]:
         if os.name == "posix":
             ports = list(serial.tools.list_ports.comports())
-            candidates = [p for p in ports if ("ttyACM" in p.device or "ttyUSB" in p.device)]
+            candidates = [
+                p for p in ports if ("ttyACM" in p.device or "ttyUSB" in p.device)
+            ]
         elif os.name == "nt":
             ports = list(serial.tools.list_ports.comports())
             candidates = [p for p in ports if "COM" in p.device]
@@ -317,27 +320,35 @@ class ArduinoLink:
             except Exception:
                 pass
 
-            port = self._wait_for_port(timeout_s=30.0, poll_s=0.5)   # <— wait here
+            port = self._wait_for_port(timeout_s=30.0, poll_s=0.5)  # <— wait here
             if not port:
-                raise ArduinoConnectionError("Arduino did not re-enumerate within timeout")
+                raise ArduinoConnectionError(
+                    "Arduino did not re-enumerate within timeout"
+                )
 
             self.logger.info("Opening %s…", port)
             self.ser = Serial(
-                port, self.baud_rate,
+                port,
+                self.baud_rate,
                 timeout=self.read_timeout,
                 write_timeout=self.read_timeout,
-                rtscts=False, dsrdtr=False, xonxoff=False, exclusive=True
+                rtscts=False,
+                dsrdtr=False,
+                xonxoff=False,
+                exclusive=True,
             )
 
             # Restore your previously-stable handshake behavior:
             try:
-                if hasattr(self.ser, "setDTR"): self.ser.setDTR(True)
-                if hasattr(self.ser, "setRTS"): self.ser.setRTS(False)
+                if hasattr(self.ser, "setDTR"):
+                    self.ser.setDTR(True)
+                if hasattr(self.ser, "setRTS"):
+                    self.ser.setRTS(False)
             except Exception:
                 pass
 
-            time.sleep(10.0)              # your setup was stable with a long settle
-            self._safe_reset_buffers()     # clear once after open
+            time.sleep(10.0)  # your setup was stable with a long settle
+            self._safe_reset_buffers()  # clear once after open
 
             # Optional: tolerate simple banners like 'Ready'
             resp = self.send(PawduinoFunctions.CMD_HELLO)
@@ -364,17 +375,30 @@ class ArduinoLink:
         last_err = None
         for attempt in range(1, self._max_reconnect_attempts + 1):
             backoff = self._reconnect_backoff_sec * (2 ** (attempt - 1))
-            self.logger.info("Reconnecting to Arduino (attempt %d/%d)…", attempt, self._max_reconnect_attempts)
+            self.logger.info(
+                "Reconnecting to Arduino (attempt %d/%d)…",
+                attempt,
+                self._max_reconnect_attempts,
+            )
             try:
                 # Force rediscovery on each attempt
                 old_cfg = self.port_address
                 self.port_address = "auto"
                 self.connect()  # will handshake and set self.port_address to the chosen port
-                self.logger.info("Reconnected successfully on attempt %d (port %s).", attempt, self.port_address)
+                self.logger.info(
+                    "Reconnected successfully on attempt %d (port %s).",
+                    attempt,
+                    self.port_address,
+                )
                 return
             except Exception as e:
                 last_err = e
-                self.logger.warning("Reconnect attempt %d failed: %s. Retrying in %.2fs", attempt, e, backoff)
+                self.logger.warning(
+                    "Reconnect attempt %d failed: %s. Retrying in %.2fs",
+                    attempt,
+                    e,
+                    backoff,
+                )
                 time.sleep(backoff)
 
         raise ArduinoConnectionError(
@@ -450,7 +474,9 @@ class ArduinoLink:
                 pass
 
             if not self.ser.is_open:
-                raise ArduinoConnectionError(f"Failed to open serial port {chosen_port}")
+                raise ArduinoConnectionError(
+                    f"Failed to open serial port {chosen_port}"
+                )
 
             self.port_address = chosen_port
             self.connected = True
@@ -459,7 +485,6 @@ class ArduinoLink:
             # settle + clear buffers ONCE after open
             time.sleep(10)
             self._safe_reset_buffers()
-
 
             self.logger.info("Attempting handshake with Arduino...")
             self.configured = True
@@ -531,16 +556,25 @@ class ArduinoLink:
         loop = asyncio.get_event_loop()
         future = loop.run_in_executor(None, self.receive)
         return await future
-    
+
     def send(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
         if not isinstance(cmd_enum_member, PawduinoFunctions):
-            raise ArduinoCommandError(f"send expects a PawduinoFunctions member, got {cmd_enum_member!r}")
+            raise ArduinoCommandError(
+                f"send expects a PawduinoFunctions member, got {cmd_enum_member!r}"
+            )
 
         with self._send_lock:
             return self._send_internal(cmd_enum_member, *args)
-    
-    def _send_internal(self, cmd_enum_member: PawduinoFunctions, *args) -> Dict[str, Any]:
-        if (not self.connected) or (not self.configured) or (not self.ser) or (not self.ser.is_open):
+
+    def _send_internal(
+        self, cmd_enum_member: PawduinoFunctions, *args
+    ) -> Dict[str, Any]:
+        if (
+            (not self.connected)
+            or (not self.configured)
+            or (not self.ser)
+            or (not self.ser.is_open)
+        ):
             raise ArduinoConnectionError("Not connected to Arduino.")
 
         command_code = cmd_enum_member.value
@@ -549,7 +583,10 @@ class ArduinoLink:
         self.logger.debug("Sending to Arduino: %s", command_to_send.strip())
 
         # Optional: avoid hitting USB exactly at a big motion/EM pulse
-        if cmd_enum_member in {PawduinoFunctions.CMD_EMAG_ON, PawduinoFunctions.CMD_EMAG_OFF}:
+        if cmd_enum_member in {
+            PawduinoFunctions.CMD_EMAG_ON,
+            PawduinoFunctions.CMD_EMAG_OFF,
+        }:
             time.sleep(0.05)  # 50 ms settle
 
         start_time = time.monotonic()
@@ -586,13 +623,19 @@ class ArduinoLink:
                             continue
 
                         # Ignore non-protocol lines quietly
-                        self.logger.debug("Ignoring non-protocol line: %s", response_str)
+                        self.logger.debug(
+                            "Ignoring non-protocol line: %s", response_str
+                        )
 
                     # If we got here, no protocol line within the per-command window
-                    self.logger.warning("No protocol response within 5s for %s", command_to_send.strip())
+                    self.logger.warning(
+                        "No protocol response within 5s for %s", command_to_send.strip()
+                    )
 
                 except (serial.SerialTimeoutException,) as e:
-                    self.logger.warning("Serial timeout for '%s': %s", command_to_send.strip(), e)
+                    self.logger.warning(
+                        "Serial timeout for '%s': %s", command_to_send.strip(), e
+                    )
 
                 except (serial.SerialException, OSError, IOError) as e:
                     msg = str(e)
@@ -601,7 +644,9 @@ class ArduinoLink:
                     # one reconnect mid-command
                     if not attempted_reconnect:
                         attempted_reconnect = True
-                        self._handle_serial_error(e, during=f"send({cmd_enum_member.name})")
+                        self._handle_serial_error(
+                            e, during=f"send({cmd_enum_member.name})"
+                        )
                         # _handle_serial_error should call your reconnect which waits for the port to reappear
                         continue
                     raise ArduinoConnectionError(
@@ -614,6 +659,7 @@ class ArduinoLink:
         raise ArduinoTimeoutError(
             f"Timeout after {elapsed:.1f}s waiting for response to: {command_to_send.strip()}"
         )
+
     async def async_send(
         self, cmd_enum_member: PawduinoFunctions, *args
     ) -> Dict[str, Any]:
@@ -646,8 +692,6 @@ class ArduinoLink:
 
         while time.time() - start_time < max_total_time:
             try:
-
-
                 await loop.run_in_executor(
                     None, lambda: self.ser.write(command_to_send.encode())
                 )
@@ -807,32 +851,32 @@ class ArduinoLink:
         """Turn on the white lights"""
         response = self.send(PawduinoFunctions.CMD_WHITE_ON_5)
         return response.get("success", False)
-    
+
     def white_lights_on10(self):
         """Turn on the white lights"""
         response = self.send(PawduinoFunctions.CMD_WHITE_ON_10)
         return response.get("success", False)
-    
+
     def white_lights_on15(self):
         """Turn on the white lights"""
         response = self.send(PawduinoFunctions.CMD_WHITE_ON_15)
         return response.get("success", False)
-    
+
     def white_lights_on25(self):
         """Turn on the white lights"""
         response = self.send(PawduinoFunctions.CMD_WHITE_ON_25)
         return response.get("success", False)
-    
+
     def white_lights_on50(self):
         """Turn on the white lights"""
         response = self.send(PawduinoFunctions.CMD_WHITE_ON_50)
         return response.get("success", False)
-    
+
     def white_lights_on100(self):
         """Turn on the white lights"""
         response = self.send(PawduinoFunctions.CMD_WHITE_ON_100)
         return response.get("success", False)
-    
+
     def white_lights_off(self):
         """Turn off the white lights"""
         response = self.send(PawduinoFunctions.CMD_WHITE_OFF)
@@ -852,22 +896,22 @@ class ArduinoLink:
         """Turn on the rb lights"""
         response = self.send(PawduinoFunctions.CMD_CONTACT_ON_50)
         return response.get("success", False)
-    
+
     def ca_lights_on_30(self):
         """Turn on the rb lights"""
         response = self.send(PawduinoFunctions.CMD_CONTACT_ON_30)
         return response.get("success", False)
-    
+
     def ca_lights_on_20(self):
         """Turn on the rb lights"""
         response = self.send(PawduinoFunctions.CMD_CONTACT_ON_20)
         return response.get("success", False)
-    
+
     def ca_lights_on_10(self):
         """Turn on the rb lights"""
         response = self.send(PawduinoFunctions.CMD_CONTACT_ON_10)
         return response.get("success", False)
-    
+
     def ca_lights_on_5(self):
         """Turn on the rb lights"""
         response = self.send(PawduinoFunctions.CMD_CONTACT_ON_5)
@@ -1286,8 +1330,10 @@ class ArduinoLink:
         else:
             response = self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE, volume)
         return response
-    
-    def mix(self, repetitions: int, volume: float, rate: Optional[float] = None) -> Dict[str, Any]:
+
+    def mix(
+        self, repetitions: int, volume: float, rate: Optional[float] = None
+    ) -> Dict[str, Any]:
         """
         Mix in place by plunger oscillation.
 
@@ -1301,12 +1347,12 @@ class ArduinoLink:
         """
         if rate is not None:
             # Pass directly to firmware (firmware will interpret as steps/sec)
-            response = self.send(PawduinoFunctions.CMD_PIPETTE_MIX,
-                                repetitions, volume, rate)
+            response = self.send(
+                PawduinoFunctions.CMD_PIPETTE_MIX, repetitions, volume, rate
+            )
         else:
             # Don’t send a rate arg → firmware uses its default
-            response = self.send(PawduinoFunctions.CMD_PIPETTE_MIX,
-                                repetitions, volume)
+            response = self.send(PawduinoFunctions.CMD_PIPETTE_MIX, repetitions, volume)
         return response
 
     def hello(self) -> bool:

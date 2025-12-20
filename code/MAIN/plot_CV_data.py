@@ -7,19 +7,22 @@ import pathlib
 from matplotlib.colors import Normalize
 from matplotlib.lines import Line2D
 
+
 #################
 # Book keeeping #
 #################
 def modify_function(value):
-    return value *100000/(7.25*7.25) #converts the current from amps to milliamps and changes the current column to current density
-
+    return (
+        value * 100000 / (7.25 * 7.25)
+    )  # converts the current from amps to milliamps and changes the current column to current density
 
 
 #################
 # Summary Plots #
 #################
 
-#This code will generate ONE plot of ALL second cycles for all CV files in the folder
+
+# This code will generate ONE plot of ALL second cycles for all CV files in the folder
 def plot_all_second_cycles(folder_path, echem_function):
     plt.figure(figsize=(8, 6))  # Create a single plot for all second cycles
     plt.rcParams["figure.dpi"] = 150
@@ -31,38 +34,61 @@ def plot_all_second_cycles(folder_path, echem_function):
 
     for file_path in folder_path.glob("*{echem_function}.txt"):
         file_name = file_path.stem
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=[
+                "Time",
+                "Vf",
+                "Vu",
+                "Im",
+                "Vsig",
+                "Ach",
+                "IERange",
+                "Overload",
+                "StopTest",
+                "Cycle",
+                "Ach2",
+            ],
+        )
 
         # Check for NaN values in the 'Cycle' column and drop them
-        df = df.dropna(subset=['Cycle'])
+        df = df.dropna(subset=["Cycle"])
 
         # Convert the 'Cycle' column to integers
-        df['Cycle'] = df['Cycle'].astype(int)
+        df["Cycle"] = df["Cycle"].astype(int)
 
         # Filter data for the second cycle
-        df_second_cycle = df[df['Cycle'] == 2]
+        df_second_cycle = df[df["Cycle"] == 2]
 
         if len(df_second_cycle) == 0:
             continue  # Skip files without a second cycle
 
         df_second_cycle_copy = df_second_cycle.copy()
-        df_second_cycle_copy['Im'] = df_second_cycle_copy['Im'].apply(modify_function)
+        df_second_cycle_copy["Im"] = df_second_cycle_copy["Im"].apply(modify_function)
 
         color = colors[cycle_count % len(colors)]
 
-        plt.plot(df_second_cycle_copy['Vsig'], df_second_cycle_copy['Im'], label=f'{file_name}', color=color)
+        plt.plot(
+            df_second_cycle_copy["Vsig"],
+            df_second_cycle_copy["Im"],
+            label=f"{file_name}",
+            color=color,
+        )
         cycle_count += 1
 
-    plt.xlabel('V vs Ag/AgCl (V)')
-    plt.ylabel('Current Density (mA/cm²)')
+    plt.xlabel("V vs Ag/AgCl (V)")
+    plt.ylabel("Current Density (mA/cm²)")
     plt.legend()
     plt.tight_layout()
 
     plt.savefig(folder_path / f"all_second_cycles_{echem_function}.png")
-    print(f"All second cycles plot saved")
+    print("All second cycles plot saved")
     plt.close()
 
-#This code will generate ONE plot of ALL second cycles for all CV baseline files in the folder
+
+# This code will generate ONE plot of ALL second cycles for all CV baseline files in the folder
 def plot_all_second_cycles_baseline(folder_path, echem_function):
     plt.figure(figsize=(8, 6))  # Create a single plot for all second cycles
     plt.rcParams["figure.dpi"] = 150
@@ -74,115 +100,173 @@ def plot_all_second_cycles_baseline(folder_path, echem_function):
 
     for file_path in folder_path.glob("*{echem_function}_baseline.txt"):
         file_name = file_path.stem
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=[
+                "Time",
+                "Vf",
+                "Vu",
+                "Im",
+                "Vsig",
+                "Ach",
+                "IERange",
+                "Overload",
+                "StopTest",
+                "Cycle",
+                "Ach2",
+            ],
+        )
 
         # Check for NaN values in the 'Cycle' column and drop them
-        df = df.dropna(subset=['Cycle'])
+        df = df.dropna(subset=["Cycle"])
 
         # Convert the 'Cycle' column to integers
-        df['Cycle'] = df['Cycle'].astype(int)
+        df["Cycle"] = df["Cycle"].astype(int)
 
         # Filter data for the second cycle
-        df_second_cycle = df[df['Cycle'] == 2]
+        df_second_cycle = df[df["Cycle"] == 2]
 
         if len(df_second_cycle) == 0:
             continue  # Skip files without a second cycle
 
         df_second_cycle_copy = df_second_cycle.copy()
-        df_second_cycle_copy['Im'] = df_second_cycle_copy['Im'].apply(modify_function)
+        df_second_cycle_copy["Im"] = df_second_cycle_copy["Im"].apply(modify_function)
 
         color = colors[cycle_count % len(colors)]
 
-        plt.plot(df_second_cycle_copy['Vsig'], df_second_cycle_copy['Im'], label=f'{file_name}', color=color)
+        plt.plot(
+            df_second_cycle_copy["Vsig"],
+            df_second_cycle_copy["Im"],
+            label=f"{file_name}",
+            color=color,
+        )
         cycle_count += 1
 
-    plt.xlabel('V vs Ag/AgCl (V)')
-    plt.ylabel('Current Density (mA/cm²)')
+    plt.xlabel("V vs Ag/AgCl (V)")
+    plt.ylabel("Current Density (mA/cm²)")
     plt.legend()
     plt.tight_layout()
 
     plt.savefig(folder_path / f"all_second_cycles_{echem_function}.png")
-    print(f"All second cycles plot saved")
-    plt.close()    
+    print("All second cycles plot saved")
+    plt.close()
 
-#This code will generate ONE plot of ALL second cycles for all CV files listed in the experiment list**********This is the most recent code, other sections might need to be modified.
+
+# This code will generate ONE plot of ALL second cycles for all CV files listed in the experiment list**********This is the most recent code, other sections might need to be modified.
 def plot_list_second_cycles(folder_path, echem_function, experiment_numbers):
-    #plt.figure(figsize=(8, 8))  # Create a single plot for all second cycles
+    # plt.figure(figsize=(8, 8))  # Create a single plot for all second cycles
     plt.rcParams["figure.dpi"] = 150
     plt.rcParams["figure.facecolor"] = "white"
 
-    colors = cm.viridis(np.linspace(0,1,36))  # Adjust the number of colors if needed
+    colors = cm.viridis(np.linspace(0, 1, 36))  # Adjust the number of colors if needed
 
     cycle_count = 0
 
-    ratio_values =[]
+    ratio_values = []
 
-    '''
+    """
     for experiment_number in experiment_numbers:
         file_name = f"experiment-{experiment_number}_{echem_function}.txt"
         file_path = os.path.join(folder_path,file_name)
         try:
             legend_value = master_df.loc[master_df[experiment_number_column] == experiment_number, legend_value_column].values[0]
     
-    '''
+    """
     for experiment_number in experiment_numbers:
         file_name = f"experiment-{experiment_number}_{echem_function}.txt"
-        file_path = os.path.join(folder_path,file_name)
+        file_path = os.path.join(folder_path, file_name)
         try:
-            legend_value = master_df.loc[master_df[experiment_number_column] == experiment_number, legend_value_column].values[0]
-            if pd.notna(legend_value) and str(legend_value).replace(".","",1).isdigit():
+            legend_value = master_df.loc[
+                master_df[experiment_number_column] == experiment_number,
+                legend_value_column,
+            ].values[0]
+            if (
+                pd.notna(legend_value)
+                and str(legend_value).replace(".", "", 1).isdigit()
+            ):
                 ratio_values.append(legend_value)
             else:
-                print(f"Non-numeric value for experiment {experiment_number}. Skipping...")
+                print(
+                    f"Non-numeric value for experiment {experiment_number}. Skipping..."
+                )
                 continue
         except IndexError:
-            print(f"Experiment number {experiment_number} not found in the master file.")
+            print(
+                f"Experiment number {experiment_number} not found in the master file."
+            )
             continue
 
         if not os.path.exists(file_path):
             print(f"File not found for experiment {experiment_number}. Skipping...")
             continue
-                
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
+
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=[
+                "Time",
+                "Vf",
+                "Vu",
+                "Im",
+                "Vsig",
+                "Ach",
+                "IERange",
+                "Overload",
+                "StopTest",
+                "Cycle",
+                "Ach2",
+            ],
+        )
 
         # Check for NaN values in the 'Cycle' column and drop them
-        df = df.dropna(subset=['Cycle'])
+        df = df.dropna(subset=["Cycle"])
 
         # Convert the 'Cycle' column to integers
-        df['Cycle'] = df['Cycle'].astype(int)
+        df["Cycle"] = df["Cycle"].astype(int)
 
         # Filter data for the second cycle
-        df_second_cycle = df[df['Cycle'] == 2]
+        df_second_cycle = df[df["Cycle"] == 2]
 
         if len(df_second_cycle) == 0:
             continue  # Skip files without a second cycle
 
         df_second_cycle_copy = df_second_cycle.copy()
-        df_second_cycle_copy['Im'] = df_second_cycle_copy['Im'].apply(modify_function)
+        df_second_cycle_copy["Im"] = df_second_cycle_copy["Im"].apply(modify_function)
 
         color = colors[cycle_count % len(colors)]
 
-        plt.plot(df_second_cycle_copy['Vsig'], df_second_cycle_copy['Im'], label=f"PEG:Acrylate {legend_value}", color=color)
+        plt.plot(
+            df_second_cycle_copy["Vsig"],
+            df_second_cycle_copy["Im"],
+            label=f"PEG:Acrylate {legend_value}",
+            color=color,
+        )
         cycle_count += 1
 
-    if not any(isinstance(value,(int,float)) for value in ratio_values):
-            print("No numeric values found in {legend_value_column}. Skipping color bar...")
+    if not any(isinstance(value, (int, float)) for value in ratio_values):
+        print("No numeric values found in {legend_value_column}. Skipping color bar...")
     else:
         norm = plt.Normalize(min(ratio_values), max(ratio_values))
         sm = plt.cm.ScalarMappable(cmap=cm.viridis, norm=norm)
         sm.set_array([])
-        cbar = plt.colorbar(sm, ax=plt.gca(), label='PEG:Acrylate - #:1')
+        cbar = plt.colorbar(sm, ax=plt.gca(), label="PEG:Acrylate - #:1")
 
-    plt.xlabel('V vs Ag (V)')
-    plt.ylabel('Current Density (mA/cm²)')
-    #plt.legend()
+    plt.xlabel("V vs Ag (V)")
+    plt.ylabel("Current Density (mA/cm²)")
+    # plt.legend()
     plt.tight_layout()
 
-    plt.savefig(folder_path / f"all_second_cycles_{echem_function}_{legend_value_column}.png")
-    print(f"All second cycles plot saved")
+    plt.savefig(
+        folder_path / f"all_second_cycles_{echem_function}_{legend_value_column}.png"
+    )
+    print("All second cycles plot saved")
     plt.close()
 
-#This code will generate ONE plot of ALL second cycles for all CV baseline files listed in the experiment list
+
+# This code will generate ONE plot of ALL second cycles for all CV baseline files listed in the experiment list
 def plot_list_second_cycles_baseline(folder_path, echem_function, experiment_numbers):
     plt.figure(figsize=(8, 6))  # Create a single plot for all second cycles
     plt.rcParams["figure.dpi"] = 150
@@ -194,103 +278,160 @@ def plot_list_second_cycles_baseline(folder_path, echem_function, experiment_num
 
     for experiment_number in experiment_numbers:
         file_name = f"experiment-{experiment_number}_{echem_function}_baseline.txt"
-        file_path = os.path.join(folder_path,file_name)
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
+        file_path = os.path.join(folder_path, file_name)
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=[
+                "Time",
+                "Vf",
+                "Vu",
+                "Im",
+                "Vsig",
+                "Ach",
+                "IERange",
+                "Overload",
+                "StopTest",
+                "Cycle",
+                "Ach2",
+            ],
+        )
 
         # Check for NaN values in the 'Cycle' column and drop them
-        df = df.dropna(subset=['Cycle'])
+        df = df.dropna(subset=["Cycle"])
 
         # Convert the 'Cycle' column to integers
-        df['Cycle'] = df['Cycle'].astype(int)
+        df["Cycle"] = df["Cycle"].astype(int)
 
         # Filter data for the second cycle
-        df_second_cycle = df[df['Cycle'] == 2]
+        df_second_cycle = df[df["Cycle"] == 2]
 
         if len(df_second_cycle) == 0:
             continue  # Skip files without a second cycle
 
         df_second_cycle_copy = df_second_cycle.copy()
-        df_second_cycle_copy['Im'] = df_second_cycle_copy['Im'].apply(modify_function)
+        df_second_cycle_copy["Im"] = df_second_cycle_copy["Im"].apply(modify_function)
 
         color = colors[cycle_count % len(colors)]
 
-        plt.plot(df_second_cycle_copy['Vsig'], df_second_cycle_copy['Im'], label=f'{file_name}', color=color)
+        plt.plot(
+            df_second_cycle_copy["Vsig"],
+            df_second_cycle_copy["Im"],
+            label=f"{file_name}",
+            color=color,
+        )
         cycle_count += 1
 
-    plt.xlabel('V vs Ag (V)')
-    plt.ylabel('Current Density (mA/cm²)')
+    plt.xlabel("V vs Ag (V)")
+    plt.ylabel("Current Density (mA/cm²)")
     plt.legend()
     plt.tight_layout()
 
     plt.savefig(folder_path / f"all_second_cycles_{echem_function}.png")
-    print(f"All second cycles plot saved")
+    print("All second cycles plot saved")
     plt.close()
 
+
 def plot_list_deposition_backup(folder_path, echem_function, experiment_numbers):
-    #plt.figure(figsize=(8, 8))  # Create a single plot for all second cycles
+    # plt.figure(figsize=(8, 8))  # Create a single plot for all second cycles
     plt.rcParams["figure.dpi"] = 150
     plt.rcParams["figure.facecolor"] = "white"
 
     cmap = cm.viridis
-    #colors = cm.viridis(np.linspace(0,1,10))  # Adjust the number of colors if needed
-    
+    # colors = cm.viridis(np.linspace(0,1,10))  # Adjust the number of colors if needed
+
     exp_count = 0
 
-    ratio_values =[]
+    ratio_values = []
     norm = plt.Normalize(min(ratio_values), max(ratio_values))
-    '''
+    """
     for experiment_number in experiment_numbers:
         file_name = f"experiment-{experiment_number}_{echem_function}.txt"
         file_path = os.path.join(folder_path,file_name)
         try:
             legend_value = master_df.loc[master_df[experiment_number_column] == experiment_number, legend_value_column].values[0]
     
-    '''
+    """
     for experiment_number in experiment_numbers:
         file_name = f"experiment-{experiment_number}_{echem_function}.txt"
-        file_path = os.path.join(folder_path,file_name)
+        file_path = os.path.join(folder_path, file_name)
         try:
-            legend_value = master_df.loc[master_df[experiment_number_column] == experiment_number, legend_value_column].values[0]
-            if pd.notna(legend_value) and str(legend_value).replace(".","",1).isdigit():
+            legend_value = master_df.loc[
+                master_df[experiment_number_column] == experiment_number,
+                legend_value_column,
+            ].values[0]
+            if (
+                pd.notna(legend_value)
+                and str(legend_value).replace(".", "", 1).isdigit()
+            ):
                 ratio_values.append(legend_value)
             else:
-                print(f"Non-numeric value for experiment {experiment_number}. Skipping...")
+                print(
+                    f"Non-numeric value for experiment {experiment_number}. Skipping..."
+                )
                 continue
         except IndexError:
-            print(f"Experiment number {experiment_number} not found in the master file.")
+            print(
+                f"Experiment number {experiment_number} not found in the master file."
+            )
             continue
 
         if not os.path.exists(file_path):
             print(f"File not found for experiment {experiment_number}. Skipping...")
             continue
-                
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["runtime", "Vf", "Vu", "Im", "Q", "Vsig", "Ach", "IERange", "Over", "StopTest"])
 
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=[
+                "runtime",
+                "Vf",
+                "Vu",
+                "Im",
+                "Q",
+                "Vsig",
+                "Ach",
+                "IERange",
+                "Over",
+                "StopTest",
+            ],
+        )
 
         df_copy = df.copy()
-        df_copy['Im'] = df_copy['Im'].apply(modify_function)
-        
+        df_copy["Im"] = df_copy["Im"].apply(modify_function)
+
         color = cmap(norm(legend_value))  # Map legend value to a color
-        
-        plt.plot(df_copy['runtime'], df_copy['Im'], label=f"PEG:Acr {legend_value}", color=color)
+
+        plt.plot(
+            df_copy["runtime"],
+            df_copy["Im"],
+            label=f"PEG:Acr {legend_value}",
+            color=color,
+        )
         exp_count += 1
 
-    if not any(isinstance(value,(int,float)) for value in ratio_values):
-            print("No numeric values found in {legend_value_column}. Skipping color bar...")
+    if not any(isinstance(value, (int, float)) for value in ratio_values):
+        print("No numeric values found in {legend_value_column}. Skipping color bar...")
     else:
         norm = plt.Normalize(min(ratio_values), max(ratio_values))
         sm = plt.cm.ScalarMappable(cmap=cm.viridis, norm=norm)
         sm.set_array([])
-        cbar = plt.colorbar(sm, ax=plt.gca(), label='PEG:Acrylate - #:1')
+        cbar = plt.colorbar(sm, ax=plt.gca(), label="PEG:Acrylate - #:1")
 
-    plt.xlabel('Time (s)')
-    plt.ylabel('Current Density (mA/cm²)')
-    #plt.legend()
+    plt.xlabel("Time (s)")
+    plt.ylabel("Current Density (mA/cm²)")
+    # plt.legend()
     plt.tight_layout()
 
-    plt.savefig(folder_path / f"ACR_rich_depositions_noleg_{echem_function}_{legend_value_column}.png")
-    print(f"All depositions plot saved")
+    plt.savefig(
+        folder_path
+        / f"ACR_rich_depositions_noleg_{echem_function}_{legend_value_column}.png"
+    )
+    print("All depositions plot saved")
     plt.close()
+
 
 def plot_list_deposition(folder_path, echem_function, experiment_numbers):
     plt.rcParams["figure.dpi"] = 150
@@ -304,10 +445,16 @@ def plot_list_deposition(folder_path, echem_function, experiment_numbers):
     for experiment_number in experiment_numbers:
         file_name = f"experiment-{experiment_number}_{echem_function}.txt"
         file_path = os.path.join(folder_path, file_name)
-        
+
         try:
-            legend_value = master_df.loc[master_df[experiment_number_column] == experiment_number, legend_value_column].values[0]
-            if pd.notna(legend_value) and str(legend_value).replace(".", "", 1).isdigit():
+            legend_value = master_df.loc[
+                master_df[experiment_number_column] == experiment_number,
+                legend_value_column,
+            ].values[0]
+            if (
+                pd.notna(legend_value)
+                and str(legend_value).replace(".", "", 1).isdigit()
+            ):
                 if "." in str(legend_value):
                     # Convert non-integer values to integers
                     legend_value = int(float(legend_value))
@@ -316,28 +463,50 @@ def plot_list_deposition(folder_path, echem_function, experiment_numbers):
                 ratio_values.append(legend_value)
                 print(f"Added legend value {legend_value} to ratio_values")
             else:
-                print(f"Non-numeric value for experiment {experiment_number}. Skipping...")
+                print(
+                    f"Non-numeric value for experiment {experiment_number}. Skipping..."
+                )
                 continue
         except IndexError:
-            print(f"Experiment number {experiment_number} not found in the master file.")
+            print(
+                f"Experiment number {experiment_number} not found in the master file."
+            )
             continue
 
         if not os.path.exists(file_path):
             print(f"File not found for experiment {experiment_number}. Skipping...")
             continue
-                
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["runtime", "Vf", "Vu", "Im", "Q", "Vsig", "Ach", "IERange", "Over", "StopTest"])
+
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=[
+                "runtime",
+                "Vf",
+                "Vu",
+                "Im",
+                "Q",
+                "Vsig",
+                "Ach",
+                "IERange",
+                "Over",
+                "StopTest",
+            ],
+        )
 
         df_copy = df.copy()
-        df_copy['Im'] = df_copy['Im'].apply(modify_function)
-        
+        df_copy["Im"] = df_copy["Im"].apply(modify_function)
+
         # Create a separate norm for each experiment
         norm = Normalize(vmin=min(ratio_values), vmax=max(ratio_values))
         print(f"Created norm with min: {min(ratio_values)}, max: {max(ratio_values)}")
 
         # Map legend value to a color using the colormap and norm
         color = cmap(norm(legend_value))
-        plt.plot(df_copy['runtime'], df_copy['Im'], label=f"{legend_value}", color=color)
+        plt.plot(
+            df_copy["runtime"], df_copy["Im"], label=f"{legend_value}", color=color
+        )
 
     if not any(isinstance(value, (int, float)) for value in ratio_values):
         print("No numeric values found in {legend_value_column}. Skipping color bar...")
@@ -346,44 +515,52 @@ def plot_list_deposition(folder_path, echem_function, experiment_numbers):
         sm.set_array([])
 
         # Use the same norm for color mapping in the colorbar
-        cbar = plt.colorbar(sm, ax=plt.gca(), label=f'{legend_value_column}')
+        cbar = plt.colorbar(sm, ax=plt.gca(), label=f"{legend_value_column}")
 
-    plt.xlabel('Time (s)')
-    plt.ylabel('Current Density (mA/cm²)')
+    plt.xlabel("Time (s)")
+    plt.ylabel("Current Density (mA/cm²)")
     plt.tight_layout()
-    #plt.legend()
-    plt.savefig(folder_path / f"ACR_rich_depositions_{echem_function}_{legend_value_column}.png")
-    print(f"All depositions plot saved")
+    # plt.legend()
+    plt.savefig(
+        folder_path / f"ACR_rich_depositions_{echem_function}_{legend_value_column}.png"
+    )
+    print("All depositions plot saved")
     plt.close()
+
 
 def plot_list_OCP(folder_path, echem_function, experiment_numbers):
     plt.rcParams["figure.dpi"] = 150
     plt.rcParams["figure.facecolor"] = "white"
-    
+
     cycle_count = 0
-    colors = cm.viridis(np.linspace(0,1,len(experiment_numbers)))
+    colors = cm.viridis(np.linspace(0, 1, len(experiment_numbers)))
     legend_handles = []  # List to store legend handles
-    legend_labels = []   # List to store legend labels
+    legend_labels = []  # List to store legend labels
 
     for experiment_number in experiment_numbers:
         file_name = f"experiment-{experiment_number}_{echem_function}_char.txt"
         file_path = os.path.join(folder_path, file_name)
-                
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
-                    
+
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"],
+        )
+
         color = colors[cycle_count % len(colors)]
-        plt.plot(df['Time'], df['Vf'], color=color)
+        plt.plot(df["Time"], df["Vf"], color=color)
         # Create a custom legend handle for this experiment
         legend_handles.append(Line2D([0], [0], color=color, lw=2))
-        legend_labels.append(f'Experiment {experiment_number}')
+        legend_labels.append(f"Experiment {experiment_number}")
         cycle_count += 1
 
-    plt.xlabel('Time (s)')
-    plt.ylabel('Voltage (V)')
+    plt.xlabel("Time (s)")
+    plt.ylabel("Voltage (V)")
     plt.tight_layout()
     plt.legend(legend_handles, legend_labels)
     plt.savefig(folder_path / f"{echem_function}_ALL.png")
-    print(f"All OCP plots saved")
+    print("All OCP plots saved")
     plt.close()
 
 
@@ -391,81 +568,119 @@ def plot_list_OCP(folder_path, echem_function, experiment_numbers):
 # Individual Plots #
 ####################
 
-#This code will generate individual plots based on the experiment number given in the variables at the bottom
+
+# This code will generate individual plots based on the experiment number given in the variables at the bottom
 def plot_ind(folder_path, expnum, echem_funcion):
     file_path = folder_path / f"{expnum}_{echem_funcion}.txt"
-    df = pd.read_csv(file_path, 
-                    sep=" ", 
-                    header=None, 
-                    names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
+    df = pd.read_csv(
+        file_path,
+        sep=" ",
+        header=None,
+        names=[
+            "Time",
+            "Vf",
+            "Vu",
+            "Im",
+            "Vsig",
+            "Ach",
+            "IERange",
+            "Overload",
+            "StopTest",
+            "Cycle",
+            "Ach2",
+        ],
+    )
     plt.rcParams["figure.dpi"] = 150
     plt.rcParams["figure.facecolor"] = "white"
 
     # Check for NaN values in the 'Cycle' column and drop them
-    df = df.dropna(subset=['Cycle'])
+    df = df.dropna(subset=["Cycle"])
 
     # Convert the 'Cycle' column to integers
-    df['Cycle'] = df['Cycle'].astype(int)
+    df["Cycle"] = df["Cycle"].astype(int)
 
     # Find the maximum cycle number
-    max_cycle = df['Cycle'].max()
+    max_cycle = df["Cycle"].max()
 
     # Create a list of custom dash patterns for each cycle
-   
+
     # Create a 'viridis' colormap with the number of colors equal to the number of cycles
     colors = cm.cool(np.linspace(0, 1, max_cycle))
 
-    df['Im'] = df['Im'].apply(modify_function)
+    df["Im"] = df["Im"].apply(modify_function)
 
     # Plot values for vsig vs Im for each cycle with different dash patterns
     for i in range(max_cycle):
-        df2 = df[df['Cycle'] == i]
-        
-        plt.plot(df2['Vsig'], df2['Im'], linestyle='--', color=colors[i - 1], label=f'Cycle {i}')
+        df2 = df[df["Cycle"] == i]
 
-    plt.xlabel('V vs Ag (V)')
-    plt.ylabel('Current Density (mA/cm²)')
+        plt.plot(
+            df2["Vsig"],
+            df2["Im"],
+            linestyle="--",
+            color=colors[i - 1],
+            label=f"Cycle {i}",
+        )
 
+    plt.xlabel("V vs Ag (V)")
+    plt.ylabel("Current Density (mA/cm²)")
 
     # Add legend to the plot
-    plt.legend()      
+    plt.legend()
 
     plt.tight_layout()
-    #plt.show()
+    # plt.show()
     plt.savefig(folder_path / f"{expnum}_{echem_funcion}_allcycles.png")
     print(f"{expnum}_{echem_funcion}_allcycles plot saved")
     plt.close()
 
-#This code will generate individual plots of the second cycles for all files in the folder with the specified echem_function   
+
+# This code will generate individual plots of the second cycles for all files in the folder with the specified echem_function
 def plot_second_cycle(folder_path, echem_function):
     for file_path in folder_path.glob("*{echem_function}.txt"):
         file_name = file_path.stem
-        print('Plotting second cycle for:', file_name)
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
+        print("Plotting second cycle for:", file_name)
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=[
+                "Time",
+                "Vf",
+                "Vu",
+                "Im",
+                "Vsig",
+                "Ach",
+                "IERange",
+                "Overload",
+                "StopTest",
+                "Cycle",
+                "Ach2",
+            ],
+        )
         plt.rcParams["figure.dpi"] = 150
         plt.rcParams["figure.facecolor"] = "white"
-        f=plt.figure()      
+        f = plt.figure()
         f.set_figwidth(4)
         f.set_figheight(4)
         # Check for NaN values in the 'Cycle' column and drop them
-        df = df.dropna(subset=['Cycle'])
+        df = df.dropna(subset=["Cycle"])
 
         # Convert the 'Cycle' column to integers
-        df['Cycle'] = df['Cycle'].astype(int)
+        df["Cycle"] = df["Cycle"].astype(int)
 
         # Filter data for the second cycle
-        df_second_cycle = df[df['Cycle'] == 2]
+        df_second_cycle = df[df["Cycle"] == 2]
 
         if len(df_second_cycle) == 0:
             continue  # Skip files without a second cycle
 
-        df_second_cycle['Im'] = df_second_cycle['Im'].apply(modify_function)
+        df_second_cycle["Im"] = df_second_cycle["Im"].apply(modify_function)
 
-        plt.plot(df_second_cycle['Vsig'], df_second_cycle['Im'], label=f'Second Cycle')
+        plt.plot(df_second_cycle["Vsig"], df_second_cycle["Im"], label="Second Cycle")
 
-        plt.xlabel('V vs Ag/AgCl (V)')
-        plt.ylabel('Current Density (mA/cm²)')
-        #plt.legend()
+        plt.xlabel("V vs Ag/AgCl (V)")
+        plt.ylabel("Current Density (mA/cm²)")
+        # plt.legend()
 
         plt.tight_layout()
 
@@ -473,36 +688,60 @@ def plot_second_cycle(folder_path, echem_function):
         print(f"{file_name}_{echem_function}_second_cycle plot saved")
         plt.close()
 
-#This code will generate individual plots of all cycles for all CV files in the folder with the specified echem_function  
+
+# This code will generate individual plots of all cycles for all CV files in the folder with the specified echem_function
 def plot_all_cycles(folder_path, echem_function):
     plt.rcParams["figure.dpi"] = 150
     plt.rcParams["figure.facecolor"] = "white"
 
     for file_path in folder_path.glob("*{echem_function}.txt"):
         file_name = file_path.stem
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
-        
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=[
+                "Time",
+                "Vf",
+                "Vu",
+                "Im",
+                "Vsig",
+                "Ach",
+                "IERange",
+                "Overload",
+                "StopTest",
+                "Cycle",
+                "Ach2",
+            ],
+        )
+
         # Check for NaN values in the 'Cycle' column and drop them
-        df = df.dropna(subset=['Cycle'])
+        df = df.dropna(subset=["Cycle"])
 
         # Convert the 'Cycle' column to integers
-        df['Cycle'] = df['Cycle'].astype(int)
+        df["Cycle"] = df["Cycle"].astype(int)
 
         # Find the maximum cycle number
-        max_cycle = df['Cycle'].max()
+        max_cycle = df["Cycle"].max()
 
         # Create a colormap with the number of colors equal to the number of cycles
         colors = cm.winter_r(np.linspace(0, 1, max_cycle))
-        
-        df['Im'] = df['Im'].apply(modify_function)
-        
+
+        df["Im"] = df["Im"].apply(modify_function)
+
         plt.figure(figsize=(8, 6))  # Create a new plot for each file
         for i in range(max_cycle):
-            df2 = df[df['Cycle'] == i]
-            
-            plt.plot(df2['Vsig'], df2['Im'], linestyle='--', color=colors[i - 1], label=f'Cycle {i}')
-        plt.xlabel('V vs Ag (V)')
-        plt.ylabel('Current Density (mA/cm²)')
+            df2 = df[df["Cycle"] == i]
+
+            plt.plot(
+                df2["Vsig"],
+                df2["Im"],
+                linestyle="--",
+                color=colors[i - 1],
+                label=f"Cycle {i}",
+            )
+        plt.xlabel("V vs Ag (V)")
+        plt.ylabel("Current Density (mA/cm²)")
         plt.legend()
         plt.tight_layout()
 
@@ -510,36 +749,60 @@ def plot_all_cycles(folder_path, echem_function):
         print(f"Plot for {file_name} saved")
         plt.close()
 
-#This code will generate individual plots of all cycles for CV baseline all files in the folder with the specified echem_function  
+
+# This code will generate individual plots of all cycles for CV baseline all files in the folder with the specified echem_function
 def plot_all_cycles_baseline(folder_path, echem_function):
     plt.rcParams["figure.dpi"] = 150
     plt.rcParams["figure.facecolor"] = "white"
 
     for file_path in folder_path.glob("*{echem_function}_baseline.txt"):
         file_name = file_path.stem
-        df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
-        
+        df = pd.read_csv(
+            file_path,
+            sep=" ",
+            header=None,
+            names=[
+                "Time",
+                "Vf",
+                "Vu",
+                "Im",
+                "Vsig",
+                "Ach",
+                "IERange",
+                "Overload",
+                "StopTest",
+                "Cycle",
+                "Ach2",
+            ],
+        )
+
         # Check for NaN values in the 'Cycle' column and drop them
-        df = df.dropna(subset=['Cycle'])
+        df = df.dropna(subset=["Cycle"])
 
         # Convert the 'Cycle' column to integers
-        df['Cycle'] = df['Cycle'].astype(int)
+        df["Cycle"] = df["Cycle"].astype(int)
 
         # Find the maximum cycle number
-        max_cycle = df['Cycle'].max()
+        max_cycle = df["Cycle"].max()
 
         # Create a colormap with the number of colors equal to the number of cycles
         colors = cm.winter_r(np.linspace(0, 1, max_cycle))
-        
-        df['Im'] = df['Im'].apply(modify_function)
-        
+
+        df["Im"] = df["Im"].apply(modify_function)
+
         plt.figure(figsize=(8, 6))  # Create a new plot for each file
         for i in range(max_cycle):
-            df2 = df[df['Cycle'] == i]
-            
-            plt.plot(df2['Vsig'], df2['Im'], linestyle='--', color=colors[i - 1], label=f'Cycle {i}')
-        plt.xlabel('V vs Ag (V)')
-        plt.ylabel('Current Density (mA/cm²)')
+            df2 = df[df["Cycle"] == i]
+
+            plt.plot(
+                df2["Vsig"],
+                df2["Im"],
+                linestyle="--",
+                color=colors[i - 1],
+                label=f"Cycle {i}",
+            )
+        plt.xlabel("V vs Ag (V)")
+        plt.ylabel("Current Density (mA/cm²)")
         plt.legend()
         plt.tight_layout()
 
@@ -556,49 +819,49 @@ def plot_all_cycles_baseline(folder_path, echem_function):
 # Individual Plots #
 ####################
 
-#expnum = 'experiment-166'
+# expnum = 'experiment-166'
 
 
 #################
 # Summary Plots #
 #################
-experiment_numbers = [
-170,171,172,173,174,175,176,177,178
-]
+experiment_numbers = [170, 171, 172, 173, 174, 175, 176, 177, 178]
 
 
 ##########
 # Shared #
 ##########
 
-#date = '2023-09-09'
-#folder_path = prefolder_path / f"{date}"
-#folder_path = pathlib.Path(__file__).parents[2] /  "data" / "2023-09-06"
-prefolder_path = pathlib.Path("G:\\.shortcut-targets-by-id\\1-5Q8N9FCPTbzY_DvdwwKXIjGIYwbSlFQ\\data\\")
-folder_path = pathlib.Path("G:\\.shortcut-targets-by-id\\1-5Q8N9FCPTbzY_DvdwwKXIjGIYwbSlFQ\\data\\panda-app-dev\\")
+# date = '2023-09-09'
+# folder_path = prefolder_path / f"{date}"
+# folder_path = pathlib.Path(__file__).parents[2] /  "data" / "2023-09-06"
+prefolder_path = pathlib.Path(
+    "G:\\.shortcut-targets-by-id\\1-5Q8N9FCPTbzY_DvdwwKXIjGIYwbSlFQ\\data\\"
+)
+folder_path = pathlib.Path(
+    "G:\\.shortcut-targets-by-id\\1-5Q8N9FCPTbzY_DvdwwKXIjGIYwbSlFQ\\data\\panda-app-dev\\"
+)
 
-master_file_path = folder_path / f"master_file.csv"
-#master_df = pd.read_csv(master_file_path, sep=",", header='infer')
+master_file_path = folder_path / "master_file.csv"
+# master_df = pd.read_csv(master_file_path, sep=",", header='infer')
 experiment_number_column = "ExpID"
 legend_value_column = "Ratio calc PEG rich"
 echem_function = "OCP"
-#exp = 174
-#expnum = f"experiment-{exp}"
+# exp = 174
+# expnum = f"experiment-{exp}"
 
 #############
 # Functions #
 #############
 
-#plot_all_second_cycles(folder_path, echem_function)
-#plot_all_second_cycles_baseline(folder_path, echem_function)
-#plot_list_second_cycles(folder_path, echem_function, experiment_numbers)
-#plot_list_second_cycles_baseline(folder_path, echem_function, experiment_numbers)
-#plot_list_deposition(folder_path, echem_function, experiment_numbers)
+# plot_all_second_cycles(folder_path, echem_function)
+# plot_all_second_cycles_baseline(folder_path, echem_function)
+# plot_list_second_cycles(folder_path, echem_function, experiment_numbers)
+# plot_list_second_cycles_baseline(folder_path, echem_function, experiment_numbers)
+# plot_list_deposition(folder_path, echem_function, experiment_numbers)
 plot_list_OCP(folder_path, echem_function, experiment_numbers)
 
-#plot_ind(folder_path, expnum, echem_function)
-#plot_second_cycle(folder_path, echem_function)
-#plot_all_cycles(folder_path, echem_function)
-#plot_all_cycles_baseline(folder_path, echem_function)
-
-
+# plot_ind(folder_path, expnum, echem_function)
+# plot_second_cycle(folder_path, echem_function)
+# plot_all_cycles(folder_path, echem_function)
+# plot_all_cycles_baseline(folder_path, echem_function)

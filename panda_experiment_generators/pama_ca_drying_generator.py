@@ -1,15 +1,14 @@
 """Experiment parameters for the edot screening experiments"""
 
-import pandas as pd
 from pydantic import ValidationError
 
 from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
-PROJECT_ID = 300 
+PROJECT_ID = 300
 EXPERIMENT_NAME = "pama_CA_drying"
-CAMPAIGN_ID = 2 
-PLATE_TYPE = 8 
+CAMPAIGN_ID = 2
+PLATE_TYPE = 8
 
 
 def main():
@@ -22,12 +21,12 @@ def main():
 
     try:
         num_experiments = 1
-        for _ in range(num_experiments): 
+        for _ in range(num_experiments):
             experiments.append(
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_name="pama_ca_drying_protocol",
-                    analysis_id=999, # TODO: Update with actual analysis ID
+                    analysis_id=999,  # TODO: Update with actual analysis ID
                     well_id="B1",
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
@@ -35,7 +34,11 @@ def main():
                     project_campaign_id=CAMPAIGN_ID,
                     solutions={
                         "pama_200": {"volume": 0, "concentration": 200, "repeated": 1},
-                        "electrolyte": {"volume": 0, "concentration": 0.0, "repeated": 1},
+                        "electrolyte": {
+                            "volume": 0,
+                            "concentration": 0.0,
+                            "repeated": 1,
+                        },
                         "ipa": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "dmf": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "acn": {"volume": 0, "concentration": 0.0, "repeated": 1},
@@ -59,7 +62,7 @@ def main():
                     ca_prestep_voltage=0.0,
                     ca_prestep_time_delay=0.0,
                     ca_step_1_voltage=1.5,
-                    ca_step_1_time=600, # deposition time in seconds 
+                    ca_step_1_time=600,  # deposition time in seconds
                     ca_step_2_voltage=0.0,
                     ca_step_2_time=0.0,
                     ca_sample_rate=0.5,

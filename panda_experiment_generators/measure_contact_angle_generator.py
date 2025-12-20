@@ -1,15 +1,14 @@
 """Experiment parameters for the edot screening experiments"""
 
-import pandas as pd
 from pydantic import ValidationError
 
 from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
-PROJECT_ID = 300 
+PROJECT_ID = 300
 EXPERIMENT_NAME = "measure_CA"
-CAMPAIGN_ID = 5 
-PLATE_TYPE = 8 
+CAMPAIGN_ID = 5
+PLATE_TYPE = 8
 
 
 def main():
@@ -20,14 +19,14 @@ def main():
     experiments: list[experiment_types.EchemExperimentBase] = []
 
     try:
-        #num_experiments = 13
+        # num_experiments = 13
         well_id = {"A5"}
         for well in well_id:
             experiments.append(
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_name="measure_contact_angle_protocol",
-                    analysis_id=999, # TODO: Update with actual analysis ID
+                    analysis_id=999,  # TODO: Update with actual analysis ID
                     well_id=well,
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,

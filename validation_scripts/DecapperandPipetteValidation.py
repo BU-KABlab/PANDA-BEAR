@@ -7,10 +7,12 @@ from panda_lib.hardware.imaging import CameraType
 from panda_lib.hardware.panda_pipettes import Pipette, insert_new_pipette
 from panda_lib.toolkit import Toolkit
 
+
 def main():
     # Logging
-    logging.basicConfig(level=logging.INFO,
-                        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
     log = logging.getLogger("panda")
 
     # 1) DB: ensure an active pipette record exists
@@ -34,7 +36,9 @@ def main():
     # Sanity checks (fail fast with a clear message if config is wrong)
     assert tools.pipette is not None, "No pipette attached to Toolkit"
     assert getattr(tools.pipette, "pipette_tracker", None), "pipette_tracker missing"
-    assert getattr(tools.pipette.pipette_tracker, "capacity_ul", 0) > 0, "capacity_ul invalid"
+    assert getattr(tools.pipette.pipette_tracker, "capacity_ul", 0) > 0, (
+        "capacity_ul invalid"
+    )
 
     for i in range(18):
         log.info("Beginning transfer operations... %d of 18", i + 1)
@@ -51,6 +55,7 @@ def main():
         )
 
     print("Experiment completed successfully.")
+
 
 if __name__ == "__main__":
     main()

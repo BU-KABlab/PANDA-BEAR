@@ -30,10 +30,10 @@ class SyncScale:
 
     def __getattr__(self, name):
         """Forward attribute access to the wrapped scale."""
-        if name == 'hw' and hasattr(self.scale, 'hw'):
+        if name == "hw" and hasattr(self.scale, "hw"):
             return self.scale.hw
         raise AttributeError(f"'SyncScale' object has no attribute '{name}'")
-    
+
     def _get_event_loop(self):
         """Get or create an event loop."""
         try:

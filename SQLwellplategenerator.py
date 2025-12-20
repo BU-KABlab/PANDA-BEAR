@@ -5,10 +5,10 @@
 
 # --- CONFIG ---
 plate_id = 120
-rows = "ABCDE"       # row letters
-cols = 8             # number of columns
-a1 = {"x": -227.6, "y": -154.4, "z": -194.3}   # A1 coords
-e8 = {"x": -282.6, "y": -250.4, "z": -194.3}   # E8 coords
+rows = "ABCDE"  # row letters
+cols = 8  # number of columns
+a1 = {"x": -227.6, "y": -154.4, "z": -194.3}  # A1 coords
+e8 = {"x": -282.6, "y": -250.4, "z": -194.3}  # E8 coords
 # ---------------
 
 # steps per row/col
@@ -27,5 +27,3 @@ for ri, r in enumerate(rows):
             f"UPDATE panda_well_hx SET coordinates = '{coords}' "
             f"WHERE plate_id = {plate_id} AND well_id = '{r}{c}';"
         )
-
-

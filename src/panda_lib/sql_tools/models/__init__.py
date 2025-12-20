@@ -62,5 +62,5 @@ __all__ = [
     "VialsBase",
     "TipModel",
     "Racks",
-    "RackTypes"
+    "RackTypes",
 ]

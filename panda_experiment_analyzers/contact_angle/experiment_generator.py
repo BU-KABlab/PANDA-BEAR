@@ -13,7 +13,7 @@ from .contact_angle_classes import PAMAParams
 
 CURRENT_PIN = get_current_pin()
 
-PROJECT_ID = 16 # TODO: update based on PAMA project number
+PROJECT_ID = 16  # TODO: update based on PAMA project number
 
 
 def pama_generator(
@@ -25,12 +25,16 @@ def pama_generator(
         experiment_id=experiment_id,
         protocol_name=15,  # TODO: update this based on protocol used
         well_id="A1",  # Default to A1, let the program decide where else to put it
-        well_type_number=4, #TODO: update based on new well plate type
+        well_type_number=4,  # TODO: update based on new well plate type
         experiment_name=experiment_name,
         pin=str(CURRENT_PIN),
         project_id=PROJECT_ID,
         project_campaign_id=campaign_id,
-        solutions={"edot": 120, "solvent": 0, "rinse": 120}, # TODO: update volumes and solutions
+        solutions={
+            "edot": 120,
+            "solvent": 0,
+            "rinse": 120,
+        },  # TODO: update volumes and solutions
         status=ExperimentStatus.NEW,
         filename=experiment_name + " " + str(experiment_id),
         # Echem specific

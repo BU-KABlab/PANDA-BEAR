@@ -1,6 +1,5 @@
 import logging
-import re
-from typing import List, Optional, Callable, ClassVar, Tuple
+from typing import List, Optional, Tuple
 from datetime import datetime, timezone
 from sqlalchemy import select, update, delete, func, text, Integer, cast
 from sqlalchemy.sql import func
@@ -32,8 +31,10 @@ from .schemas import (  # PyDanctic models
     WellWriteModel,
 )
 
+
 def _now_dt():
     return datetime.now(timezone.utc)
+
 
 class TipService:
     def __init__(self, session_maker=SessionLocal):
@@ -71,8 +72,8 @@ class TipService:
             # parse "A1"
             row_label = "".join(ch for ch in tip_id if ch.isalpha()).upper()
             col_num = int("".join(ch for ch in tip_id if ch.isdigit()))
-            r = tt.rows.index(row_label)   # 0-based
-            c = col_num - 1                # 0-based
+            r = tt.rows.index(row_label)  # 0-based
+            c = col_num - 1  # 0-based
 
             # A1 origin
             x = rack.a1_x + tt.x_spacing * c
@@ -96,7 +97,9 @@ class TipService:
                 return _solve(s)
         return _solve(session)
 
-    def get_tip_coordinates(self, rack_id: int, tip_id: str) -> tuple[float, float, float]:
+    def get_tip_coordinates(
+        self, rack_id: int, tip_id: str
+    ) -> tuple[float, float, float]:
         with self.session_maker() as session:
             return self.compute_tip_xy(session, rack_id, tip_id)
 
@@ -113,51 +116,54 @@ class TipService:
                     func.lower(TipDBModel.status) == "new",  # robust to case
                 )
                 .order_by(
-                    func.substr(TipDBModel.tip_id, 1, 1).asc(),                 # row letter
-                    cast(func.substr(TipDBModel.tip_id, 2), Integer).asc(),      # numeric col
+                    func.substr(TipDBModel.tip_id, 1, 1).asc(),  # row letter
+                    cast(
+                        func.substr(TipDBModel.tip_id, 2), Integer
+                    ).asc(),  # numeric col
                 )
                 .limit(1)
             )
             tip = session.execute(stmt).scalars().first()
             return TipReadModel.model_validate(tip) if tip else None
 
-
     def update_tip(self, tip_id: str, rack_id: int, updates: dict) -> TipDBModel:
-            with self.session_maker() as s:
+        with self.session_maker() as s:
+            try:
+                tip = s.execute(
+                    select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
+                ).scalar()
+                if not tip:
+                    raise ValueError(
+                        f"Tip not found for rack_id={rack_id}, tip_id={tip_id}"
+                    )
+
+                payload = {"tip_id": tip_id, "rack_id": rack_id, **(updates or {})}
+
+                now = _now_dt()
+                # always bump updated
+                payload.setdefault("updated", now)
+                # set status_date only when status actually changes
+                if "status" in payload:
+                    new_status = str(payload["status"]).lower()
+                    old_status = (tip.status or "").lower()
+                    if new_status != old_status:
+                        payload.setdefault("status_date", now)
+
+                # If you use Pydantic, make sure its field types match (see below)
                 try:
-                    tip = s.execute(
-                        select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
-                    ).scalar()
-                    if not tip:
-                        raise ValueError(f"Tip not found for rack_id={rack_id}, tip_id={tip_id}")
+                    data = TipWriteModel(**payload).model_dump(exclude_none=True)
+                except NameError:
+                    data = {k: v for k, v in payload.items() if v is not None}
 
-                    payload = {"tip_id": tip_id, "rack_id": rack_id, **(updates or {})}
+                for k, v in data.items():
+                    setattr(tip, k, v)
 
-                    now = _now_dt()
-                    # always bump updated
-                    payload.setdefault("updated", now)
-                    # set status_date only when status actually changes
-                    if "status" in payload:
-                        new_status = str(payload["status"]).lower()
-                        old_status = (tip.status or "").lower()
-                        if new_status != old_status:
-                            payload.setdefault("status_date", now)
-
-                    # If you use Pydantic, make sure its field types match (see below)
-                    try:
-                        data = TipWriteModel(**payload).model_dump(exclude_none=True)
-                    except NameError:
-                        data = {k: v for k, v in payload.items() if v is not None}
-
-                    for k, v in data.items():
-                        setattr(tip, k, v)
-
-                    s.commit(); s.refresh(tip)
-                    return tip
-                except SQLAlchemyError as e:
-                    s.rollback()
-                    raise ValueError(f"Error updating tip: {e}") from e
-
+                s.commit()
+                s.refresh(tip)
+                return tip
+            except SQLAlchemyError as e:
+                s.rollback()
+                raise ValueError(f"Error updating tip: {e}") from e
 
     def delete_tip(self, tip_id: str, rack_id: int) -> None:
         with self.session_maker() as active_db_session:
@@ -165,13 +171,14 @@ class TipService:
                 stmt = select(TipDBModel).filter_by(tip_id=tip_id, rack_id=rack_id)
                 tip = active_db_session.execute(stmt).scalar()
                 if not tip:
-                    raise ValueError(f"Tip with id {tip_id} (rack {rack_id}) not found.")
+                    raise ValueError(
+                        f"Tip with id {tip_id} (rack {rack_id}) not found."
+                    )
                 active_db_session.delete(tip)
                 active_db_session.commit()
             except SQLAlchemyError as e:
                 active_db_session.rollback()
                 raise ValueError(f"Error deleting tip: {e}")
-
 
     def fetch_tip_type_characteristics(
         self,
@@ -202,9 +209,7 @@ class TipService:
             if rack_id and not type_id:
                 # Fetch the plate using plate_id to get its type_id
                 stmt = select(RackDBModel).filter_by(id=rack_id)
-                rack: RackDBModel = active_db_session.execute(
-                    stmt
-                ).scalar_one_or_none()
+                rack: RackDBModel = active_db_session.execute(stmt).scalar_one_or_none()
                 if not rack:
                     raise ValueError(f"Rack with given id {rack_id} not found.")
 
@@ -221,12 +226,12 @@ class TipService:
                 raise ValueError(f"Rack type with id {type_id} not found.")
 
         return RackTypeModel.model_validate(rack_type)
-    
+
     def get_rack_for_tip(self, rack_id: int):
         # defer to RackService using the same session_maker
         return RackService(self.session_maker).get_rack(rack_id)
 
-    
+
 class RackService:
     """
     Service class for interacting with tip racks in the database.
@@ -376,13 +381,10 @@ class RackService:
 
         header = f"{'ID':<5} {'Count':<6}"
         separator = "-" * len(header)
-        rows = [
-            f"{rack.id:<5} {rack.count:<6}"
-            for rack in rack_types
-        ]
+        rows = [f"{rack.id:<5} {rack.count:<6}" for rack in rack_types]
 
         return "\n".join([header, separator] + rows)
-    
+
     @staticmethod
     def _generate_positions_rows_x_cols_y(
         a1_x: float,
@@ -402,11 +404,11 @@ class RackService:
             if o == 0:
                 return x, y
             dx, dy = x - a1_x, y - a1_y
-            if o == 90:   
+            if o == 90:
                 return a1_x - dy, a1_y + dx
-            if o == 180:  
+            if o == 180:
                 return a1_x - dx, a1_y - dy
-            if o == 270:  
+            if o == 270:
                 return a1_x + dy, a1_y - dx
             return x, y
 
@@ -419,7 +421,7 @@ class RackService:
         return out
 
     def seed_tips_for_rack(
-        self,                     # <-- add self
+        self,  # <-- add self
         session: Session,
         rack_id: int,
         *,
@@ -463,7 +465,11 @@ class RackService:
                 rack_id=rack_id,
                 tip_id=tip_id,
                 status=default_status,
-                coordinates={"x": float(x), "y": float(y), "z": float(rack.pickup_height)},
+                coordinates={
+                    "x": float(x),
+                    "y": float(y),
+                    "z": float(rack.pickup_height),
+                },
             )
             for tip_id, x, y in positions
         ]
@@ -575,9 +581,7 @@ class RackTypeService:
         with self.session_maker() as db_session:
             stmt = select(RackTypeDBModel)
             rack_types = db_session.execute(stmt).scalars().all()
-            return [
-                RackTypeModel.model_validate(rack_type) for rack_type in rack_types
-            ]
+            return [RackTypeModel.model_validate(rack_type) for rack_type in rack_types]
 
 
 class VialService:

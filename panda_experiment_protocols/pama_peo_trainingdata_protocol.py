@@ -1,7 +1,8 @@
 """The sequence of steps for a pama contact angle drying experiment."""
 
 # Standard imports
-import time 
+import time
+
 # Non-standard imports
 from panda_lib.actions import (
     image_well,
@@ -25,14 +26,12 @@ from panda_lib.experiments.experiment_types import EchemExperimentBase, Experime
 from panda_lib.labware.vials import Vial, read_vials
 from panda_lib.toolkit import Toolkit
 from panda_lib.utilities import Instruments, solve_multisolute_mix
-from panda_lib.hardware.panda_pipettes import insert_new_pipette
 from panda_shared.db_setup import SessionLocal
 from panda_lib.sql_tools.queries.racks import select_current_rack_id
 from panda_lib.actions.pipetting import replace_tip, mix
-from panda_shared.db_setup import SessionLocal
 
 
-PROTOCOL_ID = 37 
+PROTOCOL_ID = 37
 
 
 def main(
@@ -49,13 +48,14 @@ def main(
         toolkit=toolkit,
     )
 
+
 def pama_peo_ca(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
     The initial screening of the pama contact angle drying solution
-    
+
     Per experiment:
     0. pama_peo_deposition
     1. pama_ipa_rinse
@@ -86,25 +86,29 @@ def pama_peo_deposition(
     8. Rinse the well 3x with flush
     9. Take image of well
     """
-    
-    toolkit.global_logger.info(
-        "Running experiment %s part 1", experiment.experiment_id
-    )
-    
+
+    toolkit.global_logger.info("Running experiment %s part 1", experiment.experiment_id)
+
     if not toolkit.pipette.has_tip:
         replace_tip(
-            toolkit,
-            session_maker=SessionLocal,
-            tiprack_id=select_current_rack_id()
+            toolkit, session_maker=SessionLocal, tiprack_id=select_current_rack_id()
         )
-    
+
     toolkit.global_logger.info("0. Imaging the well")
     experiment.set_status_and_save(ExperimentStatus.IMAGING)
-    image_well(toolkit, experiment, "BeforeDeposition", curvature_image=False, add_datazone=False)
+    image_well(
+        toolkit,
+        experiment,
+        "BeforeDeposition",
+        curvature_image=False,
+        add_datazone=False,
+    )
 
     experiment.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
 
-    toolkit.global_logger.info("1. Dispensing PAMA/electrolyte mix into well: %s", experiment.well_id)
+    toolkit.global_logger.info(
+        "1. Dispensing PAMA/electrolyte mix into well: %s", experiment.well_id
+    )
 
     # Define which solution keys to use for mixing
     mixing_keys = ["electrolyte", "pama_200", "peo_70"]
@@ -125,9 +129,9 @@ def pama_peo_deposition(
     # Units just need to be consistent with target.
     # Here: mg/mL for concentrations, µL for volumes (OK as long as both sides use µL).
     vial_comp = {
-        "electrolyte": {"pama": 0.0,   "peo": 0.0},
-        "pama_200":    {"pama": 200.0, "peo": 0.0},
-        "peo_70":      {"pama": 0.0,   "peo": 70.0},
+        "electrolyte": {"pama": 0.0, "peo": 0.0},
+        "pama_200": {"pama": 200.0, "peo": 0.0},
+        "peo_70": {"pama": 0.0, "peo": 70.0},
     }
 
     # If you store concentrations in `experiment.solutions`, you could also construct `vial_comp`
@@ -139,7 +143,7 @@ def pama_peo_deposition(
     # Either pull from your experiment (preferred):
     target = {
         "pama": experiment.dep_sol_conc,
-        "peo":  experiment.dep_sol2_conc,
+        "peo": experiment.dep_sol2_conc,
     }
     # Or set explicitly for this run:
     # target = {"pama": 50.0, "peo": 50.0}  # mg/mL
@@ -149,8 +153,8 @@ def pama_peo_deposition(
         vial_comp=vial_comp,
         v_total=v_total,
         target=target,
-        min_vol=10.0,         # enforce ≥10 µL per vial if selected
-        allow_slack=False,    # try exact match first
+        min_vol=10.0,  # enforce ≥10 µL per vial if selected
+        allow_slack=False,  # try exact match first
     )
 
     if vols is None:
@@ -160,7 +164,7 @@ def pama_peo_deposition(
             v_total=v_total,
             target=target,
             min_vol=10.0,
-            allow_slack=True,   # minimize sum of absolute species deviations
+            allow_slack=True,  # minimize sum of absolute species deviations
         )
         if vols is None:
             raise ValueError("No feasible mixture found even with slack allowed.")
@@ -185,9 +189,14 @@ def pama_peo_deposition(
 
     toolkit.global_logger.info("Mixing solution in the well")
 
-    mix(toolkit=toolkit, well=toolkit.wellplate.wells[experiment.well_id],
-        volume=100, mix_count=3, mix_height=2)
-    
+    mix(
+        toolkit=toolkit,
+        well=toolkit.wellplate.wells[experiment.well_id],
+        volume=100,
+        mix_count=3,
+        mix_height=2,
+    )
+
     # --- END MIXING STRATEGY ---
 
     ## Move the electrode to the well
@@ -197,7 +206,7 @@ def pama_peo_deposition(
     toolkit.mill.safe_move(
         x_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "x"),
         y_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "y"),
-        z_coord=toolkit.wellplate.top, 
+        z_coord=toolkit.wellplate.top,
         tool=Instruments.ELECTRODE,
     )
     # Set the feed rate to 100 to avoid overflowing the well
@@ -239,10 +248,10 @@ def pama_peo_deposition(
         toolkit=toolkit,
     )
     clear_well_res(
-        toolkit=toolkit, 
-        src_vessel=toolkit.wellplate.wells[experiment.well_id], 
-        dst_vessel=waste_selector("waste",100), 
-        desired_volume=100
+        toolkit=toolkit,
+        src_vessel=toolkit.wellplate.wells[experiment.well_id],
+        dst_vessel=waste_selector("waste", 100),
+        desired_volume=100,
     )
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
@@ -271,10 +280,10 @@ def pama_peo_deposition(
             toolkit=toolkit,
         )
     clear_well_res(
-        toolkit=toolkit, 
-        src_vessel=toolkit.wellplate.wells[experiment.well_id], 
-        dst_vessel=waste_selector("waste",200), 
-        desired_volume=200
+        toolkit=toolkit,
+        src_vessel=toolkit.wellplate.wells[experiment.well_id],
+        dst_vessel=waste_selector("waste", 200),
+        desired_volume=200,
     )
 
     toolkit.global_logger.info("8. Rinsing the well 3x with ACN")
@@ -300,12 +309,12 @@ def pama_peo_deposition(
             toolkit=toolkit,
         )
     clear_well_res(
-        toolkit=toolkit, 
-        src_vessel=toolkit.wellplate.wells[experiment.well_id], 
-        dst_vessel=waste_selector("waste",200), 
-        desired_volume=200
+        toolkit=toolkit,
+        src_vessel=toolkit.wellplate.wells[experiment.well_id],
+        dst_vessel=waste_selector("waste", 200),
+        desired_volume=200,
     )
-    
+
     toolkit.global_logger.info("8. Rinsing the well 3x with IPA")
     experiment.set_status_and_save(ExperimentStatus.RINSING)
     for i in range(3):
@@ -329,10 +338,10 @@ def pama_peo_deposition(
             toolkit=toolkit,
         )
     clear_well_res(
-        toolkit=toolkit, 
-        src_vessel=toolkit.wellplate.wells[experiment.well_id], 
-        dst_vessel=waste_selector("waste",200), 
-        desired_volume=200
+        toolkit=toolkit,
+        src_vessel=toolkit.wellplate.wells[experiment.well_id],
+        dst_vessel=waste_selector("waste", 200),
+        desired_volume=200,
     )
 
     toolkit.global_logger.info("10. Take after image")
@@ -340,29 +349,29 @@ def pama_peo_deposition(
     image_well(
         toolkit=toolkit,
         experiment=experiment,
-        image_label="AfterDeposition", curvature_image=False, add_datazone=False
+        image_label="AfterDeposition",
+        curvature_image=False,
+        add_datazone=False,
     )
 
     toolkit.global_logger.info("PAMA deposition complete\n\n")
- 
+
 
 def pama_ipa_contact_angle(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
-    
+
     0. Image well
     1. Contact angle measurement
     2. Rinse with IPA
-    
+
     Args:
         experiment (EchemExperimentBase): _description_
         toolkit (Toolkit): _description_
     """
-    toolkit.global_logger.info(
-        "Running experiment %s part 2", experiment.experiment_id
-    )
+    toolkit.global_logger.info("Running experiment %s part 2", experiment.experiment_id)
     toolkit.global_logger.info("Image well")
     experiment.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
@@ -375,13 +384,13 @@ def pama_ipa_contact_angle(
     time_min = 60  # in minutes
     toolkit.global_logger.info("Drying for %d minutes", time_min)
     time.sleep(time_min * 60)
-    toolkit.global_logger.info("Measuring contact angle after %d minutes", time_min)    
+    toolkit.global_logger.info("Measuring contact angle after %d minutes", time_min)
     experiment.set_status_and_save(ExperimentStatus.MEASURING_CA)
     measure_contact_angle(
         toolkit=toolkit,
         experiment=experiment,
-        session_maker=SessionLocal,           
-        tiprack_id=select_current_rack_id(),  
+        session_maker=SessionLocal,
+        tiprack_id=select_current_rack_id(),
         file_tag=f"ContactAngle_AfterDrying_{time_min}min",
     )
     image_well(
@@ -390,4 +399,3 @@ def pama_ipa_contact_angle(
         image_label="AfterContactAngle",
     )
     toolkit.global_logger.info("Contact angle measurement complete\n\n")
-

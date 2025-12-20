@@ -70,13 +70,15 @@ class VialKwargs(TypedDict, total=False):
     name: str
     base_thickness: float
 
+
 class TipKwargs(TypedDict, total=False):
     """TypedDict for Tip constructor keyword arguments"""
-    
+
     name: str
     capacity: float
     coordinates: CoordinatesDict
     pickup_height: float
+
 
 # Hardware types
 class PipetteState(TypedDict):

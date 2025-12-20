@@ -1,16 +1,13 @@
 """Experiment parameters for the dmfc system check experiments"""
 
-import pandas as pd
 from pydantic import ValidationError
-from pathlib import Path
-import pandas as pd
 from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
-PROJECT_ID = 300 
+PROJECT_ID = 300
 EXPERIMENT_NAME = "dmfc_systemcheck"
 CAMPAIGN_ID = 6
-PLATE_TYPE = 8 
+PLATE_TYPE = 8
 
 
 def main():
@@ -22,14 +19,14 @@ def main():
     experiments: list[experiment_types.EchemExperimentBase] = []
 
     try:
-        #num_experiments = 13
+        # num_experiments = 13
         well_id = {"A4"}
         for well in well_id:
             experiments.append(
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_name="dmfc_cv_protocol",
-                    analysis_id=999, 
+                    analysis_id=999,
                     well_id=well,
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
@@ -37,7 +34,11 @@ def main():
                     project_campaign_id=CAMPAIGN_ID,
                     solutions={
                         "dmfc": {"volume": 0, "concentration": 100, "repeated": 1},
-                        "electrolyte": {"volume": 0, "concentration": 0.0, "repeated": 1},
+                        "electrolyte": {
+                            "volume": 0,
+                            "concentration": 0.0,
+                            "repeated": 1,
+                        },
                         "ipa": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "dmf": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "acn": {"volume": 0, "concentration": 0.0, "repeated": 1},

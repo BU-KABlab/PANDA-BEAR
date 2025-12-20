@@ -106,7 +106,7 @@ class Toolkit:
             self.camera.close()
         if self.arduino:
             self.arduino.close()
-        #if self.scale:
+        # if self.scale:
         #    self.scale.hw.close()
         if self.pipette:
             self.pipette.close()
@@ -121,7 +121,7 @@ class Hardware:
         if self.camera is None:
             self.initialize_camera(use_mock_instruments)
         self.mill = kwargs.get("mill", None)
-        #self.scale = kwargs.get("scale", None)
+        # self.scale = kwargs.get("scale", None)
         self.pipette = kwargs.get("pipette", None)
         self.wellplate = kwargs.get("wellplate", None)
         self.arduino = kwargs.get("arduino", None)
@@ -130,7 +130,7 @@ class Hardware:
         self.experiment_logger = kwargs.get("experiment_logger", None)
 
     mill: Union[PandaMill, None] = None
-    #scale: Union[Scale, None] = None
+    # scale: Union[Scale, None] = None
     pipette: Union[Pipette, None] = None
     arduino: ArduinoLink = None
     # include the global logger so that the hardware can log to the same file
@@ -212,7 +212,7 @@ def connect_to_instruments(
     instruments = Toolkit(
         use_mock_instruments=use_mock_instruments,
         mill=None,
-        #scale=None,
+        # scale=None,
         pipette=None,
         wellplate=None,
         global_logger=logger,
@@ -250,7 +250,7 @@ def connect_to_instruments(
 
     # Initialize the camera
     logger.debug("Connecting to camera")
-    #if instruments.camera is None:
+    # if instruments.camera is None:
     #    instruments.initialize_camera(use_mock=False)
 
     # Connect to the camera
@@ -287,7 +287,9 @@ def connect_to_instruments(
                 arduino = None
 
         if not arduino or not arduino.configured:
-            logger.error("No Arduino connected (tried: %s)", ", ".join(map(repr, candidates)))
+            logger.error(
+                "No Arduino connected (tried: %s)", ", ".join(map(repr, candidates))
+            )
             incomplete = True
             instruments.arduino = None
 
@@ -296,10 +298,9 @@ def connect_to_instruments(
         incomplete = True
         instruments.arduino = None
 
-
     # Connect to the pump or pipette depending on configuration
     # Check if the config specifies a syringe pump. If not skip the check
-    '''
+    """
     syringe_pump = read_config_value("PIPETTE", "PIPETTE_TYPE")
     pump_port = read_config_value("PUMP", "PORT")
 
@@ -325,7 +326,7 @@ def connect_to_instruments(
             logger.error("No OT2 Pipette connected, %s", error)
             instruments.pipette = None
             incomplete = True
-    '''
+    """
     # TODO: look into why the pump logic wasn't working, for now....specify pipette directly instead of syringe pump because it wasn't connecting to the pipette
     try:
         if instruments.arduino is None:
@@ -363,7 +364,7 @@ def test_instrument_connections(
     instruments = Toolkit(
         use_mock_instruments=use_mock_instruments,
         mill=None,
-        #scale=None,
+        # scale=None,
         pipette=None,
         wellplate=None,
         arduino=None,
@@ -383,7 +384,7 @@ def test_instrument_connections(
         instruments.mill.connect_to_mill()
         instruments.pipette = Pipette()
         instruments.arduino = ArduinoLink()
-        #instruments.scale = Scale()
+        # instruments.scale = Scale()
         # Initialize the camera (mock)
         instruments.initialize_camera(use_mock=True)
         connected_instruments = ["PandaMill", "Pipette", "Arduino", "Camera"]
@@ -584,7 +585,6 @@ def test_instrument_connections(
         disconnected_instruments.append("Arduino")
         incomplete = True
 
-    
     # Pump connection
     # Check if the config specifies a syringe pump. If not skip the check
     syringe_pump = read_config_value("PIPETTE", "PIPETTE_TYPE")
@@ -624,7 +624,7 @@ def test_instrument_connections(
             print("OT2 pipette not found                        ", flush=True)
             disconnected_instruments.append("OT2 Pipette")
             incomplete = True
-    
+
     else:
         print(
             "No pump port nor syringe pump specified in the configuration file",
@@ -667,7 +667,7 @@ def disconnect_from_instruments(instruments: Toolkit):
         instruments.camera.close()
     if instruments.arduino:
         instruments.arduino.close()
-    #if instruments.scale:
+    # if instruments.scale:
     #    instruments.scale.hw.close()
     if instruments.pipette:
         instruments.pipette.close()

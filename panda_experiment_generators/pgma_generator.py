@@ -1,17 +1,13 @@
 """Experiment parameters for the pgma screening experiments"""
 
-import pandas as pd
 from pydantic import ValidationError
-from pathlib import Path
-import pandas as pd
 from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
-PROJECT_ID = 300 
+PROJECT_ID = 300
 EXPERIMENT_NAME = "pgma_contactangle"
 CAMPAIGN_ID = 7
-PLATE_TYPE = 8 
-
+PLATE_TYPE = 8
 
 
 def main():
@@ -32,8 +28,8 @@ def main():
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_name="pgma_protocol",
-                    analysis_id=999, 
-                    well_id= well,
+                    analysis_id=999,
+                    well_id=well,
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
                     project_id=PROJECT_ID,
@@ -62,7 +58,7 @@ def main():
                     ca_prestep_voltage=0.0,
                     ca_prestep_time_delay=0.0,
                     ca_step_1_voltage=v_dep,
-                    ca_step_1_time=600, # deposition time in seconds
+                    ca_step_1_time=600,  # deposition time in seconds
                     ca_step_2_voltage=0.0,
                     ca_step_2_time=0.0,
                     ca_sample_rate=0.5,
@@ -74,5 +70,3 @@ def main():
 
     except ValidationError as e:
         raise e
-
-

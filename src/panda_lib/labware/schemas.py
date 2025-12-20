@@ -1,7 +1,8 @@
-from typing import Dict, Optional, Literal, Any
+from typing import Dict, Optional, Any
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 import json
 from datetime import datetime
+
 
 class DeckObjectModel(BaseModel):
     name: str
@@ -199,6 +200,7 @@ class TipWriteModel(BaseModel):
     coordinates: Optional[Dict[str, Any]] = None
     drop_coordinates: Optional[Dict[str, Any]] = None
 
+
 class TipReadModel(BaseModel):
     rack_id: int
     tip_id: str
@@ -216,7 +218,6 @@ class TipReadModel(BaseModel):
     )
     name: Optional[str] = "default"
 
-
     model_config = ConfigDict(from_attributes=True)
 
     @field_validator("coordinates", "drop_coordinates", mode="before")
@@ -228,6 +229,7 @@ class TipReadModel(BaseModel):
             except Exception:
                 return None
         return v
+
 
 class RackTypeModel(BaseModel):
     id: int
@@ -263,7 +265,7 @@ class RackReadModel(DeckObjectModel):
 
     panda_unit_id: int
     current: bool
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 

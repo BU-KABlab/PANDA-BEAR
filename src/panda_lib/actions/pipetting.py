@@ -17,9 +17,8 @@ from ..experiments.experiment_types import (
     ExperimentBase,
     ExperimentStatus,
 )
-from ..labware import StockVial, Vial, WasteVial, Well, Tip 
+from ..labware import StockVial, Vial, WasteVial, Well
 from ..labware.services import TipService
-from ..labware.schemas import TipReadModel 
 from ..toolkit import Hardware, Labware, Toolkit
 from ..utilities import Coordinates, correction_factor
 from .movement import capping_sequence, decapping_sequence
@@ -41,17 +40,20 @@ logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
 
 # Default location to discard tips when no drop coordinates are available
-DEFAULT_TIP_DROP_COORDINATES = {"x":-92.1,"y":-227.3,"z":-169.0}
+DEFAULT_TIP_DROP_COORDINATES = {"x": -92.1, "y": -227.3, "z": -169.0}
 
-class NoTipAttachedError(Exception):
-    ...
-class TipAlreadyAttachedError(Exception):
-    ...
+
+class NoTipAttachedError(Exception): ...
+
+
+class TipAlreadyAttachedError(Exception): ...
+
+
 def replace_tip(
     toolkit: Union[Toolkit, Hardware],
     session_maker: sessionmaker,
     tiprack_id: int,
-    tip_id: Optional[str] = None
+    tip_id: Optional[str] = None,
 ) -> bool:
     logger.info("Replacing pipette tip...")
 
@@ -70,7 +72,9 @@ def replace_tip(
     if tip_id:
         tip = tip_service.get_tip(tip_id=tip_id, rack_id=tiprack_id)
         if not tip or str(getattr(tip, "status", "")).lower() != "new":
-            logger.warning(f"Tip '{tip_id}' unavailable or not new. Selecting next unused tip instead.")
+            logger.warning(
+                f"Tip '{tip_id}' unavailable or not new. Selecting next unused tip instead."
+            )
             tip = tip_service.get_first_unused_tip(rack_id=tiprack_id)
     else:
         tip = tip_service.get_first_unused_tip(rack_id=tiprack_id)
@@ -88,7 +92,9 @@ def replace_tip(
 
     drop_coords = None
     if current_tip_id and current_tip_rack_id is not None:
-        old_tip = tip_service.get_tip(tip_id=current_tip_id, rack_id=current_tip_rack_id)
+        old_tip = tip_service.get_tip(
+            tip_id=current_tip_id, rack_id=current_tip_rack_id
+        )
         drop_coords = getattr(old_tip, "drop_coordinates", None)
 
     if not drop_coords:
@@ -96,17 +102,23 @@ def replace_tip(
 
     try:
         toolkit.mill.safe_move(
-            drop_coords["x"], drop_coords["y"], drop_coords["z"],
-            tool=Instruments.PIPETTE
+            drop_coords["x"],
+            drop_coords["y"],
+            drop_coords["z"],
+            tool=Instruments.PIPETTE,
         )
     except Exception as e:
-        logger.warning(f"Safe move to drop location failed: {e}. Attempting drop anyway at current pos.")
+        logger.warning(
+            f"Safe move to drop location failed: {e}. Attempting drop anyway at current pos."
+        )
 
     # Try dropping regardless of tracker state. If no tip is attached, many drivers simply return False.
     try:
         dropped = toolkit.pipette.pipette_driver.drop_tip()
     except Exception as e:
-        logger.warning(f"drop_tip raised an exception: {e}. Continuing as if no tip was attached.")
+        logger.warning(
+            f"drop_tip raised an exception: {e}. Continuing as if no tip was attached."
+        )
         dropped = False
 
     # If we believe a specific old tip was on, mark it discarded when the drop succeeds.
@@ -114,8 +126,14 @@ def replace_tip(
         try:
             tip_service.update_tip(
                 tip_id=current_tip_id,
-                rack_id=current_tip_rack_id if current_tip_rack_id is not None else tiprack_id,
-                updates={"status": "discarded", "rack_id": current_tip_rack_id, "tip_id": current_tip_id},
+                rack_id=current_tip_rack_id
+                if current_tip_rack_id is not None
+                else tiprack_id,
+                updates={
+                    "status": "discarded",
+                    "rack_id": current_tip_rack_id,
+                    "tip_id": current_tip_id,
+                },
             )
             logger.info(f"Old tip '{current_tip_id}' dropped and marked as discarded.")
         except Exception as e:
@@ -138,22 +156,30 @@ def replace_tip(
         return False
 
     # Defensive guards for coordinates and heights
-    if not getattr(tip, "coordinates", None) or "x" not in tip.coordinates or "y" not in tip.coordinates:
+    if (
+        not getattr(tip, "coordinates", None)
+        or "x" not in tip.coordinates
+        or "y" not in tip.coordinates
+    ):
         logger.error(f"Tip '{tip.tip_id}' is missing XY coordinates.")
         return False
 
     pickup_height = getattr(tip, "pickup_height", None)
     if pickup_height is None:
-        logger.warning(f"Tip '{tip.tip_id}' missing pickup_height. Using default height of 0.0.")
+        logger.warning(
+            f"Tip '{tip.tip_id}' missing pickup_height. Using default height of 0.0."
+        )
         pickup_height = 0.0
 
     approach_z = float(pickup_height) + 20.0
 
     toolkit.mill.safe_move(
-        tip.coordinates["x"], tip.coordinates["y"], approach_z,
+        tip.coordinates["x"],
+        tip.coordinates["y"],
+        approach_z,
         tool=Instruments.PIPETTE,
         second_z_cord=pickup_height,
-        second_z_cord_feed=1000
+        second_z_cord_feed=1000,
     )
 
     # ----------------------------
@@ -161,8 +187,9 @@ def replace_tip(
     # ----------------------------
     try:
         tip_service.update_tip(
-            tip.tip_id, tip.rack_id,
-            {"rack_id": tip.rack_id, "tip_id": tip.tip_id, "status": "used"}
+            tip.tip_id,
+            tip.rack_id,
+            {"rack_id": tip.rack_id, "tip_id": tip.tip_id, "status": "used"},
         )
     except Exception as e:
         logger.warning(f"Failed to mark new tip used in DB: {e}")
@@ -179,7 +206,7 @@ def replace_tip(
     return True
 
 
-'''
+"""
 def replace_tip(
     toolkit: Union[Toolkit, Hardware],
     session_maker: sessionmaker,
@@ -269,7 +296,9 @@ def replace_tip(
 
     logger.info(f"New tip '{tip.tip_id}' picked up successfully.")
     return True
-'''
+"""
+
+
 def _pipette_action(
     toolkit: Union[Toolkit, Hardware],
     src_vessel: Union[Vial, Well],
@@ -351,7 +380,9 @@ def _pipette_action(
             )
 
         # Use standard interface for dispense
-        dispense_z = ca_dispense_height if ca_dispense_height is not None else dst_vessel.top
+        dispense_z = (
+            ca_dispense_height if ca_dispense_height is not None else dst_vessel.top
+        )
         toolkit.mill.safe_move(
             dst_vessel.x,
             dst_vessel.y,
@@ -363,7 +394,7 @@ def _pipette_action(
             being_infused=src_vessel,
             infused_into=dst_vessel,
         )
-        
+
         if isinstance(dst_vessel, WasteVial):
             capping_sequence(
                 toolkit.mill,
@@ -379,7 +410,7 @@ def _forward_pipette_v3(
     toolkit: Union[Toolkit, Hardware],
     source_concentration: float = None,
     labware: Optional[Labware] = None,
-    dst_vessel_z_dispense_height: float = None
+    dst_vessel_z_dispense_height: float = None,
 ) -> int:
     try:
         if volume <= 0.0:
@@ -423,7 +454,13 @@ def _forward_pipette_v3(
         for vessel, desired_volume in source_vessel_volumes:
             if desired_volume <= 0.0:
                 continue
-            _pipette_action(toolkit, src_vessel, dst_vessel, desired_volume, dst_vessel_z_dispense_height)
+            _pipette_action(
+                toolkit,
+                src_vessel,
+                dst_vessel,
+                desired_volume,
+                dst_vessel_z_dispense_height,
+            )
 
     except Exception as e:
         toolkit.global_logger.error("Exception occurred during pipetting: %s", e)
@@ -467,6 +504,7 @@ def transfer(
         volume, src_vessel, dst_vessel, toolkit, source_concentration
     )
 
+
 def contact_angle_transfer(
     volume: float,
     src_vessel: Union[str, Well, StockVial],
@@ -476,14 +514,19 @@ def contact_angle_transfer(
     session_maker: sessionmaker = SessionLocal,
     tiprack_id: int = 1,
     source_concentration: float = None,
-    tip_id: Optional[str] = None
+    tip_id: Optional[str] = None,
 ) -> int:
     """Transfer liquid between vessels."""
-    
+
     replace_tip(toolkit, session_maker, tiprack_id, tip_id=tip_id)
 
     return _forward_pipette_v3(
-        volume, src_vessel, dst_vessel, toolkit, source_concentration, ca_dispense_height
+        volume,
+        src_vessel,
+        dst_vessel,
+        toolkit,
+        source_concentration,
+        ca_dispense_height,
     )
 
 
@@ -693,7 +736,6 @@ def mix(
 
     logger.info("Mixing well %s %dx...", well.name, mix_count)
 
-
     for i in range(mix_count):
         logger.info("Mixing well %s %d of %d...", well.name, i + 1, mix_count)
         # Move to the bottom of the target well
@@ -705,9 +747,7 @@ def mix(
         )
 
         # Withdraw the solutions from the well
-        toolkit.pipette.mix(
-            repetitions=3, volume=150
-        )
+        toolkit.pipette.mix(repetitions=3, volume=150)
     toolkit.mill.move_to_position(
         x_coordinate=well.x,
         y_coordinate=well.y,

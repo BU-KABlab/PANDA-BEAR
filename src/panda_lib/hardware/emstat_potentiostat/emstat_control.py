@@ -4,7 +4,6 @@ from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 import pathlib
 import logging
-from decimal import Decimal
 from typing import Tuple
 import pandas as pd
 import inspect
@@ -16,13 +15,18 @@ logger = logging.getLogger("panda")
 # Helpers
 # ========
 
+
 def _as_dict_like(params):
     """Return a (key->value) mapping from params which may be a dict or object."""
     if isinstance(params, dict):
         return dict(params)
     # object with attributes
-    return {k: getattr(params, k) for k in dir(params)
-            if not k.startswith("_") and hasattr(params, k)}
+    return {
+        k: getattr(params, k)
+        for k in dir(params)
+        if not k.startswith("_") and hasattr(params, k)
+    }
+
 
 def _coerce_float(v):
     try:
@@ -30,11 +34,13 @@ def _coerce_float(v):
     except Exception:
         return v
 
+
 def _coerce_int(v):
     try:
         return int(v)
     except Exception:
         return v
+
 
 def _normalize_cv_kwargs(params):
     """
@@ -50,7 +56,7 @@ def _normalize_cv_kwargs(params):
         "CVap2": "Ev2",
         "CVvf": "Efin",
         "sr1": "sr",
-        "sr2": "sr",  
+        "sr2": "sr",
         "sr3": "sr",
         "nCycles": "nSweeps",
         "cycleCount": "nSweeps",
@@ -67,7 +73,17 @@ def _normalize_cv_kwargs(params):
             raw[new] = raw.pop(old)
 
     # Coerce core fields to numeric types if present
-    numeric_float_keys = ("Eini","Ev1","Ev2","Efin","sr","dE","sens","sens2","E2")
+    numeric_float_keys = (
+        "Eini",
+        "Ev1",
+        "Ev2",
+        "Efin",
+        "sr",
+        "dE",
+        "sens",
+        "sens2",
+        "E2",
+    )
     for k in numeric_float_keys:
         if k in raw and raw[k] is not None:
             raw[k] = _coerce_float(raw[k])
@@ -84,13 +100,24 @@ def _normalize_cv_kwargs(params):
     kwargs = {k: v for k, v in raw.items() if (v is not None and k in allowed)}
 
     # Optionally enforce a minimal set that EmStat needs
-    required = {"Eini","Ev1","Ev2","Efin","sr","dE","nSweeps","fileName","header"}
+    required = {
+        "Eini",
+        "Ev1",
+        "Ev2",
+        "Efin",
+        "sr",
+        "dE",
+        "nSweeps",
+        "fileName",
+        "header",
+    }
     missing = [k for k in required if k not in kwargs]
     if missing:
         # You may prefer to log a warning and fill defaults instead of raising
         raise ValueError(f"Missing required EmStat CV parameters: {missing}")
 
     return kwargs
+
 
 # =====================
 # Parameter dataclasses
@@ -205,13 +232,14 @@ def OCP(params: potentiostat_ocp_parameters):
     setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
     connected = setup.check_connection()
     if not connected:
-            raise RuntimeError("Could not connect to Pstat")
+        raise RuntimeError("Could not connect to Pstat")
     COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
     file_stem = pathlib.Path(COMPLETE_FILE_NAME).stem
     ocp = hp.potentiostat.OCP(params.ttot, params.dt, file_stem, params.header)
     ocp.run()
     # save_in_gamry_format(ocp.data, COMPLETE_FILE_NAME, params.header)
     return ocp.data
+
 
 def OCP_check(params: potentiostat_ocp_parameters):
     """Run OCP experiment on EmStat"""
@@ -221,14 +249,14 @@ def OCP_check(params: potentiostat_ocp_parameters):
     setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
     connected = setup.check_connection()
     if not connected:
-            raise RuntimeError("Could not connect to Pstat")
+        raise RuntimeError("Could not connect to Pstat")
     COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
     file_stem = pathlib.Path(COMPLETE_FILE_NAME).stem
     ocp = hp.potentiostat.OCP(params.ttot, params.dt, file_stem, params.header)
     ocp.run()
     # save_in_gamry_format(ocp.data, COMPLETE_FILE_NAME, params.header)
     return ocp.data
-    
+
 
 def cyclic(params: cv_parameters | dict):
     """Run CV experiment on EmStat (accepts dataclass OR dict)."""
@@ -245,8 +273,10 @@ def cyclic(params: cv_parameters | dict):
     if isinstance(params, dict):
         params = {**params, "fileName": file_stem, "header": "CV"}
     else:
-        if not getattr(params, "fileName", None): setattr(params, "fileName", file_stem)
-        if not getattr(params, "header", None):   setattr(params, "header", "CV")
+        if not getattr(params, "fileName", None):
+            setattr(params, "fileName", file_stem)
+        if not getattr(params, "header", None):
+            setattr(params, "header", "CV")
 
     kwargs = _normalize_cv_kwargs(params)
     if "nSweeps" in kwargs:
@@ -305,22 +335,25 @@ def chrono(params: chrono_parameters):
     setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
     connected = setup.check_connection()
     if not connected:
-            raise RuntimeError("Could not connect to Pstat")
+        raise RuntimeError("Could not connect to Pstat")
 
     ca = hp.potentiostat.CA(
         Estep=params.Estep,
         dt=params.dt,
         ttot=params.ttot,
         sens=params.sens,
-        fileName=pathlib.Path(COMPLETE_FILE_NAME).stem,  # Use the stem of the path to avoid double extension
+        fileName=pathlib.Path(
+            COMPLETE_FILE_NAME
+        ).stem,  # Use the stem of the path to avoid double extension
         header=params.header,
-        E2=params.E2,        # if your subclass needs it
-        sens2=params.sens2   # if your subclass needs it
+        E2=params.E2,  # if your subclass needs it
+        sens2=params.sens2,  # if your subclass needs it
     )
 
     ca.run()
     # save_in_gamry_format(ca.data, COMPLETE_FILE_NAME, params.header)
     return ca.data
+
 
 def run_mscript(params: MScriptParameters):
     """Run custom mscript file on EmStat."""
@@ -330,7 +363,7 @@ def run_mscript(params: MScriptParameters):
     setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
     connected = setup.check_connection()
     if not connected:
-            raise RuntimeError("Could not connect to Pstat")
+        raise RuntimeError("Could not connect to Pstat")
     COMPLETE_FILE_NAME = validate_file_name(COMPLETE_FILE_NAME)
     mscript = hp.potentiostat.MethodScript(
         None,
@@ -339,7 +372,7 @@ def run_mscript(params: MScriptParameters):
     )
     mscript.run()
     return mscript.data
-    #save_in_gamry_format(data, COMPLETE_FILE_NAME, params.header)
+    # save_in_gamry_format(data, COMPLETE_FILE_NAME, params.header)
 
 
 # =====================
@@ -358,11 +391,22 @@ def save_in_gamry_format(data, file_name: str, header: str):
         # f.write(f"{header}\n")
 
         for row in data:
-            line = ",".join(str(row.get(key, "N/A")) for key in [
-                "t", "E", "U", "I", "Vsig", "Ach", "Overload", "StopTest", "Cycle", "Ach2"
-            ])
+            line = ",".join(
+                str(row.get(key, "N/A"))
+                for key in [
+                    "t",
+                    "E",
+                    "U",
+                    "I",
+                    "Vsig",
+                    "Ach",
+                    "Overload",
+                    "StopTest",
+                    "Cycle",
+                    "Ach2",
+                ]
+            )
             f.write(line + "\n")
-
 
 
 # =====================
@@ -455,6 +499,6 @@ def check_vf_range(filename) -> Tuple[bool, float]:
             # logger.error("Vf not in valid range. Aborting echem experiment")
             return False, 0.0
 
-    except Exception as error:
+    except Exception:
         # logger.error("Error occurred while checking Vf: %s", error)
         return False, 0.0
