@@ -1,4 +1,8 @@
-# Construction | [Installation](installation.md) | [End User Manual](end_user_manual.md) | [Dev User Manual](developer_manual.md) | [Contents](user_manual.md) <!-- omit from toc -->
+# Construction Guide
+
+Detailed instructions for constructing the physical PANDA system components.
+
+**Navigation**: [Home](00-Home.md) | [Build Guide](Build-Guide.md) | Construction Guide | [Arduino Wiring](Arduino-Wiring.md)
 
 ## Table of Contents <!-- omit from toc -->
 - [Parts](#parts)

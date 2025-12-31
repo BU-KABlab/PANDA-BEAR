@@ -6,7 +6,6 @@ and saves the data to validate electrode functionality.
 
 import logging
 import os
-import time
 from datetime import datetime
 from pathlib import Path
 
@@ -16,7 +15,7 @@ import matplotlib.pyplot as plt
 from panda_lib.actions.electrochemistry import open_circuit_potential
 from panda_lib.experiments.experiment_types import (
     EchemExperimentBase,
-    ExperimentResults
+    ExperimentResults,
 )
 
 # Set up logging
@@ -26,7 +25,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("electrode_validation")
 
-# Configuration 
+# Configuration
 DRY_RUN = False  # Set to True to run without actual hardware
 DATA_DIR = Path("./data")  # Simple data directory
 
@@ -35,6 +34,7 @@ os.makedirs(DATA_DIR, exist_ok=True)
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 experiment_dir = DATA_DIR / f"electrode_validation_{timestamp}"
 os.makedirs(experiment_dir, exist_ok=True)
+
 
 def create_simple_experiment():
     """Create a simple experiment for electrode validation"""
@@ -70,35 +70,47 @@ def create_simple_experiment():
     experiment.results = ExperimentResults(experiment_id=experiment.experiment_id)
     return experiment
 
+
 def run_ocp_test(experiment):
     """Run OCP test with the given experiment"""
     logger.info("Starting Open Circuit Potential (OCP) measurement")
-    
+
     try:
         # Run OCP measurement
         ocp_passed, ocp_voltage = open_circuit_potential(
-            file_tag="validation",
-            exp=experiment,
-            testing=DRY_RUN
+            file_tag="validation", exp=experiment, testing=DRY_RUN
         )
-        
-        logger.info(f"OCP Test completed: Passed = {ocp_passed}, Voltage = {ocp_voltage:.4f}V")
-        
+
+        logger.info(
+            f"OCP Test completed: Passed = {ocp_passed}, Voltage = {ocp_voltage:.4f}V"
+        )
+
         # Check if OCP file was created and exists
         if experiment.results.ocp_file and os.path.exists(experiment.results.ocp_file):
             logger.info(f"OCP data saved to: {experiment.results.ocp_file}")
-            
+
             try:
                 # Load and analyze OCP data
                 ocp_data = pd.read_csv(
-                    experiment.results.ocp_file, 
-                    sep=" ", 
+                    experiment.results.ocp_file,
+                    sep=" ",
                     header=None,
-                    names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"]
+                    names=[
+                        "Time",
+                        "Vf",
+                        "Vu",
+                        "Vsig",
+                        "Ach",
+                        "Overload",
+                        "StopTest",
+                        "Temp",
+                    ],
                 )
                 logger.info(f"OCP data points: {len(ocp_data)}")
-                logger.info(f"OCP voltage range: {ocp_data['Vf'].min():.4f}V to {ocp_data['Vf'].max():.4f}V")
-                
+                logger.info(
+                    f"OCP voltage range: {ocp_data['Vf'].min():.4f}V to {ocp_data['Vf'].max():.4f}V"
+                )
+
                 # Create a simple plot of the OCP data
                 plt.figure(figsize=(10, 6))
                 plt.plot(ocp_data["Time"], ocp_data["Vf"])
@@ -109,30 +121,33 @@ def run_ocp_test(experiment):
                 plot_path = experiment_dir / "ocp_plot.png"
                 plt.savefig(plot_path)
                 logger.info(f"OCP plot saved to: {plot_path}")
-                    
+
             except Exception as e:
                 logger.error(f"Error analyzing OCP data: {e}")
-        
+
         return ocp_passed, ocp_voltage
-        
+
     except Exception as e:
         logger.error(f"Error during OCP measurement: {e}")
         return False, 0.0
 
+
 def main():
     """Main function to run electrode validation"""
     logger.info("Starting electrode validation")
-    
+
     try:
         # Prompt user to confirm electrode is connected
-        input("Please ensure the electrode is properly connected to the eMStat potentiostat and press Enter to continue...")
-        
+        input(
+            "Please ensure the electrode is properly connected to the eMStat potentiostat and press Enter to continue..."
+        )
+
         # Create a simple experiment
         experiment = create_simple_experiment()
-        
+
         # Run OCP test
         ocp_passed, ocp_voltage = run_ocp_test(experiment)
-        
+
         # Evaluate results
         if ocp_passed:
             logger.info("✅ Electrode validation PASSED!")
@@ -140,33 +155,40 @@ def main():
             if -0.5 < ocp_voltage < 0.5:
                 logger.info("✅ OCP voltage is within expected range (-0.5V to 0.5V)")
             else:
-                logger.warning("⚠️ OCP voltage is outside expected range (-0.5V to 0.5V)")
+                logger.warning(
+                    "⚠️ OCP voltage is outside expected range (-0.5V to 0.5V)"
+                )
         else:
             logger.error("❌ Electrode validation FAILED!")
             logger.error(f"OCP voltage: {ocp_voltage:.4f}V")
-        
+
     except Exception as e:
         logger.error(f"Error during electrode validation: {e}")
-    
+
     finally:
         logger.info("Electrode validation complete")
-        
+
         # Save a simple summary report
         try:
             summary_path = experiment_dir / "validation_summary.txt"
             with open(summary_path, "w") as f:
-                f.write(f"Electrode Validation Summary\n")
-                f.write(f"===========================\n")
+                f.write("Electrode Validation Summary\n")
+                f.write("===========================\n")
                 f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                if 'ocp_passed' in locals():
+                if "ocp_passed" in locals():
                     f.write(f"OCP Test Passed: {ocp_passed}\n")
                     f.write(f"OCP Voltage: {ocp_voltage:.4f}V\n")
-                if 'experiment' in locals() and hasattr(experiment, 'results') and experiment.results.ocp_file:
+                if (
+                    "experiment" in locals()
+                    and hasattr(experiment, "results")
+                    and experiment.results.ocp_file
+                ):
                     f.write(f"OCP Data File: {experiment.results.ocp_file}\n")
                 f.write("\n")
             logger.info(f"Summary report saved to: {summary_path}")
         except Exception as e:
             logger.error(f"Error saving summary report: {e}")
+
 
 if __name__ == "__main__":
     main()

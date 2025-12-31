@@ -1,25 +1,14 @@
-import json
 import logging
-from pathlib import Path
 from typing import Optional, Tuple, Union
 
 from pydantic import BaseModel
-from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
 # from panda_lib.exceptions import OverDraftException, OverFillException
 
 from panda_lib.hardware.gantry_interface import Coordinates
 from panda_lib.labware.services import RackService, TipService
-from panda_lib.sql_tools import (
-    ExperimentParameters,
-    ExperimentResults,
-    Experiments,
-    TipModel,
-    Racks,
-)
 from panda_lib.types import TipKwargs
-from panda_shared.config.config_tools import read_config_value
 from panda_shared.db_setup import SessionLocal
 
 from panda_lib.labware.schemas import (
@@ -32,6 +21,7 @@ from panda_lib.labware.schemas import (
 
 
 logger = logging.getLogger("panda")
+
 
 class RackKwargs(BaseModel, validate_assignment=True):
     """
@@ -49,13 +39,13 @@ class RackKwargs(BaseModel, validate_assignment=True):
     coordinates: dict
     """
 
-    name: str | None = None 
-    type_id: int | None = None 
-    a1_x: float = 0.0 
-    a1_y: float = 0.0 
-    orientation: int = 0 
-    rows: str = "ABCD" 
-    cols: int = 14 
+    name: str | None = None
+    type_id: int | None = None
+    a1_x: float = 0.0
+    a1_y: float = 0.0
+    orientation: int = 0
+    rows: str = "ABCD"
+    cols: int = 14
     pickup_height: float = 0.0
     coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0}
 
@@ -167,6 +157,7 @@ class Rack:
             x, y = a1_x + (y - a1_y), a1_y - (x - a1_x)
 
         return {"x": x, "y": y, "z": self.rack_data.pickup_height}
+
 
 class Tip:
     """
@@ -305,8 +296,7 @@ class Tip:
             )
         else:
             rack_type = self.service.fetch_tip_type_characteristics(
-                db_session=self.session_maker,
-                rack_id=self.rack_id
+                db_session=self.session_maker, rack_id=self.rack_id
             )
 
         # Remove rack_type attributes from kwargs if they exist
@@ -321,7 +311,7 @@ class Tip:
             drop_coords = {
                 "x": rack.coordinates["x"],
                 "y": rack.coordinates["y"],
-                "z": rack.coordinates["z"] + rack.pickup_height + 20
+                "z": rack.coordinates["z"] + rack.pickup_height + 20,
             }
         # Create tip entry
         kwargs.setdefault("pickup_height", rack.pickup_height)
@@ -333,24 +323,17 @@ class Tip:
             **kwargs,
         )
 
-        self.tip_data = TipWriteModel.model_validate(
-            self.service.create_tip(new_tip)
-        )
+        self.tip_data = TipWriteModel.model_validate(self.service.create_tip(new_tip))
         self.save()
         self.load_tip()
 
-
     def load_tip(self):
         """Load the tip data from the database"""
-        self.tip_data: TipReadModel = self.service.get_tip(
-            self.tip_id, self.rack_id
-        )
+        self.tip_data: TipReadModel = self.service.get_tip(self.tip_id, self.rack_id)
 
     def save(self):
         """Save the tip data to the database"""
-        self.service.update_tip(
-            self.tip_id, self.rack_id, self.tip_data.model_dump()
-        )
+        self.service.update_tip(self.tip_id, self.rack_id, self.tip_data.model_dump())
         self.load_tip()
 
     def update_status(self, new_status: str):
@@ -375,4 +358,3 @@ class Tip:
 
     def __repr__(self):
         return f"<tip(tip_id={self.tip_id}, volume={self.tip_data.volume}, contents={self.tip_data.contents})>"
-

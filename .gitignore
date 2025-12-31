@@ -199,3 +199,20 @@ temp.db
 /*.ini
 hardware/grbl_cnc_mill/tools.json
 *.db
+
+# Cleanup directory - files marked for deletion (do not commit)
+please_delete/
+
+# Large model files - NOT stored in Git (see MODEL_FILES.md)
+*.pth
+*.pth.tar
+*.h5
+*.ckpt
+
+# Database exports and backups
+*export*.sql
+*export*.csv
+*backup*.sql
+*backup*.db
+.cursor/worktrees.json
+.vscode/settings.json

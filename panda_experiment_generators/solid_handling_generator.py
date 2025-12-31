@@ -1,19 +1,19 @@
 """Generator for the solid handling test protocol."""
 
-import pandas as pd 
 from pydantic import ValidationError
 
 from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
-PROJECT_ID = 400 
+PROJECT_ID = 400
 EXPERIMENT_NAME = "solid_handling_test"
 CAMPAIGN_ID = 1
-PLATE_TYPE = 9  
+PLATE_TYPE = 9
 # add plate type to SQL, panda_wellplate_types
 # then add your specific wellplate to panda_wellplates
 
 # it then adds the wells to panda_well_hx
+
 
 def main():
     """Schedules one or more solid handling experiments."""
@@ -28,7 +28,7 @@ def main():
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_name="solid_handling_protocol",
-                    well_id="A1",   # placeholder; protocol won’t use it
+                    well_id="A1",  # placeholder; protocol won’t use it
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
                     project_id=PROJECT_ID,

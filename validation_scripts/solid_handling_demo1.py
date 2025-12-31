@@ -9,25 +9,23 @@ This script demonstrates solid handling capabilities including:
 - Interaction with gel surfaces
 """
 
-import time
 import logging
-import asyncio
 from pathlib import Path
 from datetime import datetime
 
 # PANDA system imports
-from panda_lib.hardware import ArduinoLink, PandaMill
+from panda_lib.hardware import PandaMill
+
 # from panda_lib.hardware.panda_pipettes import Pipette, insert_newz h_pipette
-from panda_lib.hardware.arduino_interface import PawduinoFunctions
 from panda_lib.toolkit import Toolkit
 from panda_lib.types import VialKwargs
 from panda_lib.labware.vials import StockVial
-from panda_lib.actions.movement import decapping_sequence, capping_sequence
+from panda_lib.actions.movement import capping_sequence
 
 # Set up logging
 logger = logging.getLogger("solid_handling_demo")
 logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 # Create output directory
 timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
@@ -49,8 +47,12 @@ logger.addHandler(console_handler)
 # Constants
 vial_x = -20.1  # X coordinate for stock vial
 vial_y = -74.3  # Y coordinate for stock vial
-vial_z_touch = -184.16  # Z coordinate for stock vial right above powder TODO update this before running
-well_a1_z_touch = -164.36  # Z coordinate for wellplate A1 (base level) TODO update this before running
+vial_z_touch = (
+    -184.16
+)  # Z coordinate for stock vial right above powder TODO update this before running
+well_a1_z_touch = (
+    -164.36
+)  # Z coordinate for wellplate A1 (base level) TODO update this before running
 safe_z = 0
 well_x_init = -139.5  # X coordinate for wellplate A1 TODO update this before running
 well_y_init = -80.2  # Y coordinate for wellplate A1 TODO update this before running
@@ -74,28 +76,39 @@ class DryRunMill:
         self.log_file = Path("dry_run_movements.csv")
 
         # Create log file with headers
-        with open(self.log_file, 'w') as f:
+        with open(self.log_file, "w") as f:
             f.write("command,x,y,z,tool,feed_rate,notes\n")
 
-        print(f"🔍 DRY RUN MODE ACTIVE - No actual movements will occur")
+        print("🔍 DRY RUN MODE ACTIVE - No actual movements will occur")
         print(f"📝 Movement commands will be logged to: {self.log_file}")
 
-    def log_movement(self, command, x=None, y=None, z=None, tool=None, feed_rate=None, notes=None):
+    def log_movement(
+        self, command, x=None, y=None, z=None, tool=None, feed_rate=None, notes=None
+    ):
         """Log a movement command to CSV file."""
-        with open(self.log_file, 'a') as f:
+        with open(self.log_file, "a") as f:
             f.write(f"{command},{x},{y},{z},{tool},{feed_rate},{notes}\n")
 
         # Also print to console
         tool_str = f", tool: {tool}" if tool else ""
-        position_str = ", ".join([f"{axis}: {val}" for axis, val in
-                                  [("x", x), ("y", y), ("z", z)] if val is not None])
+        position_str = ", ".join(
+            [
+                f"{axis}: {val}"
+                for axis, val in [("x", x), ("y", y), ("z", z)]
+                if val is not None
+            ]
+        )
         print(f"🔍 {command}: {position_str}{tool_str}")
 
         # Update current position
-        if x is not None: self.current_position["x"] = x
-        if y is not None: self.current_position["y"] = y
-        if z is not None: self.current_position["z"] = z
-        if tool is not None: self.current_tool = tool
+        if x is not None:
+            self.current_position["x"] = x
+        if y is not None:
+            self.current_position["y"] = y
+        if z is not None:
+            self.current_position["z"] = z
+        if tool is not None:
+            self.current_tool = tool
 
     # Implement all the methods from PandaMill that your script uses
     def connect_to_mill(self):
@@ -111,22 +124,28 @@ class DryRunMill:
         return True
 
     def move_to_position(self, x=None, y=None, z=None, tool=None, **kwargs):
-        self.log_movement("move_to_position", x, y, z, tool, notes=str(kwargs) if kwargs else None)
+        self.log_movement(
+            "move_to_position", x, y, z, tool, notes=str(kwargs) if kwargs else None
+        )
         return True
 
     def safe_move(self, x=None, y=None, z=None, tool=None, **kwargs):
         # Check if x is actually a dictionary of coordinates
-        if isinstance(x, dict) and 'x' in x and 'y' in x:
+        if isinstance(x, dict) and "x" in x and "y" in x:
             coords = x
-            x = coords.get('x')
-            y = coords.get('y')
-            z = coords.get('z')
+            x = coords.get("x")
+            y = coords.get("y")
+            z = coords.get("z")
 
-        self.log_movement("safe_move", x, y, z, tool, notes=str(kwargs) if kwargs else None)
+        self.log_movement(
+            "safe_move", x, y, z, tool, notes=str(kwargs) if kwargs else None
+        )
         return True
 
     def move_to_safe_position(self):
-        self.log_movement("move_to_safe_position", 0, 0, 0, notes="Moving to safe position")
+        self.log_movement(
+            "move_to_safe_position", 0, 0, 0, notes="Moving to safe position"
+        )
         return True
 
     def disconnect(self):
@@ -138,7 +157,6 @@ class DryRunMill:
         return "OK"
 
 
-
 # Add this class after your DryRunArduino class definition
 class CoordinateObject:
     """Simple class to hold x, y, z coordinates with attribute access."""
@@ -148,11 +166,11 @@ class CoordinateObject:
         self.y = y
         self.z = z
 
+
 # Add this code before your "try" block
 if DRY_RUN:
     # Replace actual hardware classes with dry run versions
     PandaMill = DryRunMill
-
 
     # Create a mock capping sequence that works around the bug
     def mock_capping_sequence(mill, coords, arduino, **kwargs):
@@ -160,8 +178,14 @@ if DRY_RUN:
         print("🔍 MOCK CAPPING: Would cap vial")
 
         # Log the movements
-        mill.log_movement("capping", coords.x, coords.y, coords.z,
-                          tool="decapper", notes="Start capping sequence")
+        mill.log_movement(
+            "capping",
+            coords.x,
+            coords.y,
+            coords.z,
+            tool="decapper",
+            notes="Start capping sequence",
+        )
         mill.safe_move(coords.x, coords.y, coords.z, tool="decapper")
 
         # Simulate the ALL_CAP call
@@ -176,8 +200,8 @@ if DRY_RUN:
         # Indicate success
         return True
 
-
     capping_sequence = mock_capping_sequence
+
 
 def get_well_coordinates(well_id):
     """Input like A1, B2, return real x, y coordinates"""
@@ -194,13 +218,13 @@ def get_well_coordinates(well_id):
     y = well_y_init + y_offset * (int(row) - 1)
     return round(x, 3), round(y, 3)
 
+
 try:
     # ===== HARDWARE SETUP =====
     logger.info("Initializing hardware components...")
 
     # Initialize the mill
     mill = PandaMill()
-
 
     # Create toolkit
     tools = Toolkit(
@@ -223,7 +247,7 @@ try:
         density=1,
         height=66,
         radius=14,
-        volume=10000, # TODO update this before running
+        volume=10000,  # TODO update this before running
         capacity=20000,
         contamination=0,
         coordinates={
@@ -235,9 +259,7 @@ try:
         dead_volume=0,
     )
 
-    stock_vial = StockVial(
-        position="s1", create_new=True, **vkwargs_stock
-    )
+    stock_vial = StockVial(position="s1", create_new=True, **vkwargs_stock)
     stock_vial.save()
 
     # ===== RECTANGULAR MOVEMENT PATTERN =====
@@ -247,7 +269,7 @@ try:
         {"x": 2, "y": 0},  # Right
         {"x": 2, "y": 2},  # Up
         {"x": 0, "y": 2},  # Left
-        {"x": 0, "y": 0}  # Back to start
+        {"x": 0, "y": 0},  # Back to start
     ]
 
     # ===== EXECUTE PROTOCOL =====
@@ -267,13 +289,14 @@ try:
     #     arduino
     # )
 
-    
     while True:
-        wells_input = input("Input the well position (like A1 B2 C3) or measure the whole plate (all), Enter: ")
-        
+        wells_input = input(
+            "Input the well position (like A1 B2 C3) or measure the whole plate (all), Enter: "
+        )
+
         # Log the user input
         logger.info(f"User input received: '{wells_input}'")
-        
+
         if wells_input.strip() == "":
             logger.info("Empty input received, breaking input loop")
             break
@@ -298,7 +321,7 @@ try:
         logger.info(f"Current valid wells list: {wells}")
         print(f"Now valid wells: {wells}")
 
-# TODO: fix this to make sure back to the stock each time
+    # TODO: fix this to make sure back to the stock each time
     for well in wells:
         # 2. Move pipette to stock vial 1
         logger.info("Moving pipette back to the stock")
@@ -306,7 +329,7 @@ try:
             stock_vial.coordinates.x,
             stock_vial.coordinates.y,
             stock_vial.bottom + 80,  # Position above vial
-            tool="pipette"
+            tool="pipette",
         )
 
         # 3. Lower pipette into stock vial
@@ -315,10 +338,8 @@ try:
             stock_vial.coordinates.x,
             stock_vial.coordinates.y,
             vial_z_touch,  # TODO upddate this before running
-            tool="pipette"
+            tool="pipette",
         )
-
-
 
         # # 4. Move in rectangular pattern
         # logger.info("Executing rectangular movement pattern...")
@@ -332,17 +353,15 @@ try:
         #     logger.info(f"Moving to relative position: ({point['x']}, {point['y']})")
         #     mill.move_to_position(target_x, target_y, base_z, tool="pipette")
 
-
-
         # 5. Raise pipette up
         logger.info("Raising pipette...")
         mill.safe_move(
             stock_vial.coordinates.x,
             stock_vial.coordinates.y,
             stock_vial.bottom + 80,
-            tool="pipette"
+            tool="pipette",
         )
-        
+
         # 6. Cap the stock vial
 
         # 7. Move pipette to wellplate
@@ -352,7 +371,7 @@ try:
             well_a1_x,
             well_a1_y,
             stock_vial.bottom + 80,  # Position above well
-            tool="pipette"
+            tool="pipette",
         )
 
         # 8. Lower pipette to touch gel surface
@@ -360,8 +379,8 @@ try:
         mill.move_to_position(
             well_a1_x,
             well_a1_y,
-        well_a1_z_touch,  # little bit above the solvent base
-        tool="pipette",
+            well_a1_z_touch,  # little bit above the solvent base
+            tool="pipette",
         )
 
         # 10. Raise pipette to safe position
@@ -369,7 +388,6 @@ try:
         mill.move_to_safe_position()
 
         input("Please Enter to continue if cleaning is done:")
-
 
     # Protocol complete
     logger.info("Solid handling protocol completed successfully")
@@ -382,7 +400,7 @@ finally:
     # Cleanup
     try:
         # Disconnect from hardware
-        if 'mill' in locals():
+        if "mill" in locals():
             mill.disconnect()
             logger.info("Mill disconnected")
 

@@ -1,6 +1,8 @@
 # API Reference
 
-This document provides a comprehensive reference of the PANDA-SDL API, covering the main components and functions available for writing protocols, generators, and analyzers.
+Complete reference documentation for the PANDA-SDL API, covering all components and functions available for writing protocols, generators, and analyzers.
+
+**Navigation**: [Home](00-Home.md) | [Getting Started](01%20Getting-Started.md) | [Writing Protocols](03%20Writing-Protocols.md) | [Creating Generators](02%20Creating-Generators.md) | API Reference
 
 - [API Reference](#api-reference)
   - [Core Components](#core-components)
@@ -685,5 +687,7 @@ def analyze_experiment(experiment_id):
 For more detailed information about specific components, refer to:
 
 - Source code docstrings in the respective modules
-- [End User Manual](../documentation/end_user_manual.md)
-- [Developer Manual](../documentation/developer_manual.md)
+- [Getting Started Guide](01%20Getting-Started.md) for installation and first experiments
+- [Developer Guide](Developer-Guide.md) for development setup and guidelines
+- [Writing Protocols](03%20Writing-Protocols.md) for protocol development
+- [Creating Generators](02%20Creating-Generators.md) for generator development

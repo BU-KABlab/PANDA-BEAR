@@ -1,9 +1,10 @@
 """The sequence of steps for a pama contact angle drying experiment."""
 
 # Standard imports
-import time 
+import time
 import threading
 import sys
+
 # Non-standard imports
 from panda_lib.actions import (
     image_well,
@@ -19,23 +20,17 @@ from panda_lib.actions.electrochemistry import (
     CAFailure,
     DepositionFailure,
     OCPError,
-    move_to_and_perform_ca
-)
-from panda_lib.actions.electrochemistry import (
-    perform_chronoamperometry as chrono_amp,
+    move_to_and_perform_ca,
 )
 from panda_lib.experiments.experiment_types import EchemExperimentBase, ExperimentStatus
-from panda_lib.labware.vials import Vial, read_vials
 from panda_lib.toolkit import Toolkit
-from panda_lib.utilities import Instruments, solve_multisolute_mix
-from panda_lib.hardware.panda_pipettes import insert_new_pipette
+from panda_lib.utilities import Instruments
 from panda_shared.db_setup import SessionLocal
 from panda_lib.sql_tools.queries.racks import select_current_rack_id
-from panda_lib.actions.pipetting import replace_tip, mix
-from panda_shared.db_setup import SessionLocal
+from panda_lib.actions.pipetting import replace_tip
 
 
-PROTOCOL_ID = 37 
+PROTOCOL_ID = 37
 
 
 def main(
@@ -52,13 +47,14 @@ def main(
         toolkit=toolkit,
     )
 
+
 def pgma_ca(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
     The initial screening of the pgma contact angle drying solution
-    
+
     Per experiment:
     0. pgma_deposition
     1. pgma_ipa_rinse
@@ -89,6 +85,7 @@ def pgma_deposition(
     8. Rinse the well 3x with flush
     9. Take image of well
     """
+
     def timer_thread(stop_event):
         start = time.time()
         while not stop_event.is_set():
@@ -99,23 +96,25 @@ def pgma_deposition(
             time.sleep(1)
         print()
 
-    toolkit.global_logger.info(
-        "Running experiment %s part 1", experiment.experiment_id
-    )
-    
+    toolkit.global_logger.info("Running experiment %s part 1", experiment.experiment_id)
+
     if not toolkit.pipette.has_tip:
         replace_tip(
-            toolkit,
-            session_maker=SessionLocal,
-            tiprack_id=select_current_rack_id()
+            toolkit, session_maker=SessionLocal, tiprack_id=select_current_rack_id()
         )
-    
+
     toolkit.global_logger.info("0. Imaging the well")
     experiment.set_status_and_save(ExperimentStatus.IMAGING)
-    image_well(toolkit, experiment, "BeforeDeposition", curvature_image=False, add_datazone=False)
+    image_well(
+        toolkit,
+        experiment,
+        "BeforeDeposition",
+        curvature_image=False,
+        add_datazone=False,
+    )
 
     experiment.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
-    
+
     volume = 300
     transfer(
         volume=volume,
@@ -129,15 +128,15 @@ def pgma_deposition(
         dst_vessel=waste_selector("waste", 200),
         toolkit=toolkit,
     )
-    
+
     ## Move the electrode to the well
     toolkit.global_logger.info("2. Moving electrode to well: %s", experiment.well_id)
-    
+
     # Move the electrode to above the well
     toolkit.mill.safe_move(
         x_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "x"),
         y_coord=toolkit.wellplate.get_coordinates(experiment.well_id, "y"),
-        z_coord=toolkit.wellplate.top, 
+        z_coord=toolkit.wellplate.top,
         tool=Instruments.ELECTRODE,
     )
     # Set the feed rate to 100 to avoid overflowing the well
@@ -156,15 +155,15 @@ def pgma_deposition(
         stop_event = threading.Event()
         t = threading.Thread(target=timer_thread, args=(stop_event,), daemon=True)
         t.start()
-        
+
         move_to_and_perform_ca(
             exp=experiment,
             toolkit=toolkit,
             file_tag="CA_deposition",
             well=toolkit.wellplate.wells[experiment.well_id],
-            log=toolkit.global_logger,  
+            log=toolkit.global_logger,
         )
-        #chrono_amp(experiment, file_tag="CA_deposition") --- IGNORE --- this is used if we don't need to confirm electrode is in the correct position
+        # chrono_amp(experiment, file_tag="CA_deposition") --- IGNORE --- this is used if we don't need to confirm electrode is in the correct position
     except (OCPError, CAFailure, DepositionFailure) as e:
         toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
         raise e
@@ -190,12 +189,18 @@ def pgma_deposition(
         toolkit=toolkit,
     )
     clear_well_res(
-        toolkit=toolkit, 
-        src_vessel=toolkit.wellplate.wells[experiment.well_id], 
-        dst_vessel=waste_selector("waste",200), 
-        desired_volume=200
+        toolkit=toolkit,
+        src_vessel=toolkit.wellplate.wells[experiment.well_id],
+        dst_vessel=waste_selector("waste", 200),
+        desired_volume=200,
     )
-    image_well(toolkit, experiment, "AfterDepBeforeRinse", curvature_image=False, add_datazone=False)
+    image_well(
+        toolkit,
+        experiment,
+        "AfterDepBeforeRinse",
+        curvature_image=False,
+        add_datazone=False,
+    )
 
     toolkit.global_logger.info("7. Rinsing the well 3x with DMF")
     experiment.set_status_and_save(ExperimentStatus.RINSING)
@@ -214,10 +219,10 @@ def pgma_deposition(
             toolkit=toolkit,
         )
     clear_well_res(
-        toolkit=toolkit, 
-        src_vessel=toolkit.wellplate.wells[experiment.well_id], 
-        dst_vessel=waste_selector("waste",200), 
-        desired_volume=200
+        toolkit=toolkit,
+        src_vessel=toolkit.wellplate.wells[experiment.well_id],
+        dst_vessel=waste_selector("waste", 200),
+        desired_volume=200,
     )
 
     toolkit.global_logger.info("8. Rinsing the well 3x with ACN")
@@ -237,10 +242,10 @@ def pgma_deposition(
             toolkit=toolkit,
         )
     clear_well_res(
-        toolkit=toolkit, 
-        src_vessel=toolkit.wellplate.wells[experiment.well_id], 
-        dst_vessel=waste_selector("waste",200), 
-        desired_volume=200
+        toolkit=toolkit,
+        src_vessel=toolkit.wellplate.wells[experiment.well_id],
+        dst_vessel=waste_selector("waste", 200),
+        desired_volume=200,
     )
     stop_event.set()
     t.join(timeout=2)
@@ -249,29 +254,29 @@ def pgma_deposition(
     image_well(
         toolkit=toolkit,
         experiment=experiment,
-        image_label="AfterDeposition", curvature_image=False, add_datazone=False
+        image_label="AfterDeposition",
+        curvature_image=False,
+        add_datazone=False,
     )
 
     toolkit.global_logger.info("PAMA deposition complete\n\n")
- 
+
 
 def pgma_contact_angle(
     experiment: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
-    
+
     0. Image well
     1. Contact angle measurement
     2. Rinse with IPA
-    
+
     Args:
         experiment (EchemExperimentBase): _description_
         toolkit (Toolkit): _description_
     """
-    toolkit.global_logger.info(
-        "Running experiment %s part 2", experiment.experiment_id
-    )
+    toolkit.global_logger.info("Running experiment %s part 2", experiment.experiment_id)
     toolkit.global_logger.info("Image well")
     experiment.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
@@ -284,13 +289,13 @@ def pgma_contact_angle(
     time_min = 60  # in minutes
     toolkit.global_logger.info("Drying for %d minutes", time_min)
     time.sleep(time_min * 60)
-    toolkit.global_logger.info("Measuring contact angle after %d minutes", time_min)    
+    toolkit.global_logger.info("Measuring contact angle after %d minutes", time_min)
     experiment.set_status_and_save(ExperimentStatus.MEASURING_CA)
     measure_contact_angle(
         toolkit=toolkit,
         experiment=experiment,
-        session_maker=SessionLocal,           
-        tiprack_id=select_current_rack_id(),  
+        session_maker=SessionLocal,
+        tiprack_id=select_current_rack_id(),
         file_tag=f"ContactAngle_AfterDrying_{time_min}min",
     )
     image_well(
@@ -299,4 +304,3 @@ def pgma_contact_angle(
         image_label="AfterContactAngle",
     )
     toolkit.global_logger.info("Contact angle measurement complete\n\n")
-

@@ -1,16 +1,13 @@
 """Experiment parameters for the peo screening experiments"""
 
-import pandas as pd
 from pydantic import ValidationError
-from pathlib import Path
-import pandas as pd
 from panda_lib import scheduler
 from panda_lib.experiments import experiment_types
 
-PROJECT_ID = 300 
+PROJECT_ID = 300
 EXPERIMENT_NAME = "peo_contactangle"
 CAMPAIGN_ID = 7
-PLATE_TYPE = 8 
+PLATE_TYPE = 8
 
 
 def main():
@@ -23,12 +20,11 @@ def main():
     well_id = {"D3"}
     try:
         for well in well_id:
-
             experiments.append(
                 experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_name="peo_ca_protocol",
-                    analysis_id=999, 
+                    analysis_id=999,
                     well_id=well,
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
@@ -36,7 +32,11 @@ def main():
                     project_campaign_id=CAMPAIGN_ID,
                     solutions={
                         "peo_70": {"volume": 0, "concentration": 70, "repeated": 1},
-                        "electrolyte": {"volume": 0, "concentration": 0.0, "repeated": 1},
+                        "electrolyte": {
+                            "volume": 0,
+                            "concentration": 0.0,
+                            "repeated": 1,
+                        },
                         "ipa": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "dmf": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "acn": {"volume": 0, "concentration": 0.0, "repeated": 1},
@@ -60,7 +60,7 @@ def main():
                     ca_prestep_voltage=0.0,
                     ca_prestep_time_delay=0.0,
                     ca_step_1_voltage=1.6,
-                    ca_step_1_time=600, # deposition time in seconds
+                    ca_step_1_time=600,  # deposition time in seconds
                     ca_step_2_voltage=0.0,
                     ca_step_2_time=0.0,
                     ca_sample_rate=0.5,
@@ -72,5 +72,3 @@ def main():
 
     except ValidationError as e:
         raise e
-
-

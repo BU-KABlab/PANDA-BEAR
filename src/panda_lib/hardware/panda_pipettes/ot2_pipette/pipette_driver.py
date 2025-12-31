@@ -230,11 +230,15 @@ class Pipette:
         """
         # Always move to ZERO_POSITION (0 mm) before aspirating
         logger.debug("Resetting plunger to zero before aspirating...")
-        reset_response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.prime_position, s)
+        reset_response = self.stepper.send(
+            CMD.CMD_PIPETTE_MOVE_TO, self.prime_position, s
+        )
 
         if not reset_response.get("success", False):
-            logger.error("Failed to reset to zero before aspiration: %s",
-                        reset_response.get("message", "Unknown error"))
+            logger.error(
+                "Failed to reset to zero before aspiration: %s",
+                reset_response.get("message", "Unknown error"),
+            )
             return False
 
         response = self.stepper.aspirate(vol, s)
@@ -257,13 +261,13 @@ class Pipette:
         if response.get("success", False):
             if "value2" in response:
                 self.position = response["value2"]
-            logger.info("Aspirated %s uL (relative), new position: %s mm",
-                        vol, self.position)
+            logger.info(
+                "Aspirated %s uL (relative), new position: %s mm", vol, self.position
+            )
         else:
             error_msg = response.get("message", "Unknown error")
             logger.error("Failed drip stop %s uL: %s", vol, error_msg)
         return response.get("success", False)
-
 
     def dispense(self, vol: float, s: int = 2000):
         """Moves the plunger downwards to dispense liquid out of the pipette tip
@@ -281,8 +285,10 @@ class Pipette:
             if "value2" in response:
                 self.position = response["value2"]
             logger.info("Dispensed %s uL, new position: %s mm", vol, self.position)
-            time.sleep(2) #delay before priming, important for more viscous solutions, adjust as needed
-            '''
+            time.sleep(
+                2
+            )  # delay before priming, important for more viscous solutions, adjust as needed
+            """
             # Auto-prime after dispensing to reset position for next operation
             logger.info("Automatically priming after dispense...")
             prime_response = self.stepper.send(CMD.CMD_PIPETTE_MOVE_TO, self.prime_position, s)
@@ -294,14 +300,16 @@ class Pipette:
             else:
                 logger.warning("Auto-prime after dispense failed: %s", 
                             prime_response.get("message", "Unknown error"))
-            '''
+            """
         else:
             error_msg = response.get("message", "Unknown error")
             logger.error("Failed to dispense %s uL: %s", vol, error_msg)
 
         return response.get("success", False)
-    
-    def blowout(self, s: int = 2500): #TODO remove this function and fix all references to it
+
+    def blowout(
+        self, s: int = 2500
+    ):  # TODO remove this function and fix all references to it
         """Blows out any remaining liquid in the pipette tip
 
         :param s: The speed of the plunger movement in steps/sec, defaults to 2500
@@ -319,7 +327,9 @@ class Pipette:
 
         return response.get("success", False)
 
-    def blowout_volume(self, vol, s: int = 2500): #TODO remove this function and all references to it
+    def blowout_volume(
+        self, vol, s: int = 2500
+    ):  # TODO remove this function and all references to it
         """Moves the plunger upwards to aspirate air into the pipette tip
 
         :param vol: The volume of air to aspirate in uL
@@ -332,8 +342,7 @@ class Pipette:
         logger.info("Creating air gap of %s uL", vol)
         return self.aspirate(vol, s)
 
-
-    def mix(self, vol: float, n: int, s: int = 2500): 
+    def mix(self, vol: float, n: int, s: int = 2500):
         """Mixes liquid by moving plunger a set distance (calculated from volume specified) for the specified number of times
 
         :param vol: The volume of liquid to mix in uL
@@ -351,7 +360,6 @@ class Pipette:
             return True
         else:
             logger.warning("Mix command failed")
-
 
     def drop_tip(self, s: int = 2000):
         """Moves the plunger to eject the pipette tip
@@ -388,8 +396,10 @@ class Pipette:
         response = self.stepper.move_to(self.prime_position, s)
 
         if not response.get("success", False):
-            logger.error("Failed to move to tip pickup position: %s",
-                        response.get("message", "Unknown error"))
+            logger.error(
+                "Failed to move to tip pickup position: %s",
+                response.get("message", "Unknown error"),
+            )
             return False
 
         self.position = self.prime_position

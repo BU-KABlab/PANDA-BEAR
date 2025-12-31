@@ -133,9 +133,11 @@ class Vial:
         if self.vial_data.dead_volume == 0:
             dead_height = bottom + 3.5
         else:
-            dead_height = bottom + 3.5 + ( self.vial_data.dead_volume / (
-                3.14 * self.vial_data.radius**2
-            ))
+            dead_height = (
+                bottom
+                + 3.5
+                + (self.vial_data.dead_volume / (3.14 * self.vial_data.radius**2))
+            )
         if height < dead_height:
             return dead_height
         else:

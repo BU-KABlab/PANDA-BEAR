@@ -8,9 +8,9 @@ import json
 from datetime import datetime as dt
 from datetime import timezone
 from typing import Any, Dict, Optional
-from sqlalchemy import String, Integer, Float, Text, UniqueConstraint
+from sqlalchemy import String, Integer, Float, Text
 import sqlalchemy as sa
-from sqlalchemy import Column, Computed, ForeignKey, Table, Text, event, select
+from sqlalchemy import Column, Computed, ForeignKey, Table, event, select
 from sqlalchemy.ext import compiler
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column
@@ -53,6 +53,7 @@ class JSONEncodedDict(TypeDecorator):
 
 
 Base = declarative_base()
+
 
 class DeckObjectBase:
     """Base class for DeckObject models
@@ -242,6 +243,7 @@ class Users(Base):
             f"active={self.active}, full={self.full}, created_at={self.created_at}, "
             f"updated={self.updated})>"
         )
+
 
 def generate_username(mapper, connection, target):
     """Generate a unique username by concatenating the first letter of the first name with the last name and an auto-incremented number."""

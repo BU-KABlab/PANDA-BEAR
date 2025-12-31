@@ -38,7 +38,9 @@ def get_database_url() -> str:
             return db_url.strip('"')
         # fallback to manual construction if needed
         db_type = config.get("PRODUCTION", "production_db_type", fallback="sqlite")
-        db_address = config.get("PRODUCTION", "production_db_address", fallback="panda.db")
+        db_address = config.get(
+            "PRODUCTION", "production_db_address", fallback="panda.db"
+        )
         db_user = config.get("PRODUCTION", "production_db_user", fallback="")
         db_password = config.get("PRODUCTION", "production_db_password", fallback="")
 

@@ -1,6 +1,17 @@
 # Using Analyzers
 
-Analyzers are specialized Python scripts designed to process and analyze the results of experiments run on the PANDA-SDL system. They can perform data analysis, visualization, and even generate new experiments based on the results.
+Analyzers process and analyze experiment results from the PANDA-SDL system. They perform data analysis, generate visualizations, and can create new experiments based on analysis results.
+
+**Navigation**: [Home](00-Home.md) | [Getting Started](01%20Getting-Started.md) | [Writing Protocols](03%20Writing-Protocols.md) | [Creating Generators](02%20Creating-Generators.md) | Using Analyzers
+
+## Table of Contents
+
+- [Analyzer Basics](#analyzer-basics)
+- [Analyzer Structure](#analyzer-structure)
+- [Creating an Analyzer](#creating-an-analyzer)
+- [Running Analyzers](#running-analyzers)
+- [Best Practices](#best-practices)
+- [Next Steps](#next-steps)
 
 ## Analyzer Basics
 
@@ -308,3 +319,5 @@ With analyzers in place, you can complete the full experimental cycle from proto
 
 - [API Reference](API-Reference.md) for detailed information on the PANDA-SDL library
 - [Main Menu Reference](Main-Menu-Reference.md) for all available system functions
+- [Writing Protocols](03%20Writing-Protocols.md) to understand how experiments are executed
+- [Creating Generators](02%20Creating-Generators.md) to automate experiment creation

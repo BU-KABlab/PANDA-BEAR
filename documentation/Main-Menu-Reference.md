@@ -1,6 +1,15 @@
 # Main Menu Reference
 
-The PANDA-SDL main menu provides a comprehensive interface for controlling all aspects of the system. This reference guide explains each menu option and its function.
+Complete reference for all PANDA-SDL command-line interface menu options and functions.
+
+**Navigation**: [Home](00-Home.md) | [Getting Started](01%20Getting-Started.md) | Main Menu Reference | [API Reference](API-Reference.md)
+
+## Table of Contents
+
+- [Main Menu Overview](#main-menu-overview)
+- [Menu Options](#menu-options)
+- [Common Workflows](#common-workflows)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
 
 ## Main Menu Overview
 
@@ -135,3 +144,12 @@ If you encounter issues:
 5. Check that vials have sufficient volumes for your planned experiments.
 
 6. Verify that the wellplate is properly installed and configured in the system.
+
+## Next Steps
+
+After familiarizing yourself with the main menu, you may want to:
+
+- Review [Getting Started](01%20Getting-Started.md) for basic system usage
+- Learn to [write protocols](03%20Writing-Protocols.md) for custom experiments
+- Create [generators](02%20Creating-Generators.md) for batch experiments
+- Consult the [API Reference](API-Reference.md) for programmatic usage

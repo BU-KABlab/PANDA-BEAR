@@ -1,6 +1,17 @@
 # Writing Protocols
 
-Protocols are the core scripts that define how your PANDA-SDL experiment will be executed. Think of protocols as detailed recipes or ordered steps for your experiments. This guide will walk you through creating your own protocols.
+Protocols define the sequence of actions executed during a PANDA-SDL experiment. Each protocol specifies the steps performed by the system, from solution preparation through data collection.
+
+**Navigation**: [Home](00-Home.md) | [Getting Started](01%20Getting-Started.md) | Writing Protocols | [Creating Generators](02%20Creating-Generators.md) | [Using Analyzers](04%20Using-Analyzers.md)
+
+## Table of Contents
+
+- [Protocol Basics](#protocol-basics)
+- [Protocol Structure](#protocol-structure)
+- [Available Actions](#available-actions)
+- [Testing Your Protocol](#testing-your-protocol)
+- [Best Practices](#best-practices)
+- [Next Steps](#next-steps)
 
 ## Protocol Basics
 
@@ -180,4 +191,4 @@ Before running your protocol on the actual hardware:
 
 ## Next Steps
 
-Once you've created your protocol, you'll need a [generator](Creating-Generators.md) to define the specific parameters for your experiment series.
+Once you've created your protocol, you'll need a [generator](02%20Creating-Generators.md) to define the specific parameters for your experiment series. You may also want to create an [analyzer](04%20Using-Analyzers.md) to process the results from experiments using your protocol.

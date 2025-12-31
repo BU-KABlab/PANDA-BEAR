@@ -303,15 +303,14 @@ def solve_vials_ilp(
         return None, None, None
 
 
-
 def solve_multisolute_mix(
     vial_comp: Dict[str, Dict[str, float]],  # {vial: {species: conc_in_mg_per_mL}}
-    v_total: float,                           # total volume in µL
-    target: Dict[str, float],                 # {species: target_conc_mg_per_mL}
+    v_total: float,  # total volume in µL
+    target: Dict[str, float],  # {species: target_conc_mg_per_mL}
     *,
-    min_vol: float = 10.0,                    # µL
-    max_vol: Optional[float] = None,          # µL
-    allow_slack: bool = True                  # if True, minimize sum of abs deviations
+    min_vol: float = 10.0,  # µL
+    max_vol: Optional[float] = None,  # µL
+    allow_slack: bool = True,  # if True, minimize sum of abs deviations
 ) -> Tuple[Optional[Dict[str, float]], Optional[Dict[str, float]], Optional[float]]:
     """
     Returns (vol_by_vial_µL, species_deviation, objective_value).
@@ -343,8 +342,10 @@ def solve_multisolute_mix(
     # Species balances: conc (mg/mL) * vol (µL→mL) = mg
     UL_TO_ML = 1e-3
     for s in species:
-        lhs = pulp.lpSum(vial_comp[p].get(s, 0.0) * (v[p] * UL_TO_ML) for p in vials)  # mg
-        rhs = target[s] * (v_total * UL_TO_ML)                                         # mg
+        lhs = pulp.lpSum(
+            vial_comp[p].get(s, 0.0) * (v[p] * UL_TO_ML) for p in vials
+        )  # mg
+        rhs = target[s] * (v_total * UL_TO_ML)  # mg
         cname = f"balance_{s}"
         if allow_slack:
             prob += lhs - rhs == dpos[s] - dneg[s], cname
@@ -362,7 +363,7 @@ def solve_multisolute_mix(
     status = prob.solve(pulp.PULP_CBC_CMD(msg=False))
     if pulp.LpStatus[status] != "Optimal":
         return None, None, None
-    
+
     def _val(x):
         try:
             vx = pulp.value(x)
@@ -381,7 +382,8 @@ def solve_multisolute_mix(
     # Species devs (0 if no slack)
     species_dev = (
         {s: float(_val(dpos[s]) + _val(dneg[s])) for s in species}
-        if allow_slack else {s: 0.0 for s in species}
+        if allow_slack
+        else {s: 0.0 for s in species}
     )
 
     # Safe objective read (falls back to 0.0)

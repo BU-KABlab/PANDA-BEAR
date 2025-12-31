@@ -1,6 +1,17 @@
 # Creating Generators
 
-Experiment generators allow you to easily set up batches of experiments with varying parameters. They also enable closed loop experiment creation. Generators are Python scripts that define experiment variables and add the resulting experiments to the PANDA-SDL scheduler.
+Experiment generators create batches of experiments with varying parameters and enable closed-loop experiment creation. Generators are Python scripts that define experiment variables and schedule experiments in the PANDA-SDL system.
+
+**Navigation**: [Home](00-Home.md) | [Getting Started](01%20Getting-Started.md) | [Writing Protocols](03%20Writing-Protocols.md) | Creating Generators | [Using Analyzers](04%20Using-Analyzers.md)
+
+## Table of Contents
+
+- [Generator Basics](#generator-basics)
+- [Generator Structure](#generator-structure)
+- [Experiment Parameters](#experiment-parameters)
+- [Running Your Generator](#running-your-generator)
+- [Best Practices](#best-practices)
+- [Next Steps](#next-steps)
 
 ## Generator Basics
 
@@ -254,5 +265,7 @@ for voltage, concentration, time in parameter_combinations:
 
 After creating your generator, you might want to explore:
 
-- [Using Analyzers](Using-Analyzers.md) to process experiment results
+- [Using Analyzers](04%20Using-Analyzers.md) to process experiment results
+- [Writing Protocols](03%20Writing-Protocols.md) to create the protocols your generator will use
 - [Main Menu Reference](Main-Menu-Reference.md) for all available system functions
+- [API Reference](API-Reference.md) for detailed function documentation

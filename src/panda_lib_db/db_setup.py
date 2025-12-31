@@ -150,7 +150,9 @@ if __name__ == "__main__":
             match = re.match(r"([^:/]+):(\d+)/(.*)", db_address)
             if match:
                 host, port, dbname = match.groups()
-                DATABASE_URL = f"mysql+pymysql://{db_user}:{db_password}@{host}:{port}/{dbname}"
+                DATABASE_URL = (
+                    f"mysql+pymysql://{db_user}:{db_password}@{host}:{port}/{dbname}"
+                )
             else:
                 raise ValueError(f"Malformed db_address: {db_address}")
     else:
@@ -165,7 +167,9 @@ if __name__ == "__main__":
         print("Tables in the database:")
         with SessionLocal() as session:
             if db_type == "sqlite":
-                result = session.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
+                result = session.execute(
+                    text("SELECT name FROM sqlite_master WHERE type='table';")
+                )
             else:
                 result = session.execute(text("SHOW TABLES;"))
             for row in result:

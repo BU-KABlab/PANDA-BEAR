@@ -511,12 +511,12 @@ def sila_experiment_loop_worker(
             exp_obj = None
 
             ## Check that the pipette is empty, if not dispose of full volume into waste
-            
+
             if hardware.pipette.pipette_tracker.volume > 0:
                 exp_logger.info("Pipette not empty, purging into waste")
                 set_worker_state(SystemState.PIPETTE_PURGE)
                 purge_pipette(toolkit)
-            
+
             # This also validates the experiment parameters since its a pydantic object
             exp_obj: EchemExperimentBase = _initialize_experiment(
                 specific_experiment_id, hardware, labware, exp_logger, specific_well_id
@@ -593,14 +593,14 @@ def sila_experiment_loop_worker(
                 share_to_slack(exp_obj)
 
             ## Clean up the instruments
-            '''
+            """
             if (
                 hardware.pipette.pipette_tracker.volume > 0
                 and hardware.pipette.pipette_tracker.volume_ml < 1
             ):
                 # assume unreal volume, not actually solution, set to 0
                 purge_pipette(toolkit)
-            '''
+            """
             hardware.mill.rest_electrode()
             # We are not disconnecting from instruments with this function, that will
             # be handled by a higher level function
@@ -709,15 +709,17 @@ def _fetch_protocol_function(protocol_id: int) -> callable:
 
     # Get relative module path from file path
     full_path = Path(config.get("GENERAL", "protocols_dir")) / protocol_entry.filepath
-    relative_path = full_path.relative_to(Path(__file__).parent.parent.parent)  # Adjust as needed
-    module_path = str(relative_path.with_suffix("")).replace("/", ".").replace("\\", ".")
+    relative_path = full_path.relative_to(
+        Path(__file__).parent.parent.parent
+    )  # Adjust as needed
+    module_path = (
+        str(relative_path.with_suffix("")).replace("/", ".").replace("\\", ".")
+    )
 
     print(f"Importing module: {module_path}")
 
     # Import the module
     protocol_module = importlib.import_module(module_path)
-
-
 
     # Get the main function from the module
     try:

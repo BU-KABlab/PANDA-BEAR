@@ -59,7 +59,9 @@ elif db_type == "mysql":
         match = re.match(r"([^:/]+):(\d+)/(.*)", db_address)
         if match:
             host, port, dbname = match.groups()
-            DATABASE_URL = f"mysql+pymysql://{db_user}:{db_password}@{host}:{port}/{dbname}"
+            DATABASE_URL = (
+                f"mysql+pymysql://{db_user}:{db_password}@{host}:{port}/{dbname}"
+            )
         else:
             raise ValueError(f"Malformed db_address: {db_address}")
 else:

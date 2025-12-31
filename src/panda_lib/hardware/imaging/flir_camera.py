@@ -20,6 +20,8 @@ import cv2
 import numpy as np
 
 PYSPIN_AVAILABLE = True
+
+
 class FlirCamera(CameraInterface):
     """
     Implementation of CameraInterface for FLIR cameras using PySpin
@@ -152,7 +154,6 @@ class FlirCamera(CameraInterface):
             self.logger.error("Cannot capture image: Camera not connected")
             return None
 
-
         try:
             nodemap = self.camera.GetNodeMap()
             pixel_format = PySpin.CEnumerationPtr(nodemap.GetNode("PixelFormat"))
@@ -160,7 +161,9 @@ class FlirCamera(CameraInterface):
                 rgb8_entry = pixel_format.GetEntryByName("RGB8")
                 if rgb8_entry and PySpin.IsAvailable(rgb8_entry):
                     pixel_format.SetIntValue(rgb8_entry.GetValue())
-                    self.logger.info("Set camera to RGB8 format - using built-in color processing")
+                    self.logger.info(
+                        "Set camera to RGB8 format - using built-in color processing"
+                    )
 
             self.camera.BeginAcquisition()
             image_result = self.camera.GetNextImage(1000)
@@ -203,7 +206,6 @@ class FlirCamera(CameraInterface):
             self.logger.error("PySpin library not available")
             return False
 
-
         try:
             path = Path(path) if isinstance(path, str) else path
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -216,7 +218,6 @@ class FlirCamera(CameraInterface):
         except Exception as ex:
             self.logger.error(f"Error saving image from FLIR camera: {ex}")
             return False
-
 
     def capture_and_save(self, path: Union[str, Path]) -> Tuple[Path, bool]:
         """Capture an image and save it to disk
@@ -232,7 +233,6 @@ class FlirCamera(CameraInterface):
         if not PYSPIN_AVAILABLE:
             self.logger.error("PySpin library not available")
             return Path(path), False
-
 
         path = Path(path) if isinstance(path, str) else path
         path = file_enumeration(path)

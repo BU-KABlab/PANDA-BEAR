@@ -152,7 +152,7 @@ class PandaMill(Mill):
 
         self.safe_move(coordinates=coords, tool="electrode")
         return 0
-    
+
     def disconnect(self):
         """Close the serial connection to the mill safely."""
         mill_control_logger.info("Disconnecting from the mill")
@@ -165,10 +165,14 @@ class PandaMill(Mill):
             self.ser_mill.close()
             time.sleep(2)
             if self.ser_mill.is_open:
-                mill_control_logger.error("Failed to close the serial connection to the mill")
+                mill_control_logger.error(
+                    "Failed to close the serial connection to the mill"
+                )
                 raise MillConnectionError("Error closing serial connection to mill")
             else:
-                mill_control_logger.info("Serial connection to mill closed successfully")
+                mill_control_logger.info(
+                    "Serial connection to mill closed successfully"
+                )
         except Exception as e:
             mill_control_logger.error(f"Exception while closing serial connection: {e}")
         finally:

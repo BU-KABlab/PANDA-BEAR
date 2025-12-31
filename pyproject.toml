@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "panda_lib"
 version = "2.0"
-description = "A library for operating a PANDA SDL as a standalone device or in a SiLA environment."
+description = "A library for operating a PANDA SDL as a standalone device."
 readme = "README.md"
 requires-python = ">=3.10,<3.11"
 license = { text = "GPL-2.0" }
@@ -24,7 +24,7 @@ dependencies = [
     "contourpy==1.3.0",
     "cycler==0.12.1",
     "filelock==3.16.0",
-    "fonttools==4.53.1",
+    "fonttools==4.60.2",
     "fsspec==2024.9.0",
     "gitdb==4.0.11",
     "GitPython==3.1.43",
@@ -33,7 +33,7 @@ dependencies = [
     "hardpotato==1.4.0",
     "imageio==2.35.1",
     "jaxtyping==0.2.19",
-    "Jinja2==3.1.4",
+    "Jinja2==3.1.6",
     "joblib==1.4.2",
     "kiwisolver==1.4.7",
     "lazy_loader==0.4",
@@ -48,7 +48,7 @@ dependencies = [
     "packaging==24.1",
     "pandas==2.2.2",
     "pillow==10.4.0",
-    "pip>=24.3.1",
+    # "pip>=25.3",  # REMOVED: Package manager, not a dependency
     "pre-commit>=4.2.0",
     "PuLP==2.9.0",
     "pydantic==2.9.1",
@@ -74,17 +74,21 @@ dependencies = [
     "threadpoolctl==3.5.0",
     "tifffile==2024.8.30",
     "tomli==2.0.1",
-    "torch>=2.4.0",
+    "torch>=2.7.1-rc1",
     "torchaudio>=2.4.0",
     "torchvision>=0.19.0",
     "tqdm==4.67.1",
     "typeguard==4.3.0",
     "typing_extensions==4.12.2",
     "tzdata==2024.1",
-    "uv>=0.6.4",
+    # NOTE: pip and uv are package managers, not library dependencies
+    # They should be installed separately, not as dependencies
+    # "pip>=25.3",  # REMOVED: Package manager, not a dependency
+    # "uv>=0.8.6",  # REMOVED: Package manager, not a dependency
     "simple-pyspin==0.1.1",
     "websocket-client==1.8.0",
-    "spinnaker-python",
+    # UNCOMMENT THE LINE BELOW WHEN YOU HAVE THE SPINNKER WHL FILE 
+    # "spinnaker-python",
     "alembic",
     "mako"
 ]
@@ -100,6 +104,7 @@ dev = ["pytest>=8.3.4", "ruff>=0.8.3", "mypy>=1.8.0", "black>=24.3.0"]
 [project.scripts]
 panda-cli = "panda_lib_cli.main:main"
 panda-db-setup = "panda_lib_db.cli:main"
+panda-slack-bot = "panda_lib.slack_tools.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -171,7 +176,8 @@ panda_sdl = { workspace = true }
 panda-lib = { workspace = true }
 hardpotato = { git = "https://github.com/BU-KABlab/hardpotato.git" }
 nesp-lib = { git = "https://github.com/BU-KABlab/nesp-lib-py.git" }
-spinnaker-python = { path = "../../spinnaker_python-4.2.0.46-cp310-cp310-linux_aarch64.whl" }
+# UNCOMMENT THE LINE BELOW WHEN YOU HAVE THE SPINNKER WHL FILE 
+# spinnaker-python = { path = "../../spinnaker_python-4.2.0.46-cp310-cp310-linux_aarch64.whl" }
 
 [dependency-groups]
 dev = ["panda-lib"]

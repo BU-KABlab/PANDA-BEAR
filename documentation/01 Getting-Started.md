@@ -1,6 +1,20 @@
 # Getting Started with PANDA-SDL
 
-This guide will help you set up your environment and get started with the PANDA-SDL system. Follow these steps to install the required software, configure your environment, and run your first experiment.
+This guide provides step-by-step instructions for installing PANDA-SDL, configuring your environment, and running your first experiment.
+
+**Navigation**: [Home](00-Home.md) | Getting Started | [Writing Protocols](03%20Writing-Protocols.md) | [Creating Generators](02%20Creating-Generators.md) | [Using Analyzers](04%20Using-Analyzers.md)
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Set Up the Database](#4-set-up-the-database)
+- [Configure the Environment](#5-configure-the-environment)
+- [Setting up Slack](#6-setting-up-slack-optional)
+- [Running Your First Experiment](#7-running-your-first-experiment)
+- [Next Steps](#8-next-steps)
+- [Verifying Your Installation](#9-verifying-your-installation)
+- [Troubleshooting](#10-troubleshooting)
 
 ## Prerequisites
 
@@ -14,14 +28,22 @@ Before you begin, ensure you have the following:
 
 ## Installation
 
-### 1. Clone the Repository
+### 1. Clone the Repository or Install from GitHub
 
-First, clone the PANDA-SDL repository to your local machine:
+You can either clone the repository for development or install directly from GitHub:
 
+**Option A: Clone for Development**
 ```bash
-git clone https://github.com/BU-KABlab/PANDA-SDL.git
-cd PANDA-SDL
+git clone https://github.com/BU-KABlab/PANDA-BEAR.git
+cd PANDA-BEAR
 ```
+
+**Option B: Install from GitHub (Recommended for End Users)**
+```bash
+pip install git+https://github.com/BU-KABlab/PANDA-BEAR.git
+```
+
+If installing from GitHub, you can skip to step 3 (Choose Your Installation Method) after creating a virtual environment.
 
 ### 2. Drivers and SDKs
 
@@ -114,7 +136,17 @@ c. Install dependencies:
 pip install -r requirements.txt
 ```
 
-### 4. Configure the Environment
+## 4. Set Up the Database
+
+Before running experiments, you need to initialize the database:
+
+```bash
+panda-db-setup
+```
+
+This creates a SQLite database with the required schema. For custom database paths or options, see the [Database Setup README](../src/panda_lib_db/README.md).
+
+## 5. Configure the Environment
 
 a. Create a `.env` file in the project root:
 
@@ -259,7 +291,7 @@ max_pipetting_rate = 50.0
 pipette_capacity = 300
 ```
 
-## Setting up Slack [Optional]
+## 6. Setting up Slack (Optional)
 
 To obtain a token for your own SlackBot you will need to follow the [instructions](https://api.slack.com/quickstart) from Slack on making a Slack App.
 
@@ -275,55 +307,120 @@ Get the access token from the OAuth & Permissions page and add it to your ini fi
 
 For each channel that you want the app to have access to you first need to add the bot to the channel, and then find the channel ID by going to that channel in the Slack app, click the channel name at the top, and scroll to the bottom of the pop-up. There will be Channel ID: ######### and a copy button. Repeat for each channel and add the appropriate code in the ini file.
 
-## Running Your First Experiment
+## 7. Running Your First Experiment
 
-### 1. Start the PANDA System
+### Method 1: Using the CLI Menu (Interactive)
 
-To start the PANDA system, run:
+1. Start the PANDA system:
+   ```bash
+   python main.py
+   # Or: panda-cli
+   ```
 
-```bash
-python main.py
-```
+2. Enable testing mode (uses mock instruments, no hardware required):
+   - Press `t` to toggle testing mode
 
-This will launch the main menu interface where you can interact with the system.
+3. Test the system:
+   - Press `7` to test the camera
+   - Press `8` to check all instrument connections
 
-Depending on how you configured your config file, the system will prompt you to create any missing directories, or databases.
-
-### 2. Using the Main Menu
-
-The main menu provides various options for controlling the system. Here are some basic commands:
-
-- Press `7` to test the camera (good first test)
-- Press `8` to check all instrument connections
-- Press `t` to toggle testing mode (uses mock instruments, good for validating protocols run virtually)
-- Press `q` to exit the program
+4. Run a demo experiment:
+   - Press `4` then `1` to access the experiment generator menu
+   - Select a generator (e.g., `system_test`)
+   - Press `1` to run the queue of generated experiments
 
 Detailed descriptions of each command can be found in [Main Menu Reference](Main-Menu-Reference.md)
 
-### 3. Running a Demo Protocol
+### Method 2: Using Python Scripts (Programmatic)
 
-To run a demo experiment:
+You can run experiments programmatically without the CLI menu:
 
-1. Navigate to the main menu
-2. Press `4` then `1` to access the experiment generator menu
-3. Select one of the available demo generators
-4. Press `1` to run the queue of generated experiments
+```bash
+# Run the quick start example
+python examples/quick_start.py
 
-## Next Steps
+# Run a specific experiment by ID
+python examples/run_experiment.py --experiment-id 1 --testing
+```
+
+See the [Examples README](../examples/README.md) for more programmatic usage examples.
+
+### Method 3: Direct Python Code
+
+```python
+from panda_lib import scheduler
+from panda_lib.experiments import EchemExperimentBase
+from panda_lib.experiment_loop import experiment_loop_worker
+
+# Create and schedule experiment
+experiment = EchemExperimentBase(
+    experiment_id=scheduler.determine_next_experiment_id(),
+    protocol_name="demo",
+    well_id="A1",
+    wellplate_type_id=4,
+    experiment_name="my_experiment",
+    project_id=1,
+    project_campaign_id=1,
+    solutions={},
+    ocp=0, baseline=0, cv=0, ca=0,
+)
+scheduler.schedule_experiments([experiment])
+
+# Run the experiment
+experiment_loop_worker(
+    use_mock_instruments=True,  # Testing mode
+    one_off=True,
+    specific_experiment_id=experiment.experiment_id,
+)
+```
+
+## 8. Next Steps
 
 Now that you've set up your environment and run your first experiment, you can:
 
-- Learn to [write your own protocols](Writing-Protocols.md)
-- Create [custom experiment generators](Creating-Generators.md)
+- Learn to [write your own protocols](03%20Writing-Protocols.md)
+- Create [custom experiment generators](02%20Creating-Generators.md)
 - Explore the [main menu options](Main-Menu-Reference.md) in more detail
+- Review the [API Reference](API-Reference.md) for available functions
 
-## Troubleshooting
+## 9. Verifying Your Installation
+
+Before running experiments, verify your installation works:
+
+```bash
+# Run unit tests
+pytest tests/unit/ -v
+
+# Run with coverage
+pytest tests/unit/ --cov=src --cov-report=html
+```
+
+If tests pass, your installation is working correctly!
+
+## 10. Troubleshooting
 
 If you encounter issues during installation or running:
 
-- Check the logs in the `logs_test/` directory
-- Ensure all hardware is properly connected
-- Verify your config.ini file is correctly configured
-- Make sure your Python version is exactly 3.10
+### Common Issues
 
-For more detailed information, refer to the [End User Manual](../documentation/end_user_manual.md).
+1. **Database errors**: Run `panda-db-setup --force` to recreate the database
+2. **Import errors**: 
+   - Verify virtual environment is activated
+   - Check Python version is 3.10: `python --version`
+   - Reinstall: `pip install --force-reinstall git+https://github.com/BU-KABlab/PANDA-BEAR.git`
+3. **Configuration errors**:
+   - Check `.env` file exists and `PANDA_SDL_CONFIG_PATH` is set correctly
+   - Verify `config.ini` exists at the specified path
+   - Check logs in `logs_test/` directory
+4. **Hardware connection failures**: 
+   - Verify device drivers are installed
+   - Check port configurations in `config.ini`
+   - Use testing mode first: set `testing = True` in config
+
+### Getting Help
+
+- Check the [Troubleshooting section](../README.md#troubleshooting) in the main README
+- Review logs in `logs_test/` directory
+- Open an issue on [GitHub](https://github.com/BU-KABlab/PANDA-BEAR/issues)
+
+For additional information, see the [Main Menu Reference](Main-Menu-Reference.md) and [API Reference](API-Reference.md).

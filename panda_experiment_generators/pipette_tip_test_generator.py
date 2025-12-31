@@ -1,6 +1,5 @@
 """Generator for the pipette tip replacement test protocol."""
 
-import pandas as pd  # kept for parity with your other generator
 from pydantic import ValidationError
 
 from panda_lib import scheduler
@@ -10,6 +9,7 @@ PROJECT_ID = 300
 EXPERIMENT_NAME = "pipette_tip_test"
 CAMPAIGN_ID = 2
 PLATE_TYPE = 8  # not used by the protocol itself, but included for model parity
+
 
 def main():
     """Schedules one or more pipette-tip test experiments."""
@@ -25,7 +25,7 @@ def main():
                     experiment_id=experiment_id,
                     protocol_name="pipette_tip_test_protocol",
                     analysis_id=0,  # no analysis for this hardware/db smoke test
-                    well_id="A1",   # placeholder; protocol won’t use it
+                    well_id="A1",  # placeholder; protocol won’t use it
                     wellplate_type_id=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
                     project_id=PROJECT_ID,
@@ -33,7 +33,11 @@ def main():
                     # Solutions block kept to satisfy the same model fields your PAMA generator uses
                     solutions={
                         "pama_200": {"volume": 0, "concentration": 0.0, "repeated": 1},
-                        "electrolyte": {"volume": 0, "concentration": 0.0, "repeated": 1},
+                        "electrolyte": {
+                            "volume": 0,
+                            "concentration": 0.0,
+                            "repeated": 1,
+                        },
                         "ipa": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "dmf": {"volume": 0, "concentration": 0.0, "repeated": 1},
                         "acn": {"volume": 0, "concentration": 0.0, "repeated": 1},

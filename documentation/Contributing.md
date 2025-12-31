@@ -1,6 +1,15 @@
 # Contributing to PANDA-SDL
 
-Thank you for your interest in contributing to the PANDA-SDL project! This guide will help you understand the contribution process and best practices.
+Guidelines and best practices for contributing to the PANDA-SDL project.
+
+**Navigation**: [Home](00-Home.md) | [Developer Guide](Developer-Guide.md) | Contributing | [Code Architecture](Code-Architecture.md)
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [How to Contribute](#how-to-contribute)
+- [Development Guidelines](#development-guidelines)
+- [Submitting Changes](#submitting-changes)
 
 ## Getting Started
 
@@ -174,6 +183,15 @@ The project follows [Semantic Versioning](https://semver.org/):
 - **MAJOR** version for incompatible API changes
 - **MINOR** version for backward-compatible new functionality
 - **PATCH** version for backward-compatible bug fixes
+
+## Next Steps
+
+After reviewing the contribution guidelines, you may want to:
+
+- Review the [Developer Guide](Developer-Guide.md) for development environment setup
+- Study the [Code Architecture](Code-Architecture.md) to understand the system structure
+- Consult the [API Reference](API-Reference.md) for detailed function documentation
+- Check existing issues on GitHub to find areas where contributions are needed
 
 ## License
 

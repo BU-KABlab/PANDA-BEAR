@@ -303,14 +303,15 @@ class Well:
 
         # Proportional removal based on actual contents
         current_content_ratios = {
-            key: value / total_content
-            for key, value in self.well_data.contents.items()
+            key: value / total_content for key, value in self.well_data.contents.items()
         }
 
         removed_contents = {}
         for key in self.well_data.contents:
             removed_volume = round(volume * current_content_ratios[key], 6)
-            self.well_data.contents[key] = max(self.well_data.contents[key] - removed_volume, 0.0)
+            self.well_data.contents[key] = max(
+                self.well_data.contents[key] - removed_volume, 0.0
+            )
             removed_contents[key] = removed_volume
 
         # Logically subtract, but clamp to zero to avoid negative volume
@@ -615,7 +616,7 @@ class Wellplate:
     def bottom(self):
         """The z-coordinate of the wellplate bottom"""
         return self.plate_data.bottom
-    
+
     @property
     def echem_height(self):
         return self.plate_data.echem_height + self.plate_data.bottom
@@ -730,7 +731,9 @@ def _remove_experiment_from_db(
         return False, f"Error occurred while deleting the experiment: {e}"
 
 
-def load_configuration(filename: str = "src/panda_lib/hardware/grbl_cnc_mill/_configuration.json"):
+def load_configuration(
+    filename: str = "src/panda_lib/hardware/grbl_cnc_mill/_configuration.json",
+):
     """Load the configuration from the JSON file"""
 
     filename: Path = Path(filename)
