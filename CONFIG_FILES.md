@@ -77,7 +77,7 @@ Both files contain the same sections:
 
 ## Security Notes
 
-⚠️ **Important**: Never commit your actual configuration file with:
+**Important**: Never commit your actual configuration file with:
 - Real Slack tokens
 - Production database passwords
 - Sensitive API keys

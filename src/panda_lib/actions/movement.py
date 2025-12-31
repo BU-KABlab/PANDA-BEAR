@@ -324,7 +324,7 @@ def decapping_sequence(
             return  # Success
         elif attempt == 0:
             # Retry once
-            print("⚠️ Cap not detected. Retrying decapping...")
+            print("[WARNING] Cap not detected. Retrying decapping...")
             time.sleep(1.0)
             mill.safe_move(
                 target_coords.x, target_coords.y, target_coords.z, tool="decapper"
@@ -386,7 +386,7 @@ def capping_sequence(
             return
 
         # Still detected
-        print(f"⚠️ Cap detected. Attempt {attempt + 1} of {MAX_ATTEMPTS}...")
+        print(f"[WARNING] Cap detected. Attempt {attempt + 1} of {MAX_ATTEMPTS}...")
 
         if attempt == 0:
             time.sleep(1.0)
@@ -427,7 +427,7 @@ def capping_sequence(
     time.sleep(1.0)
 
     if check_line_break():
-        print("⚠️ Cap still detected after capping.")
+        print("[WARNING] Cap still detected after capping.")
         raise ValueError("Cap still detected after manual intervention.")
 
 

@@ -5,12 +5,22 @@ Detailed instructions for constructing the physical PANDA system components.
 **Navigation**: [Home](00-Home.md) | [Build Guide](Build-Guide.md) | Construction Guide | [Arduino Wiring](Arduino-Wiring.md)
 
 ## Table of Contents <!-- omit from toc -->
+- [Construction Guide](#construction-guide)
 - [Parts](#parts)
 - [Constructing the Process Automation Widget (PAW)](#constructing-the-process-automation-widget-paw)
   - [PAWduino (Arduino)](#pawduino-arduino)
 - [Placing Objects on the Deck](#placing-objects-on-the-deck)
   - [Vials](#vials)
   - [Wellplates](#wellplates)
+  - [Wellplate Holder Assembly](#wellplate-holder-assembly)
+    - [Magnets](#magnets)
+      - [Base Insert](#base-insert)
+      - [Base](#base)
+      - [Top](#top)
+      - [Top Insert](#top-insert)
+      - [Cover](#cover)
+    - [Pogo Pins](#pogo-pins)
+    - [Magnet Connectors](#magnet-connectors)
 - [Mapping the Location of Objects and Calibrating Offsets](#mapping-the-location-of-objects-and-calibrating-offsets)
 
 
@@ -97,7 +107,7 @@ _**You will need to orient the prints a specific way and include programmed paus
 
 For assembly of the wellplate holder, you will need the following:
 
-### 🔩 Magnets
+### Magnets
  *You can stack magnets to get the right dimensions. Ensure they are **strong magnets** that work through 3D prints.*
 
 #### Base Insert
@@ -126,7 +136,7 @@ For assembly of the wellplate holder, you will need the following:
 
 
 
-### 🧲 Magnet Connectors
+### Magnet Connectors
 - [Adafruit Magnet Connectors – Product #5358](https://www.adafruit.com/product/5358)
 
 

@@ -1,6 +1,6 @@
 # API Reference
 
-Complete reference documentation for the PANDA-SDL API, covering all components and functions available for writing protocols, generators, and analyzers.
+Complete reference documentation for the PANDA-BEAR API, covering all components and functions available for writing protocols, generators, and analyzers.
 
 **Navigation**: [Home](00-Home.md) | [Getting Started](01%20Getting-Started.md) | [Writing Protocols](03%20Writing-Protocols.md) | [Creating Generators](02%20Creating-Generators.md) | API Reference
 
@@ -61,7 +61,7 @@ Complete reference documentation for the PANDA-SDL API, covering all components 
 
 ### Toolkit
 
-The `Toolkit` class is the central interface for interacting with the PANDA-SDL hardware and software systems.
+The `Toolkit` class is the central interface for interacting with the PANDA-BEAR hardware and software systems.
 
 ```python
 from panda_lib import Toolkit
@@ -87,7 +87,7 @@ NOTE: The potentiostat is not included as it is connected and disconnected with 
 
 ### Experiments
 
-The experiment classes define the structure and parameters of PANDA-SDL experiments.
+The experiment classes define the structure and parameters of PANDA-BEAR experiments.
 
 ```python
 from panda_lib.experiments import ExperimentBase
@@ -315,7 +315,7 @@ Utility functions for writing protocols
 
 ## Labware
 
-The PANDA-SDL system works with different types of labware, including wellplates, wells, and vials.
+The PANDA-BEAR system works with different types of labware, including wellplates, wells, and vials.
 
 ### Wellplates
 
@@ -545,7 +545,7 @@ Coming soon
 
 ## Exception Handling
 
-The PANDA-SDL system defines several exception types for handling errors:
+The PANDA-BEAR system defines several exception types for handling errors:
 
 ```python
 from panda_lib.exceptions import ...

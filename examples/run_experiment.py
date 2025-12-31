@@ -23,7 +23,7 @@ from panda_lib.experiment_loop import experiment_loop_worker
 def main():
     """Run a specific experiment by ID."""
     parser = argparse.ArgumentParser(
-        description="Run a PANDA-SDL experiment by ID",
+        description="Run a PANDA-BEAR experiment by ID",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -61,12 +61,12 @@ Examples:
             one_off=True,  # Run one experiment and exit
             specific_experiment_id=args.experiment_id,
         )
-        print(f"\n✓ Experiment {args.experiment_id} completed successfully!")
+        print(f"\n[OK] Experiment {args.experiment_id} completed successfully!")
     except KeyboardInterrupt:
         print("\n\nExperiment interrupted by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n✗ Error running experiment: {e}")
+        print(f"\n[ERROR] Error running experiment: {e}")
         sys.exit(1)
 
 

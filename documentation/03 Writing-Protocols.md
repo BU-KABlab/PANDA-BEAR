@@ -1,6 +1,6 @@
 # Writing Protocols
 
-Protocols define the sequence of actions executed during a PANDA-SDL experiment. Each protocol specifies the steps performed by the system, from solution preparation through data collection.
+Protocols define the sequence of actions executed during a PANDA-BEAR experiment. Each protocol specifies the steps performed by the system, from solution preparation through data collection.
 
 **Navigation**: [Home](00-Home.md) | [Getting Started](01%20Getting-Started.md) | Writing Protocols | [Creating Generators](02%20Creating-Generators.md) | [Using Analyzers](04%20Using-Analyzers.md)
 
@@ -71,7 +71,7 @@ def run(experiment, toolkit):
 
 ## Available Actions
 
-PANDA-SDL provides a set of predefined actions that you can use in your protocols:
+PANDA-BEAR provides a set of predefined actions that you can use in your protocols:
 
 ### Fluid Handling
 - `transfer(volume, solution_name, destination_well, toolkit)` - Transfers a solution to a well

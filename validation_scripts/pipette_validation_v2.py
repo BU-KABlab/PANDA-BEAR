@@ -157,9 +157,9 @@ from panda_lib.types import VialKwargs
                     
                     # Print current state
                     if is_stable:
-                        print(f"✅ Reading {attempt}: {mass:.4f} g (STABLE)")
+                        print(f"[STABLE] Reading {attempt}: {mass:.4f} g (STABLE)")
                     else:
-                        print(f"⏳ Reading {attempt}: {mass:.4f} g (unstable)")
+                        print(f"[WAITING] Reading {attempt}: {mass:.4f} g (unstable)")
                     
                     # If we got a stable reading, return it
                     if is_stable:
@@ -191,7 +191,7 @@ from panda_lib.types import VialKwargs
                 mass = final_reading
                 is_stable = False
             
-            print(f"⚠️ Could not get confirmed stable reading after {max_attempts} attempts")
+            print(f"[WARNING] Could not get confirmed stable reading after {max_attempts} attempts")
             print(f"Using best available: {mass:.4f} g (stable: {is_stable})")
             return (mass, is_stable)
         except Exception as e:

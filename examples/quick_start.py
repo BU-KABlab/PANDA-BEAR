@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Quick Start Example for PANDA-SDL
+Quick Start Example for PANDA-BEAR
 
 This script demonstrates a minimal working example of running an experiment
 programmatically without using the CLI menu.
 
 Prerequisites:
-1. Install PANDA-SDL: pip install git+https://github.com/BU-KABlab/PANDA-BEAR.git
+1. Install PANDA-BEAR: pip install git+https://github.com/BU-KABlab/PANDA-BEAR.git
 2. Set up database: panda-db-setup
 3. Configure .env file with PANDA_SDL_CONFIG_PATH
 4. Create config.ini file (see config.ini.example)
@@ -29,7 +29,7 @@ from panda_lib.experiment_loop import experiment_loop_worker
 
 def main():
     """Run a simple test experiment."""
-    print("PANDA-SDL Quick Start Example")
+    print("PANDA-BEAR Quick Start Example")
     print("=" * 50)
 
     # Step 1: Create a simple experiment
@@ -73,12 +73,12 @@ def main():
             one_off=True,  # Run one experiment and exit
             specific_experiment_id=experiment_id,
         )
-        print("\n✓ Experiment completed successfully!")
+        print("\n[OK] Experiment completed successfully!")
     except KeyboardInterrupt:
         print("\n\nExperiment interrupted by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n✗ Error running experiment: {e}")
+        print(f"\n[ERROR] Error running experiment: {e}")
         print("\nTroubleshooting:")
         print("1. Ensure database is set up: panda-db-setup")
         print("2. Check config file exists and is valid")

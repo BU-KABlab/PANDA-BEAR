@@ -7,7 +7,7 @@ import re
 import argparse
 from typing import Dict, List, Tuple, Optional
 
-from ContactAngleScriptsForPANDAV2.ContactAngle_LEDdetect import process_z_stack_then_measure, extract_z_mm_from_name, process_image
+from .ContactAngle_LEDdetect import process_z_stack_then_measure, extract_z_mm_from_name, process_image
 
 # Helpers to group images into stacks (by well and position)
 WELL_RE = re.compile(r"\b([A-Ha-h][1-9]\d?)\b")

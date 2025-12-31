@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-This guide will get you up and running with PANDA-SDL in the fastest way possible.
+This guide will get you up and running with PANDA-BEAR in the fastest way possible.
 
 ## Installation (5 minutes)
 
@@ -11,7 +11,7 @@ This guide will get you up and running with PANDA-SDL in the fastest way possibl
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Install PANDA-SDL
+# Install PANDA-BEAR
 pip install git+https://github.com/BU-KABlab/PANDA-BEAR.git
 ```
 

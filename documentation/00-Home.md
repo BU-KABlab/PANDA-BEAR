@@ -1,4 +1,4 @@
-# PANDA-SDL Documentation
+# PANDA-BEAR Documentation
 
 ![PANDA Logo](../PANDAlogo.png)
 
@@ -12,9 +12,9 @@ PANDA is an open-source self-driving lab developed by the [KABLab](https://www.k
 
 ### User Guides
 
-These guides are designed for end users who want to install, configure, and use PANDA-SDL for experiments.
+These guides are designed for end users who want to install, configure, and use PANDA-BEAR for experiments.
 
-1. **[Installation and Setup](01%20Getting-Started.md#installation)** - Install PANDA-SDL, configure your environment, and set up the database
+1. **[Installation and Setup](01%20Getting-Started.md#installation)** - Install PANDA-BEAR, configure your environment, and set up the database
 2. **[Getting Started](01%20Getting-Started.md)** - Run your first experiment and understand the basic workflow
 3. **[Writing Protocols](03%20Writing-Protocols.md)** - Create experimental protocols that define experiment execution
 4. **[Creating Generators](02%20Creating-Generators.md)** - Build experiment generators for parameter sweeps and batch experiments
@@ -30,7 +30,7 @@ Quick reference materials for looking up specific information.
 
 ### Developer Documentation
 
-Information for developers contributing to or extending PANDA-SDL.
+Information for developers contributing to or extending PANDA-BEAR.
 
 - **[Code Architecture](Code-Architecture.md)** - System architecture and component relationships
 - **[Developer Guide](Developer-Guide.md)** - Development environment setup and guidelines
@@ -62,4 +62,4 @@ For new users, follow this sequence:
 
 ## License
 
-PANDA-SDL is licensed under the GNU General Public License v2.0. See the [LICENSE](../LICENSE) file for details.
+PANDA-BEAR is licensed under the GNU General Public License v2.0. See the [LICENSE](../LICENSE) file for details.

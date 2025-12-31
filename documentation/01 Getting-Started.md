@@ -1,6 +1,6 @@
-# Getting Started with PANDA-SDL
+# Getting Started with PANDA-BEAR
 
-This guide provides step-by-step instructions for installing PANDA-SDL, configuring your environment, and running your first experiment.
+This guide provides step-by-step instructions for installing PANDA-BEAR, configuring your environment, and running your first experiment.
 
 **Navigation**: [Home](00-Home.md) | Getting Started | [Writing Protocols](03%20Writing-Protocols.md) | [Creating Generators](02%20Creating-Generators.md) | [Using Analyzers](04%20Using-Analyzers.md)
 

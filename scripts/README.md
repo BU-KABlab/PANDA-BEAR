@@ -55,4 +55,4 @@ Edit the script to set:
 
 ## Notes
 
-These scripts are utility tools and are not part of the core PANDA-SDL library. They may require modification for your specific use case.
+These scripts are utility tools and are not part of the core PANDA-BEAR library. They may require modification for your specific use case.

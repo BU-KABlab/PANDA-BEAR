@@ -641,12 +641,12 @@ def test_instrument_connections(
     if connected_instruments:
         print("Connected instruments:")
         for instrument in connected_instruments:
-            print(f"  ✓ {instrument}")
+            print(f"  [OK] {instrument}")
 
     if disconnected_instruments:
         print("Disconnected instruments:")
         for instrument in disconnected_instruments:
-            print(f"  ✗ {instrument}")
+            print(f"  [FAIL] {instrument}")
 
     if incomplete:
         print("\nWarning: Not all instruments connected")

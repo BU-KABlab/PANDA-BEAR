@@ -1,6 +1,6 @@
 # Main Menu Reference
 
-Complete reference for all PANDA-SDL command-line interface menu options and functions.
+Complete reference for all PANDA-BEAR command-line interface menu options and functions.
 
 **Navigation**: [Home](00-Home.md) | [Getting Started](01%20Getting-Started.md) | Main Menu Reference | [API Reference](API-Reference.md)
 
@@ -137,7 +137,7 @@ If you encounter issues:
 
 2. Verify that all instruments are properly connected and powered on.
 
-3. Restart the PANDA-SDL system if you encounter unexpected behavior.
+3. Restart the PANDA-BEAR system if you encounter unexpected behavior.
 
 4. Ensure your configuration files (.env and config.ini) are correctly set up.
 

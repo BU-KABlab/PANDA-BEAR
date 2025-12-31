@@ -79,8 +79,8 @@ class DryRunMill:
         with open(self.log_file, "w") as f:
             f.write("command,x,y,z,tool,feed_rate,notes\n")
 
-        print("🔍 DRY RUN MODE ACTIVE - No actual movements will occur")
-        print(f"📝 Movement commands will be logged to: {self.log_file}")
+        print("[DRY RUN] MODE ACTIVE - No actual movements will occur")
+        print(f"[LOG] Movement commands will be logged to: {self.log_file}")
 
     def log_movement(
         self, command, x=None, y=None, z=None, tool=None, feed_rate=None, notes=None
@@ -98,7 +98,7 @@ class DryRunMill:
                 if val is not None
             ]
         )
-        print(f"🔍 {command}: {position_str}{tool_str}")
+        print(f"[DRY RUN] {command}: {position_str}{tool_str}")
 
         # Update current position
         if x is not None:
@@ -112,7 +112,7 @@ class DryRunMill:
 
     # Implement all the methods from PandaMill that your script uses
     def connect_to_mill(self):
-        print("🔍 Would connect to mill")
+        print("[DRY RUN] Would connect to mill")
         return True
 
     def homing_sequence(self):
@@ -149,7 +149,7 @@ class DryRunMill:
         return True
 
     def disconnect(self):
-        print("🔍 Would disconnect from mill")
+        print("[DRY RUN] Would disconnect from mill")
         return True
 
     def send_command(self, command):
@@ -175,7 +175,7 @@ if DRY_RUN:
     # Create a mock capping sequence that works around the bug
     def mock_capping_sequence(mill, coords, arduino, **kwargs):
         """Mock implementation of capping that works in dry run mode."""
-        print("🔍 MOCK CAPPING: Would cap vial")
+        print("[DRY RUN] MOCK CAPPING: Would cap vial")
 
         # Log the movements
         mill.log_movement(
@@ -195,7 +195,7 @@ if DRY_RUN:
         mill.move_to_position(coords.x, coords.y, 0, tool="decapper")
 
         # This is the part that's broken in the real function - we'll skip it
-        print("🔍 SKIPPING problematic line break check in capping sequence")
+        print("[DRY RUN] SKIPPING problematic line break check in capping sequence")
 
         # Indicate success
         return True

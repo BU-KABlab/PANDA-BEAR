@@ -1,9 +1,6 @@
 """Generates a PAMA experiment."""
 
-from contact_angle.ml_model.contact_angle_ml_analyzer import (
-    main as run_ml_model,
-)
-from contact_angle_analyzer import analyze
+from .contact_angle_ml_gpr_model import fit_gpr as run_ml_model
 
 from panda_lib import scheduler
 from panda_lib.experiments import ExperimentStatus, experiment_types

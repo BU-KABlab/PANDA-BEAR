@@ -1,6 +1,6 @@
 # Using Analyzers
 
-Analyzers process and analyze experiment results from the PANDA-SDL system. They perform data analysis, generate visualizations, and can create new experiments based on analysis results.
+Analyzers process and analyze experiment results from the PANDA-BEAR system. They perform data analysis, generate visualizations, and can create new experiments based on analysis results.
 
 **Navigation**: [Home](00-Home.md) | [Getting Started](01%20Getting-Started.md) | [Writing Protocols](03%20Writing-Protocols.md) | [Creating Generators](02%20Creating-Generators.md) | Using Analyzers
 
@@ -204,7 +204,7 @@ print(results)
 
 ### 2. Automated Analysis through the Analysis Worker
 
-The PANDA-SDL system includes an analysis worker that can automatically run analyzers on completed experiments:
+The PANDA-BEAR system includes an analysis worker that can automatically run analyzers on completed experiments:
 
 1. Place your analyzer in the analyzers directory specified in your config.ini
 2. From the main menu, select option `10` to start the analysis loop
@@ -315,9 +315,9 @@ def generate_next_experiments(self):
 
 ## Next Steps
 
-With analyzers in place, you can complete the full experimental cycle from protocol development to data analysis. To learn more about other aspects of the PANDA-SDL system, check out:
+With analyzers in place, you can complete the full experimental cycle from protocol development to data analysis. To learn more about other aspects of the PANDA-BEAR system, check out:
 
-- [API Reference](API-Reference.md) for detailed information on the PANDA-SDL library
+- [API Reference](API-Reference.md) for detailed information on the PANDA-BEAR library
 - [Main Menu Reference](Main-Menu-Reference.md) for all available system functions
 - [Writing Protocols](03%20Writing-Protocols.md) to understand how experiments are executed
 - [Creating Generators](02%20Creating-Generators.md) to automate experiment creation

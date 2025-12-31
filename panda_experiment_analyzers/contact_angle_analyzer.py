@@ -11,13 +11,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from panda_experiment_analyzers.contact_angle.contact_angle_predict import predict_contact_angle
-from panda_experiment_analyzers.contact_angle.contact_angle_detection import process_image
+from panda_experiment_analyzers.contact_angle.contact_angle_led_detect import process_image
+from panda_experiment_analyzers.contact_angle.contact_angle_predict_ca_regression_model import predict_batch as predict_contact_angle
 
 from panda_experiment_analyzers.contact_angle.ml_input import (
     populate_required_information as analysis_input,
 )
-from panda_experiment_analyzers.contact_angle.ml_model import contact_angle_model
+from panda_experiment_analyzers.contact_angle.contact_angle_ml_gpr_model import fit_gpr as contact_angle_model
 from panda_experiment_analyzers.contact_angle.contact_angle_classes import (
     MLInput,
     MLOutput,
@@ -163,8 +163,8 @@ def analyze(experiment_id: int, add_to_training_data: bool = False) -> MLTrainin
     Returns:
         MLTrainingData: The training data to be used for the ML model.
     """
-        if config.getboolean("OPTIONS", "testing"):
-        return
+    if config.getboolean("OPTIONS", "testing"):
+        return None
 
     if experiment_id is None:
         experiment_id = (
@@ -172,8 +172,22 @@ def analyze(experiment_id: int, add_to_training_data: bool = False) -> MLTrainin
         )  # Get the last experiment ID
 
     input_data: RequiredData = analysis_input(experiment_id)
-    metrics: RawMetrics = lab.rgbtolab(input_data) # TODO: update this to reflect contact angle
-    results = met.process_metrics(metrics, input_data)  # TODO: update this to reflect contact angle
+    
+    # TODO: Implement contact angle processing workflow
+    # The following placeholder code was from PEDOT analyzer and needs to be updated:
+    # - Process the image using process_image() from ContactAngle_LEDdetect
+    # - Predict contact angle using predict_contact_angle() from ContactAngle_PredictCA_RegressionModel
+    # For now, we create placeholder metrics and results
+    metrics = RawMetrics(
+        experiment_id=experiment_id,
+        contact_angle_volume=input_data.contact_angle_volume,
+        s_red_px=input_data.s_red_px,
+        s_blue_px=input_data.s_blue_px,
+    )
+    results = PAMAMetrics(
+        experiment_id=experiment_id,
+        Predicted_Contact_Angle_deg=0.0,  # TODO: Calculate actual contact angle
+    )
 
     # insert the metrics as experiment results
     list_of_raw_metrics = [
@@ -207,13 +221,13 @@ def analyze(experiment_id: int, add_to_training_data: bool = False) -> MLTrainin
         experiment_id=results.experiment_id,
         ca_step_1_voltage=input_data.ca_step_1_voltage,
         pama_concentration=input_data.pama_concentration,
-        contact_angle=results.contact_angle
+        Predicted_Contact_Angle_deg=results.Predicted_Contact_Angle_deg,
     )
 
     # Add the new training data to the training file
     df_new_training_data = pd.DataFrame(
         {
-            "contact_angle": [ml_training_data.contact_angle],
+            "contact_angle": [ml_training_data.Predicted_Contact_Angle_deg],
             "voltage": [ml_training_data.ca_step_1_voltage],
             "concentration": [ml_training_data.pama_concentration],
         }

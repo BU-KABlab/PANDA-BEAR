@@ -150,16 +150,16 @@ def main():
 
         # Evaluate results
         if ocp_passed:
-            logger.info("✅ Electrode validation PASSED!")
+            logger.info("[PASS] Electrode validation PASSED!")
             logger.info(f"OCP voltage: {ocp_voltage:.4f}V")
             if -0.5 < ocp_voltage < 0.5:
-                logger.info("✅ OCP voltage is within expected range (-0.5V to 0.5V)")
+                logger.info("[PASS] OCP voltage is within expected range (-0.5V to 0.5V)")
             else:
                 logger.warning(
-                    "⚠️ OCP voltage is outside expected range (-0.5V to 0.5V)"
+                    "[WARNING] OCP voltage is outside expected range (-0.5V to 0.5V)"
                 )
         else:
-            logger.error("❌ Electrode validation FAILED!")
+            logger.error("[FAIL] Electrode validation FAILED!")
             logger.error(f"OCP voltage: {ocp_voltage:.4f}V")
 
     except Exception as e:

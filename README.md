@@ -1,18 +1,20 @@
-# PANDA-SDL
+# PANDA-BEAR
 
 ![Static Badge](https://img.shields.io/badge/Python-3.10-blue)
 ![Static Badge](https://img.shields.io/badge/OS-Windows-blue)
 ![Static Badge](https://img.shields.io/badge/OS-Debian-maroon)
 ![Static Badge](https://img.shields.io/badge/Code%20Style-Ruff-purple)
-[![Tests](https://github.com/BU-KABlab/panda-bear/actions/workflows/pytest.yml/badge.svg)](https://github.com/BU-KABlab/panda-bear/actions/workflows/pytest.yml)
+[![Tests](https://github.com/BU-KABlab/PANDA-BEAR/actions/workflows/pytest.yml/badge.svg)](https://github.com/BU-KABlab/PANDA-BEAR/actions/workflows/pytest.yml)
 
-**Polymer Analysis and Discovery Array (PANDA) - Self-Driving Lab (SDL)**: An automated system for high-throughput electrodeposition and functional characterization of polymer films.
+**Polymer Analysis aNd Discovery Array - Bayesian Experimentation for Autonomous Research (PANDA-BEAR)**: An automated system for high-throughput electrodeposition and functional characterization of polymer films.
 
-![PANDA-logo](https://github.com/BU-KABlab/PANDA-SDL/blob/2c1d91d546d233a9af88f7912e32f243253305e5/PANDAlogo.png)
+![PANDA-logo](PANDAlogo.png)
 
 ## Overview
 
-PANDA-SDL is a comprehensive automation framework for conducting high-throughput experiments on polymer thin films. The system integrates multiple laboratory instruments to automate the entire workflow from solution preparation through deposition, characterization, and analysis.
+PANDA-BEAR is a comprehensive automation framework for conducting high-throughput experiments on polymer thin films. The system integrates multiple laboratory instruments to automate the entire workflow from solution preparation through deposition, characterization, and analysis.
+
+> **Note**: PANDA-BEAR is the successor to PANDA-SDL, with enhanced support for the PANDA-film system and Bayesian optimization capabilities.
 
 ## Features
 
@@ -52,7 +54,7 @@ curl -sSf https://astral.sh/uv/install.sh | bash
 # Create virtual environment and install
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-uv pip install git+https://github.com/BU-KABlab/PANDA-SDL.git
+uv pip install git+https://github.com/BU-KABlab/PANDA-BEAR.git
 ```
 
 #### Using pip
@@ -63,7 +65,7 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install from repository
-pip install git+https://github.com/BU-KABlab/PANDA-SDL.git
+pip install git+https://github.com/BU-KABlab/PANDA-BEAR.git
 ```
 
 ### Step 2: Install Hardware-Specific Dependencies
@@ -98,6 +100,7 @@ This creates the SQLite database with the required schema.
    ```bash
    PANDA_SDL_CONFIG_PATH=/path/to/your/config.ini
    ```
+   > **Note**: The environment variable retains `SDL` naming for backwards compatibility with existing installations.
 
 2. Create a configuration file:
    - Copy `config.ini.example` or `src/panda_shared/config/default_config.ini`
@@ -116,7 +119,7 @@ pytest tests/unit/ -v
 
 ## Quick Start
 
-**New to PANDA-SDL?** Start here: [QUICK_START.md](QUICK_START.md)
+**New to PANDA-BEAR?** Start here: [QUICK_START.md](QUICK_START.md)
 
 **Quick commands:**
 ```bash
@@ -186,7 +189,6 @@ See the [Getting Started Guide](documentation/01%20Getting-Started.md) for detai
 - [Code Architecture](documentation/Code-Architecture.md)
 - [Example Scripts](examples/README.md) - Programmatic usage examples
 - [Contributing Guidelines](CONTRIBUTING.md)
-- [Changelog](CHANGELOG.md)
 
 ## Project Structure
 
@@ -254,16 +256,28 @@ For more help, please open an issue on GitHub.
 
 ## Citation
 
-If you use PANDA-SDL in your research, please cite:
+If you use PANDA-BEAR in your research, please cite the original PANDA publication:
 
 ```bibtex
-@software{panda_sdl,
-  title = {PANDA-SDL: Polymer Analysis and Discovery Array - Self-Driving Lab},
-  author = {Robben, Gregory and Quinn, Harley and Zhang, Zhaoyi and Gardner, Alan and Werner, Jörg G. and Brown, Keith},
+@article{quinn2024panda,
+  title = {PANDA: A self-driving lab for studying electrodeposited polymer films},
+  author = {Quinn, Harley and Robben, Gregory A. and Zheng, Zhaoyi and Gardner, Alan L. and Werner, Jörg G. and Brown, Keith A.},
+  journal = {Materials Horizons},
+  volume = {11},
+  pages = {5331--5340},
   year = {2024},
-  url = {https://github.com/BU-KABlab/PANDA-BEAR}
+  publisher = {Royal Society of Chemistry},
+  doi = {10.1039/D4MH00797B}
 }
 ```
+
+### Upcoming Publication
+
+A new publication describing the PANDA-film system and wetting analysis capabilities is forthcoming:
+
+> **"PANDA-film: an automated system for electrodeposition of polymer thin films and their wetting analysis"**
+> 
+> Quinn, Harley et al. (2026) — *Citation details will be added upon publication.*
 
 ## License
 

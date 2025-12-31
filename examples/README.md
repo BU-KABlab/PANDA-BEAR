@@ -1,6 +1,6 @@
 # Example Scripts
 
-This directory contains example scripts demonstrating how to use PANDA-SDL programmatically.
+This directory contains example scripts demonstrating how to use PANDA-BEAR programmatically.
 
 ## Quick Start Example
 
@@ -55,7 +55,7 @@ python examples/test_with_mocks.py
 ## Notes
 
 - All examples assume you have:
-  - Installed PANDA-SDL
+  - Installed PANDA-BEAR
   - Set up your configuration file
   - Initialized the database (`panda-db-setup`)
   - Created necessary directories (logs, data)

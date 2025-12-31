@@ -1,6 +1,6 @@
-# Contributing to PANDA-SDL
+# Contributing to PANDA-BEAR
 
-Guidelines and best practices for contributing to the PANDA-SDL project.
+Guidelines and best practices for contributing to the PANDA-BEAR project.
 
 **Navigation**: [Home](00-Home.md) | [Developer Guide](Developer-Guide.md) | Contributing | [Code Architecture](Code-Architecture.md)
 
@@ -19,7 +19,7 @@ We expect all contributors to follow our code of conduct, which promotes a respe
 
 ### Project Overview
 
-PANDA-SDL is an open-source self-driving lab for polymer analysis and discovery. Before contributing, familiarize yourself with:
+PANDA-BEAR is an open-source self-driving lab for polymer analysis and discovery. Before contributing, familiarize yourself with:
 
 - The [README.md](../README.md) file
 - The [Developer Guide](Developer-Guide.md)
@@ -195,8 +195,8 @@ After reviewing the contribution guidelines, you may want to:
 
 ## License
 
-By contributing to PANDA-SDL, you agree that your contributions will be licensed under the project's [GNU General Public License v2.0](../LICENSE).
+By contributing to PANDA-BEAR, you agree that your contributions will be licensed under the project's [GNU General Public License v2.0](../LICENSE).
 
 ## Acknowledgements
 
-We appreciate all contributors who help improve the PANDA-SDL project. Contributors will be acknowledged in the project documentation and release notes.
+We appreciate all contributors who help improve the PANDA-BEAR project. Contributors will be acknowledged in the project documentation and release notes.

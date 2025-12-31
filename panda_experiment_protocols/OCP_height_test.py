@@ -89,7 +89,7 @@ def dmfc_cv(
             elapsed = int(time.time() - start)
             mins, secs = divmod(elapsed, 60)
             # Send to Debug Console (stderr) and overwrite in place
-            sys.stderr.write(f"\r⏱ Elapsed: {mins:02d}:{secs:02d}")
+            sys.stderr.write(f"\rElapsed: {mins:02d}:{secs:02d}")
             sys.stderr.flush()
             time.sleep(1)
         # drop a newline when stopping so the next log starts cleanly

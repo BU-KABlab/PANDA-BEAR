@@ -172,7 +172,7 @@ docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
 [tool.uv.sources]
-panda_sdl = { workspace = true }
+panda_bear = { workspace = true }
 panda-lib = { workspace = true }
 hardpotato = { git = "https://github.com/BU-KABlab/hardpotato.git" }
 nesp-lib = { git = "https://github.com/BU-KABlab/nesp-lib-py.git" }

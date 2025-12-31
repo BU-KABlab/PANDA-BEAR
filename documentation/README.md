@@ -1,6 +1,6 @@
 # Documentation Directory
 
-This directory contains the complete PANDA-SDL documentation, organized for users and developers.
+This directory contains the complete PANDA-BEAR documentation, organized for users and developers.
 
 ## Starting Point
 

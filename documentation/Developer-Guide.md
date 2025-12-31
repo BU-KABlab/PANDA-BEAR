@@ -1,6 +1,6 @@
 # Developer Guide
 
-Essential information for developers contributing to or extending PANDA-SDL functionality.
+Essential information for developers contributing to or extending PANDA-BEAR functionality.
 
 **Navigation**: [Home](00-Home.md) | Developer Guide | [Code Architecture](Code-Architecture.md) | [Contributing](Contributing.md) | [API Reference](API-Reference.md)
 
@@ -14,7 +14,7 @@ Essential information for developers contributing to or extending PANDA-SDL func
 
 ## Project Architecture
 
-The PANDA-SDL system is organized into several key components:
+The PANDA-BEAR system is organized into several key components:
 
 ### Core Libraries
 
@@ -53,8 +53,8 @@ The PANDA-SDL system is organized into several key components:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/BU-KABlab/PANDA-SDL.git
-   cd PANDA-SDL
+   git clone https://github.com/BU-KABlab/PANDA-BEAR.git
+   cd PANDA-BEAR
    ```
 
 2. **Create a development environment**:
@@ -116,7 +116,7 @@ uv pip install ruff pytest pytest-cov
 
 ### Coding Standards
 
-The PANDA-SDL project follows these coding standards:
+The PANDA-BEAR project follows these coding standards:
 
 1. **PEP 8**: Follow the Python style guide
 2. **Type Hints**: Include type hints for function parameters and return values

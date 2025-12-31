@@ -1,12 +1,12 @@
 # Code Architecture
 
-Overview of the PANDA-SDL codebase architecture, including key components and their relationships. This document helps developers understand the system structure and navigate the codebase effectively.
+Overview of the PANDA-BEAR codebase architecture, including key components and their relationships. This document helps developers understand the system structure and navigate the codebase effectively.
 
 **Navigation**: [Home](00-Home.md) | [Developer Guide](Developer-Guide.md) | Code Architecture | [API Reference](API-Reference.md)
 
 ## High-Level Architecture
 
-The PANDA-SDL system is organized into several key components:
+The PANDA-BEAR system is organized into several key components:
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
@@ -167,7 +167,7 @@ Manages the definition, execution, and analysis of experiments:
 ## File Structure
 
 ```
-PANDA-SDL/
+PANDA-BEAR/
 ├── main.py                      # Main entry point
 ├── documentation/               # Documentation files
 ├── panda_experiment_analyzers/  # User-defined analyzers
@@ -185,7 +185,7 @@ PANDA-SDL/
 
 ## Design Patterns
 
-The PANDA-SDL codebase utilizes several design patterns:
+The PANDA-BEAR codebase utilizes several design patterns:
 
 ### 1. Facade Pattern
 
@@ -284,7 +284,7 @@ class MyExperimentType(ExperimentBase):
 
 ## Best Practices for Development
 
-When working with the PANDA-SDL codebase:
+When working with the PANDA-BEAR codebase:
 
 1. **Follow the existing patterns**: Maintain consistency with the existing architecture
 2. **Use abstraction layers**: Don't bypass the toolkit to access hardware directly
