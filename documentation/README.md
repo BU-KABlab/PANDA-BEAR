@@ -39,16 +39,6 @@ Begin with **[00-Home.md](00-Home.md)** for an overview and navigation to all do
 - **[documents/](documents/)** - Additional technical documents
 - **[images/](images/)** - Diagrams and illustrations
 
-## Documentation Standards
-
-All documentation follows these standards:
-
-- **Professional tone**: Technical, clear, and concise
-- **Consistent navigation**: Breadcrumb navigation at the top of each document
-- **Cross-referencing**: Links to related documents in "Next Steps" sections
-- **Detailed instructions**: Step-by-step procedures with sufficient detail
-- **Brief descriptions**: Concise explanations without unnecessary verbosity
-
 ## Finding Information
 
 - **New users**: Start with [00-Home.md](00-Home.md) and follow the Quick Start Path
