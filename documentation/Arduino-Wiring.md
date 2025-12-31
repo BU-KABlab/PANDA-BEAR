@@ -14,7 +14,7 @@ Circuit diagram showing OT2 Pipette control interface with the Arduino.
 
 ### Arduino Control System
 
-![Arduino Circuit Diagram](images/ArduinoCircuitDiagram.png)
+![Arduino Circuit Diagram](images/ArduinoCircuitDiagram_v3.png)
 
 Complete circuit diagram showing Arduino control of all system modules.
 
