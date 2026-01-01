@@ -80,7 +80,7 @@ port =
 firmware_path =
 
 [PIPETTE]
-pipette_type = OT2
+pipette_type = OT2P300
 
 
 [TOOLS]
