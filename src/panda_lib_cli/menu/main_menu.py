@@ -861,7 +861,7 @@ def check_essential_labware():
             insert_new_pipette()
             current_pipette = select_pipette_status()
             print(
-                f"New pipette inserted: {current_pipette.id}. Refresh menue to see updated status."
+                f"New pipette inserted: {current_pipette.id}. Refresh menu to see updated status."
             )
         else:
             print("No pipette found.")
