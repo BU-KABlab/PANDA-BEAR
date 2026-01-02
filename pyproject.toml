@@ -48,7 +48,6 @@ dependencies = [
     "packaging==24.1",
     "pandas==2.2.2",
     "pillow==10.4.0",
-    # "pip>=25.3",  # REMOVED: Package manager, not a dependency
     "pre-commit>=4.2.0",
     "PuLP==2.9.0",
     "pydantic==2.9.1",
@@ -70,34 +69,30 @@ dependencies = [
     "slack_sdk>=3.4.0",
     "smmap==5.0.1",
     "SQLAlchemy==2.0.34",
-    "sympy==1.13.2",
+    "sympy>=1.13.3",
     "threadpoolctl==3.5.0",
     "tifffile==2024.8.30",
     "tomli==2.0.1",
-    "torch>=2.7.1-rc1",
+    "torch>=2.9",
     "torchaudio>=2.4.0",
     "torchvision>=0.19.0",
     "tqdm==4.67.1",
     "typeguard==4.3.0",
     "typing_extensions==4.12.2",
     "tzdata==2024.1",
-    # NOTE: pip and uv are package managers, not library dependencies
-    # They should be installed separately, not as dependencies
-    # "pip>=25.3",  # REMOVED: Package manager, not a dependency
-    # "uv>=0.8.6",  # REMOVED: Package manager, not a dependency
     "simple-pyspin==0.1.1",
     "websocket-client==1.8.0",
     # UNCOMMENT THE LINE BELOW WHEN YOU HAVE THE SPINNKER WHL FILE 
     # "spinnaker-python",
     "alembic",
-    "mako"
+    "mako",
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/BU-KABlab/PANDA-BEAR"
 "Bug Tracker" = "https://github.com/BU-KABlab/PANDA-BEAR/issues"
 [project.optional-dependencies]
-flir = ["simple-pyspin==0.1.1"]                           
+flir = ["simple-pyspin==0.1.1"]
 syringe_pump = ["nesp_lib>=0.2.0"]
 dev = ["pytest>=8.3.4", "ruff>=0.8.3", "mypy>=1.8.0", "black>=24.3.0"]
 

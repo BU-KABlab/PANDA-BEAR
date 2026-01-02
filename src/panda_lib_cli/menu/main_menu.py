@@ -860,6 +860,9 @@ def check_essential_labware():
         if new_pipette == "y":
             insert_new_pipette()
             current_pipette = select_pipette_status()
+            print(
+                f"New pipette inserted: {current_pipette.id}. Refresh menu to see updated status."
+            )
         else:
             print("No pipette found.")
             missing.append("pipette")
@@ -888,10 +891,16 @@ def main():
                 num, p_type, new_wells = 0, 0, 0
             try:
                 current_pipette = select_pipette_status()
+                remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
             except (AttributeError, ValueError):
-                # insert_new_pipette() # TODO: Remove this before next campaign
-                current_pipette = select_pipette_status()
-            remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
+                # If an attribute or ValueError occurs this means that there is no cataloged pipette for the unit
+                print(
+                    "No pipette found. Please insert a new pipette or update the unit's database."
+                )
+                input("Press Enter to continue...")
+                current_pipette = None
+                remaining_uses = 0
+
             exp_loop_status = get_process_status(
                 status_queue, ProcessIDs.CONTROL_LOOP, exp_loop_status
             )
@@ -914,7 +923,7 @@ DB: {get_active_db()}
 Project ID: {prj_id}
 ====================================================================================================
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
-The current pipette id is {current_pipette.id} and has {remaining_uses} uses left.
+The current pipette id is {current_pipette.id if current_pipette is not None else "UNKNOWN"} and has {remaining_uses} uses left.
 The queue has {count_queue_length()} experiments.
 Project {prj_id} has {count_queue_length(prj_id)} experiments.
 Process Status:
