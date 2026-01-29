@@ -39,7 +39,7 @@ if TESTING:
             cv_parameters as gamry_cv_parameters,
             potentiostat_ocp_parameters as gamry_potentiostat_ocp_parameters,
         )
-    elif PSTAT == "emstat":
+    elif PSTAT in ("emstat", "emstat4_lr"):
         import panda_lib.hardware.emstat_potentiostat.emstat_control_mock as echem
         from panda_lib.hardware.emstat_potentiostat.emstat_control_mock import (
             chrono_parameters as emstat_chrono_parameters,
@@ -49,7 +49,7 @@ if TESTING:
 
     else:
         raise ValueError(
-            f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+            f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry', 'emstat', and 'emstat4_lr'."
         )
 else:
     if PSTAT == "gamry":
@@ -72,7 +72,7 @@ else:
                 cv_parameters as gamry_cv_parameters,
                 potentiostat_ocp_parameters as gamry_potentiostat_ocp_parameters,
             )
-    elif PSTAT == "emstat":
+    elif PSTAT in ("emstat", "emstat4_lr"):
         import panda_lib.hardware.emstat_potentiostat.emstat_control as echem
         from panda_lib.hardware.emstat_potentiostat.emstat_control import (
             chrono_parameters as emstat_chrono_parameters,
@@ -152,12 +152,12 @@ def open_circuit_potential(
         if PSTAT == "gamry":
             params: gamry_potentiostat_ocp_parameters
             params = gamry_potentiostat_ocp_parameters
-        elif PSTAT == "emstat":
+        elif PSTAT in ("emstat", "emstat4_lr"):
             params: emstat_potentiostat_ocp_parameters
             params = emstat_potentiostat_ocp_parameters
         else:
             raise ValueError(
-                f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+                f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry', 'emstat', and 'emstat4_lr'."
             )
         
 
@@ -310,12 +310,12 @@ def perform_chronoamperometry(
         if PSTAT == "gamry":
             params: gamry_potentiostat_ocp_parameters
             params = gamry_potentiostat_ocp_parameters
-        elif PSTAT == "emstat":
+        elif PSTAT in ("emstat", "emstat4_lr"):
             params: emstat_potentiostat_ocp_parameters
             params = emstat_potentiostat_ocp_parameters
         else:
             raise ValueError(
-                f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+                f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry', 'emstat', and 'emstat4_lr'."
             )
         
 
@@ -368,7 +368,7 @@ def perform_chronoamperometry(
                         CAt2=experiment.ca_step_2_time,
                         CAsamplerate=experiment.ca_sample_period,
                     )  # CA
-                elif PSTAT == "emstat":
+                elif PSTAT in ("emstat", "emstat4_lr"):
                     chrono_params = emstat_chrono_parameters(
                         Estep=experiment.ca_step_1_voltage,
                         dt=experiment.ca_sample_period,
@@ -465,12 +465,12 @@ def pulsed_chronoamperometry(
         if PSTAT == "gamry":
             params: gamry_potentiostat_ocp_parameters
             params = gamry_potentiostat_ocp_parameters
-        elif PSTAT == "emstat":
+        elif PSTAT in ("emstat", "emstat4_lr"):
             params: emstat_potentiostat_ocp_parameters
             params = emstat_potentiostat_ocp_parameters
         else:
             raise ValueError(
-                f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+                f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry', 'emstat', and 'emstat4_lr'."
             )
         pstat.OCP(params)  # OCP
         pstat.activecheck()
@@ -516,7 +516,7 @@ def pulsed_chronoamperometry(
                         CAt2=experiment.ca_step_2_time,
                         CAsamplerate=experiment.ca_sample_period,
                     )  # CA
-                elif PSTAT == "emstat":
+                elif PSTAT in ("emstat", "emstat4_lr"):
                     chrono_params = emstat_chrono_parameters(
                         Estep=experiment.ca_step_1_voltage,
                         dt=experiment.ca_sample_period,
@@ -617,12 +617,12 @@ def perform_cyclic_voltammetry(
             if PSTAT == "gamry":
                 params: gamry_potentiostat_ocp_parameters
                 params = gamry_potentiostat_ocp_parameters
-            elif PSTAT == "emstat":
+            elif PSTAT in ("emstat", "emstat4_lr"):
                 params: emstat_potentiostat_ocp_parameters
                 params = emstat_potentiostat_ocp_parameters
             else:
                 raise ValueError(
-                    f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+                    f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry', 'emstat', and 'emstat4_lr'."
                 )
 
             pstat.OCP(params)  # OCP
@@ -687,7 +687,7 @@ def perform_cyclic_voltammetry(
                     CVsr3=experiment.cv_scan_rate_cycle_3,
                     CVcycle=experiment.cv_cycle_count,
                 )
-            elif PSTAT == "emstat":
+            elif PSTAT in ("emstat", "emstat4_lr"):
                 cv_params = {
                     "Eini":  float(experiment.cv_initial_voltage),
                     "Ev1":   float(experiment.cv_first_anodic_peak),
@@ -699,7 +699,7 @@ def perform_cyclic_voltammetry(
                 }
             else:
                 raise ValueError(
-                    f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry' and 'emstat'."
+                    f"Unsupported potentiostat model: {PSTAT}. Supported models are 'gamry', 'emstat', and 'emstat4_lr'."
                 )
 
         try:

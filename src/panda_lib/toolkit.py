@@ -544,15 +544,24 @@ def test_instrument_connections(
         "palmsense",
         "emstat",
         "pico",
+        "emstatpico",
         "emstat4slr",
         "emstat4shr",
+        "emstat4_lr",
+        "emstat4_hr",
     ]:
         try:
             import hardpotato as hp
 
+            from panda_shared.config import read_data_dir
+
+            # emstat_control uses "emstat4_lr" for EmStat4 LR; map legacy names
             model = potentiostat_model.lower()
-            # Write the path where the data and plots are going to be automatically saved:
-            connection = hp.potentiostat.Setup(model, folder=None, verbose=0)
+            if model in ("emstat", "pico", "emstatpico"):
+                model = "emstat4_lr"
+            folder = read_data_dir()
+            setup = hp.potentiostat.Setup(model, None, folder, verbose=0)
+            connection = setup.check_connection()
             if connection:
                 logger.debug("Connected to %s Potentiostat", model)
                 print("Potentiostat connected                        ", flush=True)
