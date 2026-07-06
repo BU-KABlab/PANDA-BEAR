@@ -120,42 +120,69 @@ class Mill:
         self.auto_home = True
         self.active_connection = False
         self.tool_manager: ToolManager = ToolManager()
+        # Deck-origin (CubOS) frame: the reachable envelope runs from the
+        # front-left-bottom origin (0,0,0) to the positive max corner
+        # (x_max, y_max, z_max) read from $130/$131/$132.
+        self.working_volume_min: Coordinates = Coordinates(0.0, 0.0, 0.0)
         self.working_volume: Coordinates = self.read_working_volume()
-        self.safe_z_height = -10.0  # TODO: In the PANDA wrapper, set the safe floor height to the max height of any active object on the mill + the pipette length
-        self.max_z_height = 0.0
+        self.max_z_height = self.working_volume.z
+        self.safe_z_height = self.max_z_height - 10.0  # TODO: In the PANDA wrapper, set the safe floor height to the max height of any active object on the mill + the pipette length
         self.command_logger = set_up_command_logger(self.logger_location)
         self.interactive_mode = False
 
     def read_working_volume(self):
-        """Checks the mill config for soft limits to be enabled, and then if so check the x, y, and z max travel limits"""
-        working_volume: Coordinates = Coordinates(0, 0, 0)
-        # multiplier = 1  # Used for flipping the sign of the working volume depending on the working volume
-        if int(self.config["$20"]) == 1:
-            self.logger.info("Soft limits are enabled in the mill config")
-            # axis_conf_setting_value = int(self.config["$3"])
-            # axis_conf = axis_conf_table[axis_conf_setting_value]
-            xmultiplier = -1  # if axis_conf["reverse_x"] else 1
-            ymultiplier = -1  # if axis_conf["reverse_y"] else 1
-            zmultiplier = -1  # if axis_conf["reverse_z"] else 1
-            working_volume.x = float(self.config["$130"]) * xmultiplier
-            working_volume.y = float(self.config["$131"]) * ymultiplier
-            working_volume.z = float(self.config["$132"]) * zmultiplier
-        else:
+        """Return the max corner of the reachable envelope in the deck frame.
+
+        In the CubOS deck-origin frame the origin is front-left-bottom (0,0,0)
+        and every reachable coordinate is positive, so the envelope max is just
+        the axis travel from $130/$131/$132 (no sign flip). This is the constant
+        translation of the old machine frame, not an axis inversion.
+        """
+        if int(self.config.get("$20", 0)) != 1:
             self.logger.warning("Soft limits are not enabled in the mill config")
-            self.logger.warning("Using default working volume")
-            working_volume = Coordinates(x=-415.0, y=-300.0, z=-200.0)
-        return working_volume
+        try:
+            return Coordinates(
+                x=float(self.config["$130"]),
+                y=float(self.config["$131"]),
+                z=float(self.config["$132"]),
+            )
+        except (KeyError, ValueError):
+            self.logger.warning(
+                "Max travel ($130/$131/$132) missing from config; using defaults"
+            )
+            return Coordinates(x=401.0, y=301.0, z=85.0)
 
     def change_logging_level(self, level):
         """Change the logging level"""
         self.logger.setLevel(level)
 
     def homing_sequence(self):
-        """Home the mill, set the feed rate, and clear the buffers"""
+        """Home the mill, set the deck work offset, feed rate, and clear buffers"""
         self.home()
+        self.set_deck_work_offset()
         self.set_feed_rate(5000)  # Set feed rate to 2000
         self.clear_buffers()
         self.check_max_z_height()
+
+    def set_deck_work_offset(self):
+        """Establish the CubOS deck-origin work frame (G54) after homing.
+
+        PANDA homes to the positive corner (back-right-top). In the deck frame
+        that physical corner is (x_max, y_max, z_max), so we pin the current
+        position's work coordinates there with ``G10 L20 P1``. The controller
+        then reports WPos in the front-left-bottom, all-positive deck frame
+        (front-left-bottom = 0,0,0). G54 persists in GRBL EEPROM, so PANDA and
+        CubOS converge on the same work offset when they share the gantry.
+        """
+        self.set_grbl_setting("10", "0")  # report WPos, not MPos
+        self.config["$10"] = "0"
+        self.execute_command("G90")  # absolute distances
+        self.execute_command("G54")  # activate saved work origin
+        self.execute_command("G92.1")  # clear any transient G92 offset
+        self.execute_command(
+            f"G10 L20 P1 X{self.working_volume.x} "
+            f"Y{self.working_volume.y} Z{self.working_volume.z}"
+        )
 
     def check_max_z_height(self):
         """
@@ -325,7 +352,7 @@ class Mill:
         # Update the mill config file with the settings from the mill
         self.read_mill_config()
         self.write_mill_config_file("_configuration.json")
-        self.read_working_volume()
+        self.working_volume = self.read_working_volume()
 
         self.check_for_alarm_state()
         self.clear_buffers()
@@ -724,7 +751,6 @@ class Mill:
             raise ValueError("Invalid status mode")
 
         max_attempts = 3
-        homing_pull_off = float(self.config["$27"])
 
         pattern = wpos_pattern if status_mode in [0, 2] else mpos_pattern
         coord_type = "WPos" if status_mode in [0, 2] else "MPos"
@@ -735,10 +761,6 @@ class Mill:
                 x_coord = round(float(match.group(1)), 3)
                 y_coord = round(float(match.group(2)), 3)
                 z_coord = round(float(match.group(3)), 3)
-                if coord_type == "MPos":
-                    x_coord += homing_pull_off
-                    y_coord += homing_pull_off
-                    z_coord += homing_pull_off
                 self.logger.info(
                     "%s coordinates: X = %s, Y = %s, Z = %s",
                     coord_type,
@@ -1027,7 +1049,8 @@ class Mill:
             x=goto.x + offsets.x,
             y=goto.y + offsets.y,
             z=max(
-                self.working_volume.z + 3, min(goto.z + offsets.z, self.max_z_height)
+                self.working_volume_min.z + 3,
+                min(goto.z + offsets.z, self.max_z_height),
             ),
         )
 
@@ -1040,18 +1063,15 @@ class Mill:
         )
 
     def _validate_target_coordinates(self, target_coordinates: Coordinates):
-        if (
-            not self.working_volume.x <= target_coordinates.x <= 0
-        ):  # TODO remove the <=0 check after verifying that new offsets work
-            # TODO move to overall travel from 0 to working volume as the check
+        # Deck frame: every reachable coordinate lies between the front-left-bottom
+        # origin (working_volume_min) and the positive max corner (working_volume).
+        if not self.working_volume_min.x <= target_coordinates.x <= self.working_volume.x:
             self.logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
-        if not self.working_volume.y <= target_coordinates.y <= 0:
-            # If the target y is not between the working volume and 0, raise an error
+        if not self.working_volume_min.y <= target_coordinates.y <= self.working_volume.y:
             self.logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if not self.working_volume.z <= target_coordinates.z <= self.max_z_height:
-            # If the target z is not between the working volume and the max z height, raise an error
+        if not self.working_volume_min.z <= target_coordinates.z <= self.max_z_height:
             self.logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 

@@ -101,7 +101,7 @@ class TipService:
         self, rack_id: int, tip_id: str
     ) -> tuple[float, float, float]:
         with self.session_maker() as session:
-            return self.compute_tip_xy(session, rack_id, tip_id)
+            return self.compute_tip_xy(rack_id, tip_id, session)
 
     def get_first_unused_tip(self, rack_id: int) -> Optional[TipReadModel]:
         """

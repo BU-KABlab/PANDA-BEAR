@@ -101,7 +101,7 @@ def setup_test_environment() -> Tuple[str, str, Dict[str, str]]:
 
     if not config.has_section("PIPETTE"):
         config.add_section("PIPETTE")
-    config.set("PIPETTE", "pipette_type", "OT2")
+    config.set("PIPETTE", "pipette_type", "OT2P300")
 
     # Write the config file
     with open(config_path, "w") as f:

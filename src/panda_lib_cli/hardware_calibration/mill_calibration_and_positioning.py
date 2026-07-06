@@ -494,7 +494,9 @@ def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwa
             test_bottom = well.bottom
         else:
             test_bottom = input_validation(
-                "Enter a bottom Z-coordinate to test: ", float, (-200, 0)
+                "Enter a bottom Z-coordinate to test: ",
+                float,
+                (0, mill.working_volume.z),
             )
             if test_bottom is None:
                 test_bottom = well.bottom
@@ -517,7 +519,9 @@ def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwa
                 break
 
             test_bottom = input_validation(
-                "Enter a new bottom Z-coordinate to test: ", float, (-200, 0)
+                "Enter a new bottom Z-coordinate to test: ",
+                float,
+                (0, mill.working_volume.z),
             )
 
             if test_bottom is None:
@@ -960,7 +964,7 @@ def calibrate_vial_holders(
                 new_z = input_validation(
                     "Enter new Z coordinate or enter for no change: ",
                     float,
-                    (-200, 0),
+                    (0, mill.working_volume.z),
                     allow_blank=True,
                     default=original_bottom,
                 )
